@@ -1,0 +1,22 @@
+[
+  {
+    "Classification": "spark",
+    "Properties": {
+      "maximizeResourceAllocation": "true"
+    }
+  },
+  {
+    "Classification": "spark-defaults",
+    "Properties": {
+      "spark.dynamicAllocation.enabled": "false",
+      "spark.network.timeout": "1000000"
+    }
+  },
+  {
+    "Classification": "spark-hive-site",
+    "Properties": {
+      "hive.metastore.client.factory.class": "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
+    }
+  }
+]
+
