@@ -50,7 +50,7 @@ object Annotations {
         firstAs("hgvsg"),
         firstAs("variant_class")
       )
-      .select($"*", af, lit(studyId) as "study_id", lit(releaseId) as "release_id")
+      .select($"*", calculated_af, lit(studyId) as "study_id", lit(releaseId) as "release_id")
     annotations
   }
 }

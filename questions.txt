@@ -1,3 +1,11 @@
 - The VCF reader uses the 0-start, half-open (zero-based) coordinate system. Is it OK?
-- For now we removed multiallelic
+- For now we removed multiallelic : split by multiallelic is broken in version 0.2 of Glow. Should be fixed in next version
 - Consistency for field name : camel case, snake case?
+- Use vcf headers to calculate dynamicallly indices in annotations array
+- Annotation table : Validate zygocity count are OK
+- Occurence Table : Add father and mother genotype for each occurence. Ask to Allison or Adam if it's OK regarding the consent codes
+- Consequence Table : add columns aa_change and cdnAchange. These columns should be also used in the groupby key for grouping transcripts
+- Merge tables from previous release
+- Produce tables for clinical data (participant, biospecimen, ...)
+
+

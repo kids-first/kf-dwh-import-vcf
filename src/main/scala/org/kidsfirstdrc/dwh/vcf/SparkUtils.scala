@@ -2,7 +2,7 @@ package org.kidsfirstdrc.dwh.vcf
 
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{DecimalType, IntegerType}
+import org.apache.spark.sql.types.{ArrayType, DecimalType, IntegerType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 object SparkUtils {
@@ -19,16 +19,34 @@ object SparkUtils {
     s"${table}_${studyId.toLowerCase}_${releaseId.toLowerCase}"
   }
 
+  def colFromArrayOrField(df: DataFrame, colName: String): Column = {
+    df.schema(colName).dataType match {
+      case ArrayType(_, _) => df(colName)(0)
+      case _ => df(colName)
+    }
+  }
+
   def firstAs(c: String): Column = first(col(c)) as c
 
   object columns {
     val chromosome: Column = ltrim(col("contigName"), "chr") as "chromosome"
     val reference: Column = col("referenceAllele") as "reference"
     val alternate: Column = col("alternateAlleles")(0) as "alternate"
-    val af: Column = col("ac").divide(col("an")).cast(DecimalType(8, 8)) as "af"
     val name: Column = col("names")(0) as "name"
+    val calculated_af: Column = col("ac").divide(col("an")).cast(DecimalType(8, 8)) as "af"
+
     val ac: Column = col("INFO_AC")(0) as "ac"
+    val af: Column = col("INFO_AF")(0) as "af"
     val an: Column = col("INFO_AN") as "an"
+
+    val afr_af: Column = col("INFO_AFR_AF")(0) as "afr_af"
+    val eur_af: Column = col("INFO_EUR_AF")(0) as "eur_af"
+    val sas_af: Column = col("INFO_SAS_AF")(0) as "sas_af"
+    val amr_af: Column = col("INFO_AMR_AF")(0) as "amr_af"
+    val eas_af: Column = col("INFO_EAS_AF")(0) as "eas_af"
+
+    val dp: Column = col("INFO_DP") as "dp"
+
     val countHomozygotesUDF: UserDefinedFunction = udf { calls: Seq[Seq[Int]] => calls.map(_.sum).count(_ == 2) }
     val homozygotes: Column = countHomozygotesUDF(col("genotypes.calls")) as "homozygotes"
     val countHeterozygotesUDF: UserDefinedFunction = udf { calls: Seq[Seq[Int]] => calls.map(_.sum).count(_ == 1) }
@@ -53,6 +71,5 @@ object SparkUtils {
       col("reference"),
       col("alternate"))
   }
-
 
 }

@@ -6,5 +6,5 @@ spark.read.parquet("s3://kf-variant-parquet-prd/participantcentric").withColumn(
   .write
   .partitionBy("study_id", "release_id")
   .format("parquet")
-  .option("path","s3://kf-variant-parquet-prd/biospecimens")
-  .saveAsTable("variant.biospecimens")
+  .option("path","s3://kf-variant-parquet-prd/biospecimens/biospecimens_sd_9pyzahhe_re_123456")
+  .saveAsTable("variant.biospecimens_sd_9pyzahhe_re_123456")

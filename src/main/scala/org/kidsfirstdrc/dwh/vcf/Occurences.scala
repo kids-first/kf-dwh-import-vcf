@@ -2,6 +2,7 @@ package org.kidsfirstdrc.dwh.vcf
 
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.ArrayType
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
 import org.kidsfirstdrc.dwh.vcf.SparkUtils._
 import org.kidsfirstdrc.dwh.vcf.SparkUtils.columns._
@@ -33,8 +34,8 @@ object Occurences {
 
     val biospecimens = broadcast(
       spark
-      .table(tableName("biospecimens", studyId, releaseId))
-      .select("biospecimen_id", "participant_id", "family_id", "dbgap_consent_code")
+        .table(tableName("biospecimens", studyId, releaseId))
+        .select("biospecimen_id", "participant_id", "family_id", "dbgap_consent_code")
     )
 
     occurences
@@ -76,7 +77,7 @@ object Occurences {
       an,
       $"INFO_culprit" as "culprit",
       $"INFO_SOR" as "sor",
-      $"INFO_ReadPosRankSum"(0) as "read_pos_rank_sum",
+      $"INFO_ReadPosRankSum" as "read_pos_rank_sum",
       $"INFO_InbreedingCoeff" as "inbreeding_coeff",
       $"INFO_PG" as "pg",
       $"INFO_AF"(0) as "af",
@@ -84,16 +85,16 @@ object Occurences {
       $"INFO_DP" as "dp",
       $"INFO_POSITIVE_TRAIN_SITE" as "positive_train_site",
       $"INFO_VQSLOD" as "vqslod",
-      $"INFO_ClippingRankSum"(0) as "clipping_rank_sum",
-      $"INFO_RAW_MQ"(0) as "raw_mq",
-      $"INFO_BaseQRankSum"(0) as "base_qrank_sum",
+      $"INFO_ClippingRankSum" as "clipping_rank_sum",
+      $"INFO_RAW_MQ" as "raw_mq",
+      $"INFO_BaseQRankSum" as "base_qrank_sum",
       $"INFO_MLEAF"(0) as "mleaf",
       $"INFO_MLEAC"(0) as "mleac",
       $"INFO_MQ" as "mq",
       $"INFO_QD" as "qd",
       $"INFO_END" as "end",
       $"INFO_DB" as "db",
-      $"INFO_MQRankSum"(0) as "m_qrank_sum",
+      $"INFO_MQRankSum" as "m_qrank_sum",
       $"INFO_hiConfDeNovo" as "hiconfdenovo",
       $"INFO_ExcessHet" as "excess_het"
     ) as "family"
