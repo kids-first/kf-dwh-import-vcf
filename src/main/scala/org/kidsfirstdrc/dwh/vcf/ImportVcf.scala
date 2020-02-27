@@ -4,12 +4,12 @@ import org.apache.spark.sql.SparkSession
 
 object ImportVcf extends App {
 
+  val Array(studyId, releaseId, input, output, runType) = args
+
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
     .enableHiveSupport()
-    .appName("VCF Import to DWH").getOrCreate()
-
-  val Array(studyId, releaseId, input, output, runType) = args
+    .appName(s"Import $runType for $studyId - $releaseId").getOrCreate()
 
   run(studyId, releaseId, input, output, runType)
 

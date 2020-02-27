@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 study_ids=$1
 job=${2:-"all"}
 instance_type=${3:-"m5d.4xlarge"}
@@ -14,7 +14,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --release-label emr-5.28.0 \
 --log-uri 's3n://aws-logs-538745987955-us-east-1/elasticmapreduce/' \
 --steps "${steps}" \
---name "Variant Import to DWH - Join ${job} - Studies ${study_ids} - Release ${release_id}" \
+--name "Variant Join ${job} - Studies ${study_ids} - Release ${release_id}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \

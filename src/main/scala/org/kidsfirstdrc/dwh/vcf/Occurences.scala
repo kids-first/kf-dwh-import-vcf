@@ -2,7 +2,6 @@ package org.kidsfirstdrc.dwh.vcf
 
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.ArrayType
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
@@ -10,7 +9,7 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 object Occurences {
 
   def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
-    write(build(studyId, releaseId, input), s"$output/occurences", studyId, releaseId)
+    write(build(studyId, releaseId, input), output, studyId, releaseId)
   }
 
   def build(studyId: String, releaseId: String, input: String)(implicit spark: SparkSession): DataFrame = {
@@ -62,7 +61,7 @@ object Occurences {
       .write.mode(SaveMode.Overwrite)
       .partitionBy("study_id", "release_id", "dbgap_consent_code", "chromosome")
       .format("parquet")
-      .option("path", s"$output/$tableOccurence")
+      .option("path", s"$output/occurences/$tableOccurence")
       .saveAsTable(tableOccurence)
   }
 
