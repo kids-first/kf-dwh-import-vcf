@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.vcf.util
+package org.kidsfirstdrc.dwh.testutils
 
 object Model {
 

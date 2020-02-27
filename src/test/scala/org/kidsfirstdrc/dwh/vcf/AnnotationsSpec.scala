@@ -1,10 +1,10 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import org.kidsfirstdrc.dwh.vcf.util.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.kidsfirstdrc.dwh.vcf.util.Model._
+import org.kidsfirstdrc.dwh.testutils.Model._
 
 class AnnotationsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 

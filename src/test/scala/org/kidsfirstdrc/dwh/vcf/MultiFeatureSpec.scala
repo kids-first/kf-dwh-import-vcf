@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import io.projectglow.Glow
-import org.kidsfirstdrc.dwh.vcf.util.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers

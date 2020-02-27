@@ -4,8 +4,8 @@ import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.ArrayType
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
-import org.kidsfirstdrc.dwh.vcf.SparkUtils._
-import org.kidsfirstdrc.dwh.vcf.SparkUtils.columns._
+import org.kidsfirstdrc.dwh.utils.SparkUtils._
+import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 object Occurences {
 

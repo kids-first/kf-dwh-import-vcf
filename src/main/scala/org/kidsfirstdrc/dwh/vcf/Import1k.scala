@@ -1,8 +1,8 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import org.apache.spark.sql.{SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.vcf.SparkUtils._
-import org.kidsfirstdrc.dwh.vcf.SparkUtils.columns._
+import org.kidsfirstdrc.dwh.utils.SparkUtils._
+import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 object Import1k extends App {
 

@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.vcf
+package org.kidsfirstdrc.dwh.utils
 
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._

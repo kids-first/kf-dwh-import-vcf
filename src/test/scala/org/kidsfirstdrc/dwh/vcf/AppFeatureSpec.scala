@@ -4,8 +4,8 @@ import java.io.File
 
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.SaveMode
-import org.kidsfirstdrc.dwh.vcf.util.Model._
-import org.kidsfirstdrc.dwh.vcf.util.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.Model._
+import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
@@ -109,6 +109,9 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
 
     }
   }
+
+
+
 
 }
 

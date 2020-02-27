@@ -2,8 +2,8 @@ package org.kidsfirstdrc.dwh.vcf
 
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.sql.functions._
-import org.kidsfirstdrc.dwh.vcf.SparkUtils._
-import org.kidsfirstdrc.dwh.vcf.SparkUtils.columns._
+import org.kidsfirstdrc.dwh.utils.SparkUtils._
+import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 object ImportClinVar extends App {
 
@@ -35,7 +35,7 @@ object ImportClinVar extends App {
       $"INFO_CLNSIG"(0) as "clin_sig",
       $"INFO_RS"(0) as "rs",
       $"INFO_DBVARID"(0) as "rs",
-      $"INFO_CLNHGVS"(0) as "cln_hgvs",
+      $"INFO_CLNHGVS"(0) as "cln_hgvs"
     )
     .withColumn("gene",$"gene_info"(0))
     .withColumn("gene_id",$"gene_info"(1))

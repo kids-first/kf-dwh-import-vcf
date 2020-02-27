@@ -1,9 +1,9 @@
-package org.kidsfirstdrc.dwh.vcf
+package org.kidsfirstdrc.dwh.utils
 
-import org.kidsfirstdrc.dwh.vcf.util.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.Model._
+import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.kidsfirstdrc.dwh.vcf.util.Model._
 
 case class ACInput(ac: Long, an: Long)
 
@@ -11,7 +11,7 @@ case class ACOutput(af: BigDecimal)
 
 class SparkUtilsSpec extends AnyFlatSpec with WithSparkSession with Matchers {
 
-  import SparkUtils.columns._
+  import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
   import spark.implicits._
 
   "af" should "return a a new column named ac with ratio of columns ac and an" in {
