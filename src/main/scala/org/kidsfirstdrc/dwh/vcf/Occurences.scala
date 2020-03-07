@@ -14,7 +14,6 @@ object Occurences {
 
   def build(studyId: String, releaseId: String, input: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-
     val occurences = vcf(input)
       .withColumn("genotype", explode($"genotypes"))
       .select(
@@ -24,12 +23,19 @@ object Occurences {
         reference,
         alternate,
         name,
+        firstAnn,
         $"genotype.sampleId" as "biospecimen_id",
         $"genotype",
+        array_contains($"genotype.calls", 1) as "has_alt",
         familyColumn,
+        is_multi_allelic,
+        old_multi_allelic,
         lit(studyId) as "study_id",
         lit(releaseId) as "release_id"
       )
+      .withColumn("hgvsg", hgvsg)
+      .withColumn("variant_class", variant_class)
+      .drop("annotation")
 
     val biospecimens = broadcast(
       spark
@@ -45,7 +51,6 @@ object Occurences {
   def write(df: DataFrame, output: String, studyId: String, releaseId: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
     val tableOccurence = tableName("occurences", studyId, releaseId)
-    df.printSchema()
     df
       .repartition($"dbgap_consent_code", $"chromosome")
       .withColumn("bucket",
@@ -69,7 +74,7 @@ object Occurences {
     import spark.implicits._
     struct(
       $"qual" as "quality",
-      $"filters"(0) as "filter",
+      //$"filters"(0) as "filter",
       $"INFO_loConfDeNovo" as "lo_conf_de_novo",
       $"INFO_NEGATIVE_TRAIN_SITE" as "negative_train_site",
       ac,

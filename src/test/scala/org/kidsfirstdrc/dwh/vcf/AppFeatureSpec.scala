@@ -46,6 +46,7 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
       ImportVcf.run(studyId, releaseId, input, output)
 
       Then("Table occurences_sd_123456_re_abcdef should contain rows for the given study and release")
+      spark.table("variant.occurences_sd_123456_re_abcdef").show(false)
       val occurences = spark.table("variant.occurences_sd_123456_re_abcdef")
         .select(
           "chromosome",
@@ -68,12 +69,19 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
         OccurencesOutput("1", 10438, 10440, "AC", "A", Some("rs112766696"), "BS_IJKL8901", "PT_000003", Some("FA_000001"), studyId, releaseId, "1"),
         OccurencesOutput("1", 10559, 10560, "C", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
         OccurencesOutput("1", 10559, 10560, "C", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
-        OccurencesOutput("1", 10559, 10560, "C", "G", None, "BS_IJKL8901", "PT_000003", Some("FA_000001"), studyId, releaseId, "1")
+        OccurencesOutput("1", 10559, 10560, "C", "G", None, "BS_IJKL8901", "PT_000003", Some("FA_000001"), studyId, releaseId, "1"),
+        //Multi-Allelic
+        OccurencesOutput("1", 15273, 15274, "A", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
+        OccurencesOutput("1", 15273, 15274, "A", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
+        OccurencesOutput("1", 15273, 15274, "A", "G", None, "BS_IJKL8901", "PT_000003", Some("FA_000001"), studyId, releaseId, "1"),
+        OccurencesOutput("1", 15273, 15274, "A", "T", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
+        OccurencesOutput("1", 15273, 15274, "A", "T", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
+        OccurencesOutput("1", 15273, 15274, "A", "T", None, "BS_IJKL8901", "PT_000003", Some("FA_000001"), studyId, releaseId, "1")
       )
       occurences.collect() should contain theSameElementsAs expectedOccurences
 
-      And("Table annotations_sd_123456_re_abcdef should contain rows for the given study and release")
-      val annotations = spark.table("variant.annotations_sd_123456_re_abcdef")
+      And("Table variants_sd_123456_re_abcdef should contain rows for the given study and release")
+      val variants = spark.table("variant.variants_sd_123456_re_abcdef")
         .select(
           "chromosome",
           "start",
@@ -83,11 +91,13 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
           "hgvsg"
         )
         .as[(String, Long, Long, String, String, String)]
-      val expectedAnnotations = Seq(
+      val expectedVariants = Seq(
         ("1", 10438, 10440, "AC", "A", "chr1:g.10443del"),
-        ("1", 10559, 10560, "C", "G", "chr1:g.10560C>G")
+        ("1", 10559, 10560, "C", "G", "chr1:g.10560C>G"),
+        ("1", 15273, 15274, "A", "G", "chr1:g.15274A>G"),
+        ("1", 15273, 15274, "A", "T", "chr1:g.15274A>T")
       )
-      annotations.collect() should contain theSameElementsAs expectedAnnotations
+      variants.collect() should contain theSameElementsAs expectedVariants
 
       And("Table consequences_sd_123456_re_abcdef should contain rows for the given study and release")
       val consequences = spark.table("variant.consequences_sd_123456_re_abcdef")
@@ -103,13 +113,16 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
         ("1", 10438, 10440, "AC", "A", "DDX11L1"),
         ("1", 10438, 10440, "AC", "A", "WASH7P"),
         ("1", 10559, 10560, "C", "G", "DDX11L1"),
-        ("1", 10559, 10560, "C", "G", "WASH7P")
+        ("1", 10559, 10560, "C", "G", "WASH7P"),
+        ("1", 15273, 15274, "A",  "G", "MIR6859-1"),
+        ("1", 15273, 15274, "A",  "T", "MIR6859-1")
+
       )
+
       consequences.collect() should contain theSameElementsAs expectedConsequences
 
     }
   }
-
 
 
 

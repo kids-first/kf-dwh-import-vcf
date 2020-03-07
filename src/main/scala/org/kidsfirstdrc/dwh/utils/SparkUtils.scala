@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.utils
 
+import io.projectglow.Glow
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{ArrayType, DecimalType, IntegerType}
@@ -7,12 +8,10 @@ import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 object SparkUtils {
   def vcf(input: String)(implicit spark: SparkSession): DataFrame = {
-    import spark.implicits._
-    spark.read.format("vcf")
+    val df = spark.read.format("vcf")
       .option("flattenInfoFields", "true")
-      .option("splitToBiallelic", "true")
       .load(input)
-      .where($"splitFromMultiAllelic" === lit(false))
+    Glow.transform("split_multiallelics", df)
   }
 
   def tableName(table: String, studyId: String, releaseId: String): String = {
@@ -53,16 +52,19 @@ object SparkUtils {
     val heterozygotes: Column = countHeterozygotesUDF(col("genotypes.calls")) as "heterozygotes"
 
     //Annotations
-    val annotations: Column = col("INFO_ANN") as "annotations"
-    val firstAnn: Column = split(col("INFO_ANN")(0), "\\|") as "annotation"
-    val consequences: Column = col("annotation")(1) as "consequences"
-    val impact: Column = col("annotation")(2) as "impact"
-    val symbol: Column = col("annotation")(3) as "symbol"
-    val gene_id: Column = col("annotation")(4) as "gene_id"
-    val transcript: Column = col("annotation")(6) as "transcript"
-    val strand: Column = col("annotation")(19).cast(IntegerType) as "strand"
-    val variant_class: Column = col("annotation")(21) as "variant_class"
-    val hgvsg: Column = col("annotation")(27) as "hgvsg"
+    val annotations: Column = when(col("splitFromMultiAllelic"), expr("filter(INFO_ANN, ann-> ann.Allele == alternateAlleles[0])")).otherwise(col("INFO_ANN")) as "annotations"
+    val firstAnn: Column = annotations.getItem(0) as "annotation"
+    val consequences: Column = col("annotation.Consequence") as "consequences"
+    val impact: Column = col("annotation.IMPACT") as "impact"
+    val symbol: Column = col("annotation.SYMBOL") as "symbol"
+    val gene_id: Column = col("annotation.Gene") as "gene_id"
+    val transcript: Column = col("annotation.Feature") as "transcript"
+    val strand: Column = col("annotation.STRAND") as "strand"
+    val variant_class: Column = col("annotation.VARIANT_CLASS") as "variant_class"
+    val hgvsg: Column = col("annotation.HGVSg") as "hgvsg"
+    val is_multi_allelic = col("splitFromMultiAllelic") as "is_multi_alellic"
+    val old_multi_allelic = col("INFO_OLD_MULTIALLELIC") as "old_multi_allelic"
+
 
     val locus: Seq[Column] = Seq(
       col("chromosome"),

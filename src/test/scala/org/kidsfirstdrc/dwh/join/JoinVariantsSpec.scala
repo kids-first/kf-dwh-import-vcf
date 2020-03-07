@@ -21,7 +21,7 @@ case class JoinAnnotationOutput(chromosome: String, start: Long, end: Long, refe
 
 case class Freq(an: Long, ac: Long, af: BigDecimal, homozygotes: Long, heterozygotes: Long)
 
-class JoinAnnotationsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   import spark.implicits._
 
@@ -42,18 +42,18 @@ class JoinAnnotationsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkS
     val annotation2 = JoinAnnotationInput(chromosome = "2", start = 2000, end = 2000, "T", "G", 20, 5, 0.25, 1, 4, studyId1, releaseId)
 
     Seq(annotation1, annotation2).toDF().write.mode(SaveMode.Overwrite)
-      .option("path", s"$outputDir/annotations_sd_123_re_abcdef")
+      .option("path", s"$outputDir/variants_sd_123_re_abcdef")
       .format("parquet")
-      .saveAsTable("annotations_sd_123_re_abcdef")
+      .saveAsTable("variants_sd_123_re_abcdef")
 
     //Study 2
     val annotation3 = JoinAnnotationInput(chromosome = "3", start = 3000, end = 3000, "C", "A", 30, 10, 0.33333333, 2, 8, studyId2, releaseId)
     val annotation4 = annotation1.copy(study_id = studyId2)
 
     Seq(annotation3, annotation4).toDF().write.mode(SaveMode.Overwrite)
-      .option("path", s"$outputDir/annotations_sd_456_re_abcdef")
+      .option("path", s"$outputDir/variants_sd_456_re_abcdef")
       .format("parquet")
-      .saveAsTable("annotations_sd_456_re_abcdef")
+      .saveAsTable("variants_sd_456_re_abcdef")
 
     Given("1 existing table annotation that contains some data for at least one study")
     val studyId3 = "SD_789"
@@ -67,17 +67,16 @@ class JoinAnnotationsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkS
     ), "RE_PREVIOUS")
 
     Seq(annotation_output1, annotation_output2).toDF().write.mode(SaveMode.Overwrite)
-      .option("path", s"$outputDir/annotations")
+      .option("path", s"$outputDir/variants")
       .format("parquet")
-      .saveAsTable("annotations")
+      .saveAsTable("variants")
 
-    spark.table("annotations").printSchema()
 
     When("Join annotations")
-    JoinAnnotations.join(Seq(studyId1, studyId2), releaseId, outputDir)
+    JoinVariants.join(Seq(studyId1, studyId2), releaseId, outputDir)
 
     Then("A new table for the release is created")
-    val annotationReleaseTable = spark.table("variant.annotations_re_abcdef")
+    val annotationReleaseTable = spark.table("variant.variants_re_abcdef")
 
     And("this table should contain all merged data")
     val output = annotationReleaseTable

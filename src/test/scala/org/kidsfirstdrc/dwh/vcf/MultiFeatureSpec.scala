@@ -13,11 +13,11 @@ class MultiFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkS
     Scenario("Transform vcf with vep") {
       val input = getClass.getResource("/multi.vcf").getFile
 
-      val df = spark.read.format("com.databricks.vcf").load(input).coalesce(1)
+      val df = spark.read.format("vcf")
+        .option("flattenInfoFields", "true").load(input)
+      df.show(false)
 
-      val output = Glow.transform("normalize_variants", df, Map(
-        "mode" -> "split"
-      ))
+      val output = Glow.transform("split_multiallelics", df)
       output.show(false)
     }
   }

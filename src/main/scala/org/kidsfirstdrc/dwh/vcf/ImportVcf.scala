@@ -17,13 +17,13 @@ object ImportVcf extends App {
     spark.sql("use variant")
     if (runType == "all") {
       Occurences.run(studyId, releaseId, input, output)
-      Annotations.run(studyId, releaseId, input, output)
+      Variants.run(studyId, releaseId, input, output)
       Consequences.run(studyId, releaseId, input, output)
     }
     else if (runType == "occurences")
       Occurences.run(studyId, releaseId, input, output)
     else if (runType == "annotations")
-      Annotations.run(studyId, releaseId, input, output)
+      Variants.run(studyId, releaseId, input, output)
     else if (runType == "consequences")
       Consequences.run(studyId, releaseId, input, output)
   }

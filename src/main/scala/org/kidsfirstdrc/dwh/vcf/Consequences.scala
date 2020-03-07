@@ -41,10 +41,8 @@ object Consequences {
         first("annotations") as "annotations",
         first("name") as "name"
       )
-      .withColumn("annotation_raw", explode($"annotations"))
+      .withColumn("annotation", explode($"annotations"))
       .drop("annotations")
-      .withColumn("annotation", split($"annotation_raw", "\\|"))
-      .drop("annotation_raw")
       .select($"*",
         consequences,
         impact,
@@ -56,7 +54,7 @@ object Consequences {
         hgvsg
       )
       .drop("split_annotation")
-      .withColumn("consequence", explode(split($"consequences", "\\&")))
+      .withColumn("consequence", explode($"consequences"))
       .drop("consequences")
       .groupBy(
         $"chromosome",

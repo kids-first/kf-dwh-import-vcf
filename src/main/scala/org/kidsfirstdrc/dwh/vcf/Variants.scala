@@ -1,25 +1,27 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import org.apache.spark.sql.functions.{first, lit, sum}
+import org.apache.spark.sql.functions.{lit, sum}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-object Annotations {
+object Variants {
+  val TABLE_NAME = "variants"
+
   def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
     val inputDF = vcf(input)
     build(studyId, releaseId, inputDF)
     val annotations: DataFrame = build(studyId, releaseId, inputDF)
 
-    val tableAnnotations = tableName("annotations", studyId, releaseId)
+    val tableAnnotations = tableName(TABLE_NAME, studyId, releaseId)
     annotations
       .repartition($"chromosome")
       .sortWithinPartitions("start")
       .write.mode(SaveMode.Overwrite)
       .partitionBy("study_id", "release_id", "chromosome")
       .format("parquet")
-      .option("path", s"$output/annotations/$tableAnnotations")
+      .option("path", s"$output/$TABLE_NAME/$tableAnnotations")
       .saveAsTable(tableAnnotations)
 
   }
@@ -36,7 +38,7 @@ object Annotations {
         ac,
         an,
         name,
-        firstAnn ,
+        firstAnn,
         homozygotes,
         heterozygotes
       )

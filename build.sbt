@@ -7,11 +7,11 @@ scalaVersion := "2.11.12"
 
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
 
-val spark_version = "2.4.4"
+val spark_version = "2.4.5"
 
 /* Runtime */
 libraryDependencies +=  "org.apache.spark" %% "spark-sql" % spark_version % Provided
-libraryDependencies += "io.projectglow" %% "glow" % "0.2.0" % Provided
+libraryDependencies += "io.projectglow" %% "glow" % "0.3.0" % Provided
 
 /* Test */
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0" % "test"

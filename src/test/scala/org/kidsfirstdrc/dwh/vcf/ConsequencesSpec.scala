@@ -16,14 +16,22 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
   val releaseId = "RE_ABCDEF"
   "build" should "return a dataframe with all expected columns" in {
     val df = Seq(
-      AnnotationInput("chr1", 1000, 1001, "C", Seq("G"), Nil, 0, Seq("mutation_1"), Seq("G|intron_variant&non_coding_transcript_variant|MODIFIER|WASH7P|ENSG00000227232|Transcript|ENST00000488147|unprocessed_pseudogene||9/10|ENST00000488147.1:n.1220-236T>A|||||||||-1||SNV|HGNC|HGNC:38034|YES|||chr1:g.1000C>G", "G|intron_variant&non_coding_transcript_variant|MODIFIER|WASH7P|ENSG00000227232|Transcript|ENST00000488148|unprocessed_pseudogene||9/10|ENST00000488147.1:n.1220-236T>A|||||||||-1||SNV|HGNC|HGNC:38034|YES|||chr1:g.1000C>G"), Nil),
-      AnnotationInput("chr1", 1000, 1001, "C", Seq("G"), Nil, 0, Seq("mutation_1"), Seq("G|intron_variant&non_coding_transcript_variant|MODIFIER|WASH7P|ENSG00000227232|Transcript|ENST00000488147|unprocessed_pseudogene||9/10|ENST00000488147.1:n.1220-236T>A|||||||||-1||SNV|HGNC|HGNC:38034|YES|||chr1:g.1000C>G", "G|intron_variant&non_coding_transcript_variant|MODIFIER|WASH7P|ENSG00000227232|Transcript|ENST00000488148|unprocessed_pseudogene||9/10|ENST00000488147.1:n.1220-236T>A|||||||||-1||SNV|HGNC|HGNC:38034|YES|||chr1:g.1000C>G"), Nil),
-      AnnotationInput("chr2", 2000, 2001, "A", Seq("T"), Nil, 0, Nil, Seq("T|downstream_gene_variant|MODIFIER|DDX11L1|ENSG00000223972|Transcript|ENST00000450305|transcribed_unprocessed_pseudogene|||||||||||1604|1||SNV|HGNC|HGNC:37102||||chr2:g.2000A>T"), Nil)
+      AnnotationInput("chr1", 1000, 1001, "C", Seq("G"), Nil, 0, Seq("mutation_1"),
+        Seq(
+          AnnInput("G", Seq("intron_variant", "non_coding_transcript_variant"), "MODIFIER", "WASH7P", "ENSG00000227232", "ENST00000488147", -1, "SNV", "chr1:g.1000C>G"),
+          AnnInput("G", Seq("intron_variant", "non_coding_transcript_variant"), "MODIFIER", "WASH7P", "ENSG00000227232", "ENST00000488148", -1, "SNV", "chr1:g.1000C>G")
+        ), Nil
+      ),
+      AnnotationInput("chr1", 1000, 1001, "C", Seq("G"), Nil, 0, Seq("mutation_1"),
+        Seq(
+          AnnInput("G", Seq("intron_variant", "non_coding_transcript_variant"), "MODIFIER", "WASH7P", "ENSG00000227232", "ENST00000488147", -1, "SNV", "chr1:g.1000C>G"),
+          AnnInput("G", Seq("intron_variant", "non_coding_transcript_variant"), "MODIFIER", "WASH7P", "ENSG00000227232", "ENST00000488148", -1, "SNV", "chr1:g.1000C>G")
+        ), Nil),
+      AnnotationInput("chr2", 2000, 2001, "A", Seq("T"), Nil, 0, Nil, Seq(
+        AnnInput("T", Seq("downstream_gene_variant"), "MODIFIER", "DDX11L1", "ENSG00000223972", "ENST00000450305", 1, "SNV", "chr2:g.2000A>T")), Nil)
     ).toDF()
 
     val output = Consequences.build(studyId, releaseId, df)
-    output.show()
-    output.printSchema()
     output.as[ConsequenceOutput].collect() should contain theSameElementsAs Seq(
       ConsequenceOutput("1", 1000, 1001, "C", "G", "WASH7P", "MODIFIER", "ENSG00000227232", "intron_variant", -1, "chr1:g.1000C>G", Some("mutation_1"), "SNV", Seq("ENST00000488147", "ENST00000488148"), studyId, releaseId),
       ConsequenceOutput("1", 1000, 1001, "C", "G", "WASH7P", "MODIFIER", "ENSG00000227232", "non_coding_transcript_variant", -1, "chr1:g.1000C>G", Some("mutation_1"), "SNV", Seq("ENST00000488147", "ENST00000488148"), studyId, releaseId),

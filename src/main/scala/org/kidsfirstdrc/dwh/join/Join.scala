@@ -17,11 +17,11 @@ object Join extends App {
 
     spark.sql("use variant")
     if (runType == "all") {
-      JoinAnnotations.join(studyIds, releaseIdLc, output)
+      JoinVariants.join(studyIds, releaseIdLc, output)
       JoinConsequences.join(studyIds, releaseIdLc, output)
     }
     else if (runType == "annotations")
-      JoinAnnotations.join(studyIds, releaseIdLc, output)
+      JoinVariants.join(studyIds, releaseIdLc, output)
     else if (runType == "consequences")
       JoinConsequences.join(studyIds, releaseIdLc, output)
   }

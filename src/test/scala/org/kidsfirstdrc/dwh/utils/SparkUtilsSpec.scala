@@ -26,15 +26,11 @@ class SparkUtilsSpec extends AnyFlatSpec with WithSparkSession with Matchers {
 
   "homozygotes" should "return homozygote count" in {
     val df = Seq(Seq(hom_11, hom_11, het_01, het_10, hom_00)).toDF("genotypes")
-    df.printSchema()
-    df.show(false)
     df.select(homozygotes).as[Long].collect() should contain only 2
   }
 
   "heterozygotes" should "return heterozygote count" in {
     val df = Seq(Seq(hom_11, hom_11, het_01, het_01, het_10, het_10, hom_00)).toDF("genotypes")
-    df.printSchema()
-    df.show()
     df.select(heterozygotes).as[Long].collect() should contain only 4
   }
 
@@ -44,7 +40,6 @@ class SparkUtilsSpec extends AnyFlatSpec with WithSparkSession with Matchers {
     ).toDF("first_array")
 
     val res = df.select(SparkUtils.colFromArrayOrField(df, "first_array") as "first_col")
-    res.printSchema()
     res.as[Int].collect() should contain only 1
 
   }

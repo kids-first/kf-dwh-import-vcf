@@ -10,8 +10,9 @@ object Model {
                              INFO_AC: Seq[Long],
                              INFO_AN: Long,
                              names: Seq[String],
-                             INFO_ANN: Seq[String],
-                             genotypes: Seq[Genotype]
+                             INFO_ANN: Seq[AnnInput],
+                             genotypes: Seq[Genotype],
+                             splitFromMultiAllelic: Boolean = false
                             )
 
   case class AnnotationOutput(chromosome: String,
@@ -67,5 +68,7 @@ object Model {
   val hom_11: Genotype = Genotype(Array(1, 1))
   val het_01: Genotype = Genotype(Array(0, 1))
   val het_10: Genotype = Genotype(Array(1, 0))
+
+  case class AnnInput(Allele: String, Consequence: Seq[String], IMPACT: String, SYMBOL: String, Gene: String, Feature: String, STRAND: Int, VARIANT_CLASS: String, HGVSg: String)
 
 }

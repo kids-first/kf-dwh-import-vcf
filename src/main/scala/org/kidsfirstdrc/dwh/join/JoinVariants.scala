@@ -5,16 +5,18 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.utils.SparkUtils
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.calculated_af
 import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
+import org.kidsfirstdrc.dwh.vcf.Variants.TABLE_NAME
 
 
-object JoinAnnotations {
+object JoinVariants {
+    
   def join(studyIds: Seq[String], releaseId: String, output: String)(implicit spark: SparkSession): Unit = {
 
     import spark.implicits._
 
-    val annotations: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
+    val variants: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
-        val nextDf = spark.table(SparkUtils.tableName("annotations", studyId, releaseId))
+        val nextDf = spark.table(SparkUtils.tableName(TABLE_NAME, studyId, releaseId))
           .withColumn("freqs", struct($"an", $"ac", $"af", $"homozygotes", $"heterozygotes"))
         if (currentDF.isEmpty)
           nextDf
@@ -26,9 +28,9 @@ object JoinAnnotations {
     }
 
     val allColumns = Seq($"chromosome", $"start", $"reference", $"alternate", $"end", $"name", $"hgvsg", $"variant_class", $"release_id", $"freqs", $"study_id")
-    val merged = if (spark.catalog.tableExists("annotations")) {
+    val merged = if (spark.catalog.tableExists(TABLE_NAME)) {
 
-      val existingAnnotations = spark.table("annotations")
+      val existingVariants = spark.table(TABLE_NAME)
         .select(
           $"chromosome", $"start", $"reference", $"alternate", $"end", $"name", $"hgvsg", $"variant_class", $"release_id",
           explode($"by_study")
@@ -36,30 +38,31 @@ object JoinAnnotations {
         .withColumnRenamed("key", "study_id")
         .withColumnRenamed("value", "freqs")
         .where(not($"study_id".isin(studyIds: _*)))
-      mergeAnnotations(releaseId, existingAnnotations
+      mergeVariants(releaseId, existingVariants
         .select(allColumns: _*)
-        .union(annotations.select(allColumns: _*))
+        .union(variants.select(allColumns: _*))
       )
     } else {
-      mergeAnnotations(releaseId, annotations.select(allColumns: _*))
+      mergeVariants(releaseId, variants.select(allColumns: _*))
     }
     val joinedWithPop = joinWithPopulations(merged)
-    joinedWithPop.repartition($"chromosome")
+    joinedWithPop
+      .repartition($"chromosome")
       .sortWithinPartitions("start")
       .write.mode(SaveMode.Overwrite)
       .partitionBy("chromosome")
       .format("parquet")
-      .option("path", s"$output/annotations/annotations_$releaseId")
-      .saveAsTable(s"annotations_$releaseId")
+      .option("path", s"$output/$TABLE_NAME/${TABLE_NAME}_$releaseId")
+      .saveAsTable(s"${TABLE_NAME}_$releaseId")
 
   }
 
 
-  private def mergeAnnotations(releaseId: String, annotations: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  private def mergeVariants(releaseId: String, variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
 
     import spark.implicits._
 
-    val t = annotations
+    val t = variants
       .groupBy($"chromosome", $"start", $"reference", $"alternate")
       .agg(
         firstAs("name"),
@@ -79,14 +82,14 @@ object JoinAnnotations {
 
   }
 
-  def joinWithPopulations(annotations: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  def joinWithPopulations(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
     val genomes = spark.table("1000_genomes")
     val topmed = spark.table("topmed_bravo")
     val gnomad = spark.table("gnomad_genomes_2_1_1_liftover_grch38")
 
-    val join1k = annotations
-      .join(genomes, annotations("chromosome") === genomes("chromosome") && annotations("start") === genomes("start") && annotations("reference") === genomes("reference") && annotations("alternate") === genomes("alternate"), "left")
-      .select(annotations("*"), when(genomes("chromosome").isNull, lit(null)).otherwise(struct(genomes.drop("chromosome", "start", "end", "name", "reference", "alternate")("*"))) as "1k_genomes")
+    val join1k = variants
+      .join(genomes, variants("chromosome") === genomes("chromosome") && variants("start") === genomes("start") && variants("reference") === genomes("reference") && variants("alternate") === genomes("alternate"), "left")
+      .select(variants("*"), when(genomes("chromosome").isNull, lit(null)).otherwise(struct(genomes.drop("chromosome", "start", "end", "name", "reference", "alternate")("*"))) as "1k_genomes")
 
     val joinTopmed = join1k.join(topmed, join1k("chromosome") === topmed("chromosome") && join1k("start") === topmed("start") && join1k("reference") === topmed("reference") && join1k("alternate") === topmed("alternate"), "left")
       .select(join1k("*"), when(topmed("chromosome").isNull, lit(null)).otherwise(struct(topmed.drop("chromosome", "start", "end", "name", "reference", "alternate")("*"))) as "topmed")
