@@ -13,8 +13,8 @@ object ImportClinVar extends App {
     .appName("Import 1000 Genomes").getOrCreate()
 
   import spark.implicits._
-
-  val input = "s3://kf-variant-parquet-prd/raw/1000Genomes/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz"
+  
+  val input = "s3://kf-variant-parquet-prd/raw/clinvar/clinvar_20200217.vcf.gz"
   val output = "s3://kf-variant-parquet-prd"
   vcf(input)
     .select(chromosome,
