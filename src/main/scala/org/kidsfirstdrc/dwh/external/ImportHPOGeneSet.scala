@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.vcf
+package org.kidsfirstdrc.dwh.external
 
 import org.apache.spark.sql.SparkSession
 
