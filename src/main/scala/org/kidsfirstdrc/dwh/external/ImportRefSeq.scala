@@ -37,7 +37,7 @@ object ImportRefSeq extends App {
     .load("s3a://kf-variant-parquet-prd/raw/refseq/Homo_sapiens.gene_info.gz")
     .select(
       $"#tax_id" as "tax_id",
-      $"GeneID" as "gene_id",
+      $"GeneID" as "entrez_gene_id",
       $"Symbol" as "symbol",
       $"LocusTag" as "locus_tag",
       split($"Synonyms", "\\|") as "synonyms",
@@ -52,6 +52,8 @@ object ImportRefSeq extends App {
       split($"Other_designations", "\\|") as "other_designations",
       splitToMap($"Feature_type") as "feature_types"
     )
+    .withColumn("ensembl_gene_id", $"external_references.ensembl")
+    .withColumn("omim_gene_id", $"external_references.mim")
     .coalesce(1)
     .write
     .mode("overwrite")

@@ -8,7 +8,7 @@ case class OrphanetOutput(
                            disorder_type: String,
                            disorder_group: String,
                            gene_symbol: String,
-                           ensembl_id: Option[String],
+                           ensembl_gene_id: Option[String],
                            association_type: Option[String],
                            association_type_id: Option[Int],
                            status: Option[String])

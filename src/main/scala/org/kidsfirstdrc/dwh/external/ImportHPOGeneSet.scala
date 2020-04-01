@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
-import org.apache.spark.sql.SparkSession
-
+import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions.broadcast
 object ImportHPOGeneSet extends App {
 
   implicit val spark: SparkSession = SparkSession.builder
@@ -11,7 +11,10 @@ object ImportHPOGeneSet extends App {
 
   val input = "s3a://kf-variant-parquet-prd/raw/hpo/genes_to_phenotype.txt"
   val output = "s3://kf-variant-parquet-prd"
-  spark.read.format("csv")
+
+  val human_genes = broadcast(spark.table("variant.human_genes").select("entrez_gene_id", "ensembl_gene_id"))
+
+  val inputDF: DataFrame = spark.read.format("csv")
     .option("inferSchema", "true")
     .option("comment", "#")
     .option("header", "false")
@@ -26,6 +29,9 @@ object ImportHPOGeneSet extends App {
     .withColumnRenamed("_c6", "source_info")
     .withColumnRenamed("_c7", "source")
     .withColumnRenamed("_c8", "source_id")
+  inputDF
+    .join(spark.table("variant.human_genes"), inputDF("entrez_gene_id") === human_genes("entrez_gene_id"))
+    .select(inputDF("*"), human_genes("ensembl_gene_id"))
     .coalesce(1)
     .write
     .mode("overwrite")
