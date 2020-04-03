@@ -38,7 +38,7 @@ object Model {
                                alternate: String,
                                symbol: String,
                                impact: String,
-                               gene_id: String,
+                               ensembl_gene_id: String,
                                consequence: String,
                                strand: Int,
                                hgvsg: String,
@@ -46,7 +46,10 @@ object Model {
                                variant_class: String,
                                transcripts: Seq[String],
                                study_id: String,
-                               release_id: String
+                               release_id: String,
+                               cds_position: Option[Int],
+                               amino_acids: Option[AminoAcids],
+                               protein_position: Option[Int]
                               )
 
   case class OccurencesOutput(chromosome: String,
@@ -69,6 +72,9 @@ object Model {
   val het_01: Genotype = Genotype(Array(0, 1))
   val het_10: Genotype = Genotype(Array(1, 0))
 
-  case class AnnInput(Allele: String, Consequence: Seq[String], IMPACT: String, SYMBOL: String, Gene: String, Feature: String, STRAND: Int, VARIANT_CLASS: String, HGVSg: String)
+  case class AminoAcids(reference: String, variant: String)
+
+  case class AnnInput(Allele: String, Consequence: Seq[String], IMPACT: String, SYMBOL: String, Gene: String, Feature: String, STRAND: Int, VARIANT_CLASS: String, HGVSg: String, CDS_position: Option[Int], Amino_acids: Option[AminoAcids], Protein_position: Option[Int])
 
 }
+

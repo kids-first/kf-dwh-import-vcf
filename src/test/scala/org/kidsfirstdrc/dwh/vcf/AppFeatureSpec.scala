@@ -100,6 +100,9 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
         variants.collect() should contain theSameElementsAs expectedVariants
 
         And("Table consequences_sd_123456_re_abcdef should contain rows for the given study and release")
+        spark.table("variant.consequences_sd_123456_re_abcdef").printSchema()
+
+
         val consequences = spark.table("variant.consequences_sd_123456_re_abcdef")
           .select(
             "chromosome",

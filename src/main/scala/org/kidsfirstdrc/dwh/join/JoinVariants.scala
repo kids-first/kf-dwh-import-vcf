@@ -46,7 +46,8 @@ object JoinVariants {
       mergeVariants(releaseId, variants.select(allColumns: _*))
     }
     val joinedWithPop = joinWithPopulations(merged)
-    joinedWithPop
+    val joinedWithClinvar = joinWithClinvar(joinedWithPop)
+    joinedWithClinvar
       .repartition($"chromosome")
       .sortWithinPartitions("start")
       .write.mode(SaveMode.Overwrite)
@@ -97,6 +98,12 @@ object JoinVariants {
     joinTopmed.join(gnomad, joinTopmed("chromosome") === gnomad("chromosome") && joinTopmed("start") === gnomad("start") && joinTopmed("reference") === gnomad("reference") && joinTopmed("alternate") === gnomad("alternate"), "left")
       .select(joinTopmed("*"), when(gnomad("chromosome").isNull, lit(null)).otherwise(struct(gnomad.drop("chromosome", "start", "end", "name", "reference", "alternate")("*"))) as "gnomad_2_1")
 
+  }
+
+  def joinWithClinvar(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    val clinvar = spark.table("clinvar")
+    variants.join(clinvar, variants("chromosome") === clinvar("chromosome") && variants("start") === clinvar("start") && variants("reference") === clinvar("reference") && variants("alternate") === clinvar("alternate"), "left")
+      .select(variants("*"), clinvar("name") as "clinvar_id", clinvar("clin_sig") as "clin_sig")
   }
 
 }

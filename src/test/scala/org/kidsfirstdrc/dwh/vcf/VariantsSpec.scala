@@ -8,7 +8,7 @@ import org.kidsfirstdrc.dwh.testutils.Model._
 
 class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 
-  def ann(allele: String, variant_class: String, hgvsg: String) = AnnInput(allele, Nil, "", "", "", "", 1, variant_class, hgvsg)
+  def ann(allele: String, variant_class: String, hgvsg: String) = AnnInput(allele, Nil, "", "", "", "", 1, variant_class, hgvsg, None, None, None)
 
   import spark.implicits._
 

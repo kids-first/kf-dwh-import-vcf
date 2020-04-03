@@ -25,4 +25,7 @@ object ImportDBSNFP extends App {
     .saveAsTable("variant.dbsnfp")
 
 
+
+
 }
+

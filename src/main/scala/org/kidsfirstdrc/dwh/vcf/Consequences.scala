@@ -47,11 +47,15 @@ object Consequences {
         consequences,
         impact,
         symbol,
-        gene_id,
+        ensembl_gene_id,
         transcript,
         strand,
         variant_class,
-        hgvsg
+        hgvsg,
+        cds_position,
+        cdna_position,
+        protein_position,
+        amino_acids
       )
       .drop("split_annotation")
       .withColumn("consequence", explode($"consequences"))
@@ -63,8 +67,9 @@ object Consequences {
         $"reference",
         $"alternate",
         $"consequence",
-        $"gene_id",
-        $"strand"
+        $"ensembl_gene_id",
+        $"strand",
+        $"cds_position"
       )
       .agg(
         firstAs("name"),
@@ -72,8 +77,9 @@ object Consequences {
         firstAs("hgvsg"),
         firstAs("variant_class"),
         firstAs("symbol"),
+        firstAs("protein_position"),
+        firstAs("amino_acids"),
         collect_set($"transcript") as "transcripts"
-
       )
       .select($"*",
         lit(studyId) as "study_id",

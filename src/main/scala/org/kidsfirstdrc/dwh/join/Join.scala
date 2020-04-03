@@ -20,7 +20,7 @@ object Join extends App {
       JoinVariants.join(studyIds, releaseIdLc, output)
       JoinConsequences.join(studyIds, releaseIdLc, output)
     }
-    else if (runType == "annotations")
+    else if (runType == "variants")
       JoinVariants.join(studyIds, releaseIdLc, output)
     else if (runType == "consequences")
       JoinConsequences.join(studyIds, releaseIdLc, output)

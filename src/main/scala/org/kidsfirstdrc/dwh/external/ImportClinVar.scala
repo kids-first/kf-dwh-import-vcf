@@ -23,27 +23,19 @@ object ImportClinVar extends App {
       name,
       reference,
       alternate,
-      $"INFO_CLNVSCO" as "clnvsco",
-      split($"INFO_GENEINFO", ":") as "gene_info",
-      $"INFO_CLNSIGINCL" as "cln_sigincl",
-      $"INFO_CLNVI" as "cln_vi",
-      $"INFO_CLNDISDB" as "cln_disdb",
-      $"INFO_CLNREVSTAT" as "cln_revstat",
-      $"INFO_CLNDN" as "cln_dn",
-      $"INFO_ALLELEID" as "allele_id",
-      $"INFO_ORIGIN"(0) as "origin",
-      $"INFO_CLNSIG"(0) as "clin_sig",
-      $"INFO_RS"(0) as "rs",
-      $"INFO_DBVARID"(0) as "rs",
-      $"INFO_CLNHGVS"(0) as "cln_hgvs"
+      $"INFO_CLNSIG" as "clin_sig_original",
+      split(regexp_replace($"INFO_CLNSIGCONF"(0), """\(.\)""", ""), "%3B") as "clin_sig_conflict"
     )
-    .withColumn("gene",$"gene_info"(0))
-    .withColumn("gene_id",$"gene_info"(1))
-    .repartition($"chromosome")
-    .sortWithinPartitions("start")
+    .withColumn("clin_sig",
+      when(
+        array_contains($"clin_sig_original", "Conflicting_interpretations_of_pathogenicity"),
+        array_union(array_remove($"clin_sig_original", "Conflicting_interpretations_of_pathogenicity"), $"clin_sig_original")
+      ).otherwise($"clin_sig_original")
+    )
+    .coalesce(1)
     .write
-    .mode(SaveMode.Overwrite)
+    .mode("overwrite")
     .format("parquet")
-    .option("path", s"$output/1000_genomes")
-    .saveAsTable("variant.1000_genomes")
+    .option("path", s"$output/clinvar")
+    .saveAsTable("variant.clinvar")
 }

@@ -1,9 +1,9 @@
 package org.kidsfirstdrc.dwh.join
 
+import org.apache.spark.sql.catalyst.expressions.ArrayContains
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.utils.SparkUtils
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.calculated_af
 import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 
 
@@ -33,7 +33,7 @@ object JoinConsequences {
       $"reference",
       $"alternate",
       $"consequence",
-      $"gene_id",
+      $"ensembl_gene_id",
       $"strand",
       $"name",
       $"impact",
@@ -41,7 +41,10 @@ object JoinConsequences {
       $"variant_class",
       $"symbol",
       $"transcripts",
-      $"study_ids"
+      $"study_ids",
+      $"cds_position",
+      $"amino_acids",
+      $"protein_position"
     )
     val merged = if (spark.catalog.tableExists("consequences")) {
 
@@ -64,28 +67,35 @@ object JoinConsequences {
   }
 
 
+
   private def mergeConsequences(releaseId: String, consequences: DataFrame)(implicit spark: SparkSession): DataFrame = {
 
     import spark.implicits._
 
-    consequences
-      .groupBy($"chromosome",
-        $"start",
-        $"end",
-        $"reference",
-        $"alternate",
-        $"consequence",
-        $"gene_id",
-        $"strand")
+    consequences.groupBy(
+      $"chromosome",
+      $"start",
+      $"end",
+      $"reference",
+      $"alternate",
+      $"consequence",
+      $"ensembl_gene_id",
+      $"strand",
+      $"cds_position"
+    )
       .agg(
         firstAs("name"),
         firstAs("impact"),
         firstAs("hgvsg"),
         firstAs("variant_class"),
         firstAs("symbol"),
+        firstAs("protein_position"),
+        firstAs("amino_acids"),
         firstAs("transcripts"),
         array_distinct(flatten(collect_list($"study_ids"))) as "study_ids"
       )
+      .withColumn("aa_change", when($"amino_acids".isNotNull, concat($"amino_acids.reference", $"protein_position", $"amino_acids.variant")).otherwise(lit(null)))
+      .withColumn("coding_dna_change", when($"cds_position".isNotNull, concat($"cds_position", $"reference", lit(">"), $"alternate")).otherwise(lit(null)))
       .withColumn("release_id", lit(releaseId))
 
 
