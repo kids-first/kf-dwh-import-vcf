@@ -48,43 +48,28 @@ object Consequences {
         impact,
         symbol,
         ensembl_gene_id,
-        transcript,
+        ensembl_transcript_id,
+        ensembl_regulatory_id,
+        feature_type,
         strand,
+        biotype,
         variant_class,
+        exon,
+        intron,
+        hgvsc,
+        hgvsp,
         hgvsg,
         cds_position,
         cdna_position,
         protein_position,
-        amino_acids
-      )
-      .drop("split_annotation")
-      .withColumn("consequence", explode($"consequences"))
-      .drop("consequences")
-      .groupBy(
-        $"chromosome",
-        $"start",
-        $"end",
-        $"reference",
-        $"alternate",
-        $"consequence",
-        $"ensembl_gene_id",
-        $"strand",
-        $"cds_position"
-      )
-      .agg(
-        firstAs("name"),
-        firstAs("impact"),
-        firstAs("hgvsg"),
-        firstAs("variant_class"),
-        firstAs("symbol"),
-        firstAs("protein_position"),
-        firstAs("amino_acids"),
-        collect_set($"transcript") as "transcripts"
-      )
-      .select($"*",
+        amino_acids,
+        codons,
         lit(studyId) as "study_id",
         lit(releaseId) as "release_id"
       )
+      .drop("annotation")
+      .withColumn("consequence", explode($"consequences"))
+      .drop("consequences")
 
     consequencesDF
   }

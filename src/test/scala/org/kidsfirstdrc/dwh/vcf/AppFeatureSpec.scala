@@ -110,15 +110,19 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
             "end",
             "reference",
             "alternate",
-            "symbol"
-          ).as[(String, Long, Long, String, String, String)]
+            "symbol",
+            "ensembl_transcript_id"
+          ).as[(String, Long, Long, String, String, String,String)]
+
         val expectedConsequences = Seq(
-          ("1", 10438, 10440, "AC", "A", "DDX11L1"),
-          ("1", 10438, 10440, "AC", "A", "WASH7P"),
-          ("1", 10559, 10560, "C", "G", "DDX11L1"),
-          ("1", 10559, 10560, "C", "G", "WASH7P"),
-          ("1", 15273, 15274, "A", "G", "MIR6859-1"),
-          ("1", 15273, 15274, "A", "T", "MIR6859-1")
+          (1,10438,10440,"AC","A","DDX11L1","ENST00000450305"),
+          (1,10438,10440,"AC","A","DDX11L1","ENST00000456328"),
+          (1,10438,10440,"AC","A","WASH7P","ENST00000488147"),
+          (1,10559,10560,"C","G","DDX11L1","ENST00000450305"),
+          (1,10559,10560,"C","G","DDX11L1","ENST00000456328"),
+          (1,10559,10560,"C","G","WASH7P","ENST00000488147"),
+          (1,15273,15274,"A","G","MIR6859-1","ENST00000619216"),
+          (1,15273,15274,"A","T","MIR6859-1","ENST00000619216")
 
         )
 
@@ -130,3 +134,8 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
 
 }
 
+
+//
+// Array(
+//   (1,10438,10440,AC,A,DDX11L1,ENST00000450305), (1,10438,10440,AC,A,DDX11L1,ENST00000456328), (1,10438,10440,AC,A,WASH7P,ENST00000488147), (1,10559,10560,C,G,DDX11L1,ENST00000450305), (1,10559,10560,C,G,DDX11L1,ENST00000456328), (1,10559,10560,C,G,WASH7P,ENST00000488147), (1,15273,15274,A,G,MIR6859-1,ENST00000619216), (1,15273,15274,A,T,MIR6859-1,ENST00000619216))
+//   (1,10438,10440,AC,A,DDX11L1,ENST00000450305), (1,10438,10440,AC,A,DDX11L1,ENST00000456328), (1,10438,10440,AC,A,WASH7P,ENST00000488147), (1,10559,10560,C,G,DDX11L1,ENST00000450305), (1,10559,10560,C,G,DDX11L1,ENST00000456328), (1,10559,10560,C,G,WASH7P,ENST00000488147), (1,15273,15274,A,G,MIR6859-1,ENST00000619216), (1,15273,15274,A,T,MIR6859-1,ENST00000619216))

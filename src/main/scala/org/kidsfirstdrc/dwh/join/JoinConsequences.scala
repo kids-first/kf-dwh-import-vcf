@@ -1,6 +1,5 @@
 package org.kidsfirstdrc.dwh.join
 
-import org.apache.spark.sql.catalyst.expressions.ArrayContains
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.utils.SparkUtils
@@ -9,7 +8,7 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 
 object JoinConsequences {
 
-  def join(studyIds: Seq[String], releaseId: String, output: String)(implicit spark: SparkSession): Unit = {
+  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean)(implicit spark: SparkSession): Unit = {
 
     import spark.implicits._
 
@@ -33,20 +32,29 @@ object JoinConsequences {
       $"reference",
       $"alternate",
       $"consequence",
-      $"ensembl_gene_id",
-      $"strand",
+      $"ensembl_transcript_id",
+      $"ensembl_regulatory_id",
+      $"feature_type",
       $"name",
       $"impact",
-      $"hgvsg",
-      $"variant_class",
       $"symbol",
-      $"transcripts",
-      $"study_ids",
+      $"ensembl_gene_id",
+      $"strand",
+      $"biotype",
+      $"variant_class",
+      $"exon",
+      $"intron",
+      $"hgvsc",
+      $"hgvsp",
+      $"hgvsg",
       $"cds_position",
+      $"cdna_position",
+      $"protein_position",
       $"amino_acids",
-      $"protein_position"
+      $"codons",
+      $"study_ids"
     )
-    val merged = if (spark.catalog.tableExists("consequences")) {
+    val merged = if (mergeWithExisting && spark.catalog.tableExists("consequences")) {
 
       val existingConsequences = spark.table("consequences")
 
@@ -56,7 +64,8 @@ object JoinConsequences {
     } else {
       mergeConsequences(releaseId, consequences.select(allColumns: _*))
     }
-    merged.repartition($"chromosome")
+    val joinedWithScores = joinWithDBNSFP(merged)
+    joinedWithScores.repartition($"chromosome")
       .sortWithinPartitions("start")
       .write.mode(SaveMode.Overwrite)
       .partitionBy("chromosome")
@@ -65,7 +74,6 @@ object JoinConsequences {
       .saveAsTable(s"consequences_$releaseId")
 
   }
-
 
 
   private def mergeConsequences(releaseId: String, consequences: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -79,19 +87,28 @@ object JoinConsequences {
       $"reference",
       $"alternate",
       $"consequence",
-      $"ensembl_gene_id",
-      $"strand",
-      $"cds_position"
+      $"ensembl_transcript_id",
+      $"ensembl_regulatory_id",
+      $"feature_type"
     )
       .agg(
         firstAs("name"),
         firstAs("impact"),
-        firstAs("hgvsg"),
-        firstAs("variant_class"),
         firstAs("symbol"),
+        firstAs("ensembl_gene_id"),
+        firstAs("strand"),
+        firstAs("biotype"),
+        firstAs("variant_class"),
+        firstAs("exon"),
+        firstAs("intron"),
+        firstAs("hgvsc"),
+        firstAs("hgvsp"),
+        firstAs("hgvsg"),
+        firstAs("cds_position"),
+        firstAs("cdna_position"),
         firstAs("protein_position"),
         firstAs("amino_acids"),
-        firstAs("transcripts"),
+        firstAs("codons"),
         array_distinct(flatten(collect_list($"study_ids"))) as "study_ids"
       )
       .withColumn("aa_change", when($"amino_acids".isNotNull, concat($"amino_acids.reference", $"protein_position", $"amino_acids.variant")).otherwise(lit(null)))
@@ -101,5 +118,30 @@ object JoinConsequences {
 
   }
 
+
+  def joinWithDBNSFP(c: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    val s = spark.table("dbsnfp_scores")
+      .drop(
+        "aaref",
+        "symbol",
+        "ensembl_gene_id",
+        "ensembl_protein_id",
+        "cds_strand")
+
+    c.join(s,
+      c("chromosome") === s("chromosome") &&
+        c("start") === s("start") &&
+        c("reference") === s("reference") &&
+        c("alternate") === s("alternate") &&
+        c("ensembl_transcript_id") === s("ensembl_transcript_id"),
+      "left")
+      .drop(s("chromosome"))
+      .drop(s("start"))
+      .drop(s("reference"))
+      .drop(s("alternate"))
+      .drop(s("ensembl_transcript_id"))
+
+
+  }
 
 }

@@ -9,8 +9,8 @@ import org.kidsfirstdrc.dwh.vcf.Variants.TABLE_NAME
 
 
 object JoinVariants {
-    
-  def join(studyIds: Seq[String], releaseId: String, output: String)(implicit spark: SparkSession): Unit = {
+
+  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean = true)(implicit spark: SparkSession): Unit = {
 
     import spark.implicits._
 
@@ -28,7 +28,7 @@ object JoinVariants {
     }
 
     val allColumns = Seq($"chromosome", $"start", $"reference", $"alternate", $"end", $"name", $"hgvsg", $"variant_class", $"release_id", $"freqs", $"study_id")
-    val merged = if (spark.catalog.tableExists(TABLE_NAME)) {
+    val merged = if (mergeWithExisting && spark.catalog.tableExists(TABLE_NAME)) {
 
       val existingVariants = spark.table(TABLE_NAME)
         .select(
