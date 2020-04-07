@@ -1,9 +1,5 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import java.io.File
-import java.nio.file.{Files, Path}
-
-import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.SaveMode
 import org.kidsfirstdrc.dwh.testutils.Model._
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
@@ -112,17 +108,17 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
             "alternate",
             "symbol",
             "ensembl_transcript_id"
-          ).as[(String, Long, Long, String, String, String,String)]
+          ).as[(String, Long, Long, String, String, String, String)]
 
         val expectedConsequences = Seq(
-          (1,10438,10440,"AC","A","DDX11L1","ENST00000450305"),
-          (1,10438,10440,"AC","A","DDX11L1","ENST00000456328"),
-          (1,10438,10440,"AC","A","WASH7P","ENST00000488147"),
-          (1,10559,10560,"C","G","DDX11L1","ENST00000450305"),
-          (1,10559,10560,"C","G","DDX11L1","ENST00000456328"),
-          (1,10559,10560,"C","G","WASH7P","ENST00000488147"),
-          (1,15273,15274,"A","G","MIR6859-1","ENST00000619216"),
-          (1,15273,15274,"A","T","MIR6859-1","ENST00000619216")
+          ("1", 10438L, 10440L, "AC", "A", "DDX11L1", "ENST00000450305"),
+          ("1", 10438L, 10440L, "AC", "A", "DDX11L1", "ENST00000456328"),
+          ("1", 10438L, 10440L, "AC", "A", "WASH7P", "ENST00000488147"),
+          ("1", 10559L, 10560L, "C", "G", "DDX11L1", "ENST00000450305"),
+          ("1", 10559L, 10560L, "C", "G", "DDX11L1", "ENST00000456328"),
+          ("1", 10559L, 10560L, "C", "G", "WASH7P", "ENST00000488147"),
+          ("1", 15273L, 15274L, "A", "G", "MIR6859-1", "ENST00000619216"),
+          ("1", 15273L, 15274L, "A", "T", "MIR6859-1", "ENST00000619216")
 
         )
 
@@ -133,9 +129,3 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
 
 
 }
-
-
-//
-// Array(
-//   (1,10438,10440,AC,A,DDX11L1,ENST00000450305), (1,10438,10440,AC,A,DDX11L1,ENST00000456328), (1,10438,10440,AC,A,WASH7P,ENST00000488147), (1,10559,10560,C,G,DDX11L1,ENST00000450305), (1,10559,10560,C,G,DDX11L1,ENST00000456328), (1,10559,10560,C,G,WASH7P,ENST00000488147), (1,15273,15274,A,G,MIR6859-1,ENST00000619216), (1,15273,15274,A,T,MIR6859-1,ENST00000619216))
-//   (1,10438,10440,AC,A,DDX11L1,ENST00000450305), (1,10438,10440,AC,A,DDX11L1,ENST00000456328), (1,10438,10440,AC,A,WASH7P,ENST00000488147), (1,10559,10560,C,G,DDX11L1,ENST00000450305), (1,10559,10560,C,G,DDX11L1,ENST00000456328), (1,10559,10560,C,G,WASH7P,ENST00000488147), (1,15273,15274,A,G,MIR6859-1,ENST00000619216), (1,15273,15274,A,T,MIR6859-1,ENST00000619216))

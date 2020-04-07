@@ -23,7 +23,7 @@ object Join extends App {
     else if (runType == "variants")
       JoinVariants.join(studyIds, releaseIdLc, output)
     else if (runType == "consequences")
-      JoinConsequences.join(studyIds, releaseIdLc, output)
+      JoinConsequences.join(studyIds, releaseIdLc, output, mergeExisting)
   }
 
 }

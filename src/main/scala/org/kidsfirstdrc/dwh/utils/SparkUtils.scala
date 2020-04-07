@@ -57,7 +57,7 @@ object SparkUtils {
     val consequences: Column = col("annotation.Consequence") as "consequences"
     val impact: Column = col("annotation.IMPACT") as "impact"
     val symbol: Column = col("annotation.SYMBOL") as "symbol"
-    val feature_type = col("annotation.Feature_type") as "feature_type"
+    val feature_type: Column = col("annotation.Feature_type") as "feature_type"
     val ensembl_gene_id: Column = col("annotation.Gene") as "ensembl_gene_id"
     val ensembl_transcript_id: Column = when( col("annotation.Feature_type") === "Transcript" ,col("annotation.Feature")).otherwise(null) as "ensembl_transcript_id"
     val ensembl_regulatory_id: Column = when( col("annotation.Feature_type") === "RegulatoryFeature" ,col("annotation.Feature")).otherwise(null) as "ensembl_regulatory_id"
@@ -75,8 +75,8 @@ object SparkUtils {
     val codons: Column = col("annotation.Codons") as "codons"
     val variant_class: Column = col("annotation.VARIANT_CLASS") as "variant_class"
     val hgvsg: Column = col("annotation.HGVSg") as "hgvsg"
-    val is_multi_allelic = col("splitFromMultiAllelic") as "is_multi_alellic"
-    val old_multi_allelic = col("INFO_OLD_MULTIALLELIC") as "old_multi_allelic"
+    val is_multi_allelic: Column = col("splitFromMultiAllelic") as "is_multi_alellic"
+    val old_multi_allelic: Column = col("INFO_OLD_MULTIALLELIC") as "old_multi_allelic"
 
 
     val locus: Seq[Column] = Seq(
