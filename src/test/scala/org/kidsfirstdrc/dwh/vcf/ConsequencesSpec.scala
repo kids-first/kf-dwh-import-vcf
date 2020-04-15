@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import org.kidsfirstdrc.dwh.testutils.Model.{consequence, _}
+import org.kidsfirstdrc.dwh.testutils.Model.{ConsequenceInput, _}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
@@ -17,39 +17,39 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
   "build" should "return a dataframe with one consequecne by transcript" in {
     val df = Seq(
-      variant(
+      VariantInput(
         INFO_ANN = Seq(
-          consequence(),
-          consequence(Consequence = Seq("missense_variant", "NMD_transcript_variant"), Feature = "ENST00000636135.1")
+          ConsequenceInput(),
+          ConsequenceInput(Consequence  = Seq("missense_variant", "NMD_transcript_variant"), Feature = "ENST00000636135.1")
         )
       ),
-      variant(
+      VariantInput(
         INFO_ANN = Seq(
-          consequence()
+          ConsequenceInput()
         )
       )
     ).toDF()
 
     val output = Consequences.build(studyId, releaseId, df)
     output.as[ConsequenceOutput].collect() should contain theSameElementsAs Seq(
-      consequenceOutput(),
-      consequenceOutput(ensembl_transcript_id = Some("ENST00000636135.1")),
-      consequenceOutput(consequence = "NMD_transcript_variant", ensembl_transcript_id = Some("ENST00000636135.1"))
+      ConsequenceOutput(),
+      ConsequenceOutput(ensembl_transcript_id = Some("ENST00000636135.1")),
+      ConsequenceOutput(consequence = "NMD_transcript_variant", ensembl_transcript_id = Some("ENST00000636135.1"))
     )
   }
 
-  it should "return a dataframe with one consequence with regulatory feature" in {
+  it should "return a dataframe with one ConsequenceInput with regulatory feature" in {
     val df = Seq(
-      variant(
+      VariantInput(
         INFO_ANN = Seq(
-          consequence(Feature_type = "RegulatoryFeature", Feature = "ENSR0000636135")
+          ConsequenceInput(Feature_type = "RegulatoryFeature", Feature = "ENSR0000636135")
         )
       )
     ).toDF()
 
     val output = Consequences.build(studyId, releaseId, df)
     output.as[ConsequenceOutput].collect() should contain theSameElementsAs Seq(
-      consequenceOutput(ensembl_transcript_id = None, ensembl_regulatory_id = Some("ENSR0000636135"), feature_type = "RegulatoryFeature")
+      ConsequenceOutput(ensembl_transcript_id = None, ensembl_regulatory_id = Some("ENSR0000636135"), feature_type = "RegulatoryFeature")
     )
   }
 

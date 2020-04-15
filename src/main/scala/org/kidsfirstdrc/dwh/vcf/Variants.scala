@@ -28,6 +28,7 @@ object Variants {
 
   def build(studyId: String, releaseId: String, inputDF: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
+    inputDF.printSchema()
     val annotations = inputDF
       .select(
         chromosome,

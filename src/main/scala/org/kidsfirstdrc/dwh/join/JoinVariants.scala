@@ -26,6 +26,7 @@ object JoinVariants {
         }
 
     }
+    variants.show(false)
 
     val allColumns = Seq($"chromosome", $"start", $"reference", $"alternate", $"end", $"name", $"hgvsg", $"variant_class", $"release_id", $"freqs", $"study_id")
     val merged = if (mergeWithExisting && spark.catalog.tableExists(TABLE_NAME)) {
