@@ -40,7 +40,7 @@ object Occurences {
     val biospecimens = broadcast(
       spark
         .table(tableName("biospecimens", studyId, releaseId))
-        .select("biospecimen_id", "participant_id", "family_id", "dbgap_consent_code")
+        .select($"biospecimen_id", $"participant_id", $"family_id", when($"dbgap_consent_code".isNotNull, $"dbgap_consent_code").otherwise("none"))
     )
 
     occurences
