@@ -26,16 +26,13 @@ object JoinVariants {
         }
 
     }
-    variants.show(false)
 
-    val allColumns = Seq($"chromosome", $"start", $"reference", $"alternate", $"end", $"name", $"hgvsg", $"variant_class", $"release_id", $"freqs", $"study_id")
+    val commonColumns = Seq($"chromosome", $"start", $"reference", $"alternate", $"end", $"name", $"hgvsg", $"variant_class", $"release_id")
+    val allColumns = commonColumns :+ $"freqs" :+ $"study_id"
     val merged = if (mergeWithExisting && spark.catalog.tableExists(TABLE_NAME)) {
-
+      val existingColumns = commonColumns :+ explode($"by_study")
       val existingVariants = spark.table(TABLE_NAME)
-        .select(
-          $"chromosome", $"start", $"reference", $"alternate", $"end", $"name", $"hgvsg", $"variant_class", $"release_id",
-          explode($"by_study")
-        )
+        .select(existingColumns: _*)
         .withColumnRenamed("key", "study_id")
         .withColumnRenamed("value", "freqs")
         .where(not($"study_id".isin(studyIds: _*)))

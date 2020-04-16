@@ -15,7 +15,6 @@ object JoinConsequences {
     val consequences: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
         val nextDf = spark.table(SparkUtils.tableName("consequences", studyId, releaseId))
-          .withColumn("study_ids", array($"study_id"))
         if (currentDF.isEmpty)
           nextDf
         else {
@@ -25,7 +24,7 @@ object JoinConsequences {
 
     }
 
-    val allColumns = Seq(
+    val commonColumns = Seq(
       $"chromosome",
       $"start",
       $"end",
@@ -51,14 +50,18 @@ object JoinConsequences {
       $"cdna_position",
       $"protein_position",
       $"amino_acids",
-      $"codons",
-      $"study_ids"
+      $"codons"
     )
+    val allColumns = commonColumns :+ col("study_id")
     val merged = if (mergeWithExisting && spark.catalog.tableExists("consequences")) {
 
       val existingConsequences = spark.table("consequences")
 
-      mergeConsequences(releaseId, existingConsequences.select(allColumns: _*)
+      val existingColumns = commonColumns :+ $"study_ids"
+      mergeConsequences(releaseId, existingConsequences.select(existingColumns: _*)
+        .withColumn("study_id", explode($"study_ids"))
+        .drop("study_ids")
+        .where(not($"study_id".isin(studyIds: _*)))
         .union(consequences.select(allColumns: _*))
       )
     } else {
@@ -109,7 +112,7 @@ object JoinConsequences {
         firstAs("protein_position"),
         firstAs("amino_acids"),
         firstAs("codons"),
-        array_distinct(flatten(collect_list($"study_ids"))) as "study_ids"
+        collect_set($"study_id") as "study_ids"
       )
       .withColumn("aa_change", when($"amino_acids".isNotNull, concat($"amino_acids.reference", $"protein_position", $"amino_acids.variant")).otherwise(lit(null)))
       .withColumn("coding_dna_change", when($"cds_position".isNotNull, concat($"cds_position", $"reference", lit(">"), $"alternate")).otherwise(lit(null)))
