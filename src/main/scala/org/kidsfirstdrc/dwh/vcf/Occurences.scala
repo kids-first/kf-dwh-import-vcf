@@ -25,9 +25,11 @@ object Occurences {
         name,
         firstAnn,
         $"genotype.sampleId" as "biospecimen_id",
-        $"genotype",
+        $"genotype.alleleDepths" as "ad",
+        $"genotype.depth" as "dp",
+        $"genotype.conditionalQuality" as "gq",
+        $"genotype.calls" as "calls",
         array_contains($"genotype.calls", 1) as "has_alt",
-        familyColumn,
         is_multi_allelic,
         old_multi_allelic,
         lit(studyId) as "study_id",
@@ -40,7 +42,7 @@ object Occurences {
     val biospecimens = broadcast(
       spark
         .table(tableName("biospecimens", studyId, releaseId))
-        .select($"biospecimen_id", $"participant_id", $"family_id", when($"dbgap_consent_code".isNotNull, $"dbgap_consent_code").otherwise("none"))
+        .select($"biospecimen_id", $"participant_id", $"family_id", when($"dbgap_consent_code".isNotNull, $"dbgap_consent_code").otherwise("none") as "dbgap_consent_code")
     )
 
     occurences
@@ -55,7 +57,7 @@ object Occurences {
       .repartition($"dbgap_consent_code", $"chromosome")
       .withColumn("bucket",
         functions
-          .ntile(10)
+          .ntile(8)
           .over(
             Window.partitionBy("dbgap_consent_code", "chromosome")
               .orderBy("start")
