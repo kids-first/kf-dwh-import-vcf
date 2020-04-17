@@ -46,7 +46,7 @@ object Occurences {
     )
 
     occurences
-      .join(biospecimens, occurences("biospecimen_id") === biospecimens("biospecimen_id"), "left_outer")
+      .join(biospecimens, occurences("biospecimen_id") === biospecimens("biospecimen_id"), "inner")
       .drop(biospecimens("biospecimen_id"))
   }
 

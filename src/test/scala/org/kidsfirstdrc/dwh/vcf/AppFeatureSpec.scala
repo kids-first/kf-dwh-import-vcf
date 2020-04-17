@@ -62,17 +62,14 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
         val expectedOccurences = Seq(
           OccurencesOutput("1", 10438, 10440, "AC", "A", Some("rs112766696"), "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
           OccurencesOutput("1", 10438, 10440, "AC", "A", Some("rs112766696"), "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurencesOutput("1", 10438, 10440, "AC", "A", Some("rs112766696"), "BS_IJKL8901", "PT_000003", Some("FA_000001"), studyId, releaseId, "1"),
+
           OccurencesOutput("1", 10559, 10560, "C", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
           OccurencesOutput("1", 10559, 10560, "C", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurencesOutput("1", 10559, 10560, "C", "G", None, "BS_IJKL8901", "PT_000003", Some("FA_000001"), studyId, releaseId, "1"),
           //Multi-Allelic
           OccurencesOutput("1", 15273, 15274, "A", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
           OccurencesOutput("1", 15273, 15274, "A", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurencesOutput("1", 15273, 15274, "A", "G", None, "BS_IJKL8901", "PT_000003", Some("FA_000001"), studyId, releaseId, "1"),
           OccurencesOutput("1", 15273, 15274, "A", "T", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurencesOutput("1", 15273, 15274, "A", "T", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurencesOutput("1", 15273, 15274, "A", "T", None, "BS_IJKL8901", "PT_000003", Some("FA_000001"), studyId, releaseId, "1")
+          OccurencesOutput("1", 15273, 15274, "A", "T", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1")
         )
         occurences.collect() should contain theSameElementsAs expectedOccurences
 
@@ -97,7 +94,6 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
 
         And("Table consequences_sd_123456_re_abcdef should contain rows for the given study and release")
         spark.table("variant.consequences_sd_123456_re_abcdef").printSchema()
-
 
         val consequences = spark.table("variant.consequences_sd_123456_re_abcdef")
           .select(
