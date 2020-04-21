@@ -24,7 +24,7 @@ object ImportDataservice extends App {
     (multi(studyIds), releaseId, input, output, mergeExisting.toBoolean, tables)
   }
 
-  def build(studyIds: Set[String], releaseId: String, input: String, output: String, mergeExisting: Boolean, tables: Set[String]): Unit = {
+  def build(studyIds: Set[String], releaseId: String, input: String, output: String, mergeExisting: Boolean, tables: Set[String])(implicit spark:SparkSession): Unit = {
     (tables - "biospecimens").foreach { name =>
       write(studyIds, releaseId, input, output, mergeExisting, name)
     }
@@ -51,8 +51,8 @@ object ImportDataservice extends App {
     val releaseIdLc = releaseId.toLowerCase
     val unionsDF = studyIds.foldLeft(spark.emptyDataFrame) { (currentDF, studyId) =>
       val nextDf: DataFrame = load(studyId, spark)
-        .withColumn("release_id", lit(releaseId))
         .withColumn("study_id", lit(studyId))
+        .withColumn("release_id", lit(releaseId))
       if (currentDF.isEmpty) {
         nextDf
       } else {
@@ -60,7 +60,6 @@ object ImportDataservice extends App {
           .union(nextDf)
       }
     }
-
     val merged = if (mergeExisting && spark.catalog.tableExists(name)) {
       val existing = spark.table(name).where(not($"study_id".isin(studyIds.toSeq: _*)))
       existing.union(unionsDF)
