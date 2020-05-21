@@ -16,8 +16,8 @@ object Model {
                          )
 
   case class VariantOutput(chromosome: String = "2",
-                           start: Long = 165310405,
-                           end: Long = 165310405,
+                           start: Long = 165310406,
+                           end: Long = 165310406,
                            reference: String = "G",
                            alternate: String = "A",
                            hgvsg: String = "chr2:g.166166916G>A",
@@ -58,8 +58,8 @@ object Model {
   case class RefAlt(reference: String, variant: String)
 
   case class ConsequenceOutput(chromosome: String = "2",
-                               start: Long = 165310405,
-                               end: Long = 165310405,
+                               start: Long = 165310406,
+                               end: Long = 165310406,
                                reference: String = "G",
                                alternate: String = "A",
                                symbol: String = "SCN2A",
@@ -111,8 +111,8 @@ object Model {
                              )
 
   case class JoinVariantOutput(chromosome: String = "2",
-                               start: Long = 165310405,
-                               end: Long = 165310405,
+                               start: Long = 165310406,
+                               end: Long = 165310406,
                                reference: String = "G",
                                alternate: String = "A",
                                name: String = "rs1057520413",
@@ -133,8 +133,8 @@ object Model {
                               )
 
   case class JoinConsequenceOutput(chromosome: String = "2",
-                                   start: Long = 165310405,
-                                   end: Long = 165310405,
+                                   start: Long = 165310406,
+                                   end: Long = 165310406,
                                    reference: String = "G",
                                    alternate: String = "A",
                                    symbol: String = "SCN2A",
@@ -167,7 +167,7 @@ object Model {
                                   )
 
   case class DBSNFPScore(chromosome: String = "2",
-                         start: Long = 165310405,
+                         start: Long = 165310406,
                          reference: String = "G",
                          alternate: String = "A",
                          symbol: String = "SCN2A",
@@ -181,8 +181,8 @@ object Model {
   case class Freq(an: Long, ac: Long, af: BigDecimal, homozygotes: Long, heterozygotes: Long)
 
   case class FrequencyEntry(chromosome: String = "2",
-                            start: Long = 165310405,
-                            end: Long = 165310405,
+                            start: Long = 165310406,
+                            end: Long = 165310406,
                             reference: String = "G",
                             alternate: String = "A",
                             ac: Long = 10,
@@ -190,8 +190,8 @@ object Model {
                             af: BigDecimal = 0.5, homozygotes: Long = 10, heterozygotes: Long = 10)
 
   case class ClinvarEntry(chromosome: String = "2",
-                          start: Long = 165310405,
-                          end: Long = 165310405,
+                          start: Long = 165310406,
+                          end: Long = 165310406,
                           reference: String = "G",
                           alternate: String = "A",
                           name: String = "RCV000436956",

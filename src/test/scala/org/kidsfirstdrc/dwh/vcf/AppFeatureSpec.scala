@@ -60,16 +60,16 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
           .as[OccurrencesOutput]
 
         val expectedOccurrences = Seq(
-          OccurrencesOutput("1", 10438, 10440, "AC", "A", Some("rs112766696"), "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurrencesOutput("1", 10438, 10440, "AC", "A", Some("rs112766696"), "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
+          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
+          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
 
-          OccurrencesOutput("1", 10559, 10560, "C", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurrencesOutput("1", 10559, 10560, "C", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
+          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
+          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
           //Multi-Allelic
-          OccurrencesOutput("1", 15273, 15274, "A", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurrencesOutput("1", 15273, 15274, "A", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurrencesOutput("1", 15273, 15274, "A", "T", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurrencesOutput("1", 15273, 15274, "A", "T", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1")
+          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
+          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
+          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
+          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1")
         )
         occurrences.collect() should contain theSameElementsAs expectedOccurrences
 
@@ -85,10 +85,10 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
           )
           .as[(String, Long, Long, String, String, String)]
         val expectedVariants = Seq(
-          ("1", 10438, 10440, "AC", "A", "chr1:g.10443del"),
-          ("1", 10559, 10560, "C", "G", "chr1:g.10560C>G"),
-          ("1", 15273, 15274, "A", "G", "chr1:g.15274A>G"),
-          ("1", 15273, 15274, "A", "T", "chr1:g.15274A>T")
+          ("1", 10439, 10441, "AC", "A", "chr1:g.10443del"),
+          ("1", 10560, 10561, "C", "G", "chr1:g.10560C>G"),
+          ("1", 15274, 15275, "A", "G", "chr1:g.15274A>G"),
+          ("1", 15274, 15275, "A", "T", "chr1:g.15274A>T")
         )
         variants.collect() should contain theSameElementsAs expectedVariants
 
@@ -107,14 +107,14 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
           ).as[(String, Long, Long, String, String, String, String)]
 
         val expectedConsequences = Seq(
-          ("1", 10438L, 10440L, "AC", "A", "DDX11L1", "ENST00000450305"),
-          ("1", 10438L, 10440L, "AC", "A", "DDX11L1", "ENST00000456328"),
-          ("1", 10438L, 10440L, "AC", "A", "WASH7P", "ENST00000488147"),
-          ("1", 10559L, 10560L, "C", "G", "DDX11L1", "ENST00000450305"),
-          ("1", 10559L, 10560L, "C", "G", "DDX11L1", "ENST00000456328"),
-          ("1", 10559L, 10560L, "C", "G", "WASH7P", "ENST00000488147"),
-          ("1", 15273L, 15274L, "A", "G", "MIR6859-1", "ENST00000619216"),
-          ("1", 15273L, 15274L, "A", "T", "MIR6859-1", "ENST00000619216")
+          ("1", 10439L, 10441L, "AC", "A", "DDX11L1", "ENST00000450305"),
+          ("1", 10439L, 10441L, "AC", "A", "DDX11L1", "ENST00000456328"),
+          ("1", 10439L, 10441L, "AC", "A", "WASH7P", "ENST00000488147"),
+          ("1", 10560L, 10561L, "C", "G", "DDX11L1", "ENST00000450305"),
+          ("1", 10560L, 10561L, "C", "G", "DDX11L1", "ENST00000456328"),
+          ("1", 10560L, 10561L, "C", "G", "WASH7P", "ENST00000488147"),
+          ("1", 15274L, 15275L, "A", "G", "MIR6859-1", "ENST00000619216"),
+          ("1", 15274L, 15275L, "A", "T", "MIR6859-1", "ENST00000619216")
 
         )
 

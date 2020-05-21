@@ -17,8 +17,8 @@ object Import1k extends App {
   val output = "s3a://kf-variant-parquet-prd"
   vcf(input)
     .select(chromosome,
-      $"start",
-      $"end",
+      start,
+      end,
       name,
       reference,
       alternate,

@@ -32,6 +32,9 @@ object SparkUtils {
   object columns {
     val chromosome: Column = ltrim(col("contigName"), "chr") as "chromosome"
     val reference: Column = col("referenceAllele") as "reference"
+    val start: Column = (col("start") + 1) as "start"
+    val end: Column = (col("end") + 1) as "end"
+
     val alternate: Column = col("alternateAlleles")(0) as "alternate"
     val name: Column = col("names")(0) as "name"
     val calculated_af: Column = col("ac").divide(col("an")).cast(DecimalType(8, 8)) as "af"

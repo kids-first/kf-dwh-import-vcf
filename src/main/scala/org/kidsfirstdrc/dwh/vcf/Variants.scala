@@ -32,8 +32,8 @@ object Variants {
     val annotations = inputDF
       .select(
         chromosome,
-        $"start",
-        $"end",
+        start,
+        end,
         reference,
         alternate,
         ac,

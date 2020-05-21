@@ -18,8 +18,8 @@ object Occurrences {
       .withColumn("genotype", explode($"genotypes"))
       .select(
         chromosome,
-        $"start",
-        $"end",
+        start,
+        end,
         reference,
         alternate,
         name,

@@ -18,8 +18,8 @@ object ImportClinVar extends App {
   val output = "s3://kf-variant-parquet-prd"
   vcf(input)
     .select(chromosome,
-      $"start",
-      $"end",
+      start,
+      end,
       name,
       reference,
       alternate,

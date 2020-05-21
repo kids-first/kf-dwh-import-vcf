@@ -18,7 +18,7 @@ object ImportDBSNFP extends App {
     .option("nullValue", ".")
     .schema(schema.schema)
     .csv("s3a://kf-variant-parquet-prd/dbSNFP/variant/*.gz")
-    .withColumn("start", $"position_1-based" - 1)
+    .withColumnRenamed("position_1-based", "start")
     .write.mode(SaveMode.Overwrite)
     .partitionBy("chromosome")
     .format("parquet")

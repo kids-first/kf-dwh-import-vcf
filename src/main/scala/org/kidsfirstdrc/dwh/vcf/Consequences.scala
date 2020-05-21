@@ -29,8 +29,8 @@ object Consequences {
     val consequencesDF = inputDF
       .select(
         chromosome,
-        $"start",
-        $"end",
+        start,
+        end,
         reference,
         alternate,
         name,

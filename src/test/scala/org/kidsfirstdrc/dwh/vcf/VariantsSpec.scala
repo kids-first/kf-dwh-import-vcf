@@ -24,7 +24,7 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
     val output = Variants.build(studyId, releaseId, df)
     output.as[VariantOutput].collect() should contain theSameElementsAs Seq(
       VariantOutput(ac = 6, an = 12, af = 0.5, homozygotes = 2, heterozygotes = 2),
-      VariantOutput(chromosome = "3", start = 2000, end = 2001, reference = "A", alternate = "T", name = Some("mutation_2"), hgvsg = "chr2:g.2000A>T", ac = 4, an = 6, af = 0.66666667, homozygotes = 0, heterozygotes = 1)
+      VariantOutput(chromosome = "3", start = 2001, end = 2002, reference = "A", alternate = "T", name = Some("mutation_2"), hgvsg = "chr2:g.2000A>T", ac = 4, an = 6, af = 0.66666667, homozygotes = 0, heterozygotes = 1)
     )
   }
 
