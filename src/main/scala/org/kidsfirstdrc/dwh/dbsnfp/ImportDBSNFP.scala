@@ -22,7 +22,7 @@ object ImportDBSNFP extends App {
     .write.mode(SaveMode.Overwrite)
     .partitionBy("chromosome")
     .format("parquet")
-    .option("path", "s3a://kf-variant-parquet-prd/dbSNFP/parquet/variant")
+    .option("path", "s3a://kf-variant-parquet-prd/public/dbSNFP/parquet/variant")
     .saveAsTable("variant.dbsnfp")
 
 
@@ -143,7 +143,7 @@ object ImportDBSNFP extends App {
     .write.mode("overwrite")
     .partitionBy("chromosome")
     .format("parquet")
-    .option("path", "s3a://kf-variant-parquet-prd/dbSNFP/parquet/scores")
+    .option("path", "s3a://kf-variant-parquet-prd/public/dbSNFP/parquet/scores")
     .saveAsTable("variant.dbsnfp_scores")
 
 

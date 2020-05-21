@@ -16,4 +16,4 @@ for (k,v) in gnomad_freq_dict.items():
         df=df.withColumn(columnName,df['freq'].getItem(v)[c])
 
 df=df.drop('freq').where(col('af').isNotNull())
-df.repartition("chromosome").sortWithinPartitions("start").write.mode('overwrite').format("parquet").option("path", "s3://kf-variant-parquet-prd/gnomad/gnomad_genomes_2.1.1_liftover_grch38").saveAsTable("variant.gnomad_genomes_2_1_1_liftover_grch38")
+df.repartition("chromosome").sortWithinPartitions("start").write.mode('overwrite').format("parquet").option("path", "s3://kf-variant-parquet-prd/public/gnomad/gnomad_genomes_2.1.1_liftover_grch38").saveAsTable("variant.gnomad_genomes_2_1_1_liftover_grch38")

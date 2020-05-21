@@ -15,7 +15,7 @@ object ImportClinVar extends App {
   import spark.implicits._
   
   val input = "s3://kf-variant-parquet-prd/raw/clinvar/clinvar_20200217.vcf.gz"
-  val output = "s3://kf-variant-parquet-prd"
+  val output = "s3://kf-variant-parquet-prd/public"
   vcf(input)
     .select(chromosome,
       start,
