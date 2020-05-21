@@ -8,7 +8,7 @@ mt = hl.read_table('s3a://kf-variant-parquet-prd/raw/gnomad/gnomad.genomes.r2.1.
 freq_dict=mt.freq_index_dict.collect()
 gnomad_freq_dict = {k:v for (k,v) in freq_dict[0].items() if k.startswith('gnomad') and not k.startswith('gnomad_raw')}
 df=mt.to_spark()
-df=df.select(translate(col('`locus.contig`'), 'chr', '').alias('chromosome'), (col('`locus.position`') - 1).alias('start'), col('alleles').getItem(0).alias('reference'), col('alleles').getItem(1).alias('alternate'), col('freq'))
+df=df.select(translate(col('`locus.contig`'), 'chr', '').alias('chromosome'), (col('`locus.position`')).alias('start'), col('alleles').getItem(0).alias('reference'), col('alleles').getItem(1).alias('alternate'), col('freq'))
 for (k,v) in gnomad_freq_dict.items():
     for c in ['AC', 'AN', 'AF', 'homozygote_count']:
         columnName=k.replace('gnomad_', '') + '_' + c.lower().replace('homozygote_count', 'hom')

@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
 import org.apache.spark.sql.{SaveMode, SparkSession}
+import org.apache.spark.sql.functions._
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
@@ -28,8 +29,8 @@ object ImportTopMed extends App {
       $"INFO_HOM"(0) as "hom",
       $"INFO_HET"(0) as "het",
       $"qual",
-      $"filters"
-
+      $"filters",
+      when(size($"filters") === 1 && $"filters"(0) === "PASS", "PASS").when(array_contains($"filters","PASS"), "PASS+FAIL").otherwise("FAIL") as "qual_filter"
     )
     .repartition($"chromosome")
     .sortWithinPartitions("start")
