@@ -1,5 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.types._
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
@@ -39,4 +41,18 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
     )
   }
 
+  "genotype_states" should "run" in {
+
+    import io.projectglow.Glow
+    Glow.register(spark)
+    val df = Seq(
+      VariantInput(INFO_AC = Seq(2), INFO_AN = 6, genotypes = Seq(hom_00, hom_11, het_01), INFO_ANN = Seq(ConsequenceInput(), ConsequenceInput(Allele = "T", HGVSg = "chr2:g.166166916G>T")), splitFromMultiAllelic = true),
+      VariantInput(alternateAlleles = Seq("T"), INFO_AC = Seq(4), INFO_AN = 6, genotypes = Seq(Genotype(Array(-1,1)), Genotype(Array(-1,0)), Genotype(Array(1,-1))), INFO_ANN = Seq(ConsequenceInput(), ConsequenceInput(Allele = "T", HGVSg = "chr2:g.166166916G>T")), splitFromMultiAllelic = true)
+    ).toDF()
+
+
+    val num_alt_alleles_df = df.selectExpr("genotype_states(genotypes) as num_alt_alleles_col")
+    num_alt_alleles_df.show()
+
+  }
 }

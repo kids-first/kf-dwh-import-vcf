@@ -3,14 +3,16 @@ package org.kidsfirstdrc.dwh.utils
 import io.projectglow.Glow
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ArrayType, DecimalType, IntegerType}
+import org.apache.spark.sql.types.{ArrayType, DecimalType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 object SparkUtils {
   def vcf(input: String)(implicit spark: SparkSession): DataFrame = {
+    val inputs = input.split(",")
     val df = spark.read.format("vcf")
       .option("flattenInfoFields", "true")
-      .load(input)
+      .load(inputs: _*)
+
     Glow.transform("split_multiallelics", df)
   }
 
@@ -59,8 +61,8 @@ object SparkUtils {
     val symbol: Column = col("annotation.SYMBOL") as "symbol"
     val feature_type: Column = col("annotation.Feature_type") as "feature_type"
     val ensembl_gene_id: Column = col("annotation.Gene") as "ensembl_gene_id"
-    val ensembl_transcript_id: Column = when( col("annotation.Feature_type") === "Transcript" ,col("annotation.Feature")).otherwise(null) as "ensembl_transcript_id"
-    val ensembl_regulatory_id: Column = when( col("annotation.Feature_type") === "RegulatoryFeature" ,col("annotation.Feature")).otherwise(null) as "ensembl_regulatory_id"
+    val ensembl_transcript_id: Column = when(col("annotation.Feature_type") === "Transcript", col("annotation.Feature")).otherwise(null) as "ensembl_transcript_id"
+    val ensembl_regulatory_id: Column = when(col("annotation.Feature_type") === "RegulatoryFeature", col("annotation.Feature")).otherwise(null) as "ensembl_regulatory_id"
     val exon: Column = col("annotation.EXON") as "exon"
     val biotype: Column = col("annotation.BIOTYPE") as "biotype"
     val intron: Column = col("annotation.INTRON") as "intron"

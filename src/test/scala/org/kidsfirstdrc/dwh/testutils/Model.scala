@@ -31,7 +31,7 @@ object Model {
                            study_id: String = "SD_123456",
                            release_id: String = "RE_ABCDEF")
 
-  case class OccurencesOutput(chromosome: String,
+  case class OccurrencesOutput(chromosome: String,
                               start: Long,
                               end: Long,
                               reference: String,

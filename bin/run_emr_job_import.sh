@@ -6,8 +6,9 @@ instance_type=${4:-"m5d.4xlarge"}
 number_instance=${5:-"20"}
 study_id_lc=$(echo "$study_id" | tr '[:upper:]' '[:lower:]')
 file_pattern=${6:-"s3a://kf-study-us-east-1-prd-sd-${study_id_lc}/harmonized/family-variants/*postCGP.filtered.deNovo.vep.vcf.gz"}
+biospecimen_id_column=${7:-"biospecimen_id"}
 
-steps="[{\"Args\":[\"spark-submit\",\"--packages\",\"io.projectglow:glow_2.11:0.3.0\", \"--exclude-packages\", \"org.apache.httpcomponents:httpcore,org.apache.httpcomponents:httpclient\",\"--deploy-mode\",\"client\",\"--class\",\"org.kidsfirstdrc.dwh.vcf.ImportVcf\",\"s3a://kf-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar\",\"SD_${study_id}\",\"${release_id}\",\"${file_pattern}\",\"s3a://kf-variant-parquet-prd\", \"${job}\"],\"Type\":\"CUSTOM_JAR\",\"ActionOnFailure\":\"TERMINATE_CLUSTER\",\"Jar\":\"command-runner.jar\",\"Properties\":\"\",\"Name\":\"Spark application\"}]"
+steps="[{\"Args\":[\"spark-submit\",\"--packages\",\"io.projectglow:glow_2.11:0.3.0\", \"--exclude-packages\", \"org.apache.httpcomponents:httpcore,org.apache.httpcomponents:httpclient\",\"--deploy-mode\",\"client\",\"--class\",\"org.kidsfirstdrc.dwh.vcf.ImportVcf\",\"s3a://kf-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar\",\"SD_${study_id}\",\"${release_id}\",\"${file_pattern}\",\"s3a://kf-variant-parquet-prd\", \"${job}\", \"${biospecimen_id_column}\"],\"Type\":\"CUSTOM_JAR\",\"ActionOnFailure\":\"TERMINATE_CLUSTER\",\"Jar\":\"command-runner.jar\",\"Properties\":\"\",\"Name\":\"Spark application\"}]"
 instance_groups="[{\"InstanceCount\":${number_instance},\"InstanceGroupType\":\"CORE\",\"InstanceType\":\"${instance_type}\",\"Name\":\"Core - 2\"},{\"InstanceCount\":1,\"EbsConfiguration\":{\"EbsBlockDeviceConfigs\":[{\"VolumeSpecification\":{\"SizeInGB\":32,\"VolumeType\":\"gp2\"},\"VolumesPerInstance\":2}]},\"InstanceGroupType\":\"MASTER\",\"InstanceType\":\"m5.xlarge\",\"Name\":\"Master - 1\"}]"
 
 aws emr create-cluster --applications Name=Hadoop Name=Spark \

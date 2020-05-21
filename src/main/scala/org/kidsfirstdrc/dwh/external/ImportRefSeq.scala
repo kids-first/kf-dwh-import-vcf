@@ -28,7 +28,7 @@ object ImportRefSeq extends App {
   val splitToMap = udf(splitToMapFn)
 
   val input = "s3a://kf-variant-parquet-prd/raw/refseq/Homo_sapiens.gene_info.gz"
-  val output = "s3://kf-variant-parquet-prd"
+  val output = "s3a://kf-variant-parquet-prd"
   spark.read.format("csv")
     .option("inferSchema", "true")
     .option("header", "true")

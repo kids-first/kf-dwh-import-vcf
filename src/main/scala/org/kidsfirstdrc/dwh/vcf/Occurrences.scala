@@ -6,15 +6,15 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-object Occurences {
+object Occurrences {
 
-  def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
-    write(build(studyId, releaseId, input), output, studyId, releaseId)
+  def run(studyId: String, releaseId: String, input: String, output: String, biospecimenIdColumn: String)(implicit spark: SparkSession): Unit = {
+    write(build(studyId, releaseId, input, biospecimenIdColumn), output, studyId, releaseId)
   }
 
-  def build(studyId: String, releaseId: String, input: String)(implicit spark: SparkSession): DataFrame = {
+  def build(studyId: String, releaseId: String, input: String, biospecimenIdColumn: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val occurences = vcf(input)
+    val occurrences = vcf(input)
       .withColumn("genotype", explode($"genotypes"))
       .select(
         chromosome,
@@ -39,20 +39,21 @@ object Occurences {
       .withColumn("variant_class", variant_class)
       .drop("annotation")
 
+    val biospecimen_id_col = col(biospecimenIdColumn).as("joined_sample_id")
     val biospecimens = broadcast(
       spark
         .table(tableName("biospecimens", studyId, releaseId))
-        .select($"biospecimen_id", $"participant_id", $"family_id", when($"dbgap_consent_code".isNotNull, $"dbgap_consent_code").otherwise("none") as "dbgap_consent_code")
+        .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id", when($"dbgap_consent_code".isNotNull, $"dbgap_consent_code").otherwise("none") as "dbgap_consent_code")
     )
 
-    occurences
-      .join(biospecimens, occurences("biospecimen_id") === biospecimens("biospecimen_id"), "inner")
-      .drop(biospecimens("biospecimen_id"))
+    occurrences
+      .join(biospecimens, occurrences("biospecimen_id") === biospecimens("joined_sample_id"), "inner")
+      .drop(occurrences("biospecimen_id")).drop(biospecimens("joined_sample_id"))
   }
 
   def write(df: DataFrame, output: String, studyId: String, releaseId: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
-    val tableOccurence = tableName("occurences", studyId, releaseId)
+    val tableOccurence = tableName("occurrences", studyId, releaseId)
     df
       .repartition($"dbgap_consent_code", $"chromosome")
       .withColumn("bucket",
@@ -66,9 +67,9 @@ object Occurences {
       .repartition($"dbgap_consent_code", $"chromosome", $"bucket")
       .sortWithinPartitions($"dbgap_consent_code", $"chromosome", $"bucket", $"start")
       .write.mode(SaveMode.Overwrite)
-      .partitionBy("study_id", "release_id", "dbgap_consent_code", "chromosome")
+      .partitionBy("study_id", "dbgap_consent_code", "chromosome")
       .format("parquet")
-      .option("path", s"$output/occurences/$tableOccurence")
+      .option("path", s"$output/occurrences/$tableOccurence")
       .saveAsTable(tableOccurence)
   }
 
