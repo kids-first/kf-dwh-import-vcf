@@ -13,6 +13,16 @@ In prerequisite, you need a service account in GoogleCloud :
 
 
 1) Start an EMR cluster (1 master - 10 slaves, with Zeppelin, Spark)
+```
+aws emr create-cluster \
+--applications Name=Hadoop Name=Spark Name=Zeppelin Name=JupyterHub \
+--ebs-root-volume-size 50 \
+--ec2-attributes '{"KeyName":"flintrock","AdditionalSlaveSecurityGroups":["sg-059bf5fe80ff903be"],"InstanceProfile":"EMR_EC2_DefaultRole","ServiceAccessSecurityGroup":"sg-0487486fd3d67c14e","SubnetId":"subnet-a756a3ed","EmrManagedSlaveSecurityGroup":"sg-0807b9c40bb37be85","EmrManagedMasterSecurityGroup":"sg-012f30e67b51b6f4d","AdditionalMasterSecurityGroups":["sg-059bf5fe80ff903be"]}' --service-role EMR_DefaultRole --enable-debugging --release-label emr-5.29.0 --log-uri 's3n://aws-logs-538745987955-us-east-1/elasticmapreduce/' \
+--name 'Import external databases' \
+--instance-groups '[{"InstanceCount":1,"EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"SizeInGB":300,"VolumeType":"gp2"},"VolumesPerInstance":1}],"EbsOptimized":true},"InstanceGroupType":"MASTER","InstanceType":"m5.xlarge","Name":"Master - 1"},{"InstanceCount":10,"EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"SizeInGB":64,"VolumeType":"gp2"},"VolumesPerInstance":4}]},"InstanceGroupType":"CORE","InstanceType":"m5.4xlarge","Name":"Core - 2"}]' \
+--configurations '[{"Classification":"spark","Properties":{"maximizeResourceAllocation":"true"}},{"Classification":"spark-defaults","Properties":{"spark.jars.packages":"com.amazonaws:aws-java-sdk:1.11.683,org.apache.hadoop:hadoop-aws:2.8.5,io.projectglow:glow_2.11:0.2.0","spark.hadoop.fs.s3a.connection.maximum":"5000","spark.pyspark.python":"/usr/bin/python3"}},{"Classification":"emrfs-site","Properties":{"fs.s3.maxConnections":"5000"}},{"Classification":"spark-hive-site","Properties":{"hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"}}]' \
+--scale-down-behavior TERMINATE_AT_TASK_COMPLETION --region us-east-1
+```
 2) connect on the master with ssh
 3) Download this [jar](https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop2-latest.jar) and copy this into /usr/lib/spark/jars
 4) Add into /etc/hadoop/conf/core-site.xml :
