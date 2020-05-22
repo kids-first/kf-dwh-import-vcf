@@ -16,7 +16,7 @@ object ImportClinVar extends App {
   
   val input = "s3://kf-variant-parquet-prd/raw/clinvar/clinvar_20200217.vcf.gz"
   val output = "s3://kf-variant-parquet-prd/public"
-  vcf(input)
+  vcf(input)(spark)
     .select(chromosome,
       start,
       end,

@@ -16,7 +16,7 @@ object ImportTopMed extends App {
 
   val input = "s3://kf-variant-parquet-prd/raw/topmed/bravo-dbsnp-all.vcf.gz"
   val output = "s3://kf-variant-parquet-prd/public"
-  vcf(input)
+  vcf(input)(spark)
     .select(chromosome,
       start,
       end,

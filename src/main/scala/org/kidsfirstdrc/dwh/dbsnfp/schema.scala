@@ -4,7 +4,9 @@ import org.apache.spark.sql.types._
 
 
 object schema {
-  /*private val schemaPart1 = new StructType()
+  /*
+  //For now we keep this schema definition in comment , because it breaks the compilation due to the too large number of fields
+  private val schemaPart1 = new StructType()
     .add("chromosome", StringType, true)
     .add("position_1-based", IntegerType, true)
     .add("ref", StringType, true)
@@ -385,7 +387,7 @@ object schema {
     .add("GTEx_V7_gene", StringType, true)
     .add("GTEx_V7_tissue", StringType, true)
     .add("Geuvadis_eQTL_target_gene", StringType, true)
-
 */
+
   val schema = new StructType()
 }

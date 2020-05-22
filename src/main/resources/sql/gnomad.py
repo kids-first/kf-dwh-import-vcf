@@ -1,5 +1,6 @@
 %pyspark
-from pyspark.sql.functions import col
+from pyspark.sql.functions import col,translate
+
 import hail as hl
 
 hl.init(sc=sc)
