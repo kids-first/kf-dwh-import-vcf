@@ -18,7 +18,7 @@ steps=$(cat <<EOF
       "${study_ids}",
       "${release_id}",
       "s3a://kf-variant-parquet-prd/raw/dataservice",
-      "s3a://kf-variant-parquet-prd",
+      "s3a://kf-variant-parquet-prd/dataservice",
       "${mergeExisting}",
       "${tables}"
     ],
