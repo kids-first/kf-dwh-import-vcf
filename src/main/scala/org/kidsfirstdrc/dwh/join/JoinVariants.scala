@@ -84,23 +84,32 @@ object JoinVariants {
   def joinWithPopulations(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
     val genomes = spark.table("1000_genomes")
     val topmed = spark.table("topmed_bravo")
-    val gnomad = spark.table("gnomad_genomes_2_1_1_liftover_grch38")
+    val gnomad_genomes_2_1 = spark.table("gnomad_genomes_2_1_1_liftover_grch38")
+    val gnomad_exomes_2_1 = spark.table("gnomad_exomes_2_1_1_liftover_grch38")
+    val gnomad_genomes_3_0 = spark.table("gnomad_genomes_3_0")
 
-    val join1k = variants
-      .join(genomes, variants("chromosome") === genomes("chromosome") && variants("start") === genomes("start") && variants("reference") === genomes("reference") && variants("alternate") === genomes("alternate"), "left")
-      .select(variants("*"), when(genomes("chromosome").isNull, lit(null)).otherwise(struct(genomes.drop("chromosome", "start", "end", "name", "reference", "alternate")("*"))) as "1k_genomes")
+    val join1k = joinAndMerge(variants, genomes, "1k_genomes")
+    val joinTopmed = joinAndMerge(join1k, topmed, "topmed")
+    val join_gnomad_genomes_2_1 = joinAndMerge(joinTopmed, gnomad_genomes_2_1, "gnomad_genomes_2_1")
+    val join_gnomad_exomes_2_1 = joinAndMerge(join_gnomad_genomes_2_1, gnomad_exomes_2_1, "gnomad_exomes_2_1")
+    val join_gnomad_genomes_3_0 = joinAndMerge(join_gnomad_exomes_2_1, gnomad_genomes_3_0, "gnomad_genomes_3_0")
 
-    val joinTopmed = join1k.join(topmed, join1k("chromosome") === topmed("chromosome") && join1k("start") === topmed("start") && join1k("reference") === topmed("reference") && join1k("alternate") === topmed("alternate"), "left")
-      .select(join1k("*"), when(topmed("chromosome").isNull, lit(null)).otherwise(struct(topmed.drop("chromosome", "start", "end", "name", "reference", "alternate")("*"))) as "topmed")
+    join_gnomad_genomes_3_0
+  }
 
-    joinTopmed.join(gnomad, joinTopmed("chromosome") === gnomad("chromosome") && joinTopmed("start") === gnomad("start") && joinTopmed("reference") === gnomad("reference") && joinTopmed("alternate") === gnomad("alternate"), "left")
-      .select(joinTopmed("*"), when(gnomad("chromosome").isNull, lit(null)).otherwise(struct(gnomad.drop("chromosome", "start", "end", "name", "reference", "alternate")("*"))) as "gnomad_2_1")
+  def joinAndMerge(df1: DataFrame, df2: DataFrame, outputColumnName: String): DataFrame = {
+    joinByLocus(df1, df2)
+      .select(df1("*"), when(df2("chromosome").isNull, lit(null)).otherwise(struct(df2.drop("chromosome", "start", "end", "name", "reference", "alternate")("*"))) as outputColumnName)
+  }
 
+
+  private def joinByLocus(df1: DataFrame, df2: DataFrame) = {
+    df1.join(df2, df1("chromosome") === df2("chromosome") && df1("start") === df2("start") && df1("reference") === df2("reference") && df1("alternate") === df2("alternate"), "left")
   }
 
   def joinWithClinvar(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
     val clinvar = spark.table("clinvar")
-    variants.join(clinvar, variants("chromosome") === clinvar("chromosome") && variants("start") === clinvar("start") && variants("reference") === clinvar("reference") && variants("alternate") === clinvar("alternate"), "left")
+    joinByLocus(variants, clinvar)
       .select(variants("*"), clinvar("name") as "clinvar_id", clinvar("clin_sig") as "clin_sig")
   }
 
