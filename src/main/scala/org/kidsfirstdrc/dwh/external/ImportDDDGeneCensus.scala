@@ -22,7 +22,7 @@ object ImportDDDGeneCensus extends App {
       $"DDD category" as "ddd_category",
       $"mutation consequence" as "mutation_consequence",
       split($"phenotypes", ";") as "phenotypes",
-      split($"organ specificity list", ";") as " organ_specificity",
+      split($"organ specificity list", ";") as "organ_specificity",
       $"panel",
       $"hgnc id" as "hgnc_id"
     )
