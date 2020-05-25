@@ -22,8 +22,8 @@ object ImportDBSNFP extends App {
     .write.mode(SaveMode.Overwrite)
     .partitionBy("chromosome")
     .format("parquet")
-    .option("path", "s3a://kf-variant-parquet-prd/public/dbSNFP/parquet/variant")
-    .saveAsTable("variant.dbsnfp")
+    .option("path", "s3a://kf-variant-parquet-prd/public/dbnsfp/parquet/variant")
+    .saveAsTable("variant.dbnsfp")
 
 
   import org.apache.spark.sql.Column
@@ -40,7 +40,7 @@ object ImportDBSNFP extends App {
 
 
 
-  spark.table("variant.dbsnfp").select(
+  spark.table("variant.dbnsfp").select(
     $"chromosome",
     $"start",
     $"ref",
@@ -143,8 +143,8 @@ object ImportDBSNFP extends App {
     .write.mode("overwrite")
     .partitionBy("chromosome")
     .format("parquet")
-    .option("path", "s3a://kf-variant-parquet-prd/public/dbSNFP/parquet/scores")
-    .saveAsTable("variant.dbsnfp_scores")
+    .option("path", "s3a://kf-variant-parquet-prd/public/dbnsfp/parquet/scores")
+    .saveAsTable("variant.dbnsfp_scores")
 
 
 }
