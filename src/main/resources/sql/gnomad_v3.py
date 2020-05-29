@@ -19,4 +19,4 @@ for (k,v) in  freq_dict[0].items():
         df=df.withColumn(columnName,df['freq'].getItem(v)[c])
 
 df=df.drop('freq').where(col('af').isNotNull())
-df.repartition("chromosome").sortWithinPartitions("start").write.mode('overwrite').format("parquet").option("path", "s3://kf-variant-parquet-prd/public/gnomad/gnomad_genomes_3.0").saveAsTable("variant.gnomad_genomes_3_0")
+df.repartition("chromosome").sortWithinPartitions("start").write.mode('overwrite').format("parquet").option("path", "s3a://kf-variant-parquet-prd/public/gnomad/gnomad_genomes_3.0").saveAsTable("variant.gnomad_genomes_3_0")
