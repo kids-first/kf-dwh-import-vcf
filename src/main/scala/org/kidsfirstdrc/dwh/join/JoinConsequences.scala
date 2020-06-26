@@ -123,7 +123,7 @@ object JoinConsequences {
 
 
   def joinWithDBNSFP(c: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    val s = spark.table("dbnsfp_scores")
+    val s = spark.table("variant.dbnsfp_scores")
       .drop(
         "aaref",
         "symbol",

@@ -11,7 +11,7 @@ val spark_version = "2.4.5"
 
 /* Runtime */
 libraryDependencies +=  "org.apache.spark" %% "spark-sql" % spark_version % Provided
-libraryDependencies += "io.projectglow" %% "glow" % "0.3.0" % Provided
+libraryDependencies += "io.projectglow" %% "glow" % "0.4.0" % Provided
 
 /* Test */
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0" % "test"
