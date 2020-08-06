@@ -32,17 +32,17 @@ object Model {
                            release_id: String = "RE_ABCDEF")
 
   case class OccurrencesOutput(chromosome: String,
-                              start: Long,
-                              end: Long,
-                              reference: String,
-                              alternate: String,
-                              name: Option[String],
-                              biospecimen_id: String,
-                              participant_id: String,
-                              family_id: Option[String],
-                              study_id: String,
-                              release_id: String,
-                              dbgap_consent_code: String)
+                               start: Long,
+                               end: Long,
+                               reference: String,
+                               alternate: String,
+                               name: Option[String],
+                               biospecimen_id: String,
+                               participant_id: String,
+                               family_id: Option[String],
+                               study_id: String,
+                               release_id: String,
+                               dbgap_consent_code: String)
 
   case class Genotype(calls: Array[Int])
 
@@ -127,6 +127,7 @@ object Model {
                                gnomad_genomes_2_1: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
                                clinvar_id: Option[String] = Some("RCV000436956"),
                                clin_sig: Option[String] = Some("Pathogenic"),
+                               dbsnp_id: Option[String] = Some("rs1234567"),
                                by_study: Map[String, Freq],
                                release_id: String = "RE_ABCDEF"
                               )
@@ -196,6 +197,14 @@ object Model {
                           name: String = "RCV000436956",
                           clin_sig: String = "Pathogenic"
                          )
+
+  case class DBSNPEntry(chromosome: String = "2",
+                        start: Long = 165310406,
+                        end: Long = 165310406,
+                        reference: String = "G",
+                        alternate: String = "A",
+                        name: String = "rs1234567"
+                       )
 
   case class ParticipantInput(kf_id: String = "PT_001", family_id: String = "FM_001", affected_status: String = "alive")
 

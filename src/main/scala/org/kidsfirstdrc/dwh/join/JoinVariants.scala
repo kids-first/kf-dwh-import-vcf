@@ -45,7 +45,9 @@ object JoinVariants {
     }
     val joinedWithPop = joinWithPopulations(merged)
     val joinedWithClinvar = joinWithClinvar(joinedWithPop)
-    joinedWithClinvar
+    val joinedWithDBSNP = joinWithDBSNP(joinedWithClinvar)
+
+    joinedWithDBSNP
       .repartition($"chromosome")
       .sortWithinPartitions("start")
       .write.mode(SaveMode.Overwrite)
@@ -93,7 +95,6 @@ object JoinVariants {
     val join_gnomad_genomes_2_1 = joinAndMerge(joinTopmed, gnomad_genomes_2_1, "gnomad_genomes_2_1")
     val join_gnomad_exomes_2_1 = joinAndMerge(join_gnomad_genomes_2_1, gnomad_exomes_2_1, "gnomad_exomes_2_1")
     val join_gnomad_genomes_3_0 = joinAndMerge(join_gnomad_exomes_2_1, gnomad_genomes_3_0, "gnomad_genomes_3_0")
-
     join_gnomad_genomes_3_0
   }
 
@@ -111,6 +112,12 @@ object JoinVariants {
     val clinvar = spark.table("clinvar")
     joinByLocus(variants, clinvar)
       .select(variants("*"), clinvar("name") as "clinvar_id", clinvar("clin_sig") as "clin_sig")
+  }
+
+  def joinWithDBSNP(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    val dbsnp = spark.table("dbsnp")
+    joinByLocus(variants, dbsnp)
+      .select(variants("*"), dbsnp("name") as "dbsnp_id")
   }
 
 }

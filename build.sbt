@@ -10,12 +10,13 @@ javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
 val spark_version = "2.4.5"
 
 /* Runtime */
-libraryDependencies +=  "org.apache.spark" %% "spark-sql" % spark_version % Provided
+libraryDependencies += "org.apache.spark" %% "spark-sql" % spark_version % Provided
 libraryDependencies += "io.projectglow" %% "glow" % "0.4.0" % Provided
 
 /* Test */
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0" % "test"
 libraryDependencies += "org.apache.spark" %% "spark-hive" % spark_version % "test"
+
 
 
 test in assembly := {}

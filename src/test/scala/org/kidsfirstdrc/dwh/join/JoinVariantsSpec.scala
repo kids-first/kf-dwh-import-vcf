@@ -57,7 +57,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         by_study = Map(
           studyId3 -> Freq(3, 2, 0.66666667, 1, 1)
         ),
-        topmed = None, gnomad_genomes_2_1 = None, clinvar_id = None, clin_sig = None,
+        topmed = None, gnomad_genomes_2_1 = None, clinvar_id = None, clin_sig = None, dbsnp_id=None,
         release_id = "RE_PREVIOUS")
 
       Seq(existingVariant1, removedOldVariant, existingVariant2).toDF().write.mode(SaveMode.Overwrite)
@@ -95,6 +95,11 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         .format("parquet")
         .saveAsTable("clinvar")
 
+      And("A table dbsnp exists")
+      Seq(DBSNPEntry()).toDF().write.mode(SaveMode.Overwrite).option("path", s"$outputDir/dbsnp")
+        .format("parquet")
+        .saveAsTable("dbsnp")
+
       When("Join variants")
       JoinVariants.join(Seq(studyId1, studyId2), releaseId, outputDir)
 
@@ -114,13 +119,13 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           )),
         JoinVariantOutput(
           chromosome = "3", start = 3000, end = 3000, reference = "T", alternate = "G", ac = 5, an = 20, af = 0.25, name = "mutation_2", hgvsg = "chr3:g.2000T>G", homozygotes = 1, heterozygotes = 4,
-          topmed = None, gnomad_genomes_2_1 = None, clinvar_id = None, clin_sig = None,
+          topmed = None, gnomad_genomes_2_1 = None, clinvar_id = None, clin_sig = None, dbsnp_id=None,
           by_study = Map(
             studyId1 -> Freq(20, 5, 0.25, 1, 4)
           )),
         JoinVariantOutput(
           chromosome = "3", start = 3000, end = 3000, "C", "A", name = "mutation_2", hgvsg = "chr3:g.2000T>G", ac = 10, an = 30, af = 0.33333333, homozygotes = 2, heterozygotes = 8,
-          topmed = None, gnomad_genomes_2_1 = None, clinvar_id = None, clin_sig = None,
+          topmed = None, gnomad_genomes_2_1 = None, clinvar_id = None, clin_sig = None, dbsnp_id=None,
           by_study = Map(
             studyId2 -> Freq(30, 10, 0.33333333, 2, 8)
           )),
