@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.dbsnfp
+package org.kidsfirstdrc.dwh.external.dbsnfp
 
 import org.apache.spark.sql.types._
 
