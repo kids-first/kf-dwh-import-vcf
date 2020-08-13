@@ -22,7 +22,7 @@ object ImportVcf extends App {
     }
     else if (runType == "occurrences")
       Occurrences.run(studyId, releaseId, input, output, biospecimenIdColumn)
-    else if (runType == "annotations")
+    else if (runType == "variants")
       Variants.run(studyId, releaseId, input, output)
     else if (runType == "consequences")
       Consequences.run(studyId, releaseId, input, output)
