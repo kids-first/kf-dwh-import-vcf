@@ -1,33 +1,20 @@
-package org.kidsfirstdrc.dwh.dbsnfp
+package org.kidsfirstdrc.dwh.external.dbsnfp
 
-import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{SaveMode, SparkSession}
 
-object ImportDBSNFP extends App {
+object ImportScores extends App {
 
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
     .enableHiveSupport()
-    .appName("VCF Import to DWH").getOrCreate()
+    .appName("Import DBSNFP Scores to DWH").getOrCreate()
 
   import spark.implicits._
 
-  spark.read
-    .option("sep", "\t")
-    .option("header", "true")
-    .option("nullValue", ".")
-    .schema(schema.schema)
-    .csv("s3a://kf-variant-parquet-prd/dbSNFP/variant/*.gz")
-    .withColumnRenamed("position_1-based", "start")
-    .write.mode(SaveMode.Overwrite)
-    .partitionBy("chromosome")
-    .format("parquet")
-    .option("path", "s3a://kf-variant-parquet-prd/public/dbnsfp/parquet/variant")
-    .saveAsTable("variant.dbnsfp")
-
-
   import org.apache.spark.sql.Column
   import org.apache.spark.sql.types.DoubleType
+
   def split_semicolon(colName: String, outputColName: String): Column = split(col(colName), ";") as outputColName
 
   def split_semicolon(colName: String): Column = split_semicolon(colName, colName)
@@ -37,7 +24,6 @@ object ImportDBSNFP extends App {
   def score(colName: String) = when(element_at_postion(colName) === ".", null).otherwise(element_at_postion(colName).cast(DoubleType)) as colName
 
   def pred(colName: String) = when(element_at_postion(colName) === ".", null).otherwise(element_at_postion(colName)) as colName
-
 
 
   spark.table("variant.dbnsfp").select(
@@ -66,6 +52,9 @@ object ImportDBSNFP extends App {
     split_semicolon("FATHMM_score", "fathmm_score"),
     split_semicolon("FATHMM_pred", "fathmm_pred"),
     $"FATHMM_converted_rankscore" as "fathmm_converted_rank_score",
+    $"REVEL_rankscore" as "revel_rankscore",
+    $"LRT_converted_rankscore" as "lrt_converted_rankscore",
+    $"LRT_pred" as "lrt_pred",
     $"CADD_raw" as "cadd_score",
     $"CADD_raw_rankscore" as "cadd_rankscore",
     $"CADD_phred" as "cadd_phred",
@@ -122,6 +111,11 @@ object ImportDBSNFP extends App {
       $"cadd_phred",
       $"dann_score",
       $"dann_rank_score",
+
+      $"revel_rankscore",
+      $"lrt_converted_rankscore",
+      $"lrt_pred",
+
       $"phylo_p100way_vertebrate",
       $"phylo_p100way_vertebrate_rankscore",
       $"phylop30way_mammalian",
