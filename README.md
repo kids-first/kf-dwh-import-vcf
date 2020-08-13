@@ -11,3 +11,8 @@ Run an import
 ./run_emr_job_import.sh SD_46SK55A3 RE_000004 variants m5d.4xlarge 20 "s3a://kf-study-us-east-1-prd-sd-46sk55a3/harmonized/family-variants/*postCGP.filtered.deNovo.vep.vcf.gz,s3a://bix-dev-data-bucket/PROJECTS/sd-46sk55a3_REHEADERED_TEMP/*.vcf.gz"
 ```
 
+Run a join
+```
+./run_emr_job_join.sh SD_46SK55A3,SD_6FPYJQBR,SD_9PYZAHHE,SD_DYPMEHHF,SD_DZTB5HRR,SD_PREASA7S,SD_R0EPRSGS,SD_YGVA0E1C RE_000004
+```
+
