@@ -71,7 +71,7 @@ object JoinConsequences {
       mergeConsequences(releaseId, consequences.select(allColumns: _*))
     }
     val joinedWithScores = joinWithDBNSFP(merged)
-    write(releaseId, output, TABLE_NAME, joinedWithScores, 8)
+    write(releaseId, output, TABLE_NAME, joinedWithScores, 1)
 
   }
 
