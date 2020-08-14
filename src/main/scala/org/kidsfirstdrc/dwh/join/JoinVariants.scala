@@ -1,7 +1,8 @@
 package org.kidsfirstdrc.dwh.join
 
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.utils.SparkUtils
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.calculated_af
 import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
@@ -47,14 +48,7 @@ object JoinVariants {
     val joinedWithClinvar = joinWithClinvar(joinedWithPop)
     val joinedWithDBSNP = joinWithDBSNP(joinedWithClinvar)
 
-    joinedWithDBSNP
-      .repartition($"chromosome")
-      .sortWithinPartitions("start")
-      .write.mode(SaveMode.Overwrite)
-      .partitionBy("chromosome")
-      .format("parquet")
-      .option("path", s"$output/$TABLE_NAME/${TABLE_NAME}_$releaseId")
-      .saveAsTable(s"${TABLE_NAME}_$releaseId")
+    write(releaseId, output, TABLE_NAME, joinedWithDBSNP, 5)
 
   }
 

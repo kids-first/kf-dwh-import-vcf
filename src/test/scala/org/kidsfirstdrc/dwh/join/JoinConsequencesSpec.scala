@@ -51,10 +51,10 @@ class JoinConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
         .format("parquet")
         .saveAsTable("consequences")
 
-      And("A table 1000_genomes exists")
-      Seq(DBSNFPScore()).toDF().write.mode(SaveMode.Overwrite).option("path", s"$outputDir/dbsnfp_scores")
+      And("A table dbnsfp_scores exists")
+      Seq(DBSNFPScore()).toDF().write.mode(SaveMode.Overwrite).option("path", s"$outputDir/dbnsfp_scores")
         .format("parquet")
-        .saveAsTable("dbsnfp_scores")
+        .saveAsTable("dbnsfp_scores")
 
 
       When("Join Consequences")

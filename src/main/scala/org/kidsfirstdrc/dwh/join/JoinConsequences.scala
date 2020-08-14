@@ -1,12 +1,15 @@
 package org.kidsfirstdrc.dwh.join
 
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.utils.SparkUtils
 import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 
 
 object JoinConsequences {
+
+  val TABLE_NAME = "consequences"
 
   def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean)(implicit spark: SparkSession): Unit = {
 
@@ -68,13 +71,7 @@ object JoinConsequences {
       mergeConsequences(releaseId, consequences.select(allColumns: _*))
     }
     val joinedWithScores = joinWithDBNSFP(merged)
-    joinedWithScores.repartition($"chromosome")
-      .sortWithinPartitions("start")
-      .write.mode(SaveMode.Overwrite)
-      .partitionBy("chromosome")
-      .format("parquet")
-      .option("path", s"$output/consequences/consequences_$releaseId")
-      .saveAsTable(s"consequences_$releaseId")
+    write(releaseId, output, TABLE_NAME, joinedWithScores, 8)
 
   }
 
