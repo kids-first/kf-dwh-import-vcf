@@ -3,7 +3,7 @@ package org.kidsfirstdrc.dwh.utils
 import io.projectglow.Glow
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ArrayType, DecimalType}
+import org.apache.spark.sql.types.{ArrayType, DecimalType, StringType, StructType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 object SparkUtils {
@@ -57,8 +57,13 @@ object SparkUtils {
     val heterozygotes: Column = countHeterozygotesUDF(col("genotypes.calls")) as "heterozygotes"
 
     //Annotations
-    val annotations: Column = when(col("splitFromMultiAllelic"), expr("filter(INFO_ANN, ann-> ann.Allele == alternateAlleles[0])")).otherwise(col("INFO_ANN")) as "annotations"
-    val firstAnn: Column = annotations.getItem(0) as "annotation"
+    def annotations(df: DataFrame): Column = {
+      val colName = if (df.columns.contains("INFO_ANN")) "INFO_ANN" else "INFO_CSQ"
+      when(col("splitFromMultiAllelic"), expr(s"filter($colName, ann-> ann.Allele == alternateAlleles[0])")).otherwise(col(colName)) as "annotations"
+    }
+
+    def firstAnn(df: DataFrame): Column = annotations(df).getItem(0) as "annotation"
+
     val consequences: Column = col("annotation.Consequence") as "consequences"
     val impact: Column = col("annotation.IMPACT") as "impact"
     val symbol: Column = col("annotation.SYMBOL") as "symbol"
@@ -79,7 +84,14 @@ object SparkUtils {
     val amino_acids: Column = col("annotation.Amino_acids") as "amino_acids"
     val codons: Column = col("annotation.Codons") as "codons"
     val variant_class: Column = col("annotation.VARIANT_CLASS") as "variant_class"
-    val hgvsg: Column = col("annotation.HGVSg") as "hgvsg"
+
+    def hgvsg(df: DataFrame): Column = {
+      val index = df.schema.fieldIndex("annotation")
+      val isHGVSgpresent = df.schema(index).dataType.asInstanceOf[StructType]
+        .fieldNames.contains("HGVSg")
+      if (isHGVSgpresent) col("annotation.HGVSg") as "hgvsg" else lit(null).cast(StringType)
+    }
+
     val is_multi_allelic: Column = col("splitFromMultiAllelic") as "is_multi_alellic"
     val old_multi_allelic: Column = col("INFO_OLD_MULTIALLELIC") as "old_multi_allelic"
 

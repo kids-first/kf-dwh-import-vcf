@@ -14,7 +14,8 @@ object Occurrences {
 
   def build(input: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val occurrences = vcf(input)
+    val inputDF = vcf(input)
+    val selectedDF = inputDF
       .withColumn("genotype", explode($"genotypes"))
       .select(
         chromosome,
@@ -23,7 +24,7 @@ object Occurrences {
         reference,
         alternate,
         name,
-        firstAnn,
+        firstAnn(inputDF),
         $"genotype.sampleId" as "vcf_sample_id",
         $"genotype.alleleDepths" as "ad",
         $"genotype.depth" as "dp",
@@ -33,7 +34,7 @@ object Occurrences {
         is_multi_allelic,
         old_multi_allelic
       )
-      .withColumn("hgvsg", hgvsg)
+    val occurrences = selectedDF.withColumn("hgvsg", hgvsg(selectedDF))
       .withColumn("variant_class", variant_class)
       .drop("annotation")
 

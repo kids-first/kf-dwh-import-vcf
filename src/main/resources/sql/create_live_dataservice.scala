@@ -2,5 +2,6 @@ val all = Set("participants", "biospecimens", "biospecimens_diagnoses", "outcome
 val release = "RE_000004"
 all.foreach{ t=>
   spark.sql(s"create or replace view variant_live.$t as select * from variant.${t}_${release.toLowerCase()}")
+  spark.sql(s"create or replace view variant.$t as select * from variant.${t}_${release.toLowerCase()}")
 
 }

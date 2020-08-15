@@ -14,7 +14,8 @@ object Occurrences {
 
   def build(studyId: String, releaseId: String, input: String, biospecimenIdColumn: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val occurrences = vcf(input)
+    val inputDF = vcf(input)
+    val selectedDF = inputDF
       .withColumn("genotype", explode($"genotypes"))
       .select(
         chromosome,
@@ -23,7 +24,7 @@ object Occurrences {
         reference,
         alternate,
         name,
-        firstAnn,
+        firstAnn(inputDF),
         $"genotype.sampleId" as "biospecimen_id",
         $"genotype.alleleDepths" as "ad",
         $"genotype.depth" as "dp",
@@ -35,14 +36,15 @@ object Occurrences {
         lit(studyId) as "study_id",
         lit(releaseId) as "release_id"
       )
-      .withColumn("hgvsg", hgvsg)
+    val occurrences = selectedDF.withColumn("hgvsg", hgvsg(selectedDF))
       .withColumn("variant_class", variant_class)
       .drop("annotation")
 
     val biospecimen_id_col = col(biospecimenIdColumn).as("joined_sample_id")
     val biospecimens = broadcast(
       spark
-        .table(tableName("biospecimens", studyId, releaseId))
+        .table(s"biospecimens_$releaseId")
+        .where($"study_id" === studyId)
         .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id", when($"dbgap_consent_code".isNotNull, $"dbgap_consent_code").otherwise("none") as "dbgap_consent_code")
     )
 

@@ -26,17 +26,17 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
       And("An empty output folder")
 
       withOutputFolder("output") { output =>
-        And("A table biospecimens_sd_123456_re_abcdef")
+        And("A table biospecimens_re_abcdef")
         spark.sql("create database if not exists variant")
-        spark.sql("drop table if exists variant.biospecimens_sd_123456_re_abcdef ")
+        spark.sql("drop table if exists variant.biospecimens_sd_re_abcdef ")
 
         val bioDF = spark
           .read
-          .json(getClass.getResource("/tables/biospecimens_sd_123456_re_abcdef").getFile)
+          .json(getClass.getResource("/tables/biospecimens_re_abcdef").getFile)
         bioDF.write.mode(SaveMode.Overwrite)
-          .option("path", s"$output/biospecimens_sd_123456_re_abcdef")
+          .option("path", s"$output/biospecimens_re_abcdef")
           .format("json")
-          .saveAsTable("variant.biospecimens_sd_123456_re_abcdef")
+          .saveAsTable("variant.biospecimens_re_abcdef")
 
         When("Run the main application")
         ImportVcf.run(studyId, releaseId, input, output)
