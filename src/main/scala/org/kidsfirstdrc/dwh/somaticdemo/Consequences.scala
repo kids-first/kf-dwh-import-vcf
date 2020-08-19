@@ -58,7 +58,7 @@ object Consequences {
         intron,
         hgvsc,
         hgvsp,
-        lit(null).cast("string"),
+        lit(null).cast("string") as "hgvsg",
         cds_position,
         cdna_position,
         protein_position,
