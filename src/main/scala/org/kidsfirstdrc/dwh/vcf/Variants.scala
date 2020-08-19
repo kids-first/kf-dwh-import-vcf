@@ -11,11 +11,10 @@ object Variants {
   def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
     val inputDF = vcf(input)
-    build(studyId, releaseId, inputDF)
-    val annotations: DataFrame = build(studyId, releaseId, inputDF)
+    val variants: DataFrame = build(studyId, releaseId, inputDF)
 
     val tableAnnotations = tableName(TABLE_NAME, studyId, releaseId)
-    annotations
+    variants
       .repartition($"chromosome")
       .sortWithinPartitions("start")
       .write.mode(SaveMode.Overwrite)
