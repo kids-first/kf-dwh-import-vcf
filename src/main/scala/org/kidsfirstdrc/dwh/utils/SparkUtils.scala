@@ -58,7 +58,9 @@ object SparkUtils {
 
     //Annotations
     val annotations: Column = when(col("splitFromMultiAllelic"), expr("filter(INFO_ANN, ann-> ann.Allele == alternateAlleles[0])")).otherwise(col("INFO_ANN")) as "annotations"
+    val csq: Column = when(col("splitFromMultiAllelic"), expr("filter(INFO_CSQ, ann-> ann.Allele == alternateAlleles[0])")).otherwise(col("INFO_CSQ")) as "annotations"
     val firstAnn: Column = annotations.getItem(0) as "annotation"
+    val firstCsq: Column = csq.getItem(0) as "annotation"
     val consequences: Column = col("annotation.Consequence") as "consequences"
     val impact: Column = col("annotation.IMPACT") as "impact"
     val symbol: Column = col("annotation.SYMBOL") as "symbol"
