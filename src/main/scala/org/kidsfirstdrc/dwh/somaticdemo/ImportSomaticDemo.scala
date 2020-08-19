@@ -2,7 +2,7 @@ package org.kidsfirstdrc.dwh.somaticdemo
 
 import org.apache.spark.sql.SparkSession
 
-object ImporSomaticDemo extends App {
+object ImportSomaticDemo extends App {
 
   val Array(studyId, releaseId, input, output, runType) = args
 
