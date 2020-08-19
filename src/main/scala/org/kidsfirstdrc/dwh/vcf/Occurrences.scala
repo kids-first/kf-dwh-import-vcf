@@ -42,7 +42,7 @@ object Occurrences {
     val biospecimen_id_col = col(biospecimenIdColumn).as("joined_sample_id")
     val biospecimens = broadcast(
       spark
-        .table(s"biospecimens_$releaseId")
+        .table(s"biospecimens_${releaseId.toLowerCase}")
         .where($"study_id" === studyId)
         .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id", when($"dbgap_consent_code".isNotNull, $"dbgap_consent_code").otherwise("none") as "dbgap_consent_code")
     )
