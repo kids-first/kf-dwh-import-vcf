@@ -1,6 +1,5 @@
 package org.kidsfirstdrc.dwh.utils
 
-import org.apache.spark.sql.functions.struct
 import org.kidsfirstdrc.dwh.testutils.Model._
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.scalatest.flatspec.AnyFlatSpec
@@ -54,24 +53,6 @@ class SparkUtilsSpec extends AnyFlatSpec with WithSparkSession with Matchers {
 
     res.as[Int].collect() should contain only 1
 
-  }
-  "hgvsg" should "return value" in {
-
-    val df = Seq(
-      "chr1:10000:A>G"
-    ).toDF("HGVSg").select(struct("HGVSg") as "annotation")
-
-    val res = df.select(SparkUtils.columns.hgvsg(df))
-    res.as[String].collect() should contain only "chr1:10000:A>G"
-  }
-  it should "return null" in {
-
-    val df = Seq(
-      "chr1:10000:A>G"
-    ).toDF("another_column").select(struct("another_column") as "annotation")
-
-    val res = df.select(SparkUtils.columns.hgvsg(df))
-    res.as[String].collect() should contain only null
   }
 
 

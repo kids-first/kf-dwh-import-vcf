@@ -30,9 +30,7 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
       )
     ).toDF()
 
-    df.printSchema()
     val output = Consequences.build(studyId, releaseId, df)
-    output.printSchema()
     output.as[ConsequenceOutput].collect() should contain theSameElementsAs Seq(
       ConsequenceOutput(),
       ConsequenceOutput(ensembl_transcript_id = Some("ENST00000636135.1")),

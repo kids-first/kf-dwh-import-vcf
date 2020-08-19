@@ -27,7 +27,7 @@ object Consequences {
 
   def build(inputDF: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val selectedDF = inputDF
+    val consequencesDF = inputDF
       .select(
         chromosome,
         start,
@@ -35,7 +35,7 @@ object Consequences {
         reference,
         alternate,
         name,
-        annotations(inputDF)
+        annotations
       )
       .groupBy(locus: _*)
       .agg(
@@ -44,8 +44,7 @@ object Consequences {
       )
       .withColumn("annotation", explode($"annotations"))
       .drop("annotations")
-
-    val consequencesDF = selectedDF.select($"*",
+      .select($"*",
         consequences,
         impact,
         symbol,
@@ -60,7 +59,7 @@ object Consequences {
         intron,
         hgvsc,
         hgvsp,
-        hgvsg(selectedDF),
+        hgvsg,
         cds_position,
         cdna_position,
         protein_position,
@@ -73,5 +72,4 @@ object Consequences {
 
     consequencesDF
   }
-
 }

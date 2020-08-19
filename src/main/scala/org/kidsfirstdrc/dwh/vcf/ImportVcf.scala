@@ -2,7 +2,6 @@ package org.kidsfirstdrc.dwh.vcf
 
 import org.apache.spark.sql.SparkSession
 
-
 object ImportVcf extends App {
 
   val Array(studyId, releaseId, input, output, runType, biospecimenIdColumn) = args

@@ -6,29 +6,30 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 object Variants {
-  val TABLE_NAME = "variants"
+  val   TABLE_NAME = "variants"
 
   def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
     val inputDF = vcf(input)
-    val variants: DataFrame = build(studyId, releaseId, inputDF)
+    build(studyId, releaseId, inputDF)
+    val annotations: DataFrame = build(studyId, releaseId, inputDF)
 
-    val tableVariants = tableName(TABLE_NAME, studyId, releaseId)
-    variants
+    val tableAnnotations = tableName(TABLE_NAME, studyId, releaseId)
+    annotations
       .repartition($"chromosome")
       .sortWithinPartitions("start")
       .write.mode(SaveMode.Overwrite)
       .partitionBy("study_id", "release_id", "chromosome")
       .format("parquet")
-      .option("path", s"$output/$TABLE_NAME/$tableVariants")
-      .saveAsTable(tableVariants)
+      .option("path", s"$output/$TABLE_NAME/$tableAnnotations")
+      .saveAsTable(tableAnnotations)
 
   }
 
   def build(studyId: String, releaseId: String, inputDF: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     inputDF.printSchema()
-    val selectedDF = inputDF
+    val annotations = inputDF
       .select(
         chromosome,
         start,
@@ -38,12 +39,11 @@ object Variants {
         ac,
         an,
         name,
-        firstAnn(inputDF),
+        firstAnn,
         homozygotes,
         heterozygotes
       )
-    val annotations = selectedDF
-      .withColumn("hgvsg", hgvsg(selectedDF))
+      .withColumn("hgvsg", hgvsg)
       .withColumn("variant_class", variant_class)
       .drop("annotation")
       .groupBy(locus: _*)
