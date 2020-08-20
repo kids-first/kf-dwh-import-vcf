@@ -29,7 +29,7 @@ object Occurrences {
         $"genotype.depth" as "dp",
         $"genotype.conditionalQuality" as "gq",
         array(lit(0), lit(1)) as "calls",
-        lit(1) as "has_alt",
+        lit(true) as "has_alt",
         is_multi_allelic,
         old_multi_allelic,
         lit(studyId) as "study_id",
