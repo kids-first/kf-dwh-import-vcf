@@ -82,7 +82,7 @@ object Occurrences {
         .withColumn("acl", filterAcl($"acl"))
         .where(size($"acl") <= 1)
         .select($"acl"(0) as "acl", $"file_name")
-        .select(when($"acl".isNull, "_NONE_").when($"acl" === "*", "_ALL_").otherwise($"acl") as "dbgap_consent_code", $"file_name")
+        .select(when($"acl".isNull, "_NONE_").when($"acl" === "*", "_PUBLIC_").otherwise($"acl") as "dbgap_consent_code", $"file_name")
     )
   }
 

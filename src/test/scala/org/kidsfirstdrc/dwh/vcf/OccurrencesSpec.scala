@@ -37,7 +37,7 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
       res.as[(String, String)].collect() should contain theSameElementsAs Seq(
         ("SD_123456.c1", "file1"),
         ("SD_123456.c2", "file2"),
-        ("_ALL_", "file3"),
+        ("_PUBLIC_", "file3"),
         ("_NONE_", "file4"),
         ("_NONE_", "file5")
       )

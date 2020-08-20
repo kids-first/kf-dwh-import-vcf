@@ -72,15 +72,15 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
           .as[OccurrencesOutput]
 
         val expectedOccurrences = Seq(
-          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
-          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
-          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
-          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
+          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_PUBLIC_"),
+          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_PUBLIC_"),
+          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_PUBLIC_"),
+          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_PUBLIC_"),
           //Multi-, "sample.vcf"Allelic
-          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
-          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
-          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
-          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_")
+          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_PUBLIC_"),
+          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_PUBLIC_"),
+          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_PUBLIC_"),
+          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_PUBLIC_")
         )
         occurrences.collect() should contain theSameElementsAs expectedOccurrences
 
