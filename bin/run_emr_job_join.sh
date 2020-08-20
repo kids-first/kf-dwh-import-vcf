@@ -2,7 +2,7 @@
 study_ids=$1
 release_id=$2
 job=${3:-"all"}
-mergeExisting=${4:-"false"}
+mergeExisting=${4:-"true"}
 instance_type=${5:-"m5d.4xlarge"}
 
 
