@@ -42,6 +42,7 @@ object Model {
                                family_id: Option[String],
                                study_id: String,
                                release_id: String,
+                               file_name: String,
                                dbgap_consent_code: String)
 
   case class Genotype(calls: Array[Int])

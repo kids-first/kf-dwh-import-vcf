@@ -16,12 +16,12 @@ object ImportCovirt extends App {
   def run(releaseId: String, input: String, output: String, runType: String = "all")(implicit spark: SparkSession): Unit = {
     spark.sql("use covirt")
     if (runType == "all") {
-      Occurrences.run(releaseId, input, output)
+      CovirtOccurrences.run(releaseId, input, output)
 //      Variants.run(studyId, releaseId, input, output)
       Consequences.run(releaseId, input, output)
     }
     else if (runType == "occurrences")
-      Occurrences.run(releaseId, input, output)
+      CovirtOccurrences.run(releaseId, input, output)
 //    else if (runType == "annotations")
 //      Variants.run(studyId, releaseId, input, output)
     else if (runType == "consequences")

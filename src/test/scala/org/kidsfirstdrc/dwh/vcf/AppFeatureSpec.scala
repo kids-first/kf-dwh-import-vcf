@@ -26,9 +26,9 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
       And("An empty output folder")
 
       withOutputFolder("output") { output =>
-        And("A table biospecimens_re_abcdef")
         spark.sql("create database if not exists variant")
-        spark.sql("drop table if exists variant.biospecimens_sd_re_abcdef ")
+        And("A table biospecimens_re_abcdef")
+        spark.sql("drop table if exists variant.biospecimens_re_abcdef ")
 
         val bioDF = spark
           .read
@@ -37,6 +37,17 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
           .option("path", s"$output/biospecimens_re_abcdef")
           .format("json")
           .saveAsTable("variant.biospecimens_re_abcdef")
+
+        And("A table genomic_files_re_abcdef")
+        spark.sql("drop table if exists variant.genomic_files_re_abcdef ")
+
+        val genomicFilesDF = spark
+          .read
+          .json(getClass.getResource("/tables/genomic_files_re_abcdef").getFile)
+        genomicFilesDF.write.mode(SaveMode.Overwrite)
+          .option("path", s"$output/genomic_files_re_abcdef")
+          .format("json")
+          .saveAsTable("variant.genomic_files_re_abcdef")
 
         When("Run the main application")
         ImportVcf.run(studyId, releaseId, input, output)
@@ -56,20 +67,20 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
             "family_id",
             "study_id",
             "release_id",
+            "file_name",
             "dbgap_consent_code")
           .as[OccurrencesOutput]
 
         val expectedOccurrences = Seq(
-          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
-
-          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
-          //Multi-Allelic
-          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "1"),
-          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "1")
+          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
+          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
+          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
+          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
+          //Multi-, "sample.vcf"Allelic
+          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
+          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
+          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_"),
+          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "_ALL_")
         )
         occurrences.collect() should contain theSameElementsAs expectedOccurrences
 

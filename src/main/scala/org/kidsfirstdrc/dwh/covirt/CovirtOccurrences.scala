@@ -6,7 +6,7 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-object Occurrences {
+object CovirtOccurrences {
 
   def run(releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
     write(build(input), output, releaseId)

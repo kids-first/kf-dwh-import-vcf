@@ -123,19 +123,6 @@ class ImportDataserviceSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
         ParticipantOutput(kf_id = "PT_003", study_id = existingStudy, release_id = existingRelease)
       )
 
-//
-      // Array(
-      // ParticipantOutput(PT_003,FM_001,alive,SD_456,previous_release),
-      // ParticipantOutput(PT_003,FM_001,alive,SD_456,previous_release)
-
-      // ParticipantOutput(PT_001,FM_001,alive,RE_ABCDEF,SD_123),
-      // ParticipantOutput(PT_001,FM_001,alive,SD_123,RE_ABCDEF),
-
-      // ParticipantOutput(PT_002,FM_001,alive,RE_ABCDEF,SD_123))
-      // did not contain the same elements as List(
-      // ParticipantOutput(PT_001,FM_001,alive,SD_123,RE_ABCDEF),
-      // ParticipantOutput(PT_002,FM_001,alive,SD_123,RE_ABCDEF),
-      // ParticipantOutput(PT_003,FM_001,alive,SD_456,previous_release))
     }
   }
 }

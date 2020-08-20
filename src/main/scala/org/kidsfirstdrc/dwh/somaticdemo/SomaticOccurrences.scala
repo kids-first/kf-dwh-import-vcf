@@ -2,11 +2,12 @@ package org.kidsfirstdrc.dwh.somaticdemo
 
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
+import org.apache.spark.sql.{Column, DataFrame, Dataset, Row, SaveMode, SparkSession, functions}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
+import org.kidsfirstdrc.dwh.vcf.Occurrences.{filename, joinOccurrencesWithClinical}
 
-object Occurrences {
+object SomaticOccurrences {
 
   def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
     write(build(studyId, releaseId, input), output, studyId, releaseId)
@@ -14,7 +15,9 @@ object Occurrences {
 
   def build(studyId: String, releaseId: String, input: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val occurrences = vcf(input)
+    val inputDF = vcf(input)
+    val occurrences = inputDF
+      .withColumn("file_name", filename)
       .withColumn("genotype", $"genotypes"(1))
       .select(
         chromosome,
@@ -32,6 +35,7 @@ object Occurrences {
         lit(true) as "has_alt",
         is_multi_allelic,
         old_multi_allelic,
+        $"file_name",
         lit(studyId) as "study_id",
         lit(releaseId) as "release_id"
       )
@@ -39,17 +43,7 @@ object Occurrences {
       .withColumn("variant_class", variant_class)
       .drop("annotation")
 
-    val biospecimen_id_col = col("biospecimen_id").as("joined_sample_id")
-    val biospecimens = broadcast(
-      spark
-        .table(s"biospecimens_${releaseId.toLowerCase}")
-        .where($"study_id" === studyId)
-        .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id", when($"dbgap_consent_code".isNotNull, $"dbgap_consent_code").otherwise("none") as "dbgap_consent_code")
-    )
-
-    occurrences
-      .join(biospecimens, occurrences("biospecimen_id") === biospecimens("joined_sample_id"), "inner")
-      .drop(occurrences("biospecimen_id")).drop(biospecimens("joined_sample_id"))
+    joinOccurrencesWithClinical(studyId, releaseId, occurrences)
   }
 
   def write(df: DataFrame, output: String, studyId: String, releaseId: String)(implicit spark: SparkSession): Unit = {

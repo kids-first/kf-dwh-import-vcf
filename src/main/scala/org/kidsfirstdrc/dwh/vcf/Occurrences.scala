@@ -1,12 +1,20 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.expressions.{UserDefinedFunction, Window}
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
+import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession, functions}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 object Occurrences {
+
+  val filename: Column = regexp_extract(input_file_name(), ".*/(.*)", 1)
+
+  val filterAcl: UserDefinedFunction = udf { acl: Seq[String] =>
+    if (acl == null) None else {
+      Some(acl.filter(a => a.contains(".") || a == "*"))
+    }
+  }
 
   def run(studyId: String, releaseId: String, input: String, output: String, biospecimenIdColumn: String)(implicit spark: SparkSession): Unit = {
     write(build(studyId, releaseId, input, biospecimenIdColumn), output, studyId, releaseId)
@@ -15,6 +23,7 @@ object Occurrences {
   def build(studyId: String, releaseId: String, input: String, biospecimenIdColumn: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     val occurrences = vcf(input)
+      .withColumn("file_name", filename)
       .withColumn("genotype", explode($"genotypes"))
       .select(
         chromosome,
@@ -32,6 +41,7 @@ object Occurrences {
         array_contains($"genotype.calls", 1) as "has_alt",
         is_multi_allelic,
         old_multi_allelic,
+        $"file_name",
         lit(studyId) as "study_id",
         lit(releaseId) as "release_id"
       )
@@ -39,17 +49,41 @@ object Occurrences {
       .withColumn("variant_class", variant_class)
       .drop("annotation")
 
+    joinOccurrencesWithClinical(studyId, releaseId, occurrences, biospecimenIdColumn)
+  }
+
+  def joinOccurrencesWithClinical(studyId: String, releaseId: String, occurrences: DataFrame, biospecimenIdColumn: String = "biospecimen_id")(implicit spark: SparkSession): DataFrame = {
+    val biospecimens = getBiospecimens(studyId, releaseId, biospecimenIdColumn)
+
+    val genomicFiles = getGenomicFiles(studyId, releaseId)
+    occurrences
+      .join(biospecimens, occurrences("biospecimen_id") === biospecimens("joined_sample_id"), "inner")
+      .join(genomicFiles, occurrences("file_name") === genomicFiles("file_name"), "inner")
+      .drop(occurrences("biospecimen_id")).drop(biospecimens("joined_sample_id")).drop(occurrences("file_name"))
+  }
+
+  def getBiospecimens(studyId: String, releaseId: String, biospecimenIdColumn: String)(implicit spark: SparkSession): DataFrame = {
     val biospecimen_id_col = col(biospecimenIdColumn).as("joined_sample_id")
-    val biospecimens = broadcast(
+    import spark.implicits._
+    broadcast(
       spark
         .table(s"biospecimens_${releaseId.toLowerCase}")
         .where($"study_id" === studyId)
-        .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id", when($"dbgap_consent_code".isNotNull, $"dbgap_consent_code").otherwise("none") as "dbgap_consent_code")
+        .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id")
     )
+  }
 
-    occurrences
-      .join(biospecimens, occurrences("biospecimen_id") === biospecimens("joined_sample_id"), "inner")
-      .drop(occurrences("biospecimen_id")).drop(biospecimens("joined_sample_id"))
+  def getGenomicFiles(studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+    broadcast(
+      spark
+        .table(s"genomic_files_${releaseId.toLowerCase}")
+        .where($"study_id" === studyId)
+        .withColumn("acl", filterAcl($"acl"))
+        .where(size($"acl") <= 1)
+        .select($"acl"(0) as "acl", $"file_name")
+        .select(when($"acl".isNull, "_NONE_").when($"acl" === "*", "_ALL_").otherwise($"acl") as "dbgap_consent_code", $"file_name")
+    )
   }
 
   def write(df: DataFrame, output: String, studyId: String, releaseId: String)(implicit spark: SparkSession): Unit = {

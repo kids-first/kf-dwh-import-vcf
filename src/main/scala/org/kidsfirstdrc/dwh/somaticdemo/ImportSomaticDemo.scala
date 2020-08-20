@@ -16,12 +16,12 @@ object ImportSomaticDemo extends App {
   def run(studyId: String, releaseId: String, input: String, output: String, runType: String = "all")(implicit spark: SparkSession): Unit = {
     spark.sql("use variant")
     if (runType == "all") {
-      Occurrences.run(studyId, releaseId, input, output)
+      SomaticOccurrences.run(studyId, releaseId, input, output)
       Variants.run(studyId, releaseId, input, output)
       Consequences.run(studyId, releaseId, input, output)
     }
     else if (runType == "occurrences")
-      Occurrences.run(studyId, releaseId, input, output)
+      SomaticOccurrences.run(studyId, releaseId, input, output)
     else if (runType == "variants")
       Variants.run(studyId, releaseId, input, output)
     else if (runType == "consequences")
