@@ -21,10 +21,21 @@ object Occurrences {
   }
 
   def build(studyId: String, releaseId: String, input: String, biospecimenIdColumn: String)(implicit spark: SparkSession): DataFrame = {
+    val occurrences = selectOccurrences(studyId, releaseId, input)
+    val biospecimens = getBiospecimens(studyId, releaseId, biospecimenIdColumn)
+    val genomicFiles = getGenomicFiles(studyId, releaseId)
+    val withClinical = joinOccurrencesWithClinical(occurrences, biospecimens, genomicFiles)
+
+    val relations = getRelations(studyId, releaseId)
+    joinOccurrencesWithInheritence(withClinical, relations)
+  }
+
+  def selectOccurrences(studyId: String, releaseId: String, input: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val occurrences = vcf(input)
+    val inputDF = vcf(input)
       .withColumn("file_name", filename)
       .withColumn("genotype", explode($"genotypes"))
+    val occurrences = inputDF
       .select(
         chromosome,
         start,
@@ -41,21 +52,62 @@ object Occurrences {
         array_contains($"genotype.calls", 1) as "has_alt",
         is_multi_allelic,
         old_multi_allelic,
+        $"qual" as "quality",
+        $"INFO_filters"(0) as "filter",
+        ac as "info_ac",
+        an as "info_an",
+        $"INFO_AF"(0) as "info_af",
+        $"INFO_culprit" as "info_culprit",
+        $"INFO_SOR" as "info_sor",
+        $"INFO_ReadPosRankSum" as "info_read_pos_rank_sum",
+        $"INFO_InbreedingCoeff" as "info_inbreeding_coeff",
+        $"INFO_PG" as "info_pg",
+        $"INFO_FS" as "info_fs",
+        $"INFO_DP" as "info_dp",
+        optional_info(inputDF, "INFO_DS", "info_ds", "boolean"),
+        $"INFO_NEGATIVE_TRAIN_SITE" as "info_info_negative_train_site",
+        $"INFO_POSITIVE_TRAIN_SITE" as "info_positive_train_site",
+        $"INFO_VQSLOD" as "info_vqslod",
+        $"INFO_ClippingRankSum" as "info_clipping_rank_sum",
+        $"INFO_RAW_MQ" as "info_raw_mq",
+        $"INFO_BaseQRankSum" as "info_base_qrank_sum",
+        $"INFO_MLEAF"(0) as "info_mleaf",
+        $"INFO_MLEAC"(0) as "info_mleac",
+        $"INFO_MQ" as "info_mq",
+        $"INFO_QD" as "info_qd",
+        $"INFO_DB" as "info_db",
+        $"INFO_MQRankSum" as "info_m_qrank_sum",
+        optional_info(inputDF, "INFO_loConfDeNovo", "lo_conf_denovo"),
+        optional_info(inputDF, "INFO_hiConfDeNovo", "hi_conf_denovo"),
+        $"INFO_ExcessHet" as "info_excess_het",
+        optional_info(inputDF, "INFO_HaplotypeScore", "info_haplotype_score", "float"),
         $"file_name",
         lit(studyId) as "study_id",
         lit(releaseId) as "release_id"
       )
+      .withColumn("is_lo_conf_denovo", array_contains(split($"lo_conf_denovo", ","), $"biospecimen_id"))
+      .withColumn("is_hi_conf_denovo", array_contains(split($"hi_conf_denovo", ","), $"biospecimen_id"))
       .withColumn("hgvsg", hgvsg)
       .withColumn("variant_class", variant_class)
-      .drop("annotation")
-
-    joinOccurrencesWithClinical(studyId, releaseId, occurrences, biospecimenIdColumn)
+      .drop("annotation", "lo_conf_denovo", "hi_conf_denovo")
+    occurrences
   }
 
-  def joinOccurrencesWithClinical(studyId: String, releaseId: String, occurrences: DataFrame, biospecimenIdColumn: String = "biospecimen_id")(implicit spark: SparkSession): DataFrame = {
-    val biospecimens = getBiospecimens(studyId, releaseId, biospecimenIdColumn)
+  def joinOccurrencesWithInheritence(occurrences: DataFrame, relations: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+    occurrences.join(relations, occurrences("participant_id") === relations("participant_id"), "left")
+      .drop(relations("participant_id"))
+      .withColumn("family_calls", familyCalls)
+      .withColumn("mother_calls", $"family_calls"($"mother_id"))
+      .withColumn("father_calls", $"family_calls"($"father_id"))
+      .drop("family_calls")
+      .withColumn("zygosity", zygosity($"calls"))
+      .withColumn("mother_zygosity", zygosity($"mother_calls"))
+      .withColumn("father_zygosity", zygosity($"father_calls"))
+  }
 
-    val genomicFiles = getGenomicFiles(studyId, releaseId)
+  def joinOccurrencesWithClinical(occurrences: DataFrame, biospecimens: DataFrame, genomicFiles: DataFrame)(implicit spark: SparkSession): DataFrame = {
+
     occurrences
       .join(biospecimens, occurrences("biospecimen_id") === biospecimens("joined_sample_id"), "inner")
       .join(genomicFiles, occurrences("file_name") === genomicFiles("file_name"), "inner")
@@ -65,12 +117,38 @@ object Occurrences {
   def getBiospecimens(studyId: String, releaseId: String, biospecimenIdColumn: String)(implicit spark: SparkSession): DataFrame = {
     val biospecimen_id_col = col(biospecimenIdColumn).as("joined_sample_id")
     import spark.implicits._
+
+    val b = loadClinicalTable(studyId, releaseId, "biospecimens")
+      .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id").alias("b")
+    val p = loadClinicalTable(studyId, releaseId, "participants").select("kf_id", "is_proband", "affected_status").alias("p")
+    val all = b.join(p, b("participant_id") === p("kf_id")).select("b.*", "p.is_proband", "p.affected_status")
+
+    broadcast(all)
+  }
+
+  def getRelations(studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
     broadcast(
-      spark
-        .table(s"biospecimens_${releaseId.toLowerCase}")
-        .where($"study_id" === studyId)
-        .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id")
+      loadClinicalTable(studyId, releaseId, "family_relationships")
+        .groupBy("participant2")
+        .agg(
+          map_from_entries(
+            collect_list(
+              struct($"participant1_to_participant2_relation" as "relation", $"participant1" as "participant_id")
+            )
+          ) as "relations"
+        )
+        .select($"participant2" as "participant_id", $"relations.Mother" as "mother_id", $"relations.Father" as "father_id")
+
     )
+
+  }
+
+  private def loadClinicalTable(studyId: String, releaseId: String, tableName: String)(implicit spark: SparkSession) = {
+    import spark.implicits._
+    spark
+      .table(s"${tableName}_${releaseId.toLowerCase}")
+      .where($"study_id" === studyId)
   }
 
   def getGenomicFiles(studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
@@ -90,55 +168,22 @@ object Occurrences {
     import spark.implicits._
     val tableOccurence = tableName("occurrences", studyId, releaseId)
     df
-      .repartition($"dbgap_consent_code", $"chromosome")
+      .repartition($"has_alt", $"dbgap_consent_code", $"chromosome")
       .withColumn("bucket",
         functions
-          .ntile(8)
+          .ntile(6)
           .over(
-            Window.partitionBy("dbgap_consent_code", "chromosome")
+            Window.partitionBy("has_alt", "dbgap_consent_code", "chromosome")
               .orderBy("start")
           )
       )
-      .repartition($"dbgap_consent_code", $"chromosome", $"bucket")
-      .sortWithinPartitions($"dbgap_consent_code", $"chromosome", $"bucket", $"start")
+      .repartition($"has_alt", $"dbgap_consent_code", $"chromosome", $"bucket")
+      .sortWithinPartitions($"has_alt", $"dbgap_consent_code", $"chromosome", $"bucket", $"start")
       .write.mode(SaveMode.Overwrite)
-      .partitionBy("study_id", "dbgap_consent_code", "chromosome")
+      .partitionBy("study_id", "has_alt", "dbgap_consent_code", "chromosome")
       .format("parquet")
       .option("path", s"$output/occurrences/$tableOccurence")
       .saveAsTable(tableOccurence)
   }
 
-  private def familyColumn(implicit spark: SparkSession) = {
-    import spark.implicits._
-    struct(
-      $"qual" as "quality",
-      //$"filters"(0) as "filter",
-      $"INFO_loConfDeNovo" as "lo_conf_de_novo",
-      $"INFO_NEGATIVE_TRAIN_SITE" as "negative_train_site",
-      ac,
-      an,
-      $"INFO_culprit" as "culprit",
-      $"INFO_SOR" as "sor",
-      $"INFO_ReadPosRankSum" as "read_pos_rank_sum",
-      $"INFO_InbreedingCoeff" as "inbreeding_coeff",
-      $"INFO_PG" as "pg",
-      $"INFO_AF"(0) as "af",
-      $"INFO_FS" as "fs",
-      $"INFO_DP" as "dp",
-      $"INFO_POSITIVE_TRAIN_SITE" as "positive_train_site",
-      $"INFO_VQSLOD" as "vqslod",
-      $"INFO_ClippingRankSum" as "clipping_rank_sum",
-      $"INFO_RAW_MQ" as "raw_mq",
-      $"INFO_BaseQRankSum" as "base_qrank_sum",
-      $"INFO_MLEAF"(0) as "mleaf",
-      $"INFO_MLEAC"(0) as "mleac",
-      $"INFO_MQ" as "mq",
-      $"INFO_QD" as "qd",
-      $"INFO_END" as "end",
-      $"INFO_DB" as "db",
-      $"INFO_MQRankSum" as "m_qrank_sum",
-      $"INFO_hiConfDeNovo" as "hiconfdenovo",
-      $"INFO_ExcessHet" as "excess_het"
-    ) as "family"
-  }
 }

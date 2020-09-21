@@ -3,8 +3,7 @@ release_id=$1
 job=${2:-"all"}
 instance_type=${3:-"m5d.4xlarge"}
 instance_count=${4:-"20"}
-study_id=${5:-"SD_BHJXBDQK"}
-input=${6:-"s3://kf-study-us-east-1-prd-sd-bhjxbdqk/harmonized-data/simple-variants/*.mutect2.PASS.vep.vcf.gz"}
+input=${5:-"s3a://bix-dev-data-bucket/1000g/harmonized-data/family-variants/*filtered.deNovo.vep.vcf.gz"}
 
 steps=$(cat <<EOF
 [
@@ -17,12 +16,11 @@ steps=$(cat <<EOF
       "--deploy-mode",
       "client",
       "--class",
-      "org.kidsfirstdrc.dwh.somaticdemo.ImportSomaticDemo",
+      "org.kidsfirstdrc.dwh.demo.ImportDemo",
       "s3a://kf-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
-      "${study_id}",
       "${release_id}",
       "${input}",
-      "s3a://kf-variant-parquet-prd",
+      "s3a://kf-variant-parquet-prd/public/demo",
       "${job}"
     ],
     "Type": "CUSTOM_JAR",
@@ -43,7 +41,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --release-label emr-5.28.0 \
 --log-uri 's3n://aws-logs-538745987955-us-east-1/elasticmapreduce/' \
 --steps "${steps}" \
---name "Import somatic demo - ${job}" \
+--name "Import demo - ${job}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \

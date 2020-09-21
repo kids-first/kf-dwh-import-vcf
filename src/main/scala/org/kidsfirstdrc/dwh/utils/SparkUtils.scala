@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.utils
 
 import io.projectglow.Glow
-import org.apache.spark.sql.expressions.UserDefinedFunction
+import org.apache.spark.sql.expressions.{UserDefinedFunction, Window, WindowSpec}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{ArrayType, DecimalType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
@@ -12,6 +12,7 @@ object SparkUtils {
     val df = spark.read.format("vcf")
       .option("flattenInfoFields", "true")
       .load(inputs: _*)
+      .withColumnRenamed("filters", "INFO_FILTERS") // Avoid losing filters columns before split
 
     Glow.transform("split_multiallelics", df)
   }
@@ -51,10 +52,21 @@ object SparkUtils {
 
     val dp: Column = col("INFO_DP") as "dp"
 
+    val familyVariantWindow: WindowSpec = Window.partitionBy("chromosome", "start","reference", "alternate","family_id")
+
+    val familyCalls = map_from_entries(collect_list(struct(col("participant_id"), col("calls"))).over(familyVariantWindow))
+
     val countHomozygotesUDF: UserDefinedFunction = udf { calls: Seq[Seq[Int]] => calls.map(_.sum).count(_ == 2) }
     val homozygotes: Column = countHomozygotesUDF(col("genotypes.calls")) as "homozygotes"
     val countHeterozygotesUDF: UserDefinedFunction = udf { calls: Seq[Seq[Int]] => calls.map(_.sum).count(_ == 1) }
     val heterozygotes: Column = countHeterozygotesUDF(col("genotypes.calls")) as "heterozygotes"
+
+    val zygosity: Column => Column =  c => when(c(0) === 1 && c(1) === 1, "HOM")
+      .when(c(0) === 0 && c(1) === 1, "HET")
+      .when(c(0) === 0 && c(1) === 0, "WT")
+      .when(c(0) === 1 && c(1) === 0, "HET")
+      .when(c.isNull, lit(null).cast("string"))
+      .otherwise("UNK")
 
     //Annotations
     val annotations: Column = when(col("splitFromMultiAllelic"), expr("filter(INFO_ANN, ann-> ann.Allele == alternateAlleles[0])")).otherwise(col("INFO_ANN")) as "annotations"
@@ -82,9 +94,10 @@ object SparkUtils {
     val codons: Column = col("annotation.Codons") as "codons"
     val variant_class: Column = col("annotation.VARIANT_CLASS") as "variant_class"
     val hgvsg: Column = col("annotation.HGVSg") as "hgvsg"
-    val is_multi_allelic: Column = col("splitFromMultiAllelic") as "is_multi_alellic"
+    val is_multi_allelic: Column = col("splitFromMultiAllelic") as "is_multi_allellic"
     val old_multi_allelic: Column = col("INFO_OLD_MULTIALLELIC") as "old_multi_allelic"
 
+    def optional_info(df: DataFrame, colName: String, alias: String, colType: String = "string"): Column = (if (df.columns.contains(colName)) col(colName) else lit(null).cast(colType)).as(alias)
 
     val locus: Seq[Column] = Seq(
       col("chromosome"),

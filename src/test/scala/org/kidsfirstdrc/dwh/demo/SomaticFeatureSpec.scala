@@ -1,6 +1,7 @@
-package org.kidsfirstdrc.dwh.somaticdemo
+package org.kidsfirstdrc.dwh.demo
 
-import org.apache.spark.sql.SaveMode
+import org.apache.spark.sql.functions.input_file_name
+import org.apache.spark.sql.{SaveMode, functions}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.utils.SparkUtils.vcf
 import org.scalatest.GivenWhenThen
@@ -31,7 +32,7 @@ class SomaticFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSpar
           .format("json")
           .saveAsTable("variant.biospecimens_re_abcdef")
         spark.sql("use variant")
-        val df = Consequences.build(studyId, releaseId, vcf(input))
+        val df = DemoOccurrences.build(studyId, releaseId, input)
         df.printSchema()
         df.show(false)
       }

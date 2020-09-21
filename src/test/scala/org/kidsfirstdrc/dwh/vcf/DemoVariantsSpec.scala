@@ -8,7 +8,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.kidsfirstdrc.dwh.testutils.Model._
 
-class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class DemoVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   import spark.implicits._
 

@@ -17,7 +17,7 @@ class MultiFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkS
         .option("flattenInfoFields", "true").load(input)
       df.show(false)
 
-      val output = Glow.transform("split_multiallelics", df)
+      val output = Glow.transform("split_multiallelics", df.withColumnRenamed("filters", "INFO_FILTERS"))
       output.show(false)
     }
   }

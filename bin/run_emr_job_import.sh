@@ -3,8 +3,8 @@ study_id=$1
 release_id=$2
 file_pattern=${3:-"s3a://kf-study-us-east-1-prd-${study_id_lc}/harmonized/family-variants/*.filtered.deNovo.vep.vcf.gz"}
 job=${4:-"all"}
-instance_type=${5:-"m5d.4xlarge"}
-number_instance=${6:-"20"}
+instance_type=${5:-"m5d.8xlarge"}
+number_instance=${6:-"30"}
 study_id_lc=$(echo "$study_id" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
 biospecimen_id_column=${7:-"biospecimen_id"}
 
