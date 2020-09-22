@@ -21,6 +21,10 @@ object SparkUtils {
     s"${table}_${studyId.toLowerCase}_${releaseId.toLowerCase}"
   }
 
+  def tableName(table: String, studyId: String, releaseId: String, database: String = "variant"): String = {
+    s"${database}.${table}_${studyId.toLowerCase}_${releaseId.toLowerCase}"
+  }
+
   def colFromArrayOrField(df: DataFrame, colName: String): Column = {
     df.schema(colName).dataType match {
       case ArrayType(_, _) => df(colName)(0)
@@ -52,7 +56,7 @@ object SparkUtils {
 
     val dp: Column = col("INFO_DP") as "dp"
 
-    val familyVariantWindow: WindowSpec = Window.partitionBy("chromosome", "start","reference", "alternate","family_id")
+    val familyVariantWindow: WindowSpec = Window.partitionBy("chromosome", "start", "reference", "alternate", "family_id")
 
     val familyCalls = map_from_entries(collect_list(struct(col("participant_id"), col("calls"))).over(familyVariantWindow))
 
@@ -61,7 +65,7 @@ object SparkUtils {
     val countHeterozygotesUDF: UserDefinedFunction = udf { calls: Seq[Seq[Int]] => calls.map(_.sum).count(_ == 1) }
     val heterozygotes: Column = countHeterozygotesUDF(col("genotypes.calls")) as "heterozygotes"
 
-    val zygosity: Column => Column =  c => when(c(0) === 1 && c(1) === 1, "HOM")
+    val zygosity: Column => Column = c => when(c(0) === 1 && c(1) === 1, "HOM")
       .when(c(0) === 0 && c(1) === 1, "HET")
       .when(c(0) === 0 && c(1) === 0, "WT")
       .when(c(0) === 1 && c(1) === 0, "HET")

@@ -5,7 +5,7 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
 
 object JoinWrite {
 
-  def write(releaseId: String, output: String, tableName: String, df: DataFrame, nbFile: Int)(implicit spark: SparkSession): Unit = {
+  def write(releaseId: String, output: String, tableName: String, df: DataFrame, nbFile: Int, database: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
     if (nbFile == 1) {
       df.repartition($"chromosome")
@@ -13,8 +13,8 @@ object JoinWrite {
         .write.mode(SaveMode.Overwrite)
         .partitionBy("chromosome")
         .format("parquet")
-        .option("path", s"$output/consequences/consequences_$releaseId")
-        .saveAsTable(s"consequences_$releaseId")
+        .option("path", s"$output/$tableName/${tableName}_$releaseId")
+        .saveAsTable(s"${database}.${tableName}_$releaseId")
     } else {
       df
         .withColumn("bucket",
@@ -30,7 +30,7 @@ object JoinWrite {
         .partitionBy("chromosome")
         .format("parquet")
         .option("path", s"$output/$tableName/${tableName}_$releaseId")
-        .saveAsTable(s"${tableName}_$releaseId")
+        .saveAsTable(s"${database}.${tableName}_$releaseId")
     }
   }
 }

@@ -11,13 +11,13 @@ import org.kidsfirstdrc.dwh.vcf.Variants.TABLE_NAME
 
 object JoinVariants {
 
-  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean = true)(implicit spark: SparkSession): Unit = {
+  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean = true, database:String = "variant")(implicit spark: SparkSession): Unit = {
 
     import spark.implicits._
 
     val variants: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
-        val nextDf = spark.table(SparkUtils.tableName(TABLE_NAME, studyId, releaseId))
+        val nextDf = spark.table(SparkUtils.tableName(TABLE_NAME, studyId, releaseId, database))
           .withColumn("freqs", struct($"an", $"ac", $"af", $"homozygotes", $"heterozygotes"))
         if (currentDF.isEmpty)
           nextDf
@@ -48,7 +48,7 @@ object JoinVariants {
     val joinedWithClinvar = joinWithClinvar(joinedWithPop)
     val joinedWithDBSNP = joinWithDBSNP(joinedWithClinvar)
 
-    write(releaseId, output, TABLE_NAME, joinedWithDBSNP, 5)
+    write(releaseId, output, TABLE_NAME, joinedWithDBSNP, 5, database)
 
   }
 

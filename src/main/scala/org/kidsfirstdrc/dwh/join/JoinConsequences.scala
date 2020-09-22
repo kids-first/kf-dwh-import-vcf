@@ -4,20 +4,20 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.utils.SparkUtils
-import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
+import org.kidsfirstdrc.dwh.utils.SparkUtils.{firstAs, tableName}
 
 
 object JoinConsequences {
 
   val TABLE_NAME = "consequences"
 
-  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean)(implicit spark: SparkSession): Unit = {
+  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean, database:String = "variant")(implicit spark: SparkSession): Unit = {
 
     import spark.implicits._
 
     val consequences: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
-        val nextDf = spark.table(SparkUtils.tableName("consequences", studyId, releaseId))
+        val nextDf = spark.table(SparkUtils.tableName(TABLE_NAME, studyId, releaseId, database))
         if (currentDF.isEmpty)
           nextDf
         else {
@@ -56,9 +56,9 @@ object JoinConsequences {
       $"codons"
     )
     val allColumns = commonColumns :+ col("study_id")
-    val merged = if (mergeWithExisting && spark.catalog.tableExists("consequences")) {
+    val merged = if (mergeWithExisting && spark.catalog.tableExists(TABLE_NAME)) {
 
-      val existingConsequences = spark.table("consequences")
+      val existingConsequences = spark.table(TABLE_NAME)
 
       val existingColumns = commonColumns :+ $"study_ids"
       mergeConsequences(releaseId, existingConsequences.select(existingColumns: _*)
@@ -71,7 +71,7 @@ object JoinConsequences {
       mergeConsequences(releaseId, consequences.select(allColumns: _*))
     }
     val joinedWithScores = joinWithDBNSFP(merged)
-    write(releaseId, output, TABLE_NAME, joinedWithScores, 1)
+    write(releaseId, output, TABLE_NAME, joinedWithScores, 1, database)
 
   }
 
