@@ -10,7 +10,7 @@ import org.scalatest.matchers.should.Matchers
 class IndexVariantDbStatsSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   Feature("Run") {
-    Scenario("FIX THIS SCENARIO NAME PLEASE !!!!!") { //TODO Name
+    Scenario("Get variant stats") {
       withOutputFolder("output") { output =>
 
         spark.sql("create database if not exists variant")
@@ -41,7 +41,7 @@ class IndexVariantDbStatsSpec extends AnyFeatureSpec with GivenWhenThen with Wit
           .format("json")
           .saveAsTable("variant.occurrences_sd_12345_re_00012")
 
-        val occurrencesList = StatsUtils.getOccurrencesTableWORelease
+        val occurrencesList = StatsUtils.getOccurrencesTableWORelease("variant")
 
         occurrencesList shouldBe Seq("occurrences_sd_12345", "occurrences_sd_6789")
 

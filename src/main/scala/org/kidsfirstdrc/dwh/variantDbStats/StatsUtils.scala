@@ -6,15 +6,15 @@ import org.apache.spark.sql.functions.not
 
 object StatsUtils {
 
-  def getOccurrencesTableWORelease()(implicit spark: SparkSession) = {
+  def getOccurrencesTableWORelease(database: String)(implicit spark: SparkSession): Array[String] = {
     import spark.implicits._
 
     spark
-      .sql("show tables in variant").where($"tableName" like "occurrences_sd_%" and not($"tableName" like "%_re_00%")  )
+      .sql(s"show tables in $database").where($"tableName" like "occurrences_sd_%" and not($"tableName" like "%_re_00%")  )
       .select("tableName").collect().flatMap(_.toSeq).map(_.toString)
   }
 
-  def getUnionOfOccurrences(database: String, tabledList: Array[String])(implicit spark: SparkSession) = {
+  def getUnionOfOccurrences(database: String, tabledList: Array[String])(implicit spark: SparkSession): DataFrame = {
     val occurrences = tabledList.map{table =>
       spark.table(s"$database.$table")
     }
