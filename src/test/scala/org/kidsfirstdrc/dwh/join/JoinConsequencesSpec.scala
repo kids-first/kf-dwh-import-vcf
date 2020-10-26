@@ -82,18 +82,3 @@ class JoinConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
   }
 
 }
-
-//Array(
-// JoinConsequenceOutput(2,165310405,165310405,G,A,SCN2A,MODERATE,ENSG00000136531,Some(ENST00000283256.10),None,Transcript,missense_variant,Some(protein_coding),Some(rs1057520413),SNV,1,Some(chr2:g.166166916G>A),Some(ENST00000283256.10:c.781G>A),Some(ENSP00000283256.6:p.Val261Met),Some(Exon(7,27)),None,Some(937),Some(781),Some(RefAlt(V,M)),Some(RefAlt(GTG,ATG)),Some(261),List(SD_789, SD_123, SD_456),RE_ABCDEF,Some(0.99)),
-// JoinConsequenceOutput(2,165310405,165310405,G,A,SCN2A,MODERATE,ENSG00000136531,Some(ENST00000283256.10),None,Transcript,missense_variant,Some(protein_coding),Some(rs1057520413),SNV,1,Some(chr2:g.166166916G>A),Some(ENST00000283256.10:c.781G>A),Some(ENSP00000283256.6:p.Val261Met),Some(Exon(7,27)),None,Some(937),Some(781),Some(RefAlt(V,M)),Some(RefAlt(GTG,ATG)),Some(261),List(SD_123, SD_456, SD_789),RE_ABCDEF,Some(0.99)),
-//
-// JoinConsequenceOutput(3,3000,3000,C,A,SCN2A,MODERATE,ENSG00000136531,Some(ENST00000283256.10),None,Transcript,missense_variant,Some(protein_coding),Some(mutation_2),SNV,1,Some(chr3:g.3000C>A),Some(ENST00000283256.10:c.781G>A),Some(ENSP00000283256.6:p.Val261Met),Some(Exon(7,27)),None,Some(937),Some(781),Some(RefAlt(V,M)),Some(RefAlt(GTG,ATG)),Some(261),List(SD_456),RE_ABCDEF,None),
-// JoinConsequenceOutput(3,3000,3000,C,A,SCN2A,MODERATE,ENSG00000136531,Some(ENST00000283256.10),None,Transcript,missense_variant,Some(protein_coding),Some(mutation_2),SNV,1,Some(chr3:g.3000C>A),Some(ENST00000283256.10:c.781G>A),Some(ENSP00000283256.6:p.Val261Met),Some(Exon(7,27)),None,Some(937),Some(781),Some(RefAlt(V,M)),Some(RefAlt(GTG,ATG)),Some(261),List(SD_456),RE_ABCDEF,None),
-
-// JoinConsequenceOutput(4,4000,4000,C,A,SCN2A,MODERATE,ENSG00000136531,Some(ENST00000283256.10),None,Transcript,missense_variant,Some(protein_coding),Some(mutation_3),SNV,1,Some(chr4:g.4000C>A),Some(ENST00000283256.10:c.781G>A),Some(ENSP00000283256.6:p.Val261Met),Some(Exon(7,27)),None,Some(937),Some(781),Some(RefAlt(V,M)),Some(RefAlt(GTG,ATG)),Some(261),List(SD_789),RE_ABCDEF,None))
-// JoinConsequenceOutput(4,4000,4000,C,A,SCN2A,MODERATE,ENSG00000136531,Some(ENST00000283256.10),None,Transcript,missense_variant,Some(protein_coding),Some(mutation_3),SNV,1,Some(chr4:g.4000C>A),Some(ENST00000283256.10:c.781G>A),Some(ENSP00000283256.6:p.Val261Met),Some(Exon(7,27)),None,Some(937),Some(781),Some(RefAlt(V,M)),Some(RefAlt(GTG,ATG)),Some(261),List(SD_789),RE_ABCDEF,None))
-//
-// List(
-// JoinConsequenceOutput(2,165310405,165310405,G,A,SCN2A,MODERATE,ENSG00000136531,Some(ENST00000283256.10),None,Transcript,missense_variant,Some(protein_coding),Some(rs1057520413),SNV,1,Some(chr2:g.166166916G>A),Some(ENST00000283256.10:c.781G>A),Some(ENSP00000283256.6:p.Val261Met),Some(Exon(7,27)),None,Some(937),Some(781),Some(RefAlt(V,M)),Some(RefAlt(GTG,ATG)),Some(261),List(SD_123, SD_456, SD_789),RE_ABCDEF,Some(0.99)),
-// JoinConsequenceOutput(3,3000,3000,C,A,SCN2A,MODERATE,ENSG00000136531,Some(ENST00000283256.10),None,Transcript,missense_variant,Some(protein_coding),Some(mutation_2),SNV,1,Some(chr3:g.3000C>A),Some(ENST00000283256.10:c.781G>A),Some(ENSP00000283256.6:p.Val261Met),Some(Exon(7,27)),None,Some(937),Some(781),Some(RefAlt(V,M)),Some(RefAlt(GTG,ATG)),Some(261),List(SD_456),RE_ABCDEF,None),
-// JoinConsequenceOutput(4,4000,4000,C,A,SCN2A,MODERATE,ENSG00000136531,Some(ENST00000283256.10),None,Transcript,missense_variant,Some(protein_coding),Some(mutation_3),SNV,1,Some(chr4:g.4000C>A),Some(ENST00000283256.10:c.781G>A),Some(ENSP00000283256.6:p.Val261Met),Some(Exon(7,27)),None,Some(937),Some(781),Some(RefAlt(V,M)),Some(RefAlt(GTG,ATG)),Some(261),List(SD_789),RE_ABCDEF,None))
