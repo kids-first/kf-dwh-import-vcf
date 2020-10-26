@@ -5,16 +5,9 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession, functions}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
+import org.kidsfirstdrc.dwh.utils.ClinicalUtils.{getBiospecimens, getGenomicFiles, getRelations}
 
 object Occurrences {
-
-  val filename: Column = regexp_extract(input_file_name(), ".*/(.*)", 1)
-
-  val filterAcl: UserDefinedFunction = udf { acl: Seq[String] =>
-    if (acl == null) None else {
-      Some(acl.filter(a => a.contains(".") || a == "*"))
-    }
-  }
 
   def run(studyId: String, releaseId: String, input: String, output: String, biospecimenIdColumn: String)(implicit spark: SparkSession): Unit = {
     write(build(studyId, releaseId, input, biospecimenIdColumn), output, studyId, releaseId)
@@ -23,8 +16,7 @@ object Occurrences {
   def build(studyId: String, releaseId: String, input: String, biospecimenIdColumn: String)(implicit spark: SparkSession): DataFrame = {
     val occurrences = selectOccurrences(studyId, releaseId, input)
     val biospecimens = getBiospecimens(studyId, releaseId, biospecimenIdColumn)
-    val genomicFiles = getGenomicFiles(studyId, releaseId)
-    val withClinical = joinOccurrencesWithClinical(occurrences, biospecimens, genomicFiles)
+    val withClinical = joinOccurrencesWithClinical(occurrences, biospecimens)
 
     val relations = getRelations(studyId, releaseId)
     joinOccurrencesWithInheritence(withClinical, relations)
@@ -32,8 +24,7 @@ object Occurrences {
 
   def selectOccurrences(studyId: String, releaseId: String, input: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val inputDF = vcf(input)
-      .withColumn("file_name", filename)
+    val inputDF = visibleVcf(input, studyId, releaseId)
       .withColumn("genotype", explode($"genotypes"))
     val occurrences = inputDF
       .select(
@@ -106,63 +97,12 @@ object Occurrences {
       .withColumn("father_zygosity", zygosity($"father_calls"))
   }
 
-  def joinOccurrencesWithClinical(occurrences: DataFrame, biospecimens: DataFrame, genomicFiles: DataFrame)(implicit spark: SparkSession): DataFrame = {
-
+  def joinOccurrencesWithClinical(occurrences: DataFrame, biospecimens: DataFrame)(implicit spark: SparkSession): DataFrame = {
     occurrences
-      .join(biospecimens, occurrences("biospecimen_id") === biospecimens("joined_sample_id"), "inner")
-      .join(genomicFiles, occurrences("file_name") === genomicFiles("file_name"), "inner")
-      .drop(occurrences("biospecimen_id")).drop(biospecimens("joined_sample_id")).drop(occurrences("file_name"))
+      .join(biospecimens, occurrences("biospecimen_id") === biospecimens("joined_sample_id"))
+      .drop(occurrences("biospecimen_id")).drop(biospecimens("joined_sample_id"))
   }
 
-  def getBiospecimens(studyId: String, releaseId: String, biospecimenIdColumn: String)(implicit spark: SparkSession): DataFrame = {
-    val biospecimen_id_col = col(biospecimenIdColumn).as("joined_sample_id")
-    import spark.implicits._
-
-    val b = loadClinicalTable(studyId, releaseId, "biospecimens")
-      .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id").alias("b")
-    val p = loadClinicalTable(studyId, releaseId, "participants").select("kf_id", "is_proband", "affected_status").alias("p")
-    val all = b.join(p, b("participant_id") === p("kf_id")).select("b.*", "p.is_proband", "p.affected_status")
-
-    broadcast(all)
-  }
-
-  def getRelations(studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
-    import spark.implicits._
-    broadcast(
-      loadClinicalTable(studyId, releaseId, "family_relationships")
-        .groupBy("participant2")
-        .agg(
-          map_from_entries(
-            collect_list(
-              struct($"participant1_to_participant2_relation" as "relation", $"participant1" as "participant_id")
-            )
-          ) as "relations"
-        )
-        .select($"participant2" as "participant_id", $"relations.Mother" as "mother_id", $"relations.Father" as "father_id")
-
-    )
-
-  }
-
-  private def loadClinicalTable(studyId: String, releaseId: String, tableName: String)(implicit spark: SparkSession) = {
-    import spark.implicits._
-    spark
-      .table(s"${tableName}_${releaseId.toLowerCase}")
-      .where($"study_id" === studyId)
-  }
-
-  def getGenomicFiles(studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
-    import spark.implicits._
-    broadcast(
-      spark
-        .table(s"genomic_files_${releaseId.toLowerCase}")
-        .where($"study_id" === studyId)
-        .withColumn("acl", filterAcl($"acl"))
-        .where(size($"acl") <= 1)
-        .select($"acl"(0) as "acl", $"file_name")
-        .select(when($"acl".isNull, "_NONE_").when($"acl" === "*", "_PUBLIC_").otherwise($"acl") as "dbgap_consent_code", $"file_name")
-    )
-  }
 
   def write(df: DataFrame, output: String, studyId: String, releaseId: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._

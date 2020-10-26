@@ -14,7 +14,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --service-role EMR_DefaultRole \
 --enable-debugging \
 --release-label emr-5.28.0 \
---log-uri 's3n://aws-logs-538745987955-us-east-1/elasticmapreduce/' \
+--log-uri 's3n://aws-logs-232196027141-us-east-1/elasticmapreduce/' \
 --steps "${steps}" \
 --name "Variant Join ${job} - Studies ${study_ids} - Release ${release_id}" \
 --instance-groups "${instance_groups}" \

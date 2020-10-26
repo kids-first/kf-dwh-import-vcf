@@ -2,6 +2,7 @@ package org.kidsfirstdrc.dwh.utils
 
 import org.kidsfirstdrc.dwh.testutils.Model._
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
+import org.kidsfirstdrc.dwh.utils.SparkUtils.filename
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -55,5 +56,13 @@ class SparkUtilsSpec extends AnyFlatSpec with WithSparkSession with Matchers {
 
   }
 
+  "filename" should "return name of the input files" in {
+    val df = spark.read.json(getClass.getResource("/filename").getFile).select($"id", filename)
+    df.as[(String, String)].collect() should contain theSameElementsAs Seq(
+      ("1", "file1.json"),
+      ("2", "file1.json"),
+      ("3", "file2.json")
+    )
+  }
 
 }

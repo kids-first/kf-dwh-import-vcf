@@ -4,15 +4,15 @@ import org.apache.spark.sql.functions.{lit, sum}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
+import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getGenomicFiles
 
 object Variants {
-  val   TABLE_NAME = "variants"
+  val TABLE_NAME = "variants"
 
   def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
-    val inputDF = vcf(input)
+    val inputDF = visibleVcf(input, studyId, releaseId)
     val variants: DataFrame = build(studyId, releaseId, inputDF)
-
     val tableAnnotations = tableName(TABLE_NAME, studyId, releaseId)
     variants
       .repartition($"chromosome")
@@ -27,7 +27,6 @@ object Variants {
 
   def build(studyId: String, releaseId: String, inputDF: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    inputDF.printSchema()
     val annotations = inputDF
       .select(
         chromosome,

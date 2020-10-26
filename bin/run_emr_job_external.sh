@@ -15,7 +15,7 @@ steps=$(cat <<EOF
       "client",
       "--class",
       "org.kidsfirstdrc.dwh.external.${job}",
-      "s3a://kf-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar"
+      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",
@@ -29,11 +29,12 @@ EOF
 instance_groups="[{\"InstanceCount\":${instance_count},\"InstanceGroupType\":\"CORE\",\"InstanceType\":\"${instance_type}\",\"Name\":\"Core - 2\"},{\"InstanceCount\":1,\"EbsConfiguration\":{\"EbsBlockDeviceConfigs\":[{\"VolumeSpecification\":{\"SizeInGB\":32,\"VolumeType\":\"gp2\"},\"VolumesPerInstance\":2}]},\"InstanceGroupType\":\"MASTER\",\"InstanceType\":\"m5.xlarge\",\"Name\":\"Master - 1\"}]"
 
 aws emr create-cluster --applications Name=Hadoop Name=Spark \
---ec2-attributes '{"KeyName":"flintrock","AdditionalSlaveSecurityGroups":["sg-059bf5fe80ff903be"],"InstanceProfile":"EMR_EC2_DefaultRole","ServiceAccessSecurityGroup":"sg-0487486fd3d67c14e","SubnetId":"subnet-a756a3ed","EmrManagedSlaveSecurityGroup":"sg-0807b9c40bb37be85","EmrManagedMasterSecurityGroup":"sg-012f30e67b51b6f4d","AdditionalMasterSecurityGroups":["sg-059bf5fe80ff903be"]}' \
+--ec2-attributes '{"KeyName":"flintrock","InstanceProfile":"EMR_EC2_DefaultRole","SubnetId":"subnet-031b7ef17a032fc3b","EmrManagedSlaveSecurityGroup":"sg-0d04e7c3ff5f36538","EmrManagedMasterSecurityGroup":"sg-0abad24e2a3e5e279"}' \
 --service-role EMR_DefaultRole \
 --enable-debugging \
 --release-label emr-5.28.0 \
---log-uri 's3n://aws-logs-538745987955-us-east-1/elasticmapreduce/' \
+--log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
+--bootstrap-actions Path="s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions/copy_chain_file.sh" \
 --steps "${steps}" \
 --name "${job}" \
 --instance-groups "${instance_groups}" \

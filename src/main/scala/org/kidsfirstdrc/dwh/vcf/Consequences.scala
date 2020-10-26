@@ -8,9 +8,8 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 object Consequences {
   def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
-    val inputDF = vcf(input)
-    build(studyId, releaseId, inputDF)
-    val consequences: DataFrame = build(studyId, releaseId, inputDF)
+    val inputDF = visibleVcf(input, studyId, releaseId)
+    val consequences = build(studyId, releaseId, inputDF)
 
     val tableConsequences = tableName("consequences", studyId, releaseId)
     consequences

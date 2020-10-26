@@ -5,8 +5,29 @@ import org.apache.spark.sql.expressions.{UserDefinedFunction, Window, WindowSpec
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{ArrayType, DecimalType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
+import ClinicalUtils.getGenomicFiles
 
 object SparkUtils {
+
+  val filename: Column = regexp_extract(input_file_name(), ".*/(.*)", 1)
+
+  /**
+   * Return vcf entries found in visibles input files by joining table genomic_files
+   * @param path Path where find the vcf. Can be any path supported by hadoop
+   * @param studyId Id of the study for filter which files are visibles
+   * @param releaseId Id of the release for filter which files are visibles
+   * @param spark session
+   * @return vcf entries enriched with additional columns file_name
+   */
+  def visibleVcf(path: String, studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
+    val genomicFiles = broadcast(getGenomicFiles(studyId, releaseId).select("file_name"))
+    val inputDF = vcf(path)
+      .withColumn("file_name", filename)
+    inputDF
+      .join(genomicFiles, inputDF("file_name") === genomicFiles("file_name"), "inner")
+      .drop(genomicFiles("file_name"))
+  }
+
   def vcf(input: String)(implicit spark: SparkSession): DataFrame = {
     val inputs = input.split(",")
     val df = spark.read.format("vcf")
@@ -98,7 +119,7 @@ object SparkUtils {
     val codons: Column = col("annotation.Codons") as "codons"
     val variant_class: Column = col("annotation.VARIANT_CLASS") as "variant_class"
     val hgvsg: Column = col("annotation.HGVSg") as "hgvsg"
-    val is_multi_allelic: Column = col("splitFromMultiAllelic") as "is_multi_allellic"
+    val is_multi_allelic: Column = col("splitFromMultiAllelic") as "is_multi_allelic"
     val old_multi_allelic: Column = col("INFO_OLD_MULTIALLELIC") as "old_multi_allelic"
 
     def optional_info(df: DataFrame, colName: String, alias: String, colType: String = "string"): Column = (if (df.columns.contains(colName)) col(colName) else lit(null).cast(colType)).as(alias)

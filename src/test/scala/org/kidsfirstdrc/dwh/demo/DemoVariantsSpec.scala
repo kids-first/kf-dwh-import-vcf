@@ -1,12 +1,11 @@
-package org.kidsfirstdrc.dwh.vcf
+package org.kidsfirstdrc.dwh.demo
 
-import org.apache.spark.sql.Row
-import org.apache.spark.sql.types._
+import org.kidsfirstdrc.dwh.testutils.Model._
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
+import org.kidsfirstdrc.dwh.vcf.Variants
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.kidsfirstdrc.dwh.testutils.Model._
 
 class DemoVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 

@@ -1,0 +1,3 @@
+{"kf_id": "FR_000001", "participant2":"PT_000001", "participant1":"PT_000002", "participant1_to_participant2_relation":"Mother", "study_id": "SD_123456"}
+{"kf_id": "FR_000002", "participant2":"PT_000002", "participant1":"PT_000001", "participant1_to_participant2_relation":"Child", "study_id": "SD_123456"}
+
