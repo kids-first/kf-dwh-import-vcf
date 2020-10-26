@@ -8,7 +8,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 
-class JoinDemoVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   import spark.implicits._
 
