@@ -8,37 +8,11 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.calculated_duo_af
 import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 import org.kidsfirstdrc.dwh.vcf.Variants.TABLE_NAME
 
-
 object JoinVariants {
 
   def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean = true, database: String = "variant")(implicit spark: SparkSession): Unit = {
 
     import spark.implicits._
-    //
-    //      val df = spark.table("variants_sd_456_re_abcdef").union(spark.table("variants_sd_123_re_abcdef"))
-    //        .groupBy(locus: _*)
-    //        .agg(
-    //          first($"name") as "name",
-    //          functions.collect_list($"study_id") as "study_ids",
-    //          map_from_entries(collect_list(struct($"study_id", $"hmb.ac"))) as "hmb_ac_by_study",
-    //          map_from_entries(collect_list(struct($"study_id", $"hmb.an"))) as "hmb_an_by_study",
-    //          map_from_entries(collect_list(struct($"study_id", $"hmb.af"))) as "hmb_af_by_study",
-    //          map_from_entries(collect_list(struct($"study_id", $"hmb.homozygotes"))) as "hmb_homozygotes_by_study",
-    //          map_from_entries(collect_list(struct($"study_id", $"hmb.heterozygotes"))) as "hmb_heterozygotes_by_study"
-    //        )
-    //      val e = df
-    //        .select($"*", explode($"study_ids") as "study_id")
-    //        .withColumn("hmb_ac", $"hmb_ac_by_study"($"study_id"))
-    //        .withColumn("hmb_ac_by_study", map($"study_id", $"hmb_ac"))
-    //        .withColumn("hmb_an", $"hmb_an_by_study"($"study_id"))
-    //        .withColumn("hmb_an_by_study", map($"study_id", $"hmb_an"))
-    //        .withColumn("hmb_af_by_study", map($"study_id", $"hmb_af_by_study"($"study_id")))
-    //        .withColumn("hmb_homozygotes", $"hmb_homozygotes_by_study"($"study_id"))
-    //        .withColumn("hmb_homozygotes_by_study", map($"study_id", $"hmb_homozygotes_by_study"($"study_id")))
-    //        .withColumn("hmb_heterozygotes", $"hmb_heterozygotes_by_study"($"study_id"))
-    //        .withColumn("hmb_heterozygotes_by_study", map($"study_id", $"hmb_heterozygotes_by_study"($"study_id")))
-    //      e.printSchema()
-    //      e.show(false)
 
     val variants: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
@@ -160,14 +134,6 @@ object JoinVariants {
       .withColumn("hmb_af", calculated_duo_af("hmb"))
       .withColumn("gru_af", calculated_duo_af("gru"))
     t
-    //
-    //    t.withColumn("freqs", map_values($"by_study"))
-    //      .withColumn("ac", expr("aggregate(freqs, 0L, (acc, x) -> acc + x.ac)"))
-    //      .withColumn("an", expr("aggregate(freqs, 0L, (acc, x) -> acc + x.an)"))
-    //      .withColumn("homozygotes", expr("aggregate(freqs, 0L, (acc, x) -> acc + x.homozygotes)"))
-    //      .withColumn("heterozygotes", expr("aggregate(freqs, 0L, (acc, x) -> acc + x.heterozygotes)"))
-    //      .drop("freqs")
-    //.select($"*", calculated_af, lit(releaseId) as "release_id")
 
   }
 
