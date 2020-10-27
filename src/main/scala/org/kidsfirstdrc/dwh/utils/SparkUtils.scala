@@ -13,10 +13,11 @@ object SparkUtils {
 
   /**
    * Return vcf entries found in visibles input files by joining table genomic_files
-   * @param path Path where find the vcf. Can be any path supported by hadoop
-   * @param studyId Id of the study for filter which files are visibles
+   *
+   * @param path      Path where find the vcf. Can be any path supported by hadoop
+   * @param studyId   Id of the study for filter which files are visibles
    * @param releaseId Id of the release for filter which files are visibles
-   * @param spark session
+   * @param spark     session
    * @return vcf entries enriched with additional columns file_name
    */
   def visibleVcf(path: String, studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
@@ -63,7 +64,16 @@ object SparkUtils {
 
     val alternate: Column = col("alternateAlleles")(0) as "alternate"
     val name: Column = col("names")(0) as "name"
-    val calculated_af: Column = col("ac").divide(col("an")).cast(DecimalType(8, 8)) as "af"
+    val calculated_duo_af: String => Column = duo => {
+      val ac = col(s"${duo}_ac")
+      val an = col(s"${duo}_an")
+      val af = when(an === 0, 0)
+        .otherwise(ac / an)
+      //From documentation of changePrecision in DecimalType : returning null if it overflows.
+      //https://stackoverflow.com/questions/55688810/apache-spark-null-value-when-casting-incompatible-decimaltype-vs-classcastexcept
+      val notNullAf = when(af.isNull, 0).otherwise(af)
+      notNullAf.cast(DecimalType(11, 10))
+    }
 
     val ac: Column = col("INFO_AC")(0) as "ac"
     val af: Column = col("INFO_AF")(0) as "af"
@@ -79,12 +89,19 @@ object SparkUtils {
 
     val familyVariantWindow: WindowSpec = Window.partitionBy("chromosome", "start", "reference", "alternate", "family_id")
 
-    val familyCalls = map_from_entries(collect_list(struct(col("participant_id"), col("calls"))).over(familyVariantWindow))
+    val familyCalls: Column = map_from_entries(collect_list(struct(col("participant_id"), col("calls"))).over(familyVariantWindow))
 
-    val countHomozygotesUDF: UserDefinedFunction = udf { calls: Seq[Seq[Int]] => calls.map(_.sum).count(_ == 2) }
-    val homozygotes: Column = countHomozygotesUDF(col("genotypes.calls")) as "homozygotes"
-    val countHeterozygotesUDF: UserDefinedFunction = udf { calls: Seq[Seq[Int]] => calls.map(_.sum).count(_ == 1) }
-    val heterozygotes: Column = countHeterozygotesUDF(col("genotypes.calls")) as "heterozygotes"
+    /**
+     * has_alt return 1 if there is at least one alternative allele. Note : It cannot returned a boolean beacause it's used to partition data.
+     * It looks like Glue does not support partition by boolean
+     **/
+    val has_alt: Column = when(array_contains(col("genotype.calls"), 1), 1).otherwise(0) as "has_alt"
+
+    val calculated_ac: Column = when(col("zygosity") === "HET", 1).when(col("zygosity") === "HOM", 2).otherwise(0) as "ac"
+    val calculate_an: Column = when(col("has_alt") === 1, 2).otherwise(0) as "an"
+
+    val homozygotes: Column = when(col("zygosity") === "HOM", 1).otherwise(0) as "homozygotes"
+    val heterozygotes: Column = when(col("zygosity") === "HET", 1).otherwise(0) as "heterozygotes"
 
     val zygosity: Column => Column = c => when(c(0) === 1 && c(1) === 1, "HOM")
       .when(c(0) === 0 && c(1) === 1, "HET")

@@ -37,9 +37,11 @@ object ClinicalUtils {
     import spark.implicits._
 
     val b = loadClinicalTable(studyId, releaseId, "biospecimens")
-      .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id", $"dbgap_consent_code")
+      .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id", $"dbgap_consent_code",
+        array_contains($"duo_codes", "DUO:0000042") as "is_gru",
+        array_contains($"duo_codes", "DUO:0000006") as "is_hmb"
+      )
       .alias("b")
-    //    val withAcl = getAcls(b).alias("b")
 
     val p = loadClinicalTable(studyId, releaseId, "participants").select("kf_id", "is_proband", "affected_status").alias("p")
     val all = b.join(p, b("participant_id") === p("kf_id")).select("b.*", "p.is_proband", "p.affected_status")

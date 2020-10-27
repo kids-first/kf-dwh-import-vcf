@@ -17,13 +17,13 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
   "build" should "return a dataframe with one consequecne by transcript" in {
     val df = Seq(
-      VariantInput(
+      VCFRowInput(
         INFO_ANN = Seq(
           ConsequenceInput(),
           ConsequenceInput(Consequence  = Seq("missense_variant", "NMD_transcript_variant"), Feature = "ENST00000636135.1")
         )
       ),
-      VariantInput(
+      VCFRowInput(
         INFO_ANN = Seq(
           ConsequenceInput()
         )
@@ -40,7 +40,7 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
   it should "return a dataframe with one ConsequenceInput with regulatory feature" in {
     val df = Seq(
-      VariantInput(
+      VCFRowInput(
         INFO_ANN = Seq(
           ConsequenceInput(Feature_type = "RegulatoryFeature", Feature = "ENSR0000636135")
         )

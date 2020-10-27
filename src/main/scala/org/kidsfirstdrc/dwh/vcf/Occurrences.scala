@@ -1,11 +1,11 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import org.apache.spark.sql.expressions.{UserDefinedFunction, Window}
+import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession, functions}
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
+import org.kidsfirstdrc.dwh.utils.ClinicalUtils.{getBiospecimens, getRelations}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
-import org.kidsfirstdrc.dwh.utils.ClinicalUtils.{getBiospecimens, getGenomicFiles, getRelations}
 
 object Occurrences {
 
@@ -40,7 +40,7 @@ object Occurrences {
         $"genotype.depth" as "dp",
         $"genotype.conditionalQuality" as "gq",
         $"genotype.calls" as "calls",
-        array_contains($"genotype.calls", 1) as "has_alt",
+        has_alt,
         is_multi_allelic,
         old_multi_allelic,
         $"qual" as "quality",
