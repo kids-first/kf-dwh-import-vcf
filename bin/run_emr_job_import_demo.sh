@@ -3,7 +3,7 @@ release_id=$1
 job=${2:-"all"}
 instance_type=${3:-"m5d.4xlarge"}
 instance_count=${4:-"20"}
-input=${5:-"s3a://bix-dev-data-bucket/1000g/harmonized-data/family-variants/*filtered.deNovo.vep.vcf.gz"}
+input=${5:-"s3a://bix-dev-data-bucket/1000g/harmonized-data/family-variants"}
 
 steps=$(cat <<EOF
 [

@@ -2,18 +2,6 @@ package org.kidsfirstdrc.dwh.testutils
 
 object Model {
 
-  case class VCFRowInput(contigName: String = "chr2",
-                         start: Long = 165310405,
-                         end: Long = 165310405,
-                         referenceAllele: String = "G",
-                         alternateAlleles: Seq[String] = Seq("A"),
-                         INFO_AC: Seq[Long] = Nil,
-                         INFO_AN: Long = 0,
-                         names: Seq[String] = Seq("rs1057520413"),
-                         INFO_ANN: Seq[ConsequenceInput] = Seq(ConsequenceInput()),
-                         genotypes: Seq[Genotype] = Seq(hom_11),
-                         splitFromMultiAllelic: Boolean = false
-                        )
 
   case class VariantInput(chromosome: String = "2",
                           start: Long = 165310406,
@@ -65,12 +53,23 @@ object Model {
                                file_name: String,
                                dbgap_consent_code: String)
 
+  case class ConsequencesRowInput(chromosome: String = "2",
+                                  start: Long = 165310406,
+                                  end: Long = 165310406,
+                                  reference: String = "G",
+                                  alternate: String = "A",
+                                  name: String = "rs1057520413",
+                                  annotations: Seq[ConsequenceInput] = Seq(ConsequenceInput()),
+                                  splitFromMultiAllelic: Boolean = false)
+
   case class Genotype(calls: Array[Int])
 
   val hom_00: Genotype = Genotype(Array(0, 0))
   val hom_11: Genotype = Genotype(Array(1, 1))
   val het_01: Genotype = Genotype(Array(0, 1))
   val het_10: Genotype = Genotype(Array(1, 0))
+
+  val unk: Genotype = Genotype(Array(-1, 0))
 
   case class Exon(rank: Int, total: Int)
 

@@ -2,7 +2,7 @@ package org.kidsfirstdrc.dwh.utils
 
 import org.kidsfirstdrc.dwh.testutils.Model._
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
-import org.kidsfirstdrc.dwh.utils.SparkUtils.filename
+import org.kidsfirstdrc.dwh.utils.SparkUtils.{fileExist, filename, union}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -15,24 +15,27 @@ class SparkUtilsSpec extends AnyFlatSpec with WithSparkSession with Matchers {
   import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
   import spark.implicits._
 
-//  "af" should "return a a new column named ac with ratio of columns ac and an" in {
-//    val df = Seq(ACInput(1, 2)).toDS()
-//    df.select(calculated_af).as[ACOutput].collectAsList() should contain only ACOutput(0.5)
-//  }
-//
-//  it should "return manage a precision of 8" in {
-//    val df = Seq(ACInput(5, 62976)).toDS()
-//    df.select(calculated_af).as[ACOutput].collectAsList() should contain only ACOutput(0.00007940)
-//  }
-
-  "homozygotes" should "return homozygote count" in {
-    val df = Seq(Seq(hom_11, hom_11, het_01, het_10, hom_00)).toDF("genotypes")
-    df.select(homozygotes).as[Long].collect() should contain only 2
+  "zygosity" should "return HOM for 1/1" in {
+    val df = Seq(hom_11).toDF("genotypes")
+    df.select(zygosity($"genotypes")).as[String].collect() should contain only "HOM"
   }
 
-  "heterozygotes" should "return heterozygote count" in {
-    val df = Seq(Seq(hom_11, hom_11, het_01, het_01, het_10, het_10, hom_00)).toDF("genotypes")
-    df.select(heterozygotes).as[Long].collect() should contain only 4
+  it should "return HET for 0/1" in {
+    val df = Seq(het_01).toDF("genotypes")
+    df.select(zygosity($"genotypes")).as[String].collect() should contain only "HET"
+  }
+  it should "return HET for 1/0" in {
+    val df = Seq(het_10).toDF("genotypes")
+    df.select(zygosity($"genotypes")).as[String].collect() should contain only "HET"
+  }
+  it should "return WT for 0/0" in {
+    val df = Seq(hom_00).toDF("genotypes")
+    df.select(zygosity($"genotypes")).as[String].collect() should contain only "WT"
+  }
+
+  it should "return UNK otherwise" in {
+    val df = Seq(unk).toDF("genotypes")
+    df.select(zygosity($"genotypes")).as[String].collect() should contain only "UNK"
   }
 
   "colFromArrayOrField" should "return first element of an array" in {
@@ -63,6 +66,42 @@ class SparkUtilsSpec extends AnyFlatSpec with WithSparkSession with Matchers {
       ("2", "file1.json"),
       ("3", "file2.json")
     )
+  }
+
+  "union" should "return a unioned df if both df are not empty" in {
+    val df1 = Seq("1", "2").toDF("a")
+    val df2 = Seq("3", "4").toDF("a")
+
+    union(df1, df2).select("a").as[String].collect() should contain theSameElementsAs Seq("1", "2", "3", "4")
+  }
+
+  it should "return df1 if df2 is empty" in {
+    val df1 = Seq("1", "2").toDF("a")
+    val df2 = spark.emptyDataFrame
+
+    union(df1, df2).select("a").as[String].collect() should contain theSameElementsAs Seq("1", "2")
+  }
+
+  it should "return df2 if df1 is empty" in {
+    val df1 = spark.emptyDataFrame
+    val df2 = Seq("3", "4").toDF("a")
+    union(df1, df2).select("a").as[String].collect() should contain theSameElementsAs Seq("3", "4")
+  }
+
+  "fileExists" should "return false if there is no file associated to the pattern" in {
+    val path = getClass.getResource("/input_vcf/SD_123456").getFile
+
+    val cgp = s"$path/*.unknown"
+    println(cgp)
+    fileExist(cgp) shouldBe false
+  }
+
+  it should "return true if there is files associated to the pattern" in {
+    val path = getClass.getResource("/input_vcf/SD_123456").getFile
+
+    val vcf = s"$path/*.CGP.filtered.deNovo.vep.vcf.gz"
+    println(vcf)
+    fileExist(vcf) shouldBe true
   }
 
 }

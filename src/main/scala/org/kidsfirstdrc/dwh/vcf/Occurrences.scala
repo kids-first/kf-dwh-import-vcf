@@ -24,8 +24,8 @@ object Occurrences {
 
   def selectOccurrences(studyId: String, releaseId: String, input: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val inputDF = visibleVcf(input, studyId, releaseId)
-      .withColumn("genotype", explode($"genotypes"))
+    val inputDF: DataFrame = unionCGPFiles(input, studyId, releaseId)
+
     val occurrences = inputDF
       .select(
         chromosome,
@@ -82,6 +82,69 @@ object Occurrences {
       .withColumn("variant_class", variant_class)
       .drop("annotation", "lo_conf_denovo", "hi_conf_denovo")
     occurrences
+  }
+
+  /**
+   * This function is a hack for loading both CGP and postCGP files.
+   * These 2 kinds of vcf does not have the same headers, so it results in error when trying to parse these files together
+   * That's why we need to address schema differences, and then union these 2 dtafremaes manually.
+   *
+   * @param input path where are located the files
+   * @param studyId
+   * @param releaseId
+   * @param spark
+   * @return a dataframe that unions cgp and postcgp vcf
+   */
+  private def unionCGPFiles(input: String, studyId: String, releaseId: String)(implicit spark: SparkSession) = {
+    (postCGPExist(input), cgpExist(input)) match {
+      case (false, true) => loadCGP(input, studyId, releaseId)
+      case (true, false) => loadPostCGP(input, studyId, releaseId)
+      case (true, true) =>
+        val postCGP = loadPostCGP(input, studyId, releaseId)
+        val cgp = loadCGP(input, studyId, releaseId)
+        union(postCGP, cgp)
+      case (false, false) => throw new IllegalStateException("No VCF files found!")
+    }
+
+  }
+
+  private def loadPostCGP(input: String, studyId: String, releaseId: String)(implicit spark: SparkSession) = {
+    import spark.implicits._
+    visibleVcf(postCGPFiles(input), studyId, releaseId)
+      .withColumn("genotype", explode($"genotypes"))
+  }
+
+  private def loadCGP(input: String, studyId: String, releaseId: String)(implicit spark: SparkSession) = {
+    import spark.implicits._
+    visibleVcf(cgpFiles(input), studyId, releaseId)
+      .withColumn("INFO_DS", lit(null).cast("boolean"))
+      .withColumn("INFO_HaplotypeScore", lit(null).cast("double"))
+      .withColumn("genotype", explode($"genotypes"))
+      .drop("genotypes")
+      .withColumn("INFO_ReadPosRankSum", $"INFO_ReadPosRankSum"(0))
+      .withColumn("INFO_ClippingRankSum", $"INFO_ClippingRankSum"(0))
+      .withColumn("INFO_RAW_MQ", $"INFO_RAW_MQ"(0))
+      .withColumn("INFO_BaseQRankSum", $"INFO_BaseQRankSum"(0))
+      .withColumn("INFO_MQRankSum", $"INFO_MQRankSum"(0))
+      .withColumn("INFO_ExcessHet", $"INFO_ExcessHet"(0))
+      .withColumn("genotype", struct(
+        $"genotype.sampleId",
+        $"genotype.conditionalQuality",
+        $"genotype.filters",
+        $"genotype.SB",
+        $"genotype.alleleDepths",
+        $"genotype.PP",
+        $"genotype.PID"(0) as "PID",
+        $"genotype.phased",
+        $"genotype.calls",
+        $"genotype.MIN_DP"(0) as "MIN_DP",
+        $"genotype.JL",
+        $"genotype.PGT"(0) as "PGT",
+        $"genotype.phredLikelihoods",
+        $"genotype.depth",
+        $"genotype.RGQ",
+        $"genotype.JP"
+      ))
   }
 
   def joinOccurrencesWithInheritence(occurrences: DataFrame, relations: DataFrame)(implicit spark: SparkSession): DataFrame = {

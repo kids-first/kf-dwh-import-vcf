@@ -24,13 +24,12 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
       val input = getClass.getResource("/input_vcf/SD_123456").getFile
 
       And("An empty output folder")
-
       withOutputFolder("output") { output =>
         spark.sql("create database if not exists variant")
         And("A table biospecimens_re_abcdef")
         loadTestClinicalTable("biospecimens", output)
 
-        And("A table genomic_files_re_abcdef that contains only sample.vcf")
+        And("A table genomic_files_re_abcdef that contains only sample.CGP.filtered.deNovo.vep.vcf.gz")
         loadTestClinicalTable("genomic_files", output)
 
         And("A table participants_re_abcdef")
@@ -43,7 +42,7 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
         ImportVcf.run(studyId, releaseId, input, output)
 
         Then("Table occurrences_sd_123456_re_abcdef should contain rows for the given study and release")
-        spark.table("variant.occurrences_sd_123456_re_abcdef").show(false)
+
         val occurrences = spark.table("variant.occurrences_sd_123456_re_abcdef")
           .select(
             "chromosome",
@@ -62,15 +61,15 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
           .as[OccurrencesOutput]
 
         val expectedOccurrences = Seq(
-          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "c1"),
-          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "c1"),
-          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "c1"),
-          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "c1"),
-          //Multi-, "sample.vcf"Allelic
-          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "c1"),
-          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "c1"),
-          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.vcf", "c1"),
-          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.vcf", "c1")
+          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.CGP.filtered.deNovo.vep.vcf.gz", "c1"),
+          OccurrencesOutput("1", 10439, 10441, "AC", "A", Some("rs112766696"), "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.CGP.filtered.deNovo.vep.vcf.gz", "c1"),
+          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.CGP.filtered.deNovo.vep.vcf.gz", "c1"),
+          OccurrencesOutput("1", 10560, 10561, "C", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.CGP.filtered.deNovo.vep.vcf.gz", "c1"),
+          //MultiAllelic
+          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.CGP.filtered.deNovo.vep.vcf.gz", "c1"),
+          OccurrencesOutput("1", 15274, 15275, "A", "G", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.CGP.filtered.deNovo.vep.vcf.gz", "c1"),
+          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_ABCD1234", "PT_000001", Some("FA_000001"), studyId, releaseId, "sample.CGP.filtered.deNovo.vep.vcf.gz", "c1"),
+          OccurrencesOutput("1", 15274, 15275, "A", "T", None, "BS_EFGH4567", "PT_000002", Some("FA_000001"), studyId, releaseId, "sample.CGP.filtered.deNovo.vep.vcf.gz", "c1")
         )
         occurrences.collect() should contain theSameElementsAs expectedOccurrences
 

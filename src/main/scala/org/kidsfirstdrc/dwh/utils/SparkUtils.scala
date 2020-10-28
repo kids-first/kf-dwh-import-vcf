@@ -6,10 +6,38 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{ArrayType, DecimalType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import ClinicalUtils.getGenomicFiles
+import org.apache.hadoop.fs.{GlobFilter, Path}
 
 object SparkUtils {
 
   val filename: Column = regexp_extract(input_file_name(), ".*/(.*)", 1)
+
+  /**
+   * Check if the hadoop file exists
+   *
+   * @param path Path to check. Accept some patterns
+   * @param spark session that contains hadoop config
+   * @return
+   */
+  def fileExist(path: String)(implicit spark: SparkSession): Boolean = {
+    val conf = spark.sparkContext.hadoopConfiguration
+    val fs = org.apache.hadoop.fs.FileSystem.get(conf)
+    val statuses = fs.globStatus(new Path(path))
+    statuses != null && statuses.nonEmpty
+  }
+
+
+  def cgpExist(input: String)(implicit spark: SparkSession): Boolean = fileExist(cgpFiles(input))
+
+  def cgpFiles(input: String) = {
+    s"$input/*.CGP.filtered.deNovo.vep.vcf.gz"
+  }
+
+  def postCGPExist(input: String)(implicit spark: SparkSession): Boolean = fileExist(postCGPFiles(input))
+
+  def postCGPFiles(input: String) = {
+    s"$input/*.postCGP.filtered.deNovo.vep.vcf.gz"
+  }
 
   /**
    * Return vcf entries found in visibles input files by joining table genomic_files
@@ -40,11 +68,25 @@ object SparkUtils {
   }
 
   def tableName(table: String, studyId: String, releaseId: String): String = {
-    s"${table}_${studyId.toLowerCase}_${releaseId.toLowerCase}"
+    s"${
+      table
+    }_${
+      studyId.toLowerCase
+    }_${
+      releaseId.toLowerCase
+    }"
   }
 
   def tableName(table: String, studyId: String, releaseId: String, database: String = "variant"): String = {
-    s"${database}.${table}_${studyId.toLowerCase}_${releaseId.toLowerCase}"
+    s"${
+      database
+    }.${
+      table
+    }_${
+      studyId.toLowerCase
+    }_${
+      releaseId.toLowerCase
+    }"
   }
 
   def colFromArrayOrField(df: DataFrame, colName: String): Column = {
@@ -52,6 +94,14 @@ object SparkUtils {
       case ArrayType(_, _) => df(colName)(0)
       case _ => df(colName)
     }
+  }
+
+  def union(df1: DataFrame, df2: DataFrame)(implicit spark: SparkSession) = (df1, df2)
+  match {
+    case (p, c) if p.isEmpty => c
+    case (p, c) if c.isEmpty => p
+    case (p, c) => p.union(c)
+    case _ => spark.emptyDataFrame
   }
 
   def firstAs(c: String): Column = first(col(c)) as c
