@@ -1,12 +1,14 @@
 package org.kidsfirstdrc.dwh.utils
 
+import java.net.URI
+
 import io.projectglow.Glow
-import org.apache.spark.sql.expressions.{UserDefinedFunction, Window, WindowSpec}
+import org.apache.hadoop.fs.Path
+import org.apache.spark.sql.expressions.{Window, WindowSpec}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{ArrayType, DecimalType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
-import ClinicalUtils.getGenomicFiles
-import org.apache.hadoop.fs.{GlobFilter, Path}
+import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getGenomicFiles
 
 object SparkUtils {
 
@@ -15,13 +17,19 @@ object SparkUtils {
   /**
    * Check if the hadoop file exists
    *
-   * @param path Path to check. Accept some patterns
+   * @param path  Path to check. Accept some patterns
    * @param spark session that contains hadoop config
    * @return
    */
   def fileExist(path: String)(implicit spark: SparkSession): Boolean = {
     val conf = spark.sparkContext.hadoopConfiguration
-    val fs = org.apache.hadoop.fs.FileSystem.get(conf)
+    val fs = if (path.startsWith("s3a")) {
+      val bucket = path.replace("s3a://", "").split("/").head
+      org.apache.hadoop.fs.FileSystem.get(new URI(s"s3a://$bucket"), conf)
+    } else {
+      org.apache.hadoop.fs.FileSystem.get(conf)
+    }
+
     val statuses = fs.globStatus(new Path(path))
     statuses != null && statuses.nonEmpty
   }

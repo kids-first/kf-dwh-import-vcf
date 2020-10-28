@@ -1,26 +1,27 @@
 #!/bin/bash
+set -x
 study_id=$1
 release_id=$2
-input_vcf=${3:-"s3a://kf-study-us-east-1-prd-${study_id_lc}/harmonized/family-variants"}
-job=${4:-"all"}
-instance_type=${5:-"m5d.8xlarge"}
-number_instance=${6:-"30"}
 study_id_lc=$(echo "$study_id" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+job=${3:-"all"}
+input_vcf=${4:-"s3a://kf-study-us-east-1-prd-${study_id_lc}/harmonized/family-variants"}
+instance_type=${5:-"m5d.4xlarge"}
+number_instance=${6:-"20"}
 biospecimen_id_column=${7:-"biospecimen_id"}
+
 steps=$(cat <<EOF
 [
   {
     "Args": [
       "spark-submit",
-      "--packages",
-      "io.projectglow:glow_2.11:0.5.0",
+      "--packages","io.projectglow:glow_2.11:0.5.0",
       "--exclude-packages",
       "org.apache.httpcomponents:httpcore,org.apache.httpcomponents:httpclient",
       "--deploy-mode",
       "client",
       "--class",
       "org.kidsfirstdrc.dwh.vcf.ImportVcf",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar"
+      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
       "${study_id}",
       "${release_id}",
       "${input_vcf}",
@@ -45,7 +46,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --service-role EMR_DefaultRole \
 --enable-debugging \
 --release-label emr-5.29.0 \
---log-uri 's3n://aws-logs-538745987955-us-east-1/elasticmapreduce/' \
+--log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --steps "${steps}" \
 --name "Variant Import - ${job} - Study ${study_id} - Release ${release_id}" \
 --instance-groups "${instance_groups}" \
