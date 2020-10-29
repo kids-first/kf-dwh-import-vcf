@@ -38,8 +38,8 @@ object ClinicalUtils {
 
     val b = loadClinicalTable(studyId, releaseId, "biospecimens")
       .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id", $"dbgap_consent_code",
-        array_contains($"duo_codes", "DUO:0000042") as "is_gru",
-        array_contains($"duo_codes", "DUO:0000006") as "is_hmb"
+        array_contains($"duo_ids", "DUO:0000042") as "is_gru",
+        array_contains($"duo_ids", "DUO:0000006") as "is_hmb"
       )
       .alias("b")
 
