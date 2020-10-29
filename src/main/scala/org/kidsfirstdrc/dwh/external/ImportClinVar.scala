@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{SaveMode, SparkSession}
+import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
@@ -13,19 +13,25 @@ object ImportClinVar extends App {
     .appName("Import 1000 Genomes").getOrCreate()
 
   import spark.implicits._
-  
-  val input = "s3://kf-variant-parquet-prd/raw/clinvar/clinvar_20200217.vcf.gz"
-  val output = "s3a://kf-variant-parquet-prd/public"
-  vcf(input)(spark)
-    .select(chromosome,
-      start,
-      end,
-      name,
-      reference,
-      alternate,
-      $"INFO_CLNSIG" as "clin_sig_original",
-      split(regexp_replace($"INFO_CLNSIGCONF"(0), """\(.\)""", ""), "%3B") as "clin_sig_conflict"
-    )
+
+  val input = "s3a://kf-strides-variant-parquet-prd/raw/clinvar/clinvar_20201026.vcf.gz"
+  val output = "s3a://kf-strides-variant-parquet-prd/public"
+
+  def info_fields(df: DataFrame, excludes: String*): Seq[Column] = {
+    df.columns.collect { case c if c.startsWith("INFO") && !excludes.contains(c) => col(c) as c.replace("INFO_", "").toLowerCase }
+  }
+
+  val df = vcf(input)
+  df.select(chromosome +:
+    start +:
+    end +:
+    name +:
+    reference +:
+    alternate +:
+    ($"INFO_CLNSIG" as "clin_sig_original") +:
+    (split(regexp_replace($"INFO_CLNSIGCONF"(0), """\(.\)""", ""), "%3B") as "clin_sig_conflict") +:
+    info_fields(df, "INFO_CLNSIG", "INFO_CLNSIGCONF"): _*
+  )
     .withColumn("clin_sig",
       when(
         array_contains($"clin_sig_original", "Conflicting_interpretations_of_pathogenicity"),
