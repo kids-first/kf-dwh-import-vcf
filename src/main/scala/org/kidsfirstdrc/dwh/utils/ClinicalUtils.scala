@@ -41,6 +41,7 @@ object ClinicalUtils {
         array_contains($"duo_ids", "DUO:0000042") as "is_gru",
         array_contains($"duo_ids", "DUO:0000006") as "is_hmb"
       )
+      .where($"dbgap_consent_code".isNotNull)
       .alias("b")
 
     val p = loadClinicalTable(studyId, releaseId, "participants").select("kf_id", "is_proband", "affected_status").alias("p")
