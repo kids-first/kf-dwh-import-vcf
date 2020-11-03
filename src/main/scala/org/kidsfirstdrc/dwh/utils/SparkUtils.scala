@@ -76,25 +76,11 @@ object SparkUtils {
   }
 
   def tableName(table: String, studyId: String, releaseId: String): String = {
-    s"${
-      table
-    }_${
-      studyId.toLowerCase
-    }_${
-      releaseId.toLowerCase
-    }"
+    s"${table}_${studyId.toLowerCase}_${releaseId.toLowerCase}"
   }
 
   def tableName(table: String, studyId: String, releaseId: String, database: String = "variant"): String = {
-    s"${
-      database
-    }.${
-      table
-    }_${
-      studyId.toLowerCase
-    }_${
-      releaseId.toLowerCase
-    }"
+    s"${database}.${table}_${studyId.toLowerCase}_${releaseId.toLowerCase}"
   }
 
   def colFromArrayOrField(df: DataFrame, colName: String): Column = {
