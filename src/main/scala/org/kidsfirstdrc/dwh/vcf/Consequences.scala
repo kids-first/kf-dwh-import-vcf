@@ -92,6 +92,7 @@ object Consequences {
         protein_position,
         amino_acids,
         codons,
+        canonical,
         lit(studyId) as "study_id",
         lit(releaseId) as "release_id"
       )

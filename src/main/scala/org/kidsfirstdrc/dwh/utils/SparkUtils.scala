@@ -180,6 +180,7 @@ object SparkUtils {
     val codons: Column = col("annotation.Codons") as "codons"
     val variant_class: Column = col("annotation.VARIANT_CLASS") as "variant_class"
     val hgvsg: Column = col("annotation.HGVSg") as "hgvsg"
+    val canonical: Column = when(col("annotation.CANONICAL") === "YES", lit(true)).otherwise(lit(false)) as "canonical"
     val is_multi_allelic: Column = col("splitFromMultiAllelic") as "is_multi_allelic"
     val old_multi_allelic: Column = col("INFO_OLD_MULTIALLELIC") as "old_multi_allelic"
 

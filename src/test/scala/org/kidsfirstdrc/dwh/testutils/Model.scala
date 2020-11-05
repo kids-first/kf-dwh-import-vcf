@@ -103,6 +103,7 @@ object Model {
                                amino_acids: Option[RefAlt] = Some(RefAlt("V", "M")),
                                codons: Option[RefAlt] = Some(RefAlt("GTG", "ATG")),
                                protein_position: Option[Int] = Some(261),
+                               canonical: Boolean = true,
                                study_id: String = "SD_123456",
                                release_id: String = "RE_ABCDEF")
 
@@ -121,6 +122,7 @@ object Model {
                                HGVSg: String = "chr2:g.166166916G>A",
                                HGVSc: String = "ENST00000283256.10:c.781G>A",
                                HGVSp: String = "ENSP00000283256.6:p.Val261Met",
+                               CANONICAL: String = "YES",
                                cDNA_position: Option[Int] = Some(937),
                                CDS_position: Option[Int] = Some(781),
                                Amino_acids: Option[RefAlt] = Some(RefAlt("V", "M")),
