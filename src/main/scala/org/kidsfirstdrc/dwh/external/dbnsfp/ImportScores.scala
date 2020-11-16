@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.external.dbsnfp
+package org.kidsfirstdrc.dwh.external.dbnsfp
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{SaveMode, SparkSession}
