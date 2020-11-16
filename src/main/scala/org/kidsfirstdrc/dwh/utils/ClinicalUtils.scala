@@ -17,6 +17,7 @@ object ClinicalUtils {
     import spark.implicits._
     broadcast(
       loadClinicalTable(studyId, releaseId, "family_relationships")
+        .where($"participant1_to_participant2_relation" isin("Mother", "Father"))
         .groupBy("participant2")
         .agg(
           map_from_entries(
@@ -37,11 +38,11 @@ object ClinicalUtils {
     import spark.implicits._
 
     val b = loadClinicalTable(studyId, releaseId, "biospecimens")
-      .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id", $"dbgap_consent_code",
-        array_contains($"duo_ids", "DUO:0000042") as "is_gru",
-        array_contains($"duo_ids", "DUO:0000006") as "is_hmb"
+      .select(biospecimen_id_col, $"biospecimen_id", $"participant_id", $"family_id",
+        coalesce($"dbgap_consent_code", lit("_NONE_")) as "dbgap_consent_code",
+        ($"consent_type" === "GRU") as "is_gru",
+        ($"consent_type" === "HMB") as "is_hmb"
       )
-      .where($"dbgap_consent_code".isNotNull)
       .alias("b")
 
     val p = loadClinicalTable(studyId, releaseId, "participants").select("kf_id", "is_proband", "affected_status").alias("p")
