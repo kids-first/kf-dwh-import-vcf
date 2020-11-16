@@ -3,11 +3,11 @@ name := "kf-dwh-import-vcf"
 
 version := "0.1"
 
-scalaVersion := "2.11.12"
+scalaVersion := "2.12.12"
 
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
 
-val spark_version = "2.4.7"
+val spark_version = "3.0.0"
 
 /* Runtime */
 libraryDependencies += "org.apache.spark" %% "spark-sql" % spark_version % Provided
