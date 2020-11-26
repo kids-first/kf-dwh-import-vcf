@@ -189,7 +189,6 @@ object SparkUtils {
     val locus: Seq[Column] = Seq(
       col("chromosome"),
       col("start"),
-      col("end"),
       col("reference"),
       col("alternate"))
   }

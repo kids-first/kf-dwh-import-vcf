@@ -171,18 +171,9 @@ object Occurrences {
     import spark.implicits._
     val tableOccurence = tableName("occurrences", studyId, releaseId)
     df
-      .repartition($"has_alt", $"dbgap_consent_code", $"chromosome")
-      .withColumn("bucket",
-        functions
-          .ntile(6)
-          .over(
-            Window.partitionBy("has_alt", "dbgap_consent_code", "chromosome")
-              .orderBy("start")
-          )
-      )
-      .repartition($"has_alt", $"dbgap_consent_code", $"chromosome", $"bucket")
-      .sortWithinPartitions($"has_alt", $"dbgap_consent_code", $"chromosome", $"bucket", $"start")
-      .write.mode(SaveMode.Overwrite)
+      .repartitionByRange(700, $"has_alt", $"dbgap_consent_code", $"chromosome", $"start")
+      .sortWithinPartitions($"study_id", $"has_alt", $"dbgap_consent_code", $"chromosome", $"start")
+      .write.mode("overwrite")
       .partitionBy("study_id", "has_alt", "dbgap_consent_code", "chromosome")
       .format("parquet")
       .option("path", s"$output/occurrences/$tableOccurence")

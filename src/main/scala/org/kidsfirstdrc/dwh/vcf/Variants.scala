@@ -12,15 +12,14 @@ object Variants {
     import spark.implicits._
     val inputDF = spark.table(tableName("occurrences", studyId, releaseId))
     val variants: DataFrame = build(studyId, releaseId, inputDF)
-    val tableAnnotations = tableName(TABLE_NAME, studyId, releaseId)
+    val tableVariants = tableName(TABLE_NAME, studyId, releaseId)
     variants
       .repartition($"chromosome")
-      .sortWithinPartitions("start")
       .write.mode(SaveMode.Overwrite)
       .partitionBy("study_id", "release_id", "chromosome")
       .format("parquet")
-      .option("path", s"$output/$TABLE_NAME/$tableAnnotations")
-      .saveAsTable(tableAnnotations)
+      .option("path", s"$output/$TABLE_NAME/$tableVariants")
+      .saveAsTable(tableVariants)
 
   }
 
@@ -48,6 +47,7 @@ object Variants {
       .agg(
         firstAs("name"),
         firstAs("hgvsg") +:
+        firstAs("end") +:
         firstAs("variant_class") +:
         (freqByDuoCode("hmb") ++ freqByDuoCode("gru")) :_*
       )

@@ -4,7 +4,7 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.utils.SparkUtils
-import org.kidsfirstdrc.dwh.utils.SparkUtils.{firstAs, tableName}
+import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 
 
 object JoinConsequences {
@@ -71,7 +71,7 @@ object JoinConsequences {
       mergeConsequences(releaseId, consequences.select(allColumns: _*))
     }
     val joinedWithScores = joinWithDBNSFP(merged)
-    write(releaseId, output, TABLE_NAME, joinedWithScores, 1, database)
+    write(releaseId, output, TABLE_NAME, joinedWithScores, 2, database)
 
   }
 
@@ -120,12 +120,13 @@ object JoinConsequences {
 
 
   def joinWithDBNSFP(c: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    val s = spark.table("variant.dbnsfp_scores")
+    val s = spark.table("variant.dbnsfp_original")
       .drop(
         "aaref",
         "symbol",
         "ensembl_gene_id",
         "ensembl_protein_id",
+        "VEP_canonical",
         "cds_strand")
 
     c.join(s,

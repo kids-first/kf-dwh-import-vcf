@@ -54,7 +54,7 @@ object JoinVariants {
 
     val allColumns = commonColumns :+
       $"hmb_ac" :+ $"hmb_an" :+ $"hmb_homozygotes" :+ $"hmb_heterozygotes" :+
-      $"gru_ac" :+ $"gru_an" :+ $"gru_homozygotes" :+ $"gru_heterozygotes":+
+      $"gru_ac" :+ $"gru_an" :+ $"gru_homozygotes" :+ $"gru_heterozygotes" :+
       $"study_id"
 
     val merged = if (mergeWithExisting && spark.catalog.tableExists(TABLE_NAME)) {
@@ -93,7 +93,7 @@ object JoinVariants {
     val joinedWithClinvar = joinWithClinvar(joinedWithPop)
     val joinedWithDBSNP = joinWithDBSNP(joinedWithClinvar)
 
-    write(releaseId, output, TABLE_NAME, joinedWithDBSNP, 5, database)
+    write(releaseId, output, TABLE_NAME, joinedWithDBSNP, 10, database)
 
   }
 

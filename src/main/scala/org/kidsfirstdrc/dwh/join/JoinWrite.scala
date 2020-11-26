@@ -17,16 +17,9 @@ object JoinWrite {
         .saveAsTable(s"${database}.${tableName}_$releaseId")
     } else {
       df
-        .withColumn("bucket",
-          functions
-            .ntile(nbFile)
-            .over(
-              Window.partitionBy("chromosome")
-                .orderBy("start")
-            )
-        )
-        .repartition($"chromosome", $"bucket")
-        .sortWithinPartitions($"chromosome", $"bucket", $"start").write.mode(SaveMode.Overwrite)
+        .repartitionByRange(nbFile * 23, $"chromosome", $"start")
+        .sortWithinPartitions($"chromosome", $"start")
+        .write.mode(SaveMode.Overwrite)
         .partitionBy("chromosome")
         .format("parquet")
         .option("path", s"$output/$tableName/${tableName}_$releaseId")

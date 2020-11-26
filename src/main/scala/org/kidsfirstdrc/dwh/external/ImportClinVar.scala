@@ -28,11 +28,10 @@ object ImportClinVar extends App {
     name +:
     reference +:
     alternate +:
-    ($"INFO_CLNSIG" as "clin_sig_original") +:
     (split(regexp_replace($"INFO_CLNSIGCONF"(0), """\(.\)""", ""), "%3B") as "clin_sig_conflict") +:
-    info_fields(df, "INFO_CLNSIG", "INFO_CLNSIGCONF"): _*
+    info_fields(df): _*
   )
-    .withColumn("clin_sig",
+    .withColumn("most_clin_significant",
       when(
         array_contains($"clin_sig_original", "Conflicting_interpretations_of_pathogenicity"),
         array_union(array_remove($"clin_sig_original", "Conflicting_interpretations_of_pathogenicity"), $"clin_sig_original")
