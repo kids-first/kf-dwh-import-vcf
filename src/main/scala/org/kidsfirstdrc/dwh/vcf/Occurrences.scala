@@ -172,7 +172,6 @@ object Occurrences {
     val tableOccurence = tableName("occurrences", studyId, releaseId)
     df
       .repartitionByRange(700, $"has_alt", $"dbgap_consent_code", $"chromosome", $"start")
-      .sortWithinPartitions($"study_id", $"has_alt", $"dbgap_consent_code", $"chromosome", $"start")
       .write.mode("overwrite")
       .partitionBy("study_id", "has_alt", "dbgap_consent_code", "chromosome")
       .format("parquet")

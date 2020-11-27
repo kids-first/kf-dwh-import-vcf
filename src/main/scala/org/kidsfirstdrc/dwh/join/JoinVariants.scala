@@ -93,7 +93,7 @@ object JoinVariants {
     val joinedWithClinvar = joinWithClinvar(joinedWithPop)
     val joinedWithDBSNP = joinWithDBSNP(joinedWithClinvar)
 
-    write(releaseId, output, TABLE_NAME, joinedWithDBSNP, 10, database)
+    write(releaseId, output, TABLE_NAME, joinedWithDBSNP, Some(60), database)
 
   }
 
