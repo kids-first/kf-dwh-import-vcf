@@ -33,7 +33,7 @@ object JoinConsequences {
       $"end",
       $"reference",
       $"alternate",
-      $"consequence",
+      $"consequences",
       $"ensembl_transcript_id",
       $"ensembl_regulatory_id",
       $"feature_type",
@@ -53,7 +53,8 @@ object JoinConsequences {
       $"cdna_position",
       $"protein_position",
       $"amino_acids",
-      $"codons"
+      $"codons",
+      $"canonical"
     )
     val allColumns = commonColumns :+ col("study_id")
     val merged = if (mergeWithExisting && spark.catalog.tableExists(TABLE_NAME)) {
@@ -86,12 +87,12 @@ object JoinConsequences {
       $"end",
       $"reference",
       $"alternate",
-      $"consequence",
       $"ensembl_transcript_id",
       $"ensembl_regulatory_id",
       $"feature_type"
     )
       .agg(
+        firstAs("consequences"),
         firstAs("name"),
         firstAs("impact"),
         firstAs("symbol"),
@@ -109,6 +110,7 @@ object JoinConsequences {
         firstAs("protein_position"),
         firstAs("amino_acids"),
         firstAs("codons"),
+        firstAs("canonical"),
         collect_set($"study_id") as "study_ids"
       )
       .withColumn("aa_change", when($"amino_acids".isNotNull, concat($"amino_acids.reference", $"protein_position", $"amino_acids.variant")).otherwise(lit(null)))

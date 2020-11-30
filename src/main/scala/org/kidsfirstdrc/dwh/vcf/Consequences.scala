@@ -99,9 +99,6 @@ object Consequences {
         lit(releaseId) as "release_id"
       )
       .drop("annotation")
-      .withColumn("consequence", explode($"consequences"))
-      .drop("consequences")
-
     consequencesDF
   }
 }
