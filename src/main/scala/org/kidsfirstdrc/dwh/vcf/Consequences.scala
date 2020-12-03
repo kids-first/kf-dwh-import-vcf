@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
@@ -12,9 +13,9 @@ object Consequences {
     val consequences = build(studyId, releaseId, inputDF)
 
     val tableConsequences = tableName("consequences", studyId, releaseId)
+    val salt = (rand * 3).cast(IntegerType)  //3 files per chr, tried with 1 file per chr but got an OOM when writing parquet files
     consequences
-      .repartition($"chromosome")
-      .sortWithinPartitions("start")
+      .repartition(69, $"chromosome", salt)
       .write.mode(SaveMode.Overwrite)
       .partitionBy("study_id", "release_id", "chromosome")
       .format("parquet")
@@ -67,7 +68,8 @@ object Consequences {
       .groupBy(locus: _*)
       .agg(
         first("annotations") as "annotations",
-        first("name") as "name"
+        first("name") as "name",
+        first("end") as "end"
       )
       .withColumn("annotation", explode($"annotations"))
       .drop("annotations")
@@ -97,9 +99,6 @@ object Consequences {
         lit(releaseId) as "release_id"
       )
       .drop("annotation")
-      .withColumn("consequence", explode($"consequences"))
-      .drop("consequences")
-
     consequencesDF
   }
 }

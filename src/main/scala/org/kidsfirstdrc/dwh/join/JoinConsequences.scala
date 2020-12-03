@@ -4,7 +4,7 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.utils.SparkUtils
-import org.kidsfirstdrc.dwh.utils.SparkUtils.{firstAs, tableName}
+import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 
 
 object JoinConsequences {
@@ -33,7 +33,7 @@ object JoinConsequences {
       $"end",
       $"reference",
       $"alternate",
-      $"consequence",
+      $"consequences",
       $"ensembl_transcript_id",
       $"ensembl_regulatory_id",
       $"feature_type",
@@ -53,7 +53,8 @@ object JoinConsequences {
       $"cdna_position",
       $"protein_position",
       $"amino_acids",
-      $"codons"
+      $"codons",
+      $"canonical"
     )
     val allColumns = commonColumns :+ col("study_id")
     val merged = if (mergeWithExisting && spark.catalog.tableExists(TABLE_NAME)) {
@@ -71,7 +72,7 @@ object JoinConsequences {
       mergeConsequences(releaseId, consequences.select(allColumns: _*))
     }
     val joinedWithScores = joinWithDBNSFP(merged)
-    write(releaseId, output, TABLE_NAME, joinedWithScores, 1, database)
+    write(releaseId, output, TABLE_NAME, joinedWithScores, Some(30), database)
 
   }
 
@@ -86,12 +87,12 @@ object JoinConsequences {
       $"end",
       $"reference",
       $"alternate",
-      $"consequence",
       $"ensembl_transcript_id",
       $"ensembl_regulatory_id",
       $"feature_type"
     )
       .agg(
+        firstAs("consequences"),
         firstAs("name"),
         firstAs("impact"),
         firstAs("symbol"),
@@ -109,6 +110,7 @@ object JoinConsequences {
         firstAs("protein_position"),
         firstAs("amino_acids"),
         firstAs("codons"),
+        firstAs("canonical"),
         collect_set($"study_id") as "study_ids"
       )
       .withColumn("aa_change", when($"amino_acids".isNotNull, concat($"amino_acids.reference", $"protein_position", $"amino_acids.variant")).otherwise(lit(null)))
@@ -120,12 +122,13 @@ object JoinConsequences {
 
 
   def joinWithDBNSFP(c: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    val s = spark.table("variant.dbnsfp_scores")
+    val s = spark.table("variant.dbnsfp_original")
       .drop(
         "aaref",
         "symbol",
         "ensembl_gene_id",
         "ensembl_protein_id",
+        "VEP_canonical",
         "cds_strand")
 
     c.join(s,
