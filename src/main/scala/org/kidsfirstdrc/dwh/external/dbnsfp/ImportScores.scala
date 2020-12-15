@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
-import org.apache.spark.sql.functions._
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
 
 object ImportScores extends App {
 
@@ -10,10 +10,9 @@ object ImportScores extends App {
     .enableHiveSupport()
     .appName("Import DBSNFP Scores to DWH").getOrCreate()
 
-  import spark.implicits._
-
   import org.apache.spark.sql.Column
   import org.apache.spark.sql.types.DoubleType
+  import spark.implicits._
 
   def split_semicolon(colName: String, outputColName: String): Column = split(col(colName), ";") as outputColName
 

@@ -26,9 +26,9 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
 
   it should "return a dataframe with aggregated frequencies by duo code" in {
     val df = Seq(
-      VariantInput(is_hmb = true, zygosity = "HOM", has_alt = 1),
-      VariantInput(is_hmb = true, is_gru = true, zygosity = "HET", has_alt = 1),
-      VariantInput(is_hmb = false, is_gru = true, zygosity = "HET", has_alt = 1)
+      VariantInput(is_hmb = true, zygosity = "HOM", has_alt = 1, dbgap_consent_code =  "SD_123456.c1"),
+      VariantInput(is_hmb = true, is_gru = true, zygosity = "HET", has_alt = 1, dbgap_consent_code =  "SD_123456.c2"),
+      VariantInput(is_hmb = false, is_gru = true, zygosity = "HET", has_alt = 1, dbgap_consent_code =  "SD_123456.c3")
     ).toDF()
 
     val output = Variants.build(studyId, releaseId, df)
@@ -44,15 +44,10 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
         gru_an = 4,
         gru_af = 0.5,
         gru_homozygotes = 0,
-        gru_heterozygotes = 2)
+        gru_heterozygotes = 2,
+        consent_codes = Set("SD_123456.c1", "SD_123456.c2", "SD_123456.c3"),
+        consent_codes_by_study = Map("SD_123456" -> Set("SD_123456.c1", "SD_123456.c2", "SD_123456.c3")))
     )
   }
-
-  //Array(
-  // VariantOutput(2,165310406,165310406,G,A,chr2:g.166166916G>A,Some(rs1057520413),3,4,0.75,1,1,2,4,0.5,0,2,SNV,SD_123456,RE_ABCDEF))
-  // VariantOutput(2,165310406,165310406,G,A,chr2:g.166166916G>A,Some(rs1057520413),4,3,0.75,1,1,4,2,0.5,0,2,SNV,SD_123456,RE_ABCDEF)
-  // did not contain the same elements as
-  // List(
-  // VariantOutput(2,165310406,165310406,G,A,chr2:g.166166916G>A,Some(rs1057520413),4,3,0.75,1,1,4,2,0.5,0,2,SNV,SD_123456,RE_ABCDEF))
 
 }

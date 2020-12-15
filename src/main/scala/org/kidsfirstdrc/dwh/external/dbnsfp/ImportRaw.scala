@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
 import org.apache.spark.sql.{SaveMode, SparkSession}
-import org.apache.spark.sql.functions._
+
 object ImportRaw extends App {
 
   implicit val spark: SparkSession = SparkSession.builder

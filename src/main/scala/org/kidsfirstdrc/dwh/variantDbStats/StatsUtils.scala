@@ -1,8 +1,7 @@
 package org.kidsfirstdrc.dwh.variantDbStats
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.not
-
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object StatsUtils {
 

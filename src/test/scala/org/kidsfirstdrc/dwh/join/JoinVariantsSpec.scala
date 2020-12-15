@@ -24,8 +24,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
       Given("2 tables, one  for each study")
       //Study 1
-      val variant1 = VariantOutput(hmb_ac = 5, hmb_an = 10, hmb_af = 0.5, hmb_homozygotes = 2, hmb_heterozygotes = 3, study_id = studyId1)
-      val variant2 = VariantOutput(chromosome = "3", start = 3000, end = 3000, reference = "T", alternate = "G", hmb_ac = 5, hmb_an = 20, hmb_af = 0.25, hmb_homozygotes = 1, hmb_heterozygotes = 5, name = Some("mutation_2"), hgvsg = "chr3:g.2000T>G", study_id = studyId1)
+      val variant1 = VariantOutput(hmb_ac = 5, hmb_an = 10, hmb_af = 0.5, hmb_homozygotes = 2, hmb_heterozygotes = 3, study_id = studyId1, consent_codes = Set(s"$studyId1.c1"), consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c1")))
+      val variant2 = VariantOutput(chromosome = "3", start = 3000, end = 3000, reference = "T", alternate = "G", hmb_ac = 5, hmb_an = 20, hmb_af = 0.25, hmb_homozygotes = 1, hmb_heterozygotes = 5, name = Some("mutation_2"), hgvsg = "chr3:g.2000T>G", study_id = studyId1, consent_codes = Set(s"$studyId1.c2"), consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c2")))
 
       Seq(variant1, variant2).toDF().write.mode(SaveMode.Overwrite)
         .option("path", s"$outputDir/variants_sd_123_re_abcdef")
@@ -33,8 +33,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         .saveAsTable("variants_sd_123_re_abcdef")
 
       //Study 2
-      val variant3 = VariantOutput(chromosome = "3", start = 3000, end = 3000, "C", "A", name = Some("mutation_2"), hgvsg = "chr3:g.2000T>G", hmb_ac = 10, hmb_an = 30, hmb_af = 0.33333333, hmb_homozygotes = 2, hmb_heterozygotes = 8, study_id = studyId2)
-      val variant4 = variant1.copy(study_id = studyId2)
+      val variant3 = VariantOutput(chromosome = "3", start = 3000, end = 3000, "C", "A", name = Some("mutation_2"), hgvsg = "chr3:g.2000T>G", hmb_ac = 10, hmb_an = 30, hmb_af = 0.33333333, hmb_homozygotes = 2, hmb_heterozygotes = 8, study_id = studyId2, consent_codes = Set(s"$studyId2.c0"), consent_codes_by_study = Map(studyId2 -> Set(s"$studyId2.c0")))
+      val variant4 = variant1.copy(study_id = studyId2, consent_codes = Set(s"$studyId2.c1"), consent_codes_by_study = Map(studyId2 -> Set(s"$studyId2.c1")))
 
       Seq(variant3, variant4).toDF().write.mode(SaveMode.Overwrite)
         .option("path", s"$outputDir/variants_sd_456_re_abcdef")
@@ -64,7 +64,9 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         gru_af_by_study = Map(studyId1 -> 0.66666667, studyId3 -> 0.5),
         gru_homozygotes_by_study = Map(studyId1 -> 1, studyId3 -> 5),
         gru_heterozygotes_by_study = Map(studyId1 -> 1, studyId3 -> 1),
-        studies = Set(studyId1, studyId3), release_id = "RE_PREVIOUS")
+        studies = Set(studyId1, studyId3), release_id = "RE_PREVIOUS",
+        consent_codes = Set(s"$studyId1.c99", s"$studyId3.c99"),
+        consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c99"), studyId3 -> Set(s"$studyId3.c99")))
 
       val removedOldVariant = JoinVariantOutput(alternate = "G",
         hmb_ac_by_study = Map(studyId1 -> 75),
@@ -78,7 +80,9 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         gru_homozygotes_by_study = Map(studyId1 -> 30),
         gru_heterozygotes_by_study = Map(studyId1 -> 20),
         studies = Set(studyId1),
-        release_id = "RE_PREVIOUS")
+        release_id = "RE_PREVIOUS",
+        consent_codes = Set(s"$studyId1.c99"),
+        consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c99")))
 
       val existingVariant2 = JoinVariantOutput(
         chromosome = "4", start = 4000, end = 4000, reference = "T", alternate = "G",
@@ -96,7 +100,9 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         gru_heterozygotes_by_study = Map(studyId3 -> 1),
         studies = Set(studyId3),
         topmed = None, gnomad_genomes_2_1 = None, clinvar_id = None, clin_sig = None, dbsnp_id = None,
-        release_id = "RE_PREVIOUS")
+        release_id = "RE_PREVIOUS",
+        consent_codes = Set(s"$studyId3.c99"),
+        consent_codes_by_study = Map(studyId3 -> Set(s"$studyId3.c99")))
 
       Seq(existingVariant1, removedOldVariant, existingVariant2).toDF().write.mode(SaveMode.Overwrite)
         .option("path", s"$outputDir/variants")
@@ -147,6 +153,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
       And("this table should contain all merged data")
       val output = variantReleaseTable
         .as[JoinVariantOutput]
+
+
       val expectedOutput = Seq(
         JoinVariantOutput(
           hmb_ac = 12, hmb_an = 27, hmb_af = 0.4444444444, hmb_homozygotes = 9, hmb_heterozygotes = 7,
@@ -161,7 +169,9 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           gru_af_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 0.2857142857),
           gru_homozygotes_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 5),
           gru_heterozygotes_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 1),
-          studies = Set(studyId1, studyId2, studyId3)),
+          studies = Set(studyId1, studyId2, studyId3),
+          consent_codes = Set("SD_789.c99", "SD_123.c1", "SD_456.c1"),
+          consent_codes_by_study = Map(studyId1 -> Set("SD_123.c1"), studyId2 -> Set("SD_456.c1"), studyId3 -> Set(s"$studyId3.c99"))),
         JoinVariantOutput(
           chromosome = "3", start = 3000, end = 3000, reference = "T", alternate = "G",
           hmb_ac = 5, hmb_an = 20, hmb_af = 0.25, hmb_homozygotes = 1, hmb_heterozygotes = 5,
@@ -169,17 +179,20 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           gru_ac_by_study = Map(studyId1 -> 0), gru_an_by_study = Map(studyId1 -> 0), gru_af_by_study = Map(studyId1 -> 0), gru_homozygotes_by_study = Map(studyId1 -> 0), gru_heterozygotes_by_study = Map(studyId1 -> 0),
           name = "mutation_2", hgvsg = "chr3:g.2000T>G",
           topmed = None, gnomad_genomes_2_1 = None, clinvar_id = None, clin_sig = None, dbsnp_id = None,
-          studies = Set(studyId1)),
+          studies = Set(studyId1),
+          consent_codes = variant2.consent_codes,
+          consent_codes_by_study = Map(studyId1 -> variant2.consent_codes)),
         JoinVariantOutput(
           chromosome = "3", start = 3000, end = 3000, "C", "A", name = "mutation_2", hgvsg = "chr3:g.2000T>G",
           hmb_ac = 10, hmb_an = 30, hmb_af = 0.3333333333, hmb_homozygotes = 2, hmb_heterozygotes = 8,
           hmb_ac_by_study = Map(studyId2 -> 10), hmb_an_by_study = Map(studyId2 -> 30), hmb_af_by_study = Map(studyId2 -> 0.3333333333), hmb_homozygotes_by_study = Map(studyId2 -> 2), hmb_heterozygotes_by_study = Map(studyId2 -> 8),
           gru_ac_by_study = Map(studyId2 -> 0), gru_an_by_study = Map(studyId2 -> 0), gru_af_by_study = Map(studyId2 -> 0), gru_homozygotes_by_study = Map(studyId2 -> 0), gru_heterozygotes_by_study = Map(studyId2 -> 0),
           topmed = None, gnomad_genomes_2_1 = None, clinvar_id = None, clin_sig = None, dbsnp_id = None,
-          studies = Set(studyId2)),
+          studies = Set(studyId2),
+          consent_codes = variant3.consent_codes,
+          consent_codes_by_study = Map(studyId2 -> variant3.consent_codes)),
         existingVariant2.copy(release_id = releaseId)
       )
-
       output.collect() should contain theSameElementsAs expectedOutput
 
 

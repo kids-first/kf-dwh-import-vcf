@@ -1,7 +1,5 @@
 package org.kidsfirstdrc.dwh.utils
 
-import java.net.URI
-
 import io.projectglow.Glow
 import org.apache.hadoop.fs.Path
 import org.apache.spark.sql.expressions.{Window, WindowSpec}
@@ -9,6 +7,8 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{ArrayType, DecimalType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getGenomicFiles
+
+import java.net.URI
 
 object SparkUtils {
 
