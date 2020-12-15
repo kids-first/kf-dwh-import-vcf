@@ -91,7 +91,7 @@ object Model {
                                ensembl_transcript_id: Option[String] = Some("ENST00000283256.10"),
                                ensembl_regulatory_id: Option[String] = None,
                                feature_type: String = "Transcript",
-                               consequence: String = "missense_variant",
+                               consequences: Seq[String] = Seq("missense_variant"),
                                biotype: Option[String] = Some("protein_coding"),
                                name: Option[String] = Some("rs1057520413"),
                                variant_class: String = "SNV",
@@ -185,7 +185,7 @@ object Model {
                                    ensembl_transcript_id: Option[String] = Some("ENST00000283256.10"),
                                    ensembl_regulatory_id: Option[String] = None,
                                    feature_type: String = "Transcript",
-                                   consequence: String = "missense_variant",
+                                   consequences: Seq[String] = Seq("missense_variant"),
                                    biotype: Option[String] = Some("protein_coding"),
                                    name: Option[String] = Some("rs1057520413"),
                                    variant_class: String = "SNV",
@@ -204,8 +204,8 @@ object Model {
                                    release_id: String = "RE_ABCDEF",
                                    sift_score: Option[Double] = Some(0.99),
                                    aa_change: Option[String] = Some("V261M"),
-                                   coding_dna_change: Option[String] = Some("781G>A")
-
+                                   coding_dna_change: Option[String] = Some("781G>A"),
+                                   canonical: Boolean = true
                                   )
 
   case class DBSNFPScore(chromosome: String = "2",
@@ -237,16 +237,14 @@ object Model {
                           reference: String = "G",
                           alternate: String = "A",
                           name: String = "RCV000436956",
-                          clin_sig: String = "Pathogenic"
-                         )
+                          clin_sig: String = "Pathogenic")
 
   case class DBSNPEntry(chromosome: String = "2",
                         start: Long = 165310406,
                         end: Long = 165310406,
                         reference: String = "G",
                         alternate: String = "A",
-                        name: String = "rs1234567"
-                       )
+                        name: String = "rs1234567")
 
   case class ParticipantInput(kf_id: String = "PT_001", family_id: String = "FM_001", affected_status: String = "alive")
 

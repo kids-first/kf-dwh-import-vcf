@@ -5,11 +5,17 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object StatsUtils {
 
+  /**
+   * Fetch all Occurrences tables in a specific database that do not contain a release number
+   * @param database database where to do the lookup
+   * @param spark spark session
+   * @return an array of table names that satisfy the predicate
+   */
   def getOccurrencesTableWORelease(database: String)(implicit spark: SparkSession): Array[String] = {
     import spark.implicits._
 
     spark
-      .sql(s"show tables in $database").where($"tableName" like "occurrences_sd_%" and not($"tableName" like "%_re_00%")  )
+      .sql(s"show tables in $database").where($"tableName" like "occurrences_sd_%" and not($"tableName" like "occurrences_sd_%_re_%")  )
       .select("tableName").collect().flatMap(_.toSeq).map(_.toString)
   }
 
