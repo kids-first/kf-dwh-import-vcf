@@ -27,7 +27,6 @@ class OmimPhenotypeSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
       OmimPhenotype("Myasthenic syndrome, congenital, 8, with pre- and postsynaptic defects", "615120", Some(Array("AR", "XL")))
     )
 
-
   }
 
 }

@@ -154,7 +154,7 @@ object JoinVariants {
   }
 
 
-  private def joinByLocus(df1: DataFrame, df2: DataFrame) = {
+  def joinByLocus(df1: DataFrame, df2: DataFrame): DataFrame = {
     df1.join(df2, df1("chromosome") === df2("chromosome") && df1("start") === df2("start") && df1("reference") === df2("reference") && df1("alternate") === df2("alternate"), "left")
   }
 
