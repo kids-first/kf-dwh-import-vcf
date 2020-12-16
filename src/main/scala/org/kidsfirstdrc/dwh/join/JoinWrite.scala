@@ -1,7 +1,6 @@
 package org.kidsfirstdrc.dwh.join
 
-import org.apache.spark.sql.expressions.Window
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
 object JoinWrite {
 

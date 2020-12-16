@@ -16,7 +16,8 @@ object Model {
                           is_hmb: Boolean = true,
                           is_gru: Boolean = false,
                           study_id: String = "SD_123456",
-                          release_id: String = "RE_ABCDEF")
+                          release_id: String = "RE_ABCDEF",
+                          dbgap_consent_code: String = "SD_123456.c1")
 
   case class VariantOutput(chromosome: String = "2",
                            start: Long = 165310406,
@@ -37,7 +38,9 @@ object Model {
                            gru_heterozygotes: Long = 0,
                            variant_class: String = "SNV",
                            study_id: String = "SD_123456",
-                           release_id: String = "RE_ABCDEF")
+                           release_id: String = "RE_ABCDEF",
+                           consent_codes: Set[String] = Set("SD_123456.c1"),
+                           consent_codes_by_study: Map[String, Set[String]] = Map("SD_123456" -> Set("SD_123456.c1")))
 
   case class OccurrencesOutput(chromosome: String,
                                start: Long,
@@ -166,6 +169,8 @@ object Model {
                                gru_homozygotes_by_study: Map[String, Long],
                                gru_heterozygotes_by_study: Map[String, Long],
                                studies: Set[String],
+                               consent_codes: Set[String],
+                               consent_codes_by_study: Map[String, Set[String]],
                                release_id: String = "RE_ABCDEF"
                               )
 

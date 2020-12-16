@@ -1,8 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils.{getBiospecimens, getRelations}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._

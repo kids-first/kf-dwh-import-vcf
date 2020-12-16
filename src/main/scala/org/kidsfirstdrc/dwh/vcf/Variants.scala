@@ -41,7 +41,8 @@ object Variants {
         $"is_gru",
         $"is_hmb",
         $"variant_class",
-        $"hgvsg"
+        $"hgvsg",
+        $"dbgap_consent_code"
       )
       .groupBy(locus: _*)
       .agg(
@@ -49,12 +50,14 @@ object Variants {
         firstAs("hgvsg") +:
         firstAs("end") +:
         firstAs("variant_class") +:
+        collect_set($"dbgap_consent_code").as("consent_codes") +:
         (freqByDuoCode("hmb") ++ freqByDuoCode("gru")) :_*
       )
       .withColumn("hmb_af", calculated_duo_af("hmb"))
       .withColumn("gru_af", calculated_duo_af("gru"))
       .withColumn("study_id", lit(studyId))
       .withColumn("release_id", lit(releaseId))
+      .withColumn("consent_codes_by_study", map($"study_id", $"consent_codes"))
     variants
   }
 

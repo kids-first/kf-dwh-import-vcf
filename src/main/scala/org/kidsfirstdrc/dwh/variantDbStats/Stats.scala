@@ -1,4 +1,5 @@
 package org.kidsfirstdrc.dwh.variantDbStats
+
 import org.apache.http.HttpHeaders
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.StringEntity

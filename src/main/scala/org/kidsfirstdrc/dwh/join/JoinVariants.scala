@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.join
 
-import org.apache.spark.sql.functions.{map_from_entries, _}
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.utils.SparkUtils
@@ -38,18 +38,10 @@ object JoinVariants {
 
     }
 
-    val commonColumns = Seq($"chromosome", $"start", $"reference", $"alternate", $"end", $"name", $"hgvsg", $"variant_class", $"release_id",
-      $"hmb_ac_by_study",
-      $"hmb_an_by_study",
-      $"hmb_af_by_study",
-      $"hmb_homozygotes_by_study",
-      $"hmb_heterozygotes_by_study",
-      $"gru_ac_by_study",
-      $"gru_an_by_study",
-      $"gru_af_by_study",
-      $"gru_homozygotes_by_study",
-      $"gru_heterozygotes_by_study",
-      $"studies"
+    val commonColumns = Seq($"chromosome", $"start", $"reference", $"alternate", $"end", $"name", $"hgvsg", $"variant_class",
+      $"release_id", $"hmb_ac_by_study", $"hmb_an_by_study", $"hmb_af_by_study", $"hmb_homozygotes_by_study",
+      $"hmb_heterozygotes_by_study", $"gru_ac_by_study", $"gru_an_by_study", $"gru_af_by_study", $"gru_homozygotes_by_study",
+      $"gru_heterozygotes_by_study", $"studies", $"consent_codes", $"consent_codes_by_study"
     )
 
     val allColumns = commonColumns :+
@@ -79,6 +71,8 @@ object JoinVariants {
         .withColumn("gru_homozygotes_by_study", map($"study_id", $"gru_homozygotes"))
         .withColumn("gru_heterozygotes", $"gru_heterozygotes_by_study"($"study_id"))
         .withColumn("gru_heterozygotes_by_study", map($"study_id", $"gru_heterozygotes"))
+        .withColumn("consent_codes", $"consent_codes_by_study"($"study_id"))
+        .withColumn("consent_codes_by_study", map($"study_id", $"consent_codes"))
         .where(not($"study_id".isin(studyIds: _*)))
 
       mergeVariants(
@@ -129,6 +123,8 @@ object JoinVariants {
         sum("gru_heterozygotes") as "gru_heterozygotes",
         map_from_entries(collect_list(struct($"study_id", $"gru_heterozygotes"))) as "gru_heterozygotes_by_study",
         collect_list($"study_id") as "studies",
+        array_distinct(flatten(collect_list($"consent_codes"))) as "consent_codes",
+        map_from_entries(collect_list(struct($"study_id", $"consent_codes"))) as "consent_codes_by_study",
         lit(releaseId) as "release_id"
       )
       .withColumn("hmb_af", calculated_duo_af("hmb"))
