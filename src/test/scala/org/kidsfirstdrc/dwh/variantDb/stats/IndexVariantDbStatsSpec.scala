@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.variantDbStats
+package org.kidsfirstdrc.dwh.variantDb.stats
 
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession

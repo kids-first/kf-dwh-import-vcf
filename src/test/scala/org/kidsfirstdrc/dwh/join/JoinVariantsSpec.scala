@@ -150,11 +150,31 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
       Then("A new table for the release is created")
       val variantReleaseTable = spark.table("variant.variants_re_abcdef")
 
+      variantReleaseTable.show(false)
+
       And("this table should contain all merged data")
       val output = variantReleaseTable
+        .withColumnRenamed("1k_genomes", "one_k_genomes")
         .as[JoinVariantOutput]
+/*
+      JoinVariantOutput(2,165310406,165310406,G,A,rs1057520413,chr2:g.166166916G>A,SNV,12,27,0.4444444444,9,7,2,7,0.2857142857,5,1,
+      Some(Freq(20,10,0.500000000000000000,10,10)),Some(Freq(20,10,0.500000000000000000,10,10)),Some(Freq(20,10,0.500000000000000000,10,10)),Some(Freq(20,10,0.500000000000000000,10,10)),Some(Freq(20,10,0.500000000000000000,10,10)),Some(RCV000436956),Some(Pathogenic),Some(rs1234567),Map(SD_789 -> 2, SD_123 -> 5, SD_456 -> 5),Map(SD_789 -> 7, SD_123 -> 10, SD_456 -> 10),Map(SD_789 -> 0.2857142857, SD_123 -> 0.5000000000, SD_456 -> 0.5000000000),Map(SD_789 -> 5, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 1, SD_123 -> 3, SD_456 -> 3),Map(SD_789 -> 2, SD_123 -> 0, SD_456 -> 0),Map(SD_789 -> 7, SD_123 -> 0, SD_456 -> 0),Map(SD_789 -> 0.2857142857, SD_123 -> 0E-10, SD_456 -> 0E-10),Map(SD_789 -> 5, SD_123 -> 0, SD_456 -> 0),Map(SD_789 -> 1, SD_123 -> 0, SD_456 -> 0),Set(SD_789, SD_123, SD_456),Set(SD_789.c99, SD_123.c1, SD_456.c1),Map(SD_789 -> Set(SD_789.c99), SD_123 -> Set(SD_123.c1), SD_456 -> Set(SD_456.c1)),RE_ABCDEF),
+      JoinVariantOutput(4,4000,4000,T,G,rs1057520413,chr2:g.166166916G>A,SNV,2,3,0.6666666667,1,1,2,3,0.6666666667,1,1,
+      None,None,None,None,None,None,None,None,Map(SD_789 -> 2),Map(SD_789 -> 3),Map(SD_789 -> 0.6666666667),Map(SD_789 -> 1),Map(SD_789 -> 1),Map(SD_789 -> 2),Map(SD_789 -> 3),Map(SD_789 -> 0.6666666667),Map(SD_789 -> 1),Map(SD_789 -> 1),Set(SD_789),Set(SD_789.c99),Map(SD_789 -> Set(SD_789.c99)),RE_ABCDEF),
+      JoinVariantOutput(3,3000,3000,T,G,mutation_2,chr3:g.2000T>G,SNV,5,20,0.2500000000,1,5,0,0,0E-10,0,0,
+      None,None,None,None,None,None,None,None,Map(SD_123 -> 5),Map(SD_123 -> 20),Map(SD_123 -> 0.2500000000),Map(SD_123 -> 1),Map(SD_123 -> 5),Map(SD_123 -> 0),Map(SD_123 -> 0),Map(SD_123 -> 0E-10),Map(SD_123 -> 0),Map(SD_123 -> 0),Set(SD_123),Set(SD_123.c2),Map(SD_123 -> Set(SD_123.c2)),RE_ABCDEF),
+      JoinVariantOutput(3,3000,3000,C,A,mutation_2,chr3:g.2000T>G,SNV,10,30,0.3333333333,2,8,0,0,0E-10,0,0,
+      None,None,None,None,None,None,None,None,Map(SD_456 -> 10),Map(SD_456 -> 30),Map(SD_456 -> 0.3333333333),Map(SD_456 -> 2),Map(SD_456 -> 8),Map(SD_456 -> 0),Map(SD_456 -> 0),Map(SD_456 -> 0E-10),Map(SD_456 -> 0),Map(SD_456 -> 0),Set(SD_456),Set(SD_456.c0),Map(SD_456 -> Set(SD_456.c0)),RE_ABCDEF))
 
-
+      JoinVariantOutput(2,165310406,165310406,G,A,rs1057520413,chr2:g.166166916G>A,SNV,12,27,0.4444444444,9,7,2,7,0.2857142857,5,1,
+      Some(Freq(20,10,0.5,10,10)),Some(Freq(20,10,0.5,10,10)),Some(Freq(20,10,0.5,10,10)),Some(Freq(20,10,0.5,10,10)),Some(Freq(20,10,0.5,10,10)),Some(RCV000436956),Some(Pathogenic),Some(rs1234567),Map(SD_123 -> 5, SD_456 -> 5, SD_789 -> 2),Map(SD_123 -> 10, SD_456 -> 10, SD_789 -> 7),Map(SD_123 -> 0.5, SD_456 -> 0.5, SD_789 -> 0.2857142857),Map(SD_123 -> 2, SD_456 -> 2, SD_789 -> 5),Map(SD_123 -> 3, SD_456 -> 3, SD_789 -> 1),Map(SD_123 -> 0, SD_456 -> 0, SD_789 -> 2),Map(SD_123 -> 0, SD_456 -> 0, SD_789 -> 7),Map(SD_123 -> 0, SD_456 -> 0, SD_789 -> 0.2857142857),Map(SD_123 -> 0, SD_456 -> 0, SD_789 -> 5),Map(SD_123 -> 0, SD_456 -> 0, SD_789 -> 1),Set(SD_123, SD_456, SD_789),Set(SD_789.c99, SD_123.c1, SD_456.c1),Map(SD_123 -> Set(SD_123.c1), SD_456 -> Set(SD_456.c1), SD_789 -> Set(SD_789.c99)),RE_ABCDEF),
+      JoinVariantOutput(3,3000,3000,T,G,mutation_2,chr3:g.2000T>G,SNV,5,20,0.25,1,5,0,0,0,0,0,
+      Some(Freq(20,10,0.5,10,10)),None,None,Some(Freq(20,10,0.5,10,10)),Some(Freq(20,10,0.5,10,10)),None,None,None,Map(SD_123 -> 5),Map(SD_123 -> 20),Map(SD_123 -> 0.25),Map(SD_123 -> 1),Map(SD_123 -> 5),Map(SD_123 -> 0),Map(SD_123 -> 0),Map(SD_123 -> 0),Map(SD_123 -> 0),Map(SD_123 -> 0),Set(SD_123),Set(SD_123.c2),Map(SD_123 -> Set(SD_123.c2)),RE_ABCDEF),
+      JoinVariantOutput(3,3000,3000,C,A,mutation_2,chr3:g.2000T>G,SNV,10,30,0.3333333333,2,8,0,0,0,0,0,
+      Some(Freq(20,10,0.5,10,10)),None,None,Some(Freq(20,10,0.5,10,10)),Some(Freq(20,10,0.5,10,10)),None,None,None,Map(SD_456 -> 10),Map(SD_456 -> 30),Map(SD_456 -> 0.3333333333),Map(SD_456 -> 2),Map(SD_456 -> 8),Map(SD_456 -> 0),Map(SD_456 -> 0),Map(SD_456 -> 0),Map(SD_456 -> 0),Map(SD_456 -> 0),Set(SD_456),Set(SD_456.c0),Map(SD_456 -> Set(SD_456.c0)),RE_ABCDEF),
+      JoinVariantOutput(4,4000,4000,T,G,rs1057520413,chr2:g.166166916G>A,SNV,2,3,0.6666666667,1,1,2,3,0.6666666667,1,1,
+      Some(Freq(20,10,0.5,10,10)),None,None,Some(Freq(20,10,0.5,10,10)),Some(Freq(20,10,0.5,10,10)),None,None,None,Map(SD_789 -> 2),Map(SD_789 -> 3),Map(SD_789 -> 0.6666666667),Map(SD_789 -> 1),Map(SD_789 -> 1),Map(SD_789 -> 2),Map(SD_789 -> 3),Map(SD_789 -> 0.6666666667),Map(SD_789 -> 1),Map(SD_789 -> 1),Set(SD_789),Set(SD_789.c99),Map(SD_789 -> Set(SD_789.c99)),RE_ABCDEF)
+*/
       val expectedOutput = Seq(
         JoinVariantOutput(
           hmb_ac = 12, hmb_an = 27, hmb_af = 0.4444444444, hmb_homozygotes = 9, hmb_heterozygotes = 7,
@@ -181,7 +201,10 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           topmed = None, gnomad_genomes_2_1 = None, clinvar_id = None, clin_sig = None, dbsnp_id = None,
           studies = Set(studyId1),
           consent_codes = variant2.consent_codes,
-          consent_codes_by_study = Map(studyId1 -> variant2.consent_codes)),
+          consent_codes_by_study = Map(studyId1 -> variant2.consent_codes),
+          one_k_genomes = None,
+          gnomad_exomes_2_1 = None,
+          gnomad_genomes_3_0 = None),
         JoinVariantOutput(
           chromosome = "3", start = 3000, end = 3000, "C", "A", name = "mutation_2", hgvsg = "chr3:g.2000T>G",
           hmb_ac = 10, hmb_an = 30, hmb_af = 0.3333333333, hmb_homozygotes = 2, hmb_heterozygotes = 8,
@@ -190,8 +213,14 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           topmed = None, gnomad_genomes_2_1 = None, clinvar_id = None, clin_sig = None, dbsnp_id = None,
           studies = Set(studyId2),
           consent_codes = variant3.consent_codes,
-          consent_codes_by_study = Map(studyId2 -> variant3.consent_codes)),
-        existingVariant2.copy(release_id = releaseId)
+          consent_codes_by_study = Map(studyId2 -> variant3.consent_codes),
+          one_k_genomes = None,
+          gnomad_exomes_2_1 = None,
+          gnomad_genomes_3_0 = None),
+        existingVariant2.copy(release_id = releaseId,
+          one_k_genomes = None,
+          gnomad_exomes_2_1 = None,
+          gnomad_genomes_3_0 = None)
       )
       output.collect() should contain theSameElementsAs expectedOutput
 
