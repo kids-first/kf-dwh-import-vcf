@@ -81,7 +81,9 @@ class IndexVariantDbStatsSpec extends AnyFlatSpec with GivenWhenThen with WithSp
       val allOccurrencesList = StatsUtils.getUnionOfOccurrences("variant", inputOccurrencesList)
 
       allOccurrencesList.collect() should contain theSameElementsAs table1.union(table2).collect()
-
+      assertThrows[UnsupportedOperationException] {
+        StatsUtils.getUnionOfOccurrences("variant", Array())
+      }
     }
   }
 

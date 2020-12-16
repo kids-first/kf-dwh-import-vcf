@@ -52,10 +52,9 @@ class JoinConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
         .saveAsTable("consequences")
 
       And("A table dbnsfp_scores exists")
-      Seq(DBSNFPScore()).toDF().write.mode(SaveMode.Overwrite).option("path", s"$outputDir/dbnsfp_scores")
+      Seq(DBSNFPScore()).toDF().write.mode(SaveMode.Overwrite).option("path", s"$outputDir/dbnsfp_original")
         .format("parquet")
-        .saveAsTable("dbnsfp_scores")
-
+        .saveAsTable("dbnsfp_original")
 
       When("Join Consequences")
       JoinConsequences.join(Seq(studyId1, studyId2), releaseId, outputDir, mergeWithExisting = true)
