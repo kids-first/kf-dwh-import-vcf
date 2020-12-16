@@ -23,11 +23,4 @@ trait SparkJob extends App {
     .enableHiveSupport()
     .appName(s"Import $runType for $jobName - $releaseId").getOrCreate()
 
-  def run(etl: MultiSourceEtlJob): Unit = {
-    runType match {
-      case "debug" =>
-    }
-
-  }
-
 }
