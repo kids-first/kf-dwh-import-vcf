@@ -3,8 +3,9 @@ package org.kidsfirstdrc.dwh.external.omim
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.{col, explode, split}
 import org.kidsfirstdrc.dwh.external.omim.OmimPhenotype.parse_pheno
+import org.kidsfirstdrc.dwh.utils.EtlJob
 
-object ImportOmimGeneSet extends App {
+object ImportOmimGeneSet extends App with EtlJob {
 
   val TABLE_NAME = "omim_gene_set"
 
@@ -13,7 +14,7 @@ object ImportOmimGeneSet extends App {
     .enableHiveSupport()
     .appName("Import OMIM Geneset").getOrCreate()
 
-  def extract(input: String): DataFrame = {
+  override def extract(input: String)(implicit spark: SparkSession): DataFrame = {
     spark.read.format("csv")
       .option("inferSchema", "true")
       .option("comment", "#")
@@ -22,8 +23,8 @@ object ImportOmimGeneSet extends App {
       .load(input)
   }
 
-  def transform(df: DataFrame): DataFrame = {
-    df
+  override def transform(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    data
       .select(
         col("_c0") as "chromosome",
         col("_c1") as "start",
@@ -44,8 +45,8 @@ object ImportOmimGeneSet extends App {
       .drop("raw_phenotype")
   }
 
-  def load(df: DataFrame): Unit = {
-    df.coalesce(1)
+  override def load(data: DataFrame, output: String)(implicit spark: SparkSession): Unit = {
+    data.coalesce(1)
       .write
       .mode("overwrite")
       .format("parquet")
@@ -59,7 +60,7 @@ object ImportOmimGeneSet extends App {
 
   val inputDf = extract(input)
   val outputDf = transform(inputDf)
-  load(outputDf)
+  load(outputDf, output)
 
 }
 

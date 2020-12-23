@@ -1,14 +1,15 @@
 package org.kidsfirstdrc.dwh.variantDb.json
 
 import org.apache.spark.sql.functions.{explode, _}
+import org.apache.spark.sql.types.DoubleType
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.join.JoinConsequences
-import org.kidsfirstdrc.dwh.utils.EtlJob
+import org.kidsfirstdrc.dwh.utils.MultiSourceEtlJob
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 import org.kidsfirstdrc.dwh.vcf.Variants
 
-object VariantDbJson extends EtlJob {
+object VariantDbJson extends MultiSourceEtlJob {
 
   private def frequenciesFor(prefix: String): Column = {
     struct(
@@ -91,19 +92,23 @@ object VariantDbJson extends EtlJob {
     val variants = data(Variants.TABLE_NAME)
 
     val consequences = data(JoinConsequences.TABLE_NAME)
-      .select("chromosome", "start", "reference", "alternate", "symbol", "ensembl_gene_id", "consequences",
+
+    val consequencesColumns = Set("chromosome", "start", "reference", "alternate", "symbol", "ensembl_gene_id", "consequences",
         "name", "impact", "symbol", "strand", "biotype", "variant_class", "exon", "intron", "hgvsc", "hgvsp", "hgvsg",
         "cds_position", "cdna_position", "protein_position", "amino_acids", "codons", "canonical", "aa_change", "coding_dna_change",
-        "ensembl_transcript_id", "ensembl_regulatory_id", "feature_type")
+        "ensembl_transcript_id", "ensembl_regulatory_id", "feature_type", "scores")
+
+    val scoresColumns = consequences.schema.fields.filter(_.dataType.equals(DoubleType)).map(_.name).toSet
 
     val omim = data(ImportOmimGeneSet.TABLE_NAME)
       .select("ensembl_gene_id", "entrez_gene_id", "omim_gene_id")
 
-    val consequenceColumns: Set[String] = consequences.columns.toSet ++ omim.columns.toSet -- Set("chromosome", "start", "reference", "alternate")
+    val consequenceColumnsWithOmim: Set[String] = consequencesColumns ++ omim.columns.toSet -- Set("chromosome", "start", "reference", "alternate")
 
     val consequencesWithOmim = consequences
+      .withColumn("scores", struct(scoresColumns.toSeq.map(col):_*))
       .join(omim, Seq("ensembl_gene_id"), "left")
-      .withColumn("consequence", struct(consequenceColumns.toSeq.map(c => col(c)):_*))
+      .withColumn("consequence", struct(consequenceColumnsWithOmim.toSeq.map(col):_*))
       .groupBy(locus:_*)
       .agg(collect_set(col("consequence")).as("consequences"))
 
@@ -113,90 +118,6 @@ object VariantDbJson extends EtlJob {
       .withClinVar
       .select("chromosome", "start", "end", "reference", "alternate", "studies", "frequencies", "clinvar", "dbsnp_id")
       .joinByLocus(consequencesWithOmim)
-
-    //todo transform roughly to this:
-
-    /*
-    {
-    "chromosome":"1",
-    "start": 1000,
-    "end": 1010,
-    "reference":"A",
-    "alternate":"C",
-    "studies" : [
-        "study_id": "SD_ABC",
-        "consent_codes": ["phs001.c1", ...],
-        "frequencies" : {
-            "hmb" : {...},
-            "gru" : {...},
-        }
-    ],
-    "frequencies" : {
-            "gnomad_3_0": {
-                "ac": 1,
-                "an": 2,
-                "af": 0.5,
-                "hom": 12,
-                "het": 10,
-                "participants": 1
-            },
-            "gnomad_2_1": { ... },
-            "gnomad_2_1_exome":  {... },
-            "topmed": { ... },
-            "1000_genomes": { ... },
-            "internal" : {
-                "hmb" : {
-                    "ac":1,
-                    "af":0.23,
-                    ...
-                },
-                "gru": {
-                 .....
-                }
-            }
-    },
-    "clinvar" : {
-        "name" : "...",
-        "clin_sig": ["...."]
-    },
-    "dbsnp_id": "...",
-    //Ci dessous jkoin avec la table consequence
-    "consequences": [
-        {
-           "symbol": "BRAF1",
-           "ensembl_gene_id": "ENS000001",
-           "entrez_gene_id": 12345",
-           "omim_gene_id": "23234234",
-           "consequences": ["upstream_gene", "exon"],
-           "name" : "...."
-           "impact" : "...."
-           "symbol" : "...."
-           "ensembl_gene_id" : "...."
-           "strand" : "...."
-           "biotype" : "...."
-           "variant_class" : "...."
-           "exon" : "...."
-           "intron" : "...."
-           "hgvsc" : "...."
-           "hgvsp" : "...."
-           "hgvsg" : "...."
-           "cds_position" : "...."
-           "cdna_position" : "...."
-           "protein_position" : "...."
-           "amino_acids" : "...."
-           "codons" : "...."
-           "canonical" : true,
-           "aa_change" : "...",
-           "coding_dna_change": "...",
-           "ensembl_transcript_id": " ...",
-           "ensembl_regulatory_id": "...",
-           "feature_type": " ...",
-           "scores": {
-                "CADD" ... voire clin
-           }
-        }
-    ]
-     */
   }
 
   override def load(data: DataFrame, output: String)(implicit spark: SparkSession): Unit = {
