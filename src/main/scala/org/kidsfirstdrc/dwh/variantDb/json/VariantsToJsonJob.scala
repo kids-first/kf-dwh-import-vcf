@@ -59,7 +59,7 @@ object VariantsToJsonJob {
     def withFrequencies: DataFrame = {
       df
         .withColumn("frequencies", struct(
-          col("one_k_genomes").as("1k_genomes"),
+          col("1k_genomes"),
           col("topmed"),
           col("gnomad_genomes_2_1"),
           col("gnomad_exomes_2_1"),
@@ -113,7 +113,7 @@ class VariantsToJsonJob(releaseId: String) extends MultiSourceEtlJob {
     Map(
       Variants.TABLE_NAME -> spark.table(s"variant.${Variants.TABLE_NAME}_$releaseId"),
       JoinConsequences.TABLE_NAME -> spark.table(s"variant.${JoinConsequences.TABLE_NAME}_$releaseId"),
-      ImportOmimGeneSet.TABLE_NAME -> spark.table(s"variant.${ImportOmimGeneSet.TABLE_NAME}")
+      ImportOmimGeneSet.TABLE_NAME -> spark.table(s"variant.omim_gene_set")
     )
   }
 

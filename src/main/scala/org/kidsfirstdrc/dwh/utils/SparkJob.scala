@@ -7,8 +7,6 @@ import org.apache.spark.sql.SparkSession
  */
 trait SparkJob extends App {
 
-  val jobName: String
-
   /**
    * arguments received as parameters.
    * releaseId is the unique name of the release following re_[0-9]+ format
@@ -16,11 +14,24 @@ trait SparkJob extends App {
    * output - the out put folder where the data will be written
    * runType - one of 'debug', 'normal', 'overwrite'
    */
-  val Array(releaseId, input, output, runType) = args
+  val Array(jobName, releaseId, input, output, runType) = args
 
   implicit lazy val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
     .enableHiveSupport()
     .appName(s"Import $runType for $jobName - $releaseId").getOrCreate()
 
+  def run(etl: MultiSourceEtlJob): Unit = {
+    runType match {
+      case "debug" =>
+        val sources = etl.extract(input)
+        etl.transform(sources)
+
+      case "normal" =>
+        val sources = etl.extract(input)
+        val target = etl.transform(sources)
+        etl.load(target, output)
+    }
+
+  }
 }
