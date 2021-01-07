@@ -3,7 +3,7 @@ set -x
 study_id=$1
 release_id=$2
 study_id_lc=$(echo "$study_id" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
-is_post_cqp_only=${3:-"false"}
+is_post_cgp_only=${3:-"false"}
 job=${4:-"all"}
 number_instance=${5:-"20"}
 instance_type=${6:-"r5.4xlarge"}
@@ -29,7 +29,7 @@ steps=$(cat <<EOF
       "s3a://kf-strides-variant-parquet-prd",
       "${job}",
       "${biospecimen_id_column}",
-      "${is_post_cgp_only}
+      "${is_post_cgp_only}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",
