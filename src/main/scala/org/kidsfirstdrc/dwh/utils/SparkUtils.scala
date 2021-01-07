@@ -35,17 +35,18 @@ object SparkUtils {
   }
 
 
-  def cgpExist(input: String)(implicit spark: SparkSession): Boolean = fileExist(cgpFiles(input))
+  def cgpExist(input: String)(implicit spark: SparkSession): Boolean = fileExist(cgpFilesPath(input))
 
-  def cgpFiles(input: String) = {
+  def cgpFilesPath(input: String): String =
     s"$input/*.CGP.filtered.deNovo.vep.vcf.gz"
-  }
 
-  def postCGPExist(input: String)(implicit spark: SparkSession): Boolean = fileExist(postCGPFiles(input))
+  def postCGPExist(input: String)(implicit spark: SparkSession): Boolean = fileExist(postCGPFilesPath(input))
 
-  def postCGPFiles(input: String) = {
+  def postCGPFilesPath(input: String): String =
     s"$input/*.postCGP.filtered.deNovo.vep.vcf.gz"
-  }
+
+  def allFilesPath(input: String): String =
+    s"$input/*.filtered.deNovo.vep.vcf.gz"
 
   /**
    * Return vcf entries found in visibles input files by joining table genomic_files
