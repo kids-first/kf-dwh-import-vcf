@@ -23,7 +23,9 @@ object Occurrences {
 
   def selectOccurrences(studyId: String, releaseId: String, input: String, isPostCGPOnly: Boolean)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val inputDF: DataFrame = if (isPostCGPOnly) loadPostCGP(input, studyId, releaseId) else unionCGPFiles(input, studyId, releaseId)
+    val inputDF: DataFrame =
+      if (isPostCGPOnly) loadPostCGP(allFilesPath(input), studyId, releaseId)
+      else unionCGPFiles(input, studyId, releaseId)
 
     val occurrences = inputDF
       .select(
@@ -97,9 +99,9 @@ object Occurrences {
   private def unionCGPFiles(input: String, studyId: String, releaseId: String)(implicit spark: SparkSession) = {
     (postCGPExist(input), cgpExist(input)) match {
       case (false, true) => loadCGP(input, studyId, releaseId)
-      case (true, false) => loadPostCGP(input, studyId, releaseId)
+      case (true, false) => loadPostCGP(postCGPFilesPath(input), studyId, releaseId)
       case (true, true) =>
-        val postCGP = loadPostCGP(input, studyId, releaseId)
+        val postCGP = loadPostCGP(postCGPFilesPath(input), studyId, releaseId)
         val cgp = loadCGP(input, studyId, releaseId)
         union(postCGP, cgp)
       case (false, false) => throw new IllegalStateException("No VCF files found!")
@@ -107,15 +109,15 @@ object Occurrences {
 
   }
 
-  private def loadPostCGP(input: String, studyId: String, releaseId: String)(implicit spark: SparkSession) = {
+  private def loadPostCGP(input: String, studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    visibleVcf(postCGPFiles(input), studyId, releaseId)
+    visibleVcf(input, studyId, releaseId)
       .withColumn("genotype", explode($"genotypes"))
   }
 
-  private def loadCGP(input: String, studyId: String, releaseId: String)(implicit spark: SparkSession) = {
+  private def loadCGP(input: String, studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    visibleVcf(cgpFiles(input), studyId, releaseId)
+    visibleVcf(cgpFilesPath(input), studyId, releaseId)
       .withColumn("INFO_DS", lit(null).cast("boolean"))
       .withColumn("INFO_HaplotypeScore", lit(null).cast("double"))
       .withColumn("genotype", explode($"genotypes"))
