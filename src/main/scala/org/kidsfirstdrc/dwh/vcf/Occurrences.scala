@@ -8,12 +8,12 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 object Occurrences {
 
-  def run(studyId: String, releaseId: String, input: String, output: String, biospecimenIdColumn: String)(implicit spark: SparkSession): Unit = {
-    write(build(studyId, releaseId, input, biospecimenIdColumn), output, studyId, releaseId)
+  def run(studyId: String, releaseId: String, input: String, output: String, biospecimenIdColumn: String, isPostCGPOnly: Boolean)(implicit spark: SparkSession): Unit = {
+    write(build(studyId, releaseId, input, biospecimenIdColumn, isPostCGPOnly), output, studyId, releaseId)
   }
 
-  def build(studyId: String, releaseId: String, input: String, biospecimenIdColumn: String)(implicit spark: SparkSession): DataFrame = {
-    val occurrences = selectOccurrences(studyId, releaseId, input)
+  def build(studyId: String, releaseId: String, input: String, biospecimenIdColumn: String, isPostCGPOnly: Boolean)(implicit spark: SparkSession): DataFrame = {
+    val occurrences = selectOccurrences(studyId, releaseId, input, isPostCGPOnly)
     val biospecimens = getBiospecimens(studyId, releaseId, biospecimenIdColumn)
     val withClinical = joinOccurrencesWithClinical(occurrences, biospecimens)
 
@@ -21,9 +21,9 @@ object Occurrences {
     joinOccurrencesWithInheritence(withClinical, relations)
   }
 
-  def selectOccurrences(studyId: String, releaseId: String, input: String)(implicit spark: SparkSession): DataFrame = {
+  def selectOccurrences(studyId: String, releaseId: String, input: String, isPostCGPOnly: Boolean)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val inputDF: DataFrame = unionCGPFiles(input, studyId, releaseId)
+    val inputDF: DataFrame = if (isPostCGPOnly) loadPostCGP(input, studyId, releaseId) else unionCGPFiles(input, studyId, releaseId)
 
     val occurrences = inputDF
       .select(

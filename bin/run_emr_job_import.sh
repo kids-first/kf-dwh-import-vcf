@@ -3,11 +3,12 @@ set -x
 study_id=$1
 release_id=$2
 study_id_lc=$(echo "$study_id" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
-job=${3:-"all"}
-number_instance=${4:-"20"}
-instance_type=${5:-"r5.4xlarge"}
-input_vcf=${6:-"s3a://kf-study-us-east-1-prd-${study_id_lc}/harmonized/family-variants"}
-biospecimen_id_column=${7:-"biospecimen_id"}
+is_post_cqp_only=${3:-"false"}
+job=${4:-"all"}
+number_instance=${5:-"20"}
+instance_type=${6:-"r5.4xlarge"}
+input_vcf=${7:-"s3a://kf-study-us-east-1-prd-${study_id_lc}/harmonized/family-variants"}
+biospecimen_id_column=${8:-"biospecimen_id"}
 
 steps=$(cat <<EOF
 [
@@ -27,7 +28,8 @@ steps=$(cat <<EOF
       "${input_vcf}",
       "s3a://kf-strides-variant-parquet-prd",
       "${job}",
-      "${biospecimen_id_column}"
+      "${biospecimen_id_column}",
+      "${is_post_cgp_only}
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",

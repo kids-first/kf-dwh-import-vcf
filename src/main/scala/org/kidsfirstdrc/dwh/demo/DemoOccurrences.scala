@@ -8,13 +8,13 @@ import org.kidsfirstdrc.dwh.vcf.Occurrences
 
 object DemoOccurrences {
 
-  def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
-    write(build(studyId, releaseId, input), output, studyId, releaseId)
+  def run(studyId: String, releaseId: String, input: String, output: String, isPostCGPOnly: Boolean)(implicit spark: SparkSession): Unit = {
+    write(build(studyId, releaseId, input, isPostCGPOnly), output, studyId, releaseId)
   }
 
-  def build(studyId: String, releaseId: String, input: String)(implicit spark: SparkSession): DataFrame = {
+  def build(studyId: String, releaseId: String, input: String, isPostCGPOnly: Boolean)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val occurrences = Occurrences.selectOccurrences(studyId, releaseId, input)
+    val occurrences = Occurrences.selectOccurrences(studyId, releaseId, input, isPostCGPOnly)
       .withColumn("participant_id", $"biospecimen_id")
     val relations = broadcast(spark.read.option("sep", "\t")
       .option("header", "true")
