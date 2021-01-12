@@ -13,7 +13,7 @@ object JoinVariants {
   implicit class DataFrameOps(df: DataFrame) {
 
     def joinByLocus(df2: DataFrame): DataFrame = {
-      df.join(df2, Seq("chromosome", "start", "reference", "alternate"), "left")
+      df.join(df2, df("chromosome") === df2("chromosome") && df("start") === df2("start") && df("reference") === df2("reference") && df("alternate") === df2("alternate"), "left")
     }
 
     def joinAndMerge(df2: DataFrame, outputColumnName: String): DataFrame = {
