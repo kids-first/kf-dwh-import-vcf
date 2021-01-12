@@ -5,6 +5,18 @@ Spark Jobs to import VCF and others references databases into the datawarehosue.
 
 HOWTO :
 
+Build assembly Jar
+
+```
+sbt assembly
+```
+
+Upload Jar to s3
+
+```
+aws s3 cp target/scala-2.12/kf-dwh-import-vcf.jar s3://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar
+```
+
 Run an import
 
 ```
