@@ -4,11 +4,23 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.utils.SparkUtils
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.calculated_duo_af
+import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.{calculated_duo_af, locusColumNames}
 import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 import org.kidsfirstdrc.dwh.vcf.Variants.TABLE_NAME
 
 object JoinVariants {
+
+  implicit class DataFrameOps(df: DataFrame) {
+
+    def joinByLocus(df2: DataFrame): DataFrame = {
+      df.join(df2, Seq("chromosome", "start", "reference", "alternate"), "left")
+    }
+
+    def joinAndMerge(df2: DataFrame, outputColumnName: String): DataFrame = {
+      df.joinByLocus(df2)
+        .select(df("*"), when(df2("chromosome").isNull, lit(null)).otherwise(struct(df2.drop("chromosome", "start", "end", "name", "reference", "alternate")("*"))) as outputColumnName)
+    }
+  }
 
   def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean = true, database: String = "variant")(implicit spark: SparkSession): Unit = {
 
@@ -134,39 +146,34 @@ object JoinVariants {
   }
 
   def joinWithPopulations(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    val genomes = spark.table("1000_genomes")
-    val topmed = spark.table("topmed_bravo")
-    val gnomad_genomes_2_1 = spark.table("gnomad_genomes_2_1_1_liftover_grch38")
-    val gnomad_exomes_2_1 = spark.table("gnomad_exomes_2_1_1_liftover_grch38")
-    val gnomad_genomes_3_0 = spark.table("gnomad_genomes_3_0")
+    //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
+    val genomes = spark.table("1000_genomes").dropDuplicates(locusColumNames)
+    val topmed = spark.table("topmed_bravo").dropDuplicates(locusColumNames)
+    val gnomad_genomes_2_1 = spark.table("gnomad_genomes_2_1_1_liftover_grch38").dropDuplicates(locusColumNames)
+    val gnomad_exomes_2_1 = spark.table("gnomad_exomes_2_1_1_liftover_grch38").dropDuplicates(locusColumNames)
+    val gnomad_genomes_3_0 = spark.table("gnomad_genomes_3_0").dropDuplicates(locusColumNames)
 
-    val join1k = joinAndMerge(variants, genomes, "1k_genomes")
-    val joinTopmed = joinAndMerge(join1k, topmed, "topmed")
-    val join_gnomad_genomes_2_1 = joinAndMerge(joinTopmed, gnomad_genomes_2_1, "gnomad_genomes_2_1")
-    val join_gnomad_exomes_2_1 = joinAndMerge(join_gnomad_genomes_2_1, gnomad_exomes_2_1, "gnomad_exomes_2_1")
-    val join_gnomad_genomes_3_0 = joinAndMerge(join_gnomad_exomes_2_1, gnomad_genomes_3_0, "gnomad_genomes_3_0")
-    join_gnomad_genomes_3_0
-  }
-
-  def joinAndMerge(df1: DataFrame, df2: DataFrame, outputColumnName: String): DataFrame = {
-    joinByLocus(df1, df2)
-      .select(df1("*"), when(df2("chromosome").isNull, lit(null)).otherwise(struct(df2.drop("chromosome", "start", "end", "name", "reference", "alternate")("*"))) as outputColumnName)
-  }
-
-
-  private def joinByLocus(df1: DataFrame, df2: DataFrame) = {
-    df1.join(df2, df1("chromosome") === df2("chromosome") && df1("start") === df2("start") && df1("reference") === df2("reference") && df1("alternate") === df2("alternate"), "left")
+    variants
+      .joinAndMerge(genomes, "1k_genomes")
+      .joinAndMerge(topmed, "topmed")
+      .joinAndMerge(gnomad_genomes_2_1, "gnomad_genomes_2_1")
+      .joinAndMerge(gnomad_exomes_2_1, "gnomad_exomes_2_1")
+      .joinAndMerge(gnomad_genomes_3_0, "gnomad_genomes_3_0")
   }
 
   def joinWithClinvar(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    val clinvar = spark.table("clinvar")
-    joinByLocus(variants, clinvar)
+    //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
+    val clinvar = spark.table("clinvar").dropDuplicates(locusColumNames)
+    variants
+      .joinByLocus(clinvar)
       .select(variants("*"), clinvar("name") as "clinvar_id", clinvar("clin_sig") as "clin_sig")
   }
 
   def joinWithDBSNP(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    val dbsnp = spark.table("dbsnp")
-    joinByLocus(variants, dbsnp)
+    //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
+    val dbsnp = spark.table("dbsnp").dropDuplicates(locusColumNames)
+    variants
+      .joinByLocus(dbsnp)
       .select(variants("*"), dbsnp("name") as "dbsnp_id")
   }
 

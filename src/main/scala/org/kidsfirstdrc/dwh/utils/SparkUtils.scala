@@ -139,7 +139,7 @@ object SparkUtils {
     /**
      * has_alt return 1 if there is at least one alternative allele. Note : It cannot returned a boolean beacause it's used to partition data.
      * It looks like Glue does not support partition by boolean
-     **/
+     * */
     val has_alt: Column = when(array_contains(col("genotype.calls"), 1), 1).otherwise(0) as "has_alt"
 
     val calculated_ac: Column = when(col("zygosity") === "HET", 1).when(col("zygosity") === "HOM", 2).otherwise(0) as "ac"
@@ -187,11 +187,8 @@ object SparkUtils {
 
     def optional_info(df: DataFrame, colName: String, alias: String, colType: String = "string"): Column = (if (df.columns.contains(colName)) col(colName) else lit(null).cast(colType)).as(alias)
 
-    val locus: Seq[Column] = Seq(
-      col("chromosome"),
-      col("start"),
-      col("reference"),
-      col("alternate"))
-  }
+    val locusColumNames: Seq[String] = Seq("chromosome", "start", "reference", "alternate")
 
+    val locus: Seq[Column] = locusColumNames.map(col)
+  }
 }
