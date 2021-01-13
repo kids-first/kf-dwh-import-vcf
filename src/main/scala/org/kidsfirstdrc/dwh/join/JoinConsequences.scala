@@ -11,7 +11,7 @@ object JoinConsequences {
 
   val TABLE_NAME = "consequences"
 
-  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean, database:String = "variant")(implicit spark: SparkSession): Unit = {
+  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean, database: String = "variant")(implicit spark: SparkSession): Unit = {
 
     import spark.implicits._
 

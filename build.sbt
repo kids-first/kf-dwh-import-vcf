@@ -1,8 +1,6 @@
 
 name := "kf-dwh-import-vcf"
 
-version := "0.1"
-
 scalaVersion := "2.12.12"
 
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
@@ -33,4 +31,4 @@ assemblyMergeStrategy in assembly := {
     val oldStrategy = (assemblyMergeStrategy in assembly).value
     oldStrategy(x)
 }
-assemblyJarName in assembly := "kf-dwh-import-vcf.jar"
+assemblyJarName in assembly := s"kf-dwh-import-vcf-${version.value}.jar"

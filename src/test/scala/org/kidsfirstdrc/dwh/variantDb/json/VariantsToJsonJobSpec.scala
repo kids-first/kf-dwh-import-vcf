@@ -4,15 +4,16 @@ import org.apache.spark.sql.DataFrame
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.join.JoinConsequences
 import org.kidsfirstdrc.dwh.testutils.Model.{JoinConsequenceOutput, JoinVariantOutput}
-import org.kidsfirstdrc.dwh.testutils.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.VariantToJsonJobModel.Frequency
 import org.kidsfirstdrc.dwh.testutils.external.Omim
+import org.kidsfirstdrc.dwh.testutils.{VariantToJsonJobModel, WithSparkSession}
 import org.kidsfirstdrc.dwh.vcf.Variants
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 
-class VariantDbJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
   val studyId1 = "SD_123"
   val studyId2 = "SD_456"
@@ -39,7 +40,7 @@ class VariantDbJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
       release_id = realeaseId,
       clin_sig = Some("pathogenic"),
       clinvar_id = Some("RCV000436956"))
-  ).toDF()
+  ).toDF().withColumnRenamed("one_k_genomes", "1k_genomes")
 
   val joinConsequencesDf: DataFrame = Seq(
     JoinConsequenceOutput(),
@@ -59,12 +60,38 @@ class VariantDbJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
 
   "VariantDbJson" should "transform data to the right format" in {
 
-    val result = VariantDbJson.transform(data)
-
-    result.show(false)
+    val result = new VariantsToJsonJob(realeaseId).transform(data)
+    val parsedResult = result.as[VariantToJsonJobModel.Output].collect()
+    val `1k_genomes`: Frequency =
+      result.select(
+        "frequencies.1k_genomes.an",
+        "frequencies.1k_genomes.ac",
+        "frequencies.1k_genomes.af",
+        "frequencies.1k_genomes.homozygotes",
+        "frequencies.1k_genomes.heterozygotes")
+      .as[VariantToJsonJobModel.Frequency].collect().head
+    val variant = parsedResult.head
 
     result.columns should contain allOf
-      ("chromosome", "start", "end", "reference", "alternate", "studies",  "frequencies", "clinvar", "dbsnp_id", "consequences")
+      ("chromosome", "start", "end", "reference", "alternate", "studies",
+        "frequencies", "clinvar", "dbsnp_id", "release_id", "consequences")
+
+    //1. make sure we have only 1 row in the result
+    parsedResult.length shouldBe 1
+    //2. data validation of that row
+    variant.studies.size shouldBe 3
+    variant.studies.map(_.study_id).toSet shouldBe Set(studyId1, studyId2, studyId3)
+    variant.consequences.size shouldBe 2
+    variant.consequences.map(_.ensembl_gene_id).toSet shouldBe Set("ENSG00000136531", "ENSG00000136532")
+    variant.chromosome shouldBe "2"
+    variant.start shouldBe 165310406
+    variant.end shouldBe 165310406
+    variant.reference shouldBe "G"
+    variant.alternate shouldBe "A"
+    //3. frequencies validation in two steps as `1k_genomes` is not a valid name for java variable it needs to be tested
+    //   separately
+    variant.frequencies shouldBe VariantToJsonJobModel.Frequencies()
+    `1k_genomes` shouldBe VariantToJsonJobModel.Frequency()
 
   }
 }

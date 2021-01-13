@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external.omim
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.{col, explode, split}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.external.omim.OmimPhenotype.parse_pheno
 import org.kidsfirstdrc.dwh.utils.EtlJob
 
@@ -63,5 +63,4 @@ object ImportOmimGeneSet extends App with EtlJob {
   load(outputDf, output)
 
 }
-
 
