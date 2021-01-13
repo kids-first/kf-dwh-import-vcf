@@ -150,10 +150,12 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
       Then("A new table for the release is created")
       val variantReleaseTable = spark.table("variant.variants_re_abcdef")
 
+      variantReleaseTable.show(false)
+
       And("this table should contain all merged data")
       val output = variantReleaseTable
+        .withColumnRenamed("1k_genomes", "one_k_genomes")
         .as[JoinVariantOutput]
-
 
       val expectedOutput = Seq(
         JoinVariantOutput(
@@ -181,7 +183,10 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           topmed = None, gnomad_genomes_2_1 = None, clinvar_id = None, clin_sig = None, dbsnp_id = None,
           studies = Set(studyId1),
           consent_codes = variant2.consent_codes,
-          consent_codes_by_study = Map(studyId1 -> variant2.consent_codes)),
+          consent_codes_by_study = Map(studyId1 -> variant2.consent_codes),
+          one_k_genomes = None,
+          gnomad_exomes_2_1 = None,
+          gnomad_genomes_3_0 = None),
         JoinVariantOutput(
           chromosome = "3", start = 3000, end = 3000, "C", "A", name = "mutation_2", hgvsg = "chr3:g.2000T>G",
           hmb_ac = 10, hmb_an = 30, hmb_af = 0.3333333333, hmb_homozygotes = 2, hmb_heterozygotes = 8,
@@ -190,8 +195,14 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           topmed = None, gnomad_genomes_2_1 = None, clinvar_id = None, clin_sig = None, dbsnp_id = None,
           studies = Set(studyId2),
           consent_codes = variant3.consent_codes,
-          consent_codes_by_study = Map(studyId2 -> variant3.consent_codes)),
-        existingVariant2.copy(release_id = releaseId)
+          consent_codes_by_study = Map(studyId2 -> variant3.consent_codes),
+          one_k_genomes = None,
+          gnomad_exomes_2_1 = None,
+          gnomad_genomes_3_0 = None),
+        existingVariant2.copy(release_id = releaseId,
+          one_k_genomes = None,
+          gnomad_exomes_2_1 = None,
+          gnomad_genomes_3_0 = None)
       )
       output.collect() should contain theSameElementsAs expectedOutput
 
