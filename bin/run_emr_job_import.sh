@@ -7,7 +7,7 @@ is_post_cgp_only=${3:-"false"}
 job=${4:-"all"}
 number_instance=${5:-"20"}
 instance_type=${6:-"r5.4xlarge"}
-input_vcf=${7:-"s3a://kf-study-us-east-1-prd-${study_id_lc}/harmonized/family-variants"}
+input_vcf=${7:-"s3a://kf-study-us-east-1-prd-${study_id_lc}/harmonized-data/family-variants"}
 biospecimen_id_column=${8:-"biospecimen_id"}
 
 steps=$(cat <<EOF
