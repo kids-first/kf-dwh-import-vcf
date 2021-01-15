@@ -2,7 +2,7 @@
 release_id=$1
 input=${2:-"s3a://kf-strides-variant-parquet-prd"}
 output=${3:-"s3a://kf-strides-variant-parquet-prd"}
-jarV=${4:-"0.1"}
+jarV=${4:-"0.2"}
 number_instance=${5:-"10"}
 instance_type=${6:-"r5.4xlarge"}
 

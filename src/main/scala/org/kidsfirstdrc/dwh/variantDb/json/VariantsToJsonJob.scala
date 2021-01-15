@@ -151,6 +151,7 @@ class VariantsToJsonJob(releaseId: String) extends MultiSourceEtlJob {
 
   override def load(data: DataFrame, output: String)(implicit spark: SparkSession): Unit = {
     data
+      .repartition(400)
       .write
       .mode(SaveMode.Overwrite)
       .json(s"$output/tmp/${this.TABLE_NAME}_${this.releaseId}")

@@ -4,14 +4,13 @@ import org.kidsfirstdrc.dwh.testutils.Model.{Exon, Intron, RefAlt}
 
 object VariantToJsonJobModel {
 
-  case class StudyFrequency(hmb: Frequency, gru: Frequency)
-
   case class Frequency(an: Long = 20,
-                       ac: Long = 10, af: BigDecimal = 0.5,
+                       ac: Long = 10,
+                       af: BigDecimal = 0.5,
                        homozygotes: Long = 10,
                        heterozygotes: Long = 10)
 
-  case class Study(study_id: String, consent_codes: List[String], frequencies: StudyFrequency)
+  case class Study(study_id: String, consent_codes: List[String], frequencies: InternalFrequencies)
 
   case class InternalFrequencies(hmb: Frequency = Frequency(27,12,0.444444444400000000,9,7),
                                  gru: Frequency = Frequency(7,2,0.285714285700000000,5,1))
@@ -46,6 +45,7 @@ object VariantToJsonJobModel {
                          ensembl_gene_id: String = "ENSG00000136531",
                          ensembl_transcript_id: Option[String] = Some("ENST00000283256.10"),
                          ensembl_regulatory_id: Option[String] = None,
+
                          feature_type: String = "Transcript",
                          consequences: Seq[String] = Seq("missense_variant"),
                          biotype: Option[String] = Some("protein_coding"),

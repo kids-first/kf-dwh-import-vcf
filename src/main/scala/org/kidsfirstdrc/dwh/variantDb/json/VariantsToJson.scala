@@ -10,11 +10,13 @@ object VariantsToJson  extends App {
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
     .enableHiveSupport()
     .appName(s"Import VariantsToJson - $releaseId").getOrCreate()
+  spark.sparkContext.setLogLevel("ERROR")
 
   val job = new VariantsToJsonJob(releaseId)
 
   val sources = job.extract(input)
-  val destination = job.transform(sources)
-  job.load(destination, output)
+  val destination = job.transform(sources).persist()
+
+  job.load(destination.sample(0.01).persist(), output)
 
 }
