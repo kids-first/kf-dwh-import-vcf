@@ -32,6 +32,9 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
         And("A table genomic_files_re_abcdef that contains only sample.CGP.filtered.deNovo.vep.vcf.gz")
         loadTestClinicalTable("genomic_files", output)
 
+        And("A table genomic_files_override that contains a file to include")
+        loadTestTable("genomic_files_override", output)
+
         And("A table participants_re_abcdef")
         loadTestClinicalTable("participants", output)
 
@@ -122,7 +125,7 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
   }
 
 
-  private def loadTestClinicalTable(tableName:String,output: String): Unit = {
+  private def loadTestClinicalTable(tableName:String, output: String): Unit = {
     spark.sql(s"drop table if exists variant.${tableName}_re_abcdef ")
     val genomicFilesDF = spark
       .read
@@ -131,5 +134,16 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
       .option("path", s"$output/${tableName}_re_abcdef")
       .format("json")
       .saveAsTable(s"variant.${tableName}_re_abcdef")
+  }
+
+  private def loadTestTable(tableName:String, output: String): Unit = {
+    spark.sql(s"drop table if exists variant.${tableName}")
+    val genomicFilesDF = spark
+      .read
+      .json(getClass.getResource(s"/tables/${tableName}").getFile)
+    genomicFilesDF.write.mode(SaveMode.Overwrite)
+      .option("path", s"$output/${tableName}")
+      .format("json")
+      .saveAsTable(s"variant.${tableName}")
   }
 }
