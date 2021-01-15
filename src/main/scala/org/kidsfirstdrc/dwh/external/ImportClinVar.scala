@@ -10,7 +10,7 @@ object ImportClinVar extends App {
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
     .enableHiveSupport()
-    .appName("Import 1000 Genomes").getOrCreate()
+    .appName("Import ClinVar").getOrCreate()
 
   import spark.implicits._
 

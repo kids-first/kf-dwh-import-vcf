@@ -51,14 +51,22 @@ object ClinicalUtils {
     broadcast(all)
   }
 
+  def loadManifestFile(studyId: String)(implicit spark: SparkSession): DataFrame = {
+    //actual path => "s3://kf-strides-variant-parquet-prd/genomic_files_override/"
+    spark
+      .table("variant.genomic_files_override")
+      .filter(col("study_id").isin(studyId))
+      .select("file_name")
+  }
+
 
   def getGenomicFiles(studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     broadcast(
       loadClinicalTable(studyId, releaseId, "genomic_files")
-        .select($"file_name", $"acl")
-        .withColumn("acl", filterAcl(studyId)($"acl")).where(size($"acl") <= 1).select($"acl"(0) as "acl", $"file_name")
-        .select(when($"acl".isNull, "_NONE_").when($"acl" === "*", "_PUBLIC_").otherwise($"acl") as "dbgap_consent_code", $"file_name")
+        .select($"file_name")
+        .unionByName(loadManifestFile(studyId))
+        .dropDuplicates("file_name")
     )
   }
 
