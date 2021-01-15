@@ -35,7 +35,7 @@ object ImportClinVar extends App {
     .withColumn("clin_sig",
       when(
         array_contains($"clin_sig_original", "Conflicting_interpretations_of_pathogenicity"),
-        array_union(array_remove($"clin_sig_original", "Conflicting_interpretations_of_pathogenicity"), $"clin_sig_original")
+        array_union(array_remove($"clin_sig_original", "Conflicting_interpretations_of_pathogenicity"), $"clin_sig_conflict")
       ).otherwise($"clin_sig_original")
     )
     .coalesce(1)
