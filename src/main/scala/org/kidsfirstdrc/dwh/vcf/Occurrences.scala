@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.{ArrayType, IntegerType, MapType, StringType}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils.{getBiospecimens, getRelations}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
@@ -152,9 +153,9 @@ object Occurrences {
     import spark.implicits._
     occurrences.join(relations, occurrences("participant_id") === relations("participant_id"), "left")
       .drop(relations("participant_id"))
-      .withColumn("family_calls", familyCalls)
-      .withColumn("mother_calls", $"family_calls"($"mother_id"))
-      .withColumn("father_calls", $"family_calls"($"father_id"))
+      .withColumn("family_calls", when($"family_id".isNotNull, familyCalls).otherwise(lit(null).cast(MapType(StringType, ArrayType(IntegerType)))))
+      .withColumn("mother_calls", when($"family_id".isNotNull, $"family_calls"($"mother_id")).otherwise(lit(null).cast(ArrayType(IntegerType))))
+      .withColumn("father_calls", when($"family_id".isNotNull, $"family_calls"($"father_id")).otherwise(lit(null).cast(ArrayType(IntegerType))))
       .drop("family_calls")
       .withColumn("zygosity", zygosity($"calls"))
       .withColumn("mother_zygosity", zygosity($"mother_calls"))
