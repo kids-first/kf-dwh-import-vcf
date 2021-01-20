@@ -34,15 +34,18 @@ class ClinicalUtilsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
         .format("json")
         .saveAsTable("genomic_files_re_abcdef")
       val res = getGenomicFiles(studyId, releaseId)
-      res.as[(String, String)].collect() should contain theSameElementsAs Seq(
-        ("SD_123456.c1", "file1"),
-        ("SD_123456.c2", "file2"),
-        ("_PUBLIC_", "file3"),
-        ("_NONE_", "file4"),
-        ("_NONE_", "file5"),
-        ("_NONE_", "file8")
-      )
 
+      res.show(false)
+
+      res.as[String].collect() should contain theSameElementsAs Seq(
+        ("file1"),
+        ("file2"),
+        ("file3"),
+        ("file4"),
+        ("file5"),
+        ("file8"),
+        ("file6")
+      )
 
     }
   }

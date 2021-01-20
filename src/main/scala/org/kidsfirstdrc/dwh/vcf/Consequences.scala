@@ -8,33 +8,12 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 object Consequences {
   def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
-    import spark.implicits._
-    val inputDF = loadConsequences(allFilesPath(input), studyId, releaseId)
+    val inputDF = visibleVcf(allFilesPath(input), studyId, releaseId)
+      .select(chromosome, start, end, reference, alternate, name, annotations)
+
     val consequences = build(studyId, releaseId, inputDF)
 
-    val tableConsequences = tableName("consequences", studyId, releaseId)
-    val salt = (rand * 3).cast(IntegerType)  //3 files per chr, tried with 1 file per chr but got an OOM when writing parquet files
-    consequences
-      .repartition(69, $"chromosome", salt)
-      .write.mode(SaveMode.Overwrite)
-      .partitionBy("study_id", "release_id", "chromosome")
-      .format("parquet")
-      .option("path", s"$output/consequences/$tableConsequences")
-      .saveAsTable(tableConsequences)
-
-  }
-
-  private def loadConsequences(input: String, studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
-    visibleVcf(input, studyId, releaseId)
-      .select(
-        chromosome,
-        start,
-        end,
-        reference,
-        alternate,
-        name,
-        annotations
-      )
+    write(consequences, studyId, releaseId, output)
   }
 
   def build(studyId: String, releaseId: String, inputDF: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -76,5 +55,17 @@ object Consequences {
       .drop("annotation")
 
     consequencesDF
+  }
+
+  def write(inputDF: DataFrame, studyId: String, releaseId: String, output: String): Unit = {
+    val tableConsequences = tableName("consequences", studyId, releaseId)
+    val salt = (rand * 3).cast(IntegerType)  //3 files per chr, tried with 1 file per chr but got an OOM when writing parquet files
+    inputDF
+      .repartition(69, col("chromosome"), salt)
+      .write.mode(SaveMode.Overwrite)
+      .partitionBy("study_id", "release_id", "chromosome")
+      .format("parquet")
+      .option("path", s"$output/consequences/$tableConsequences")
+      .saveAsTable(tableConsequences)
   }
 }

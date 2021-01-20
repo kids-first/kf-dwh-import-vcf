@@ -5,7 +5,7 @@ import hail as hl
 
 hl.init(sc=sc)
 
-mt = hl.read_table('s3a://kf-variant-parquet-prd/raw/gnomad/gnomad.genomes.r2.1.1.sites.liftover_grch38.ht')
+mt = hl.read_table('s3a://kf-strides-variant-parquet-prd/raw/gnomad/gnomad.genomes.r2.1.1.sites.liftover_grch38.ht')
 freq_dict=mt.freq_index_dict.collect()
 gnomad_freq_dict = {k:v for (k,v) in freq_dict[0].items() if k.startswith('gnomad') and not k.startswith('gnomad_raw')}
 df=mt.to_spark()
@@ -17,4 +17,4 @@ for (k,v) in gnomad_freq_dict.items():
         df=df.withColumn(columnName,df['freq'].getItem(v)[c])
 
 df=df.drop('freq').where(col('af').isNotNull())
-df.repartition("chromosome").sortWithinPartitions("start").write.mode('overwrite').format("parquet").option("path", "s3a://kf-variant-parquet-prd/public/gnomad/gnomad_genomes_2.1.1_liftover_grch38").saveAsTable("variant.gnomad_genomes_2_1_1_liftover_grch38")
+df.repartition("chromosome").sortWithinPartitions("start").write.mode('overwrite').format("parquet").option("path", "s3a://kf-strides-variant-parquet-prd/public/gnomad/gnomad_genomes_2.1.1_liftover_grch38").saveAsTable("variant.gnomad_genomes_2_1_1_liftover_grch38")

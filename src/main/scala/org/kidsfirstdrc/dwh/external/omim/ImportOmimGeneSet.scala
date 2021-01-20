@@ -55,8 +55,8 @@ object ImportOmimGeneSet extends App with EtlJob {
     spark.sql(s"create or replace view variant_live.$TABLE_NAME as select * from variant.$TABLE_NAME")
   }
 
-  val input = "s3a://kf-variant-parquet-prd/raw/omim/genemap2.txt"
-  val output = "s3a://kf-variant-parquet-prd/public"
+  val input = "s3a://kf-strides-variant-parquet-prd/raw/omim/genemap2.txt"
+  val output = "s3a://kf-strides-variant-parquet-prd/public"
 
   val inputDf = extract(input)
   val outputDf = transform(inputDf)

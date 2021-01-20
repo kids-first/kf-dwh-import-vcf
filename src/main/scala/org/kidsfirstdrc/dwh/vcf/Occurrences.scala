@@ -14,7 +14,11 @@ object Occurrences {
   }
 
   def build(studyId: String, releaseId: String, input: String, biospecimenIdColumn: String, isPatternOverriden: Boolean)(implicit spark: SparkSession): DataFrame = {
-    val occurrences = selectOccurrences(studyId, releaseId, input, isPatternOverriden)
+    val inputDF: DataFrame =
+      if (isPatternOverriden) loadPostCGP(input, studyId, releaseId)
+      else unionCGPFiles(input, studyId, releaseId)
+
+    val occurrences = selectOccurrences(studyId, releaseId, inputDF)
     val biospecimens = getBiospecimens(studyId, releaseId, biospecimenIdColumn)
     val withClinical = joinOccurrencesWithClinical(occurrences, biospecimens)
 
@@ -22,11 +26,8 @@ object Occurrences {
     joinOccurrencesWithInheritence(withClinical, relations)
   }
 
-  def selectOccurrences(studyId: String, releaseId: String, input: String, isPatternOverriden: Boolean)(implicit spark: SparkSession): DataFrame = {
+  def selectOccurrences(studyId: String, releaseId: String, inputDF: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val inputDF: DataFrame =
-      if (isPatternOverriden) loadPostCGP(input, studyId, releaseId)
-      else unionCGPFiles(input, studyId, releaseId)
 
     val occurrences = inputDF
       .select(

@@ -2,17 +2,13 @@ package org.kidsfirstdrc.dwh.utils
 
 import org.kidsfirstdrc.dwh.testutils.Model._
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
+import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.{fileExist, filename, union}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-case class ACInput(ac: Long, an: Long)
-
-case class ACOutput(af: BigDecimal)
-
 class SparkUtilsSpec extends AnyFlatSpec with WithSparkSession with Matchers {
 
-  import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
   import spark.implicits._
 
   "zygosity" should "return HOM for 1/1" in {

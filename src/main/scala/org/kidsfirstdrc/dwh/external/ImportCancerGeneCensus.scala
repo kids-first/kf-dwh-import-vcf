@@ -12,8 +12,8 @@ object ImportCancerGeneCensus extends App {
 
   import spark.implicits._
 
-  val input = "s3a://kf-variant-parquet-prd/raw/cosmic/cancer_gene_census.csv"
-  val output = "s3a://kf-variant-parquet-prd/public"
+  val input = "s3a://kf-strides-variant-parquet-prd/raw/cosmic/cancer_gene_census.csv"
+  val output = "s3a://kf-strides-variant-parquet-prd/public"
   spark.read.option("header", "true").csv(input)
     .select(
       $"Gene Symbol" as "symbol",

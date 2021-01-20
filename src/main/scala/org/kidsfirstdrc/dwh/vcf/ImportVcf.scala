@@ -1,11 +1,12 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import org.apache.spark.sql.SparkSession
-import org.kidsfirstdrc.dwh.vcf.ImportVcf.isPatternOverriden
 
 import scala.util.Try
 
 object ImportVcf extends App {
+
+  println(s"Job arguments: ${args.mkString("[", ", ", "]")}")
 
   val Array(studyId, releaseId, input, output, runType, biospecimenIdColumn, isPatternOverride) = args
 
@@ -22,19 +23,18 @@ object ImportVcf extends App {
           runType: String = "all", biospecimenIdColumn: String = "biospecimen_id", isPatternOverriden: Boolean = false)
          (implicit spark: SparkSession): Unit = {
     spark.sql("use variant")
-    if (runType == "all") {
-      Occurrences.run(studyId, releaseId, input, output, biospecimenIdColumn, isPatternOverriden)
-      Variants.run(studyId, releaseId, input, output)
-      Consequences.run(studyId, releaseId, input, output)
-    }
-    else if (runType == "occurrences")
-      Occurrences.run(studyId, releaseId, input, output, biospecimenIdColumn, isPatternOverriden)
-    else if (runType == "variants")
-      Variants.run(studyId, releaseId, input, output)
-    else if (runType == "consequences")
-      Consequences.run(studyId, releaseId, input, output)
-  }
 
+    runType match {
+      case "occurrences" => Occurrences.run(studyId, releaseId, input, output, biospecimenIdColumn, isPatternOverriden)
+      case "variants" => Variants.run(studyId, releaseId, input, output)
+      case "consequences" => Consequences.run(studyId, releaseId, input, output)
+      case "all" =>
+        Occurrences.run(studyId, releaseId, input, output, biospecimenIdColumn, isPatternOverriden)
+        Variants.run(studyId, releaseId, input, output)
+        Consequences.run(studyId, releaseId, input, output)
+
+    }
+  }
 
 }
 
