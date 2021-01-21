@@ -14,7 +14,7 @@ object Import1k extends App {
   import spark.implicits._
 
   val input = "s3://kf-variant-parquet-prd/raw/1000Genomes/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz"
-  val output = "s3a://kf-variant-parquet-prd/public"
+  val output = "s3a://kf-strides-variant-parquet-prd/public"
   vcf(input)(spark)
     .select(chromosome,
       start,

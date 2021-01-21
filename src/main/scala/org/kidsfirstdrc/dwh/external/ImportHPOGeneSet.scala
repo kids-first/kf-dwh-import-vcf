@@ -9,8 +9,8 @@ object ImportHPOGeneSet extends App {
     .enableHiveSupport()
     .appName("Import HPO Geneset").getOrCreate()
 
-  val input = "s3a://kf-variant-parquet-prd/raw/hpo/genes_to_phenotype.txt"
-  val output = "s3a://kf-variant-parquet-prd/public"
+  val input = "s3a://kf-strides-variant-parquet-prd/raw/hpo/genes_to_phenotype.txt"
+  val output = "s3a://kf-strides-variant-parquet-prd/public"
 
   val human_genes = broadcast(spark.table("variant.human_genes").select("entrez_gene_id", "ensembl_gene_id"))
 

@@ -6,9 +6,11 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object ClinicalUtils {
 
-  private def loadClinicalTable(studyId: String, releaseId: String, tableName: String)(implicit spark: SparkSession) = {
+  private def loadClinicalTable(studyId: String, releaseId: String, tableName: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     spark
+      .read
+      //.parquet(s"s3a://kf-strides-variant-parquet-prd/dataservice/$tableName/${tableName}_${releaseId.toLowerCase}")
       .table(s"${tableName}_${releaseId.toLowerCase}")
       .where($"study_id" === studyId)
   }

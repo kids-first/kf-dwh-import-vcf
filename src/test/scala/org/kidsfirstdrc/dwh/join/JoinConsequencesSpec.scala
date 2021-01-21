@@ -43,7 +43,12 @@ class JoinConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
       Given("1 existing table annotation that contains some data for at least one study")
       val studyId3 = "SD_789"
       val existingCsq1 = JoinConsequenceOutput(study_ids = Set(studyId3), release_id = "RE_PREVIOUS")
-      val existingCsq2 = JoinConsequenceOutput(chromosome = "4", start = 4000, end = 4000, "C", "A", name = Some("mutation_3"), hgvsg = Some("chr4:g.4000C>A"), cds_position = None, amino_acids = None, coding_dna_change = None, aa_change = None, SIFT_score = None, study_ids = Set(studyId3), release_id = "RE_PREVIOUS")
+      val existingCsq2 = JoinConsequenceOutput(chromosome = "4", start = 4000, end = 4000, "C", "A", name = Some("mutation_3"),
+        hgvsg = Some("chr4:g.4000C>A"), cds_position = None, amino_acids = None, coding_dna_change = None, aa_change = None,
+        SIFT_score = None, study_ids = Set(studyId3), release_id = "RE_PREVIOUS",
+        CADD_raw_rankscore = None, DANN_rankscore = None, FATHMM_converted_rankscore = None, FATHMM_pred = None,
+        LRT_converted_rankscore = None, LRT_pred = None, Polyphen2_HVAR_pred = None, Polyphen2_HVAR_rankscore = None,
+        REVEL_rankscore = None, SIFT_converted_rankscore = None, SIFT_pred = None, phyloP17way_primate_rankscore = None)
 
       val removedOldCsq = JoinConsequenceOutput(alternate = "G", study_ids = Set(studyId1), release_id = "RE_PREVIOUS")
 
@@ -68,11 +73,17 @@ class JoinConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
       val output = variantReleaseTable
         .as[JoinConsequenceOutput]
       val expectedOutput = Seq(
-        JoinConsequenceOutput(study_ids = Set(studyId1, studyId2, studyId3)),
+        JoinConsequenceOutput(study_ids = Set(studyId1, studyId2, studyId3),
+          CADD_raw_rankscore = None, DANN_rankscore = None, FATHMM_converted_rankscore = None, FATHMM_pred = None,
+          LRT_converted_rankscore = None, LRT_pred = None, Polyphen2_HVAR_pred = None, Polyphen2_HVAR_rankscore = None,
+          REVEL_rankscore = None, SIFT_converted_rankscore = None, SIFT_pred = None, phyloP17way_primate_rankscore = None),
         JoinConsequenceOutput(
           chromosome = "3", start = 3000, end = 3000, "C", "A", name = Some("mutation_2"), hgvsg = Some("chr3:g.3000C>A"),
           cds_position = None, amino_acids = None, coding_dna_change = None, aa_change = None, SIFT_score = None,
-          study_ids = Set(studyId2)),
+          study_ids = Set(studyId2),
+          CADD_raw_rankscore = None, DANN_rankscore = None, FATHMM_converted_rankscore = None, FATHMM_pred = None,
+          LRT_converted_rankscore = None, LRT_pred = None, Polyphen2_HVAR_pred = None, Polyphen2_HVAR_rankscore = None,
+          REVEL_rankscore = None, SIFT_converted_rankscore = None, SIFT_pred = None, phyloP17way_primate_rankscore = None),
         existingCsq2.copy(release_id = releaseId)
 
       )

@@ -15,8 +15,8 @@ object ImportDBSNP extends App {
 
   import spark.implicits._
 
-  val input = "s3a://kf-variant-parquet-prd/raw/dbsnp/GCF_000001405.38.gz"
-  val output = "s3a://kf-variant-parquet-prd/public"
+  val input = "s3a://kf-strides-variant-parquet-prd/raw/dbsnp/GCF_000001405.38.gz"
+  val output = "s3a://kf-strides-variant-parquet-prd/public"
   vcf(input)(spark)
     .where($"contigName" like "NC_%")
     .withColumn("chromosome", regexp_extract($"contigName", "NC_(\\d+).(\\d+)", 1).cast("int"))

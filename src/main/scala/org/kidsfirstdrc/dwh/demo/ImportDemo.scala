@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.demo
 
 import org.apache.spark.sql.SparkSession
-import org.kidsfirstdrc.dwh.vcf.{Consequences, Variants}
+import org.kidsfirstdrc.dwh.vcf.Variants
 
 object ImportDemo extends App {
 
@@ -16,19 +16,16 @@ object ImportDemo extends App {
 
   def run(studyId: String, releaseId: String, input: String, output: String, runType: String = "all")(implicit spark: SparkSession): Unit = {
     spark.sql("use demo")
-    if (runType == "all") {
-      DemoOccurrences.run(studyId, releaseId, input, output, isPostCGPOnly = false)
-      Variants.run(studyId, releaseId, input, output)
-      Consequences.run(studyId, releaseId, input, output)
+    runType match {
+      case "occurrences" => DemoOccurrences.run(studyId, releaseId, input, output)
+      case "variants" => Variants.run(studyId, releaseId, input, output)
+      case "consequences" => DemoConsequences.run(studyId, releaseId, input, output)
+      case "all" =>
+        DemoOccurrences.run(studyId, releaseId, input, output)
+        Variants.run(studyId, releaseId, input, output)
+        DemoConsequences.run(studyId, releaseId, input, output)
+
     }
-    else if (runType == "occurrences")
-      DemoOccurrences.run(studyId, releaseId, input, output, isPostCGPOnly = false)
-    else if (runType == "variants")
-      Variants.run(studyId, releaseId, input, output)
-    else if (runType == "consequences")
-      Consequences.run(studyId, releaseId, input, output)
   }
-
-
 }
 

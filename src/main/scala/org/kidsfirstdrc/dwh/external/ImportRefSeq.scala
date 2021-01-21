@@ -27,14 +27,14 @@ object ImportRefSeq extends App {
 
   val splitToMap = udf(splitToMapFn)
 
-  val input = "s3a://kf-variant-parquet-prd/raw/refseq/Homo_sapiens.gene_info.gz"
-  val output = "s3a://kf-variant-parquet-prd/public"
+  val input = "s3a://kf-strides-variant-parquet-prd/raw/refseq/Homo_sapiens.gene_info.gz"
+  val output = "s3a://kf-strides-variant-parquet-prd/public"
   spark.read.format("csv")
     .option("inferSchema", "true")
     .option("header", "true")
     .option("sep", "\t")
     .option("nullValue", "-")
-    .load("s3a://kf-variant-parquet-prd/raw/refseq/Homo_sapiens.gene_info.gz")
+    .load("s3a://kf-strides-variant-parquet-prd/raw/refseq/Homo_sapiens.gene_info.gz")
     .select(
       $"#tax_id" as "tax_id",
       $"GeneID" as "entrez_gene_id",

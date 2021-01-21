@@ -11,8 +11,8 @@ object ImportDDDGeneCensus extends App {
     .appName("Import DDD Gene Census").getOrCreate()
 
   import spark.implicits._
-  val input = "s3a://kf-variant-parquet-prd/raw/ddd/DDG2P_17_5_2020.csv"
-  val output = "s3a://kf-variant-parquet-prd/public"
+  val input = "s3a://kf-strides-variant-parquet-prd/raw/ddd/DDG2P_17_5_2020.csv"
+  val output = "s3a://kf-strides-variant-parquet-prd/public"
   spark.read.option("header", "true").csv(input)
     .select(
       $"gene symbol" as "symbol",

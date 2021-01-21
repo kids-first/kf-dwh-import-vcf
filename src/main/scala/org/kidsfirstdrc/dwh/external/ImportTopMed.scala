@@ -15,7 +15,7 @@ object ImportTopMed extends App {
   import spark.implicits._
 
   val input = "s3://kf-variant-parquet-prd/raw/topmed/bravo-dbsnp-all.vcf.gz"
-  val output = "s3a://kf-variant-parquet-prd/public"
+  val output = "s3a://kf-strides-variant-parquet-prd/public"
   vcf(input)(spark)
     .select(chromosome,
       start,
