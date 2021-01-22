@@ -8,8 +8,7 @@
   {
     "Classification": "spark-defaults",
     "Properties": {
-      "spark.memory.storageFraction": "0",
-      "spark.memory.storageFraction" : "0.8",
+      "spark.memory.storageFraction" : "0",
       "spark.sql.shuffle.partitions": "5000",
       "spark.dynamicAllocation.enabled": "false",
       "spark.network.timeout": "1000000",
