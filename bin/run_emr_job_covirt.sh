@@ -12,7 +12,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --ec2-attributes '{"KeyName":"flintrock","AdditionalSlaveSecurityGroups":["sg-059bf5fe80ff903be"],"InstanceProfile":"EMR_EC2_DefaultRole","ServiceAccessSecurityGroup":"sg-0487486fd3d67c14e","SubnetId":"subnet-a756a3ed","EmrManagedSlaveSecurityGroup":"sg-0807b9c40bb37be85","EmrManagedMasterSecurityGroup":"sg-012f30e67b51b6f4d","AdditionalMasterSecurityGroups":["sg-059bf5fe80ff903be"]}' \
 --service-role EMR_DefaultRole \
 --enable-debugging \
---release-label emr-5.29.0 \
+--release-label emr-5.32.0 \
 --log-uri 's3n://aws-logs-538745987955-us-east-1/elasticmapreduce/' \
 --steps "${steps}" \
 --name "Covirt Import - ${job} - Release ${release_id}" \

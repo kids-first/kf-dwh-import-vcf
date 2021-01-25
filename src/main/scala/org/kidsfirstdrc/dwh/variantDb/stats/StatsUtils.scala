@@ -2,6 +2,7 @@ package org.kidsfirstdrc.dwh.variantDb.stats
 
 import org.apache.spark.sql.functions.not
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions._
 
 object StatsUtils {
 
@@ -24,14 +25,14 @@ object StatsUtils {
       spark.table(s"$database.$table")
     }
 
-    occurrences.reduce(_ union _)
+    occurrences.reduce(_ unionByName _)
   }
 
   def getStats(df: DataFrame): VariantDbStats = {
     val studiesCount = df.select("study_id").distinct.count()
     val participantsCount = df.select("participant_id").distinct().count()
-    val distinctVariantsCount = df.where("has_alt").select("chromosome", "start", "reference", "alternate").distinct.count()
-    val occurrencesCount = df.where("has_alt").count()
+    val distinctVariantsCount = df.where(col("has_alt") === 1).select("chromosome", "start", "reference", "alternate").distinct.count()
+    val occurrencesCount = df.where(col("has_alt") === 1).count()
 
 
     VariantDbStats(studiesCount, participantsCount, distinctVariantsCount, occurrencesCount)
