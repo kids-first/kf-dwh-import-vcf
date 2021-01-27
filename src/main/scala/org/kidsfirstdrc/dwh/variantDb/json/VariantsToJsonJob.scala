@@ -127,8 +127,6 @@ class VariantsToJsonJob(releaseId: String) extends MultiSourceEtlJob {
       "cds_position", "cdna_position", "protein_position", "amino_acids", "codons", "canonical", "aa_change", "coding_dna_change",
       "ensembl_transcript_id", "ensembl_regulatory_id", "feature_type", "scores")
 
-    val scoresColumns = consequences.schema.fields.filter(_.dataType.equals(DoubleType)).map(_.name).toSet
-
     val omim = data(ImportOmimGeneSet.TABLE_NAME)
       .select("ensembl_gene_id", "entrez_gene_id", "omim_gene_id")
 
