@@ -1,8 +1,8 @@
 package org.kidsfirstdrc.dwh.external
 
+import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql._
 import org.kidsfirstdrc.dwh.utils.EtlJob
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
@@ -11,12 +11,15 @@ import scala.collection.mutable
 
 object ImportClinVar extends App with EtlJob {
 
+  val Array(clinvarDate) = args
+  println(s"Processing clinvar for date: $clinvarDate")
+
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
     .enableHiveSupport()
     .appName("Import ClinVar").getOrCreate()
 
-  val input = "s3a://kf-strides-variant-parquet-prd/raw/clinvar/clinvar_20201026.vcf.gz"
+  val input = s"s3a://kf-strides-variant-parquet-prd/raw/clinvar/clinvar_${clinvarDate.trim}.vcf.gz"
   val output = "s3a://kf-strides-variant-parquet-prd/public"
 
   val sourceDF = extract(input)

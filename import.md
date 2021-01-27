@@ -106,9 +106,27 @@ Import DBNSFP :
 3) Run it 
 
 
-Import Topmed, 1000Genomes, etc....
+Import Topmed, 1000Genomes, etc...
 1) In a new notebook copy the content of the files (starting at spark.read...)
 2) Run it
+
+
+Import clinvar
+1) Upload `clinvar_ingestion.sh` to s3
+   ```shell
+   aws s3 cp bin/clinvar_ingestion.sh s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions/clinvar_ingestion.sh
+   ```
+2) Build and upload `kf-dwh-import.jar` to s3
+   ```shell
+   sbt assembly
+   aws s3 cp target/scala-2.12/kf-dwh-import-vcf-$VERSION.jar s3://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf-$VERSION.jar
+   ```
+3) run `bin/run_emr_job_import_clinvar.sh`
+
+   ```shell
+   cd bin
+   ./run_emr_job_import_clinvar.sh
+   ```
 
 
 

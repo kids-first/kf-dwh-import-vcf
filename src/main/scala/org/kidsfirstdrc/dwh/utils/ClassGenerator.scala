@@ -75,7 +75,7 @@ object ClassGenerator {
       case StructField(name, StructType(_), _, _) => oneClassString(name.toUpperCase, df.select(s"${name}.*"))
       case StructField(name, ArrayType(StructType(_), _), _, _) =>
         oneClassString(name.toUpperCase, df.withColumn(name, explode(col(name))).select(s"${name}.*"))
-
+      case s => s.toString()
     }
 
     s"""/**

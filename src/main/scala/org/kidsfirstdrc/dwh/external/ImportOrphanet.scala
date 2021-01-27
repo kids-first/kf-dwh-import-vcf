@@ -6,8 +6,7 @@ import scala.xml.{Elem, XML}
 
 object ImportOrphanet extends App {
 
-  val input = args(1)
-  val output = args(2)
+  val Array(input, output) = args
 
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
@@ -31,7 +30,7 @@ object ImportOrphanet extends App {
   }
 
 
-  def parseXML(doc: Elem):Seq[OrphanetOutput] = {
+  def parseXML(doc: Elem): Seq[OrphanetOutput] = {
     for {
       disorder <- doc \\ "DisorderList" \\ "Disorder"
       orphaNumber <- disorder \ "OrphaNumber"
