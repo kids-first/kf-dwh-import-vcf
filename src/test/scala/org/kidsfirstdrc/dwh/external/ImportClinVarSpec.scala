@@ -46,7 +46,7 @@ class ImportClinVarSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
 
     val outputDf = ImportClinVar.transform(inputDF)
 
-    val root = "/Users/christophe/ferlab/kf-dwh-import-vcf/src/test/scala/"
+    val root = "src/test/scala/"
     ClassGenerator.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","ClinvarInput", inputDF, root)
     ClassGenerator.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","ClinvarOutput", outputDf, root)
   }
