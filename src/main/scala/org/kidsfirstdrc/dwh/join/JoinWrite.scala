@@ -11,8 +11,8 @@ object JoinWrite {
       .write.mode(SaveMode.Overwrite)
       .partitionBy("chromosome")
       .format("parquet")
-      .option("path", s"$output/$tableName/${tableName}_$releaseId")
-      .saveAsTable(s"${database}.${tableName}_$releaseId")
+      .option("path", s"$output/$tableName/${tableName}_${releaseId.toLowerCase()}")
+      .saveAsTable(s"${database}.${tableName}_${releaseId.toLowerCase()}")
 
   }
 }

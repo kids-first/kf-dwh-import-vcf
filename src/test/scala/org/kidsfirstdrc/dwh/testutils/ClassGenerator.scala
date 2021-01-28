@@ -10,33 +10,41 @@ import java.time.LocalDateTime
 object ClassGenerator {
 
   def getType: PartialFunction[DataType, String] = {
-    case StringType               => "String"
-    case FloatType                => "Float"
-    case IntegerType              => "Int"
-    case BooleanType              => "Boolean"
-    case DoubleType               => "Double"
-    case LongType                 => "Long"
-    case ArrayType(StringType,_)  => "List[String]"
-    case ArrayType(FloatType,_)   => "List[Float]"
-    case ArrayType(IntegerType,_) => "List[Int]"
-    case ArrayType(BooleanType,_) => "List[Boolean]"
-    case ArrayType(DoubleType,_)  => "List[Double]"
-    case ArrayType(LongType,_)    => "List[Long]"
+    case StringType                           => "String"
+    case FloatType                            => "Float"
+    case IntegerType                          => "Int"
+    case BooleanType                          => "Boolean"
+    case DoubleType                           => "Double"
+    case LongType                             => "Long"
+    case DecimalType()                        => "Double"
+    case ArrayType(StringType, _)             => "List[String]"
+    case ArrayType(FloatType, _)              => "List[Float]"
+    case ArrayType(IntegerType, _)            => "List[Int]"
+    case ArrayType(BooleanType, _)            => "List[Boolean]"
+    case ArrayType(DoubleType, _)             => "List[Double]"
+    case ArrayType(LongType, _)               => "List[Long]"
+    case MapType(StringType,LongType, _)      => "Map[String,Long]"
+    case MapType(StringType,DecimalType(), _) => "Map[String,BigDecimal]"
+    case MapType(StringType,ArrayType(StringType,_),_) =>"Map[String, List[String]]"
   }
 
   def getValue: PartialFunction[(String, Row, DataType), String] = {
-    case (name, values, StringType)               => "\"" + values.getAs(name) + "\""
-    case (name, values, FloatType)                => values.getAs(name)
-    case (name, values, IntegerType)              => values.getAs(name)
-    case (name, values, BooleanType)              => values.getAs(name)
-    case (name, values, DoubleType)               => values.getAs(name)
-    case (name, values, LongType)                 => values.getAs(name)
-    case (name, values, ArrayType(StringType,_))  => values.getAs[List[String]](name).mkString("List(\"", "\", \"", "\")")
-    case (name, values, ArrayType(FloatType,_))   => values.getAs[List[Float]](name).mkString("List(", ", ", ")")
-    case (name, values, ArrayType(IntegerType,_)) => values.getAs[List[Int]](name).mkString("List(", ", ", ")")
-    case (name, values, ArrayType(BooleanType,_)) => values.getAs[List[Boolean]](name).mkString("List(", ", ", ")")
-    case (name, values, ArrayType(DoubleType,_))  => values.getAs[List[Boolean]](name).mkString("List(", ", ", ")")
-    case (name, values, ArrayType(LongType,_))    => values.getAs[List[Long]](name).mkString("List(", ", ", ")")
+    case (name, values, StringType)                                    => "\"" + values.getAs(name) + "\""
+    case (name, values, FloatType)                                     => values.getAs(name)
+    case (name, values, IntegerType)                                   => values.getAs(name)
+    case (name, values, BooleanType)                                   => values.getAs(name)
+    case (name, values, DoubleType)                                    => values.getAs(name)
+    case (name, values, LongType)                                      => values.getAs(name)
+    case (name, values, DecimalType())                                 => values.getAs(name)
+    case (name, values, ArrayType(StringType,_))                       => values.getAs[List[String]](name).mkString("List(\"", "\", \"", "\")")
+    case (name, values, ArrayType(FloatType,_))                        => values.getAs[List[Float]](name).mkString("List(", ", ", ")")
+    case (name, values, ArrayType(IntegerType,_))                      => values.getAs[List[Int]](name).mkString("List(", ", ", ")")
+    case (name, values, ArrayType(BooleanType,_))                      => values.getAs[List[Boolean]](name).mkString("List(", ", ", ")")
+    case (name, values, ArrayType(DoubleType,_))                       => values.getAs[List[Boolean]](name).mkString("List(", ", ", ")")
+    case (name, values, ArrayType(LongType,_))                         => values.getAs[List[Long]](name).mkString("List(", ", ", ")")
+    case (name, values, MapType(StringType,LongType, _))               => values.getAs[Map[String, Long]](name).mkString("Map(", ", ", ")")
+    case (name, values, MapType(StringType,DecimalType(), _))          => values.getAs[Map[String, BigDecimal]](name).mkString("Map(", ", ", ")")
+    case (name, values, MapType(StringType,ArrayType(StringType,_),_)) => values.getAs[Map[String, List[String]]](name).mkString("Map(", ", ", ")")
   }
 
   def oneClassString(className: String, df: DataFrame): String = {
@@ -101,8 +109,9 @@ object ClassGenerator {
       s"""writting file: $path :
          |$classContent
          |""".stripMargin)
-
-    val pw = new PrintWriter(new File(path))
+    val file = new File(path)
+    file.createNewFile()
+    val pw = new PrintWriter(file)
     pw.write(classContent)
     pw.close()
 
