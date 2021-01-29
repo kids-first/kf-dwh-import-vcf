@@ -1,0 +1,45 @@
+Description of the XML tags
+
+- DisorderList count: total number of clinical entities (disorders, group of disorders or
+subtypes) in the Xml file
+- ORPHAcode – a unique and time-stable numerical identifier attributed randomly by the
+database upon creation of the entity. Currently, the ORPHACode is made up of one to six
+digits. In the future, number of digits can expand. It comes with:
+o ExpertLink: stable URL pointing to the specific page of a given disease on the Orphanet
+website.
+o Name: the most generally accepted name according to the literature, and as adopted by
+the medical community. Preferred terms are unique throughout the database,
+associated with one ORPHAcode only.
+o Lang: ISO 639 code or UTF8 code for language name.
+- SynonymList: synonymsfor a given clinical entity (Terms that are perfectly equivalent to the
+preferred term they are attached to. As many synonyms as necessary are added to a
+preferred term. Acronyms are included only when they are consistently used in the
+literature).
+- Definition: short text stating the group of disorders that the clinical entity belongs to, and
+listing the major clinical characteristics (e.g. clinical, pathological, radiological, etc.) that
+define the entity and differentiate it from other entities classified within the same clinical
+group.
+- DisorderGroup: Hierarchical levels of the clinical entity that determine the level of
+precision of each diagnosis included in the nomenclature. Can be either Group of
+disorders, Disorder or Subtype of disorder (see definitions in annex)
+- DisorderType: can be either Disease, Clinical syndrome, Malformation syndrome,
+Biological anomaly, Morphological anomaly, Category, Clinical group, Etiologicalsubtype,
+Clinical subtype, Histopathological subtype or Particular clinical situation in a disease or
+syndrome (see definitions in annex)
+- DisorderFlag: Most of clinical entities do not have a flag but for the other can be either
+head of classification, historical entity, deprecated entity, obsolete entity, obsolete entity
+with resources or non-rare disease in Europe (see definitions in annex)
+- ExternalReferenceList: list of cross-references for a given clinical entity in the ICD-10,
+UMLS, MesH, MedDra, and OMIM systems
+- Source: can be either OMIM, UMLS, MesH, MedDra or ICD-10
+- Reference: listed reference for a given source associated with a clinical entity
+- DisorderMappingRelation: characterisation of the alignment between a given clinical
+entity and one of the source. Can be either E, NTBT, BTNT, NTBT/E, BTNT/E, ND (see
+explanations in annex)
+- DisorderMappingICDRelation: additional characterization used only for ICD-10. Can be
+either Specific code, Inclusion term, Index term or Attributed (see explanations in annex)
+- DisorderMappingValidationStatus: Status validation between the given clinical entity and the
+ttreference. Can be either Validated or Not yet validated
+- DisorderDisorderAssociation: Relationship between two clinical entities – Please note that
+in this file the relationship “Moved to” and “Referred to” are displayed and that the
+hierarchical relationships are given in the Orphanet classifications file.

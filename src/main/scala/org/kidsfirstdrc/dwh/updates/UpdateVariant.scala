@@ -45,13 +45,7 @@ class UpdateVariant(runEnv: Environment) extends MultiSourceEtlJob(runEnv) {
     val releaseId_datetime = s"${lastReleaseId}_$localTimeNow"
 
     write(releaseId_datetime, output, Variants.TABLE_NAME, data, Some(60), database)
-    if (runEnv.equals(Environment.PROD)) publishTable(releaseId_datetime, Variants.TABLE_NAME)
+    if (runEnv == Environment.PROD) publishTable(releaseId_datetime, Variants.TABLE_NAME)
     data
-  }
-
-  def run(inputFolder: String, outputFolder: String)(implicit spark: SparkSession): DataFrame = {
-    val inputDF = extract(inputFolder)
-    val outputDF = transform(inputDF)
-    load(outputDF, outputFolder)
   }
 }
