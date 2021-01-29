@@ -3,24 +3,13 @@ package org.kidsfirstdrc.dwh.join
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.join.JoinWrite.write
+import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.{calculated_duo_af, locusColumNames}
 import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 import org.kidsfirstdrc.dwh.vcf.Variants.TABLE_NAME
 
 object JoinVariants {
-
-  implicit class DataFrameOps(df: DataFrame) {
-
-    def joinByLocus(df2: DataFrame): DataFrame = {
-      df.join(df2, df("chromosome") === df2("chromosome") && df("start") === df2("start") && df("reference") === df2("reference") && df("alternate") === df2("alternate"), "left")
-    }
-
-    def joinAndMerge(df2: DataFrame, outputColumnName: String): DataFrame = {
-      df.joinByLocus(df2)
-        .select(df("*"), when(df2("chromosome").isNull, lit(null)).otherwise(struct(df2.drop("chromosome", "start", "end", "name", "reference", "alternate")("*"))) as outputColumnName)
-    }
-  }
 
   def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean = true, database: String = "variant")(implicit spark: SparkSession): Unit = {
 

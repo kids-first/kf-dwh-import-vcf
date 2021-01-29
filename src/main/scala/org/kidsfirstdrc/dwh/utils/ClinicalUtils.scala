@@ -6,6 +6,18 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object ClinicalUtils {
 
+  implicit class DataFrameOps(df: DataFrame) {
+
+    def joinByLocus(df2: DataFrame): DataFrame = {
+      df.join(df2, df("chromosome") === df2("chromosome") && df("start") === df2("start") && df("reference") === df2("reference") && df("alternate") === df2("alternate"), "left")
+    }
+
+    def joinAndMerge(df2: DataFrame, outputColumnName: String): DataFrame = {
+      df.joinByLocus(df2)
+        .select(df("*"), when(df2("chromosome").isNull, lit(null)).otherwise(struct(df2.drop("chromosome", "start", "end", "name", "reference", "alternate")("*"))) as outputColumnName)
+    }
+  }
+
   private def loadClinicalTable(studyId: String, releaseId: String, tableName: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     spark
