@@ -33,4 +33,10 @@ abstract class MultiSourceEtlJob(runEnv: Environment) {
 
   def load(data: DataFrame, output: String)(implicit spark: SparkSession): DataFrame
 
+  def run(input: String, output: String)(implicit spark: SparkSession): DataFrame = {
+    val inputDF = extract(input)
+    val outputDF = transform(inputDF)
+    load(outputDF, output)
+  }
+
 }

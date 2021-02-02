@@ -4,8 +4,8 @@ import org.apache.spark.sql.functions.{explode, _}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.join.JoinConsequences
-import org.kidsfirstdrc.dwh.utils.{Environment, MultiSourceEtlJob}
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
+import org.kidsfirstdrc.dwh.utils.{Environment, MultiSourceEtlJob}
 import org.kidsfirstdrc.dwh.variantDb.json.VariantsToJsonJob._
 import org.kidsfirstdrc.dwh.vcf.Variants
 
