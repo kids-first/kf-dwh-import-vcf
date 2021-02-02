@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.kidsfirstdrc.dwh.glue.SetGlueTableComments
 import org.kidsfirstdrc.dwh.utils.Environment.Environment
 import org.kidsfirstdrc.dwh.utils.{Environment, MultiSourceEtlJob}
 
@@ -39,8 +40,11 @@ class ImportOrphanetJob(runEnv: Environment) extends MultiSourceEtlJob(runEnv) {
       .option("path", s"$output/$tableName")
       .saveAsTable(s"$database.$tableName")
 
+    SetGlueTableComments.run(database, tableName, s"$output/jobs/documentation/orphanet_gene_set.json")
+
     if (runEnv == Environment.PROD)
       spark.sql(s"create or replace view variant_live.$tableName as select * from $database.$tableName")
+
     data
   }
 

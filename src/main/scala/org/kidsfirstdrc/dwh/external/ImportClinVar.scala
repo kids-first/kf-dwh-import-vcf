@@ -3,16 +3,22 @@ package org.kidsfirstdrc.dwh.external
 import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.kidsfirstdrc.dwh.utils.EtlJob
+import org.kidsfirstdrc.dwh.glue.SetGlueTableComments
+import org.kidsfirstdrc.dwh.updates.UpdateVariant
+import org.kidsfirstdrc.dwh.utils.{Environment, EtlJob}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 import scala.collection.mutable
+import scala.util.Try
 
 object ImportClinVar extends App with EtlJob {
 
-  val Array(clinvarDate) = args
-  println(s"Processing clinvar for date: $clinvarDate")
+  override val database = "variant"
+  override val tableName = "clinvar"
+
+  val Array(clinvarDate, update_dependencies) = args
+  println(s"""arguments ${args.mkString("[", ", ", "]")}""")
 
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
@@ -25,6 +31,12 @@ object ImportClinVar extends App with EtlJob {
   val sourceDF = extract(input)
   val resultDF = transform(sourceDF)
   load(resultDF, output)
+
+  Try {
+    if(update_dependencies.toBoolean)
+      new UpdateVariant(Environment.PROD).run("s3a://kf-strides-variant-parquet-prd", "s3a://kf-strides-variant-parquet-prd")
+  }
+
 
   override def extract(input: String)(implicit spark: SparkSession): DataFrame = {
     vcf(input)
@@ -58,7 +70,7 @@ object ImportClinVar extends App with EtlJob {
       .withColumn("clndnincl", split(concat_ws("", col("clndnincl")), "\\|"))
       .withColumn("mc", split(concat_ws("", col("mc")), "\\|"))
       .withColumn("allele_origin", allele_origin_udf(col("origin")))
-      .drop("clin_sig_original")
+      .drop("clin_sig_original", "clndn")
 
   }
 
@@ -67,8 +79,13 @@ object ImportClinVar extends App with EtlJob {
       .write
       .mode("overwrite")
       .format("parquet")
-      .option("path", s"$output/clinvar")
-      .saveAsTable("variant.clinvar")
+      .option("path", s"$output/$tableName")
+      .saveAsTable(s"$database.$tableName")
+
+    val metadata_file = s"s3a://kf-strides-variant-parquet-prd/jobs/documentation/$tableName.json"
+    SetGlueTableComments.run(database, tableName, metadata_file)
+
+    spark.sql(s"create or replace view variant_live.$tableName as select * from $database.$tableName")
   }
 
   def info_fields(df: DataFrame, excludes: String*): Seq[Column] = {

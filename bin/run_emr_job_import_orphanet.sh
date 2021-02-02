@@ -16,7 +16,8 @@ steps=$(cat <<EOF
       "--class", "org.kidsfirstdrc.dwh.external.ImportOrphanet",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
       "s3a://kf-strides-variant-parquet-prd/raw/orphanet",
-      "s3a://kf-strides-variant-parquet-prd"
+      "s3a://kf-strides-variant-parquet-prd",
+      "${runEnv}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",
@@ -37,7 +38,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --bootstrap-actions Path="s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions/orphanet_ingestion.sh" \
 --steps "${steps}" \
---name "Import Orphanet" \
+--name "Import Orphanet ${runEnv}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \

@@ -1,0 +1,18 @@
+[
+  {
+  "col_name": "orpha_code",
+  "comment": "orpha_code description"
+  },
+  {
+    "col_name": "expert_link",
+    "comment": "expert_link description"
+  },
+  {
+    "col_name": "name",
+    "comment": "name description"
+  },
+  {
+    "col_name": "gene_synonym_list",
+    "comment": "gene_synonym_list description"
+  }
+]

@@ -5,6 +5,9 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 trait EtlJob {
 
+  val database: String
+  val tableName: String
+
   def extract(input: String)(implicit spark: SparkSession): DataFrame
 
   def transform(data: DataFrame)(implicit spark: SparkSession): DataFrame

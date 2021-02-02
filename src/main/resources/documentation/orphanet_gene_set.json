@@ -1,0 +1,106 @@
+[
+  {
+    "col_name": "orpha_code",
+    "comment": "a unique and time-stable numerical identifier attributed randomly by the database upon creation of the entity. Currently, the ORPHACode is made up of one to six digits. In the future, number of digits can expand."
+  },
+  {
+    "col_name": "expert_link",
+    "comment": "stable URL pointing to the specific page of a given disease on the Orphanet website."
+  },
+  {
+    "col_name": "name",
+    "comment": "the most generally accepted name according to the literature, and as adopted by the medical community. Preferred terms are unique throughout the database, associated with one ORPHAcode only."
+  },
+  {
+    "col_name": "disorder_type_id",
+    "comment": "id associated with disorder_type_name"
+  },
+  {
+    "col_name": "disorder_type_name",
+    "comment": "Can be either Disease, Clinical syndrome, Malformation syndrome, Biological anomaly, Morphological anomaly, Category, Clinical group, Etiologicalsubtype, Clinical subtype, Histopathological subtype."
+  },
+  {
+    "col_name": "disorder_group_id",
+    "comment": "id associated with disorder_group_name"
+  },
+  {
+    "col_name": "disorder_group_name",
+    "comment": "Hierarchical levels of the clinical entity that determine the level of precision of each diagnosis included in the nomenclature. Can be either Group of disorders, Disorder or Subtype of disorder."
+  },
+  {
+    "col_name": "gene_source_of_validation",
+    "comment": "source of validation of the given clinical entity’s annotation."
+  },
+  {
+    "col_name": "gene_symbol",
+    "comment": "official HGNC-approved gene symbol"
+  },
+  {
+    "col_name": "gene_name",
+    "comment": "the most generally accepted name according to the literature, and as adopted by the medical community. Preferred terms are unique throughout the database, associated with one ORPHAcode only."
+  },
+  {
+    "col_name": "gene_synonym_list",
+    "comment": "synonyms for a given clinical entity. Acronyms are included only when they are consistently used in the literature."
+  },
+  {
+    "col_name": "ensembl_gene_id",
+    "comment": "(http://www.ensembl.org/) is an EBI database that maintains automatic annotation on selected eukaryotic genomes."
+  },
+  {
+    "col_name": "genatlas_gene_id",
+    "comment": "(http://www.genatlas.org/) is a database of genes and phenotypes. Only the objects with a known cytogenetic location are retained."
+  },
+  {
+    "col_name": "HGNC_gene_id",
+    "comment": "(http://www.genenames.org/) is a committee jointly funded by the US National Human Genome Research Institute (NHGRI) and the Wellcome Trust (UK)."
+  },
+  {
+    "col_name": "omim_gene_id",
+    "comment": "Online Mendelian Inheritance in Man (http://www.omim.org/), is the database of human genes and genetic phenotypes."
+  },
+  {
+    "col_name": "reactome_gene_id",
+    "comment": "(http://www.reactome.org/) is an EBI open-source, open access, manually curated and peer-reviewed pathway database"
+  },
+  {
+    "col_name": "swiss_prot_gene_id",
+    "comment": "UniProtKB (http://www.uniprot.org/) is the central hub for the collection of functional information on proteins, with accurate, consistent and rich annotation."
+  },
+  {
+    "col_name": "association_type",
+    "comment": "gene-disease relationships."
+  },
+  {
+    "col_name": "association_type_id",
+    "comment": "id associated with association_type"
+  },
+  {
+    "col_name": "association_status",
+    "comment": "can be either Validated or Not validated"
+  },
+  {
+    "col_name": "gene_locus_id",
+    "comment": ""
+  },
+  {
+    "col_name": "gene_locus",
+    "comment": "gene chromosomal location"
+  },
+  {
+    "col_name": "gene_locus_key",
+    "comment": ""
+  },
+  {
+    "col_name": "average_age_of_onset",
+    "comment": "classes based on the estimated average age of clinical entity onset. There are ten different population age groups: Antenatal, Neonatal, Infancy, Childhood, Adolescence, Adult, Elderly, All ages and No data available."
+  },
+  {
+    "col_name": "average_age_of_death",
+    "comment": "classes based on the estimated average age at death for a given clinical entity."
+  },
+  {
+    "col_name": "type_of_inheritance",
+    "comment": "type(s) of inheritance associated with a given clinical entity."
+  }
+]

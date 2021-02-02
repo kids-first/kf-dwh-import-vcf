@@ -7,6 +7,9 @@ import org.kidsfirstdrc.dwh.utils.EtlJob
 
 object ImportScores extends App with EtlJob {
 
+  override val database = "variant"
+  override val tableName = "dbnsfp"
+
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
     .enableHiveSupport()
@@ -311,6 +314,5 @@ object ImportScores extends App with EtlJob {
   val inputDf = extract(input)
   val outputDf = transform(inputDf)
   load(outputDf, output)
-
 }
 

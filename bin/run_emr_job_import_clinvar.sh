@@ -1,7 +1,8 @@
 #!/bin/bash
 date_to_process=${1:-$(date +'%Y%m%d')}
-instance_count=${2:-"5"}
-instance_type=${3:-"m5.xlarge"}
+update_dependencies=${2:-"true"}
+instance_count=${3:-"5"}
+instance_type=${4:-"m5.xlarge"}
 
 steps=$(cat <<EOF
 [
@@ -15,7 +16,8 @@ steps=$(cat <<EOF
       "client",
       "--class", "org.kidsfirstdrc.dwh.external.ImportClinVar",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
-      "${date_to_process}"
+      "${date_to_process}",
+      "${update_dependencies}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",

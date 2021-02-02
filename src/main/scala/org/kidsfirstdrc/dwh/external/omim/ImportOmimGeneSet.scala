@@ -7,7 +7,8 @@ import org.kidsfirstdrc.dwh.utils.EtlJob
 
 object ImportOmimGeneSet extends App with EtlJob {
 
-  val TABLE_NAME = "omim_gene_set"
+  override val database = "variant"
+  override val tableName = "omim_gene_set"
 
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
@@ -37,7 +38,7 @@ object ImportOmimGeneSet extends App with EtlJob {
         col("_c8") as "approved_symbol",
         col("_c9") as "entrez_gene_id",
         col("_c10") as "ensembl_gene_id",
-        col("_c11") as "comments",
+        col("_c11") as "documentation",
         split(col("_c12"), ";") as "phenotypes")
       .withColumn("raw_phenotype", explode(col("phenotypes")))
       .drop("phenotypes")
@@ -51,8 +52,8 @@ object ImportOmimGeneSet extends App with EtlJob {
       .mode("overwrite")
       .format("parquet")
       .option("path", s"$output/omim_gene_set")
-      .saveAsTable(s"variant.$TABLE_NAME")
-    spark.sql(s"create or replace view variant_live.$TABLE_NAME as select * from variant.$TABLE_NAME")
+      .saveAsTable(s"$database.$tableName")
+    spark.sql(s"create or replace view variant_live.$tableName as select * from variant.$tableName")
   }
 
   val input = "s3a://kf-strides-variant-parquet-prd/raw/omim/genemap2.txt"
@@ -61,6 +62,5 @@ object ImportOmimGeneSet extends App with EtlJob {
   val inputDf = extract(input)
   val outputDf = transform(inputDf)
   load(outputDf, output)
-
 }
 
