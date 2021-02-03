@@ -55,7 +55,7 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
   val data = Map(
     Variants.TABLE_NAME -> joinVariantDf,
     JoinConsequences.TABLE_NAME -> joinConsequencesDf,
-    ImportOmimGeneSet.TABLE_NAME -> ominDf
+    ImportOmimGeneSet.tableName -> ominDf
   )
 
   "VariantDbJson" should "transform data to the right format" in {

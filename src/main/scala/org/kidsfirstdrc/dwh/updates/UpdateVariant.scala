@@ -18,14 +18,8 @@ class UpdateVariant(runEnv: Environment) extends MultiSourceEtlJob(runEnv) {
   override val tableName: String = "variants"
 
   override def extract(input: String)(implicit spark: SparkSession): Map[String, DataFrame] = {
-
-    val path = lastTimestamp match {
-      case ""        => s"$input/variants/${Variants.TABLE_NAME}_${lastReleaseId}"
-      case timestamp => s"$input/variants/${Variants.TABLE_NAME}_${lastReleaseId}_${timestamp}"
-    }
-
     Map(
-      Variants.TABLE_NAME -> spark.read.parquet(path),
+      Variants.TABLE_NAME -> spark.table(s"$database.$tableName"),
       //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
       "clinvar" -> spark.table(s"$database.clinvar").dropDuplicates(locusColumNames)
     )

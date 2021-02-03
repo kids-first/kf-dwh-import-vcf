@@ -113,7 +113,7 @@ class VariantsToJsonJob(releaseId: String) extends MultiSourceEtlJob(Environment
     Map(
       Variants.TABLE_NAME -> spark.table(s"variant.${Variants.TABLE_NAME}_$releaseId"),
       JoinConsequences.TABLE_NAME -> spark.table(s"variant.${JoinConsequences.TABLE_NAME}_$releaseId"),
-      ImportOmimGeneSet.TABLE_NAME -> spark.table(s"variant.omim_gene_set")
+      ImportOmimGeneSet.tableName -> spark.table(s"variant.omim_gene_set")
     )
   }
 
@@ -127,7 +127,7 @@ class VariantsToJsonJob(releaseId: String) extends MultiSourceEtlJob(Environment
       "cds_position", "cdna_position", "protein_position", "amino_acids", "codons", "canonical", "aa_change", "coding_dna_change",
       "ensembl_transcript_id", "ensembl_regulatory_id", "feature_type", "scores")
 
-    val omim = data(ImportOmimGeneSet.TABLE_NAME)
+    val omim = data(ImportOmimGeneSet.tableName)
       .select("ensembl_gene_id", "entrez_gene_id", "omim_gene_id")
 
     val consequenceColumnsWithOmim: Set[String] = consequencesColumns ++ omim.columns.toSet -- Set("chromosome", "start", "reference", "alternate")
