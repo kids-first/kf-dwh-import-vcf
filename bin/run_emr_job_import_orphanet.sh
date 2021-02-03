@@ -15,8 +15,6 @@ steps=$(cat <<EOF
       "client",
       "--class", "org.kidsfirstdrc.dwh.external.ImportOrphanet",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
-      "s3a://kf-strides-variant-parquet-prd/raw/orphanet",
-      "s3a://kf-strides-variant-parquet-prd",
       "${runEnv}"
     ],
     "Type": "CUSTOM_JAR",

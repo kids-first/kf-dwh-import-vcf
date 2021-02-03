@@ -3,6 +3,7 @@ package org.kidsfirstdrc.dwh.testutils
 import org.apache.spark.sql.functions._
 import org.kidsfirstdrc.dwh.external.{ImportClinVar, ImportOrphanetJob}
 import org.kidsfirstdrc.dwh.testutils.ClassGeneratorImplicits._
+import org.kidsfirstdrc.dwh.utils.Catalog.Raw.Orphanet.{disease_history, gene_association}
 import org.kidsfirstdrc.dwh.utils.Environment
 
 object ClassGeneratorMain extends App with WithSparkSession {
@@ -33,14 +34,14 @@ object ClassGeneratorMain extends App with WithSparkSession {
    */
 
   val orphanetPath = getClass.getResource("/raw/orphanet").getFile
-  val orphanetData = new ImportOrphanetJob(Environment.DEV).extract(orphanetPath)(spark)
-  orphanetData("gene_association").where(col("orpha_code") === 447)
+  val orphanetData = new ImportOrphanetJob(Environment.LOCAL).extract()(spark)
+  orphanetData(gene_association).where(col("orpha_code") === 447)
     .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","OrphanetProduct6", root)
 
-  orphanetData("disease_history").where(col("orpha_code") === 58)
+  orphanetData(disease_history).where(col("orpha_code") === 58)
     .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","OrphanetProduct9", root)
 
-  new ImportOrphanetJob(Environment.DEV).transform(orphanetData)(spark)
+  new ImportOrphanetJob(Environment.LOCAL).transform(orphanetData)(spark)
     .where(col("orpha_code") === 166024)
     .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","OrphanetOutput", root)
 

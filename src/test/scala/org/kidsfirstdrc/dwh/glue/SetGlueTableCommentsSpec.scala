@@ -21,7 +21,7 @@ class SetGlueTableCommentsSpec extends AnyFlatSpec with GivenWhenThen with WithS
   "run" should "read metadata from a json file and update comments" in {
     import spark.implicits._
 
-    val metadata_file = this.getClass.getResource("/raw/orphanet/orphanet_test_file_comment.json").getFile
+    val metadata_file = this.getClass.getResource("/documentation/orphanet_gene_set.json").getFile
 
     spark.sql(s"DESCRIBE $database.$table").show(false)
 
