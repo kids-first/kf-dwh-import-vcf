@@ -1,7 +1,7 @@
 [
   {
-  "col_name": "orpha_code",
-  "comment": "orpha_code description"
+    "col_name": "orpha_code",
+    "comment": "orpha_code description"
   },
   {
     "col_name": "expert_link",

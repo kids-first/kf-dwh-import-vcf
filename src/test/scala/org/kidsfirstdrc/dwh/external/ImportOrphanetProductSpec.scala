@@ -2,6 +2,7 @@ package org.kidsfirstdrc.dwh.external
 
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external._
+import org.kidsfirstdrc.dwh.utils.Catalog.Raw.Orphanet.{disease_history, gene_association}
 import org.kidsfirstdrc.dwh.utils.Environment
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
@@ -11,13 +12,11 @@ import org.scalatest.matchers.should.Matchers
 class ImportOrphanetProductSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   "extract" should "return xml files parsed into a dataframes" in {
-    val path = this.getClass.getResource("/raw/orphanet").getFile
-
     import spark.implicits._
 
-    val extractedData = new ImportOrphanetJob(Environment.DEV).extract(path)
-    val gene_associationDF = extractedData("gene_association")
-    val disease_historyDF = extractedData("disease_history")
+    val extractedData = new ImportOrphanetJob(Environment.LOCAL).extract()
+    val gene_associationDF = extractedData(gene_association)
+    val disease_historyDF = extractedData(disease_history)
 
     val expectedProduct6 = OrphanetProduct6()
     gene_associationDF.show(false)
@@ -34,11 +33,9 @@ class ImportOrphanetProductSpec extends AnyFlatSpec with GivenWhenThen with With
 
     import spark.implicits._
 
-    val path = this.getClass.getResource("/raw/orphanet").getFile
+    val job = new ImportOrphanetJob(Environment.LOCAL)
 
-    val job = new ImportOrphanetJob(Environment.DEV)
-
-    val extractedData = job.extract(path)
+    val extractedData = job.extract()
     val outputDF = job.transform(extractedData)
 
     outputDF.show(false)
@@ -52,12 +49,10 @@ class ImportOrphanetProductSpec extends AnyFlatSpec with GivenWhenThen with With
 
     import spark.implicits._
 
-    val inputFolder = this.getClass.getResource("/raw/orphanet").getFile
-    val outputFolder: String = this.getClass.getClassLoader.getResource(".").getFile
-    val job = new ImportOrphanetJob(Environment.DEV)
+    val job = new ImportOrphanetJob(Environment.LOCAL)
 
-    job.run(inputFolder, outputFolder)
-    val resultDF = spark.table(s"${job.database}.${job.tableName}")
+    job.run()
+    val resultDF = spark.table(s"${job.target.database}.${job.target.name}")
 
     resultDF.show(false)
     resultDF.where($"orpha_code" === 166024).as[OrphanetOutput].collect().head shouldBe OrphanetOutput()
