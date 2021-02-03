@@ -2,6 +2,8 @@ package org.kidsfirstdrc.dwh.external
 
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.{ClinvarInput, ClinvarOutput}
+import org.kidsfirstdrc.dwh.utils.Catalog.Raw.clinvar_vcf
+import org.kidsfirstdrc.dwh.utils.Environment
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -13,11 +15,9 @@ class ImportClinVarSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
   "run" should "creates clinvar table" in {
 
     withOutputFolder("output") { _ =>
-      val inputDF = Seq(
-        ClinvarInput()
-      ).toDF()
+      val inputData = Map(clinvar_vcf -> Seq(ClinvarInput()).toDF())
 
-      val resultDF = ImportClinVar.transform(inputDF)
+      val resultDF = new ImportClinVarJob(Environment.LOCAL).transform(inputData)
 
       val expectedResult = ClinvarOutput()
 
