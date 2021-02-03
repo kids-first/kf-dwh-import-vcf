@@ -34,6 +34,6 @@ case class ClinvarOutput(chromosome: String = "2",
                          af_esp: Double = 0.01415,
                          clndisdbincl: List[String] = List(""),
                          conditions: List[String] = List("Congenital myasthenic syndrome 12", "not specified", "not provided"),
-                         allele_origin: List[String] = List("germline"))
+                         inheritance: List[String] = List("germline"))
 
 

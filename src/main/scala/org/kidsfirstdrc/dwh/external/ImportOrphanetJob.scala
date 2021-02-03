@@ -1,17 +1,15 @@
 package org.kidsfirstdrc.dwh.external
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.glue.SetGlueTableComments
 import org.kidsfirstdrc.dwh.utils.Catalog.Public
-import org.kidsfirstdrc.dwh.utils.Catalog.Raw.Orphanet._
+import org.kidsfirstdrc.dwh.utils.Catalog.Raw._
 import org.kidsfirstdrc.dwh.utils.Environment.Environment
-import org.kidsfirstdrc.dwh.utils.{DataSource, DataSourceEtl, Environment}
+import org.kidsfirstdrc.dwh.utils.{DataSource, DataSourceEtl}
 
 import scala.xml.{Elem, Node, XML}
 
 class ImportOrphanetJob(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
-  implicit val env: Environment = runEnv
   override val target: DataSource = Public.orphanet_gene_set
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
@@ -20,36 +18,17 @@ class ImportOrphanetJob(runEnv: Environment) extends DataSourceEtl(runEnv) {
     def loadXML: String => Elem = str => XML.loadString(spark.read.text(str).collect().map(_.getString(0)).mkString("\n"))
 
     Map(
-      gene_association -> parseProduct6XML(loadXML(gene_association.path)).toDF,
-      disease_history -> parseProduct9XML(loadXML(disease_history.path)).toDF
+      orphanet_gene_association -> parseProduct6XML(loadXML(orphanet_gene_association.path)).toDF,
+      orphanet_disease_history -> parseProduct9XML(loadXML(orphanet_disease_history.path)).toDF
     )
 
   }
 
   override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    data(gene_association)
+    data(orphanet_gene_association)
       .join(
-        data(disease_history).select("orpha_code", "average_age_of_onset", "average_age_of_death","type_of_inheritance"),
+        data(orphanet_disease_history).select("orpha_code", "average_age_of_onset", "average_age_of_death","type_of_inheritance"),
         Seq("orpha_code"), "left")
-  }
-
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    data
-      .coalesce(1)
-      .write
-      .mode("overwrite")
-      .format("parquet")
-      .option("path", target.path)
-      .saveAsTable(s"${target.database}.${target.name}")
-
-    println(target.documentationPath)
-    SetGlueTableComments.run(target.database, target.name, target.documentationPath)
-
-    if (runEnv == Environment.PROD) {
-      spark.sql(s"create or replace view variant_live.${target.name} as select * from ${target.database}.${target.name}")
-    }
-
-    data
   }
 
   private def getIdFromSourceName: (Node, String) => Option[String] =

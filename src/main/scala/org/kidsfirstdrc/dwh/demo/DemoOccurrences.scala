@@ -40,7 +40,7 @@ object DemoOccurrences {
       )
     )
 
-    Occurrences.joinOccurrencesWithInheritence(occurrences, relations)
+    Occurrences.joinOccurrencesWithInheritance(occurrences, relations)
 
   }
 

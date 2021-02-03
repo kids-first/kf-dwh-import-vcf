@@ -116,8 +116,8 @@
     "comment": "ClinVar\'s preferred disease name for the concept specified by disease identifiers in CLNDISDB."
   },
   {
-    "col_name": "allele_origin",
-    "comment": "Allele origin label"
+    "col_name": "inheritance",
+    "comment": "based on origin field - list of all origins"
   }
 ]
 

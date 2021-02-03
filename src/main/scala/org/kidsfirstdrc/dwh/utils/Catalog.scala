@@ -1,23 +1,24 @@
 package org.kidsfirstdrc.dwh.utils
 
-import org.kidsfirstdrc.dwh.utils.Formats.{PARQUET, XML}
+import org.kidsfirstdrc.dwh.utils.Formats.{PARQUET, VCF, XML}
 
 object Catalog {
 
   object Raw {
     val bucket = "s3a://kf-strides-variant-parquet-prd"
 
-    object Orphanet {
-      val gene_association = DataSource("en_product6"        , "", bucket, "/raw/orphanet/en_product6.xml"      , XML)
-      val disease_history  = DataSource("en_product9_ages"   , "", bucket, "/raw/orphanet/en_product9_ages.xml" , XML)
-    }
+    val clinvar_vcf               = DataSource("clinvar"            , "", bucket, "/raw/clinvar/clinvar.vcf.gz"        , VCF)
+
+    val orphanet_gene_association = DataSource("en_product6"        , "", bucket, "/raw/orphanet/en_product6.xml"      , XML)
+    val orphanet_disease_history  = DataSource("en_product9_ages"   , "", bucket, "/raw/orphanet/en_product9_ages.xml" , XML)
   }
 
   object Public {
-    import Raw.Orphanet._
+    import Raw._
     val bucket = "s3a://kf-strides-variant-parquet-prd"
 
-    val orphanet_gene_set = DataSource("orphanet_gene_set", "variant", bucket, "/orphanet_gene_set", PARQUET, List(gene_association, disease_history))
+    val orphanet_gene_set = DataSource("orphanet_gene_set", "variant", bucket, "/orphanet_gene_set", PARQUET, List(orphanet_gene_association, orphanet_disease_history))
+    val clinvar           = DataSource("clinvar"          , "variant", bucket, "/clinvar"          , PARQUET, List(clinvar_vcf))
 
   }
 

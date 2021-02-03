@@ -1,8 +1,8 @@
 #!/bin/bash
-date_to_process=${1:-$(date +'%Y%m%d')}
-update_dependencies=${2:-"true"}
-instance_count=${3:-"5"}
-instance_type=${4:-"m5.xlarge"}
+runEnv=${1:-"DEV"}
+update_dependencies=${2:-"false"}
+instance_count=${2:-"5"}
+instance_type=${3:-"m5.xlarge"}
 
 steps=$(cat <<EOF
 [
@@ -16,7 +16,7 @@ steps=$(cat <<EOF
       "client",
       "--class", "org.kidsfirstdrc.dwh.external.ImportClinVar",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
-      "${date_to_process}",
+      "${runEnv}",
       "${update_dependencies}"
     ],
     "Type": "CUSTOM_JAR",
@@ -38,7 +38,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --bootstrap-actions Path="s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions/clinvar_ingestion.sh" \
 --steps "${steps}" \
---name "ImportClinvar ${date_to_process}" \
+--name "ImportClinvar - ${update_dependencies}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \

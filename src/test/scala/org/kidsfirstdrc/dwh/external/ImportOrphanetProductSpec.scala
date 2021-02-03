@@ -2,7 +2,7 @@ package org.kidsfirstdrc.dwh.external
 
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external._
-import org.kidsfirstdrc.dwh.utils.Catalog.Raw.Orphanet.{disease_history, gene_association}
+import org.kidsfirstdrc.dwh.utils.Catalog.Raw._
 import org.kidsfirstdrc.dwh.utils.Environment
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
@@ -15,8 +15,8 @@ class ImportOrphanetProductSpec extends AnyFlatSpec with GivenWhenThen with With
     import spark.implicits._
 
     val extractedData = new ImportOrphanetJob(Environment.LOCAL).extract()
-    val gene_associationDF = extractedData(gene_association)
-    val disease_historyDF = extractedData(disease_history)
+    val gene_associationDF = extractedData(orphanet_gene_association)
+    val disease_historyDF = extractedData(orphanet_disease_history)
 
     val expectedProduct6 = OrphanetProduct6()
     gene_associationDF.show(false)

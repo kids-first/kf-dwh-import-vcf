@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.update
 
-import org.kidsfirstdrc.dwh.external.ImportClinVar
+import org.kidsfirstdrc.dwh.external.ImportClinVarJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.ClinvarOutput
 import org.kidsfirstdrc.dwh.testutils.variant.Variant
@@ -16,6 +16,11 @@ import scala.util.Try
 
 class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
+
+  Try(spark.sql("DROP TABLE IF EXISTS variant.variants"))
+  Try(spark.sql("DROP VIEW IF EXISTS variant.variants"))
+  spark.sql("CREATE DATABASE IF NOT EXISTS variant_live")
+  spark.sql("CREATE DATABASE IF NOT EXISTS variant")
 
   "transform method" should "return expected data given controlled input" in {
 
@@ -40,12 +45,6 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
 
   "load method" should "overwrite data" in {
 
-    //Cleanup the data before running tests
-    Try(spark.sql("DROP TABLE IF EXISTS variant.variants"))
-    Try(spark.sql("DROP VIEW IF EXISTS variant.variants"))
-    spark.sql("CREATE DATABASE IF NOT EXISTS variant_live")
-    spark.sql("CREATE DATABASE IF NOT EXISTS variant")
-
     val database = "variant"
     val rootFolder: String = getClass.getClassLoader.getResource(".").getFile
     println(s"output: $rootFolder")
@@ -61,7 +60,7 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
 
     val job = new UpdateVariant(Environment.PROD)
 
-    ImportClinVar.load(clinvarDF, rootFolder)
+    new ImportClinVarJob(Environment.LOCAL).load(clinvarDF)
     job.load(variantDF, rootFolder)
 
 

@@ -23,7 +23,7 @@ object Occurrences {
     val withClinical = joinOccurrencesWithClinical(occurrences, biospecimens)
 
     val relations = getRelations(studyId, releaseId)
-    joinOccurrencesWithInheritence(withClinical, relations)
+    joinOccurrencesWithInheritance(withClinical, relations)
   }
 
   def selectOccurrences(studyId: String, releaseId: String, inputDF: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -150,7 +150,7 @@ object Occurrences {
       ))
   }
 
-  def joinOccurrencesWithInheritence(occurrences: DataFrame, relations: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  def joinOccurrencesWithInheritance(occurrences: DataFrame, relations: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     occurrences.join(relations, occurrences("participant_id") === relations("participant_id"), "left")
       .drop(relations("participant_id"))
