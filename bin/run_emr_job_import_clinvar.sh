@@ -4,6 +4,9 @@ update_dependencies=${2:-"false"}
 instance_count=${2:-"5"}
 instance_type=${3:-"m5.xlarge"}
 
+aws s3 cp bootstrap-actions/clinvar_ingestion.sh s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions/clinvar_ingestion.sh
+aws s3 cp documentation/clinvar.json s3://kf-strides-variant-parquet-prd/jobs/documentation/clinvar.json
+
 steps=$(cat <<EOF
 [
   {
