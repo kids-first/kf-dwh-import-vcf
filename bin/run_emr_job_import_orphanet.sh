@@ -3,6 +3,9 @@ runEnv=${1:-"DEV"}
 instance_count=${2:-"5"}
 instance_type=${3:-"m5.xlarge"}
 
+aws s3 cp bootstrap-actions/orphanet_ingestion.sh s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions/orphanet_ingestion.sh
+aws s3 cp documentation/orphanet_gene_set.json s3://kf-strides-variant-parquet-prd/jobs/documentation/orphanet_gene_set.json
+
 steps=$(cat <<EOF
 [
   {
