@@ -17,8 +17,8 @@ object Catalog {
     import Raw._
     val bucket = "s3a://kf-strides-variant-parquet-prd"
 
-    val orphanet_gene_set = DataSource("orphanet_gene_set", "variant", bucket, "/orphanet_gene_set", PARQUET, List(orphanet_gene_association, orphanet_disease_history))
-    val clinvar           = DataSource("clinvar"          , "variant", bucket, "/clinvar"          , PARQUET, List(clinvar_vcf))
+    val orphanet_gene_set = DataSource("orphanet_gene_set", "variant", bucket, "/public/orphanet_gene_set", PARQUET, List(orphanet_gene_association, orphanet_disease_history))
+    val clinvar           = DataSource("clinvar"          , "variant", bucket, "/public/clinvar"          , PARQUET, List(clinvar_vcf))
 
   }
 
