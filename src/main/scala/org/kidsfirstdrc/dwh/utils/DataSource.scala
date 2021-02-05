@@ -6,16 +6,16 @@ import org.kidsfirstdrc.dwh.utils.Environment._
 case class DataSource(name: String,
                       database: String,
                       bucket: String,
-                      relativepath: String,
+                      relativePath: String,
                       format: Format,
                       dependsOn: List[DataSource] = List.empty[DataSource]) {
 
   def path(implicit env: Environment): String = {
     env match {
-      case PROD   => s"$bucket$relativepath"
-      case QA     => s"$bucket/qa$relativepath"
-      case DEV    => s"$bucket/dev$relativepath"
-      case LOCAL  => s"${this.getClass.getResource(relativepath)}"
+      case PROD   => s"$bucket$relativePath"
+      case QA     => s"$bucket/qa$relativePath"
+      case DEV    => s"$bucket/dev$relativePath"
+      case LOCAL  => s"${this.getClass.getResource(relativePath)}"
     }
   }
 

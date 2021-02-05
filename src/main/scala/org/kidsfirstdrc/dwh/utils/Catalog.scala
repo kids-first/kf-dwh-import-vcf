@@ -4,16 +4,16 @@ import org.kidsfirstdrc.dwh.utils.Formats.{PARQUET, VCF, XML}
 
 object Catalog {
 
-  object Raw {
+  object Raw  extends StoreFolder {
     val bucket = "s3a://kf-strides-variant-parquet-prd"
 
-    val clinvar_vcf               = DataSource("clinvar"            , "", bucket, "/raw/clinvar/clinvar.vcf.gz"        , VCF)
+    val clinvar_vcf               = DataSource("clinvar_vcf"        , "", bucket, "/raw/clinvar/clinvar.vcf.gz"        , VCF)
 
     val orphanet_gene_association = DataSource("en_product6"        , "", bucket, "/raw/orphanet/en_product6.xml"      , XML)
     val orphanet_disease_history  = DataSource("en_product9_ages"   , "", bucket, "/raw/orphanet/en_product9_ages.xml" , XML)
   }
 
-  object Public {
+  object Public extends StoreFolder {
     import Raw._
     val bucket = "s3a://kf-strides-variant-parquet-prd"
 
@@ -21,5 +21,7 @@ object Catalog {
     val clinvar           = DataSource("clinvar"          , "variant", bucket, "/public/clinvar"          , PARQUET, List(clinvar_vcf))
 
   }
+
+  def sources: Set[DataSource] = Raw.sources ++ Public.sources
 
 }

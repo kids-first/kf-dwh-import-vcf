@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.utils
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.glue.SetGlueTableComments
+import org.kidsfirstdrc.dwh.glue.UpdateTableComments
 import org.kidsfirstdrc.dwh.utils.Environment.Environment
 
 abstract class DataSourceEtl(runEnv: Environment) {
@@ -22,7 +22,7 @@ abstract class DataSourceEtl(runEnv: Environment) {
       .option("path", target.path)
       .saveAsTable(s"${target.database}.${target.name}")
 
-    SetGlueTableComments.run(target.database, target.name, target.documentationPath)
+    UpdateTableComments.run(target.database, target.name, target.documentationPath)
     if (runEnv == Environment.PROD) {
       spark.sql(s"create or replace view variant_live.${target.name} as select * from ${target.database}.${target.name}")
     }
