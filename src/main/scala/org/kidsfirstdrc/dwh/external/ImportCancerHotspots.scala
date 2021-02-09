@@ -14,7 +14,6 @@ object ImportCancerHotspots extends App {
   import spark.implicits._
 
   val input = "s3a://kf-strides-variant-parquet-prd/raw/cancerhotspots/cancerhotspots.v2.maf.gz"
-  //  val input = "/users/jecos/Downloads/cancerhotspots.v2.maf.gz"
   val chain = "/home/hadoop/b37ToHg38.over.chain"
   val output = "s3a://kf-strides-variant-parquet-prd/public"
   private val inputDF: DataFrame = spark.read

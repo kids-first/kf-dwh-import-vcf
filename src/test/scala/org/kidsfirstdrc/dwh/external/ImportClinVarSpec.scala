@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.external
 
+import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.{ClinvarInput, ClinvarOutput}
 import org.kidsfirstdrc.dwh.utils.Catalog.Raw.clinvar_vcf

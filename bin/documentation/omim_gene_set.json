@@ -1,0 +1,15 @@
+[
+  {
+    "col_name": "chromosome",
+    "comment": "gene chromosomal location"
+  },
+  {
+    "col_name": "start",
+    "comment": "starting position of the gene"
+  },
+  {
+    "col_name": "end",
+    "comment": "end position of the gene"
+  }
+]
+

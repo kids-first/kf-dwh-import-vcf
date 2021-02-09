@@ -3,29 +3,27 @@ package org.kidsfirstdrc.dwh.external.omim
 import org.apache.spark.sql.functions.{col, explode, split}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.external.omim.OmimPhenotype.parse_pheno
-import org.kidsfirstdrc.dwh.utils.EtlJob
+import org.kidsfirstdrc.dwh.utils.Catalog.{Public, Raw}
+import org.kidsfirstdrc.dwh.utils.Environment._
+import org.kidsfirstdrc.dwh.utils.{DataSource, DataSourceEtl}
 
-object ImportOmimGeneSet extends App with EtlJob {
+class ImportOmimGeneSet(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
-  override val database = "variant"
-  override val tableName = "omim_gene_set"
+  override val target: DataSource = Public.omim_gene_set
 
-  implicit val spark: SparkSession = SparkSession.builder
-    .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
-    .enableHiveSupport()
-    .appName("Import OMIM Geneset").getOrCreate()
-
-  override def extract(input: String)(implicit spark: SparkSession): DataFrame = {
-    spark.read.format("csv")
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    val df = spark.read.format("csv")
       .option("inferSchema", "true")
       .option("comment", "#")
       .option("header", "false")
       .option("sep", "\t")
-      .load(input)
+      .load(Raw.omim_genemap2.path)
+
+    Map(Raw.omim_genemap2 -> df)
   }
 
-  override def transform(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    data
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    data(Raw.omim_genemap2)
       .select(
         col("_c0") as "chromosome",
         col("_c1") as "start",
@@ -45,22 +43,5 @@ object ImportOmimGeneSet extends App with EtlJob {
       .withColumn("phenotype", parse_pheno(col("raw_phenotype")))
       .drop("raw_phenotype")
   }
-
-  override def load(data: DataFrame, output: String)(implicit spark: SparkSession): Unit = {
-    data.coalesce(1)
-      .write
-      .mode("overwrite")
-      .format("parquet")
-      .option("path", s"$output/omim_gene_set")
-      .saveAsTable(s"$database.$tableName")
-    spark.sql(s"create or replace view variant_live.$tableName as select * from variant.$tableName")
-  }
-
-  val input = "s3a://kf-strides-variant-parquet-prd/raw/omim/genemap2.txt"
-  val output = "s3a://kf-strides-variant-parquet-prd/public"
-
-  val inputDf = extract(input)
-  val outputDf = transform(inputDf)
-  load(outputDf, output)
 }
 

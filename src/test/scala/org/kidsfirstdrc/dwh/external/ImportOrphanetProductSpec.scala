@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.external
 
+import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external._
 import org.kidsfirstdrc.dwh.utils.Catalog.Raw._

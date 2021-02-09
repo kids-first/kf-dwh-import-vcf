@@ -125,7 +125,7 @@ Import clinvar
 
    ```shell
    cd bin
-   ./run_emr_job_import_clinvar.sh
+   ./run_emr_job_import_External.sh
    ```
 
 

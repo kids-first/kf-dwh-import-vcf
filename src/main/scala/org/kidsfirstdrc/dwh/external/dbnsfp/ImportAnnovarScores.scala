@@ -16,7 +16,7 @@ object ImportAnnovarScores extends App {
     .option("sep", "\t")
     .option("header", "true")
     .option("nullValue", ".")
-    .csv("s3a://kf-strides-variant-parquet-prd/raws/annovar/dbNSFP/hg38_dbnsfp41a.txt")
+    .csv("s3a://kf-strides-variant-parquet-prd/raw/annovar/dbNSFP/hg38_dbnsfp41a.txt")
     .select(
       $"#Chr" as "chromosome",
       $"Start".cast("long") as "start",
