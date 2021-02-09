@@ -1,19 +1,19 @@
 [
   {
     "col_name": "chromosome",
-    "comment": "chromosome where the variant is located"
+    "comment": "[MODIFIED]: renamed from `CONTIGNAME` - chromosome where the variant is located"
   },
   {
     "col_name": "start",
-    "comment": "starting position"
+    "comment": "starting position of the variant"
   },
   {
     "col_name": "end",
-    "comment": "end position"
+    "comment": "end position of the variant"
   },
   {
     "col_name": "reference",
-    "comment": "reference letter"
+    "comment": "reference letter of the variant"
   },
   {
     "col_name": "alternate",
@@ -21,7 +21,7 @@
   },
   {
     "col_name": "interpretations",
-    "comment": "union of fields clin_sig and clin_sig_conflict"
+    "comment": "[ADDED]: union of `clin_sig` and `clin_sig_conflict`"
   },
   {
     "col_name": "name",
@@ -29,11 +29,11 @@
   },
   {
     "col_name": "clin_sig",
-    "comment": "Clinical significance for this single variant"
+    "comment": "[MODIFIED]: renamed from `CLNSIG` - Clinical significance for this single variant"
   },
   {
     "col_name": "clin_sig_conflict",
-    "comment": "Conflicting clinical significance for this single variant"
+    "comment": "[MODIFIED]: renamed from `CLNSIGCONF` - Conflicting clinical significance for this single variant"
   },
   {
     "col_name": "af_exac",
@@ -53,7 +53,7 @@
   },
   {
     "col_name": "clnvi",
-    "comment": "the variant\'s clinical sources reported as tag-value pairs of database and variant identifier"
+    "comment": "the variant clinical sources reported as tag-value pairs of database and variant identifier"
   },
   {
     "col_name": "clndisdb",
@@ -77,7 +77,7 @@
   },
   {
     "col_name": "clndnincl",
-    "comment": "For included Variant : ClinVar\'s preferred disease name for the concept specified by disease identifiers in CLNDISDB"
+    "comment": "For included Variant : Preferred disease name for the concept specified by disease identifiers in CLNDISDB"
   },
   {
     "col_name": "rs",
@@ -113,11 +113,11 @@
   },
   {
     "col_name": "conditions",
-    "comment": "ClinVar\'s preferred disease name for the concept specified by disease identifiers in CLNDISDB."
+    "comment": "[MODIFIED]: renamed from `clndn` - preferred disease name for the concept specified by disease identifiers in CLNDISDB."
   },
   {
     "col_name": "inheritance",
-    "comment": "based on origin field - list of all origins"
+    "comment": "[ADDED]: calculated from `origin` - list of all origins as human-readable label."
   }
 ]
 

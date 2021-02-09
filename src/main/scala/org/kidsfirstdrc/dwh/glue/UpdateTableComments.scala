@@ -1,10 +1,35 @@
 package org.kidsfirstdrc.dwh.glue
 
 import org.apache.spark.sql.SparkSession
+import org.kidsfirstdrc.dwh.utils.Catalog.Public.{clinvar, orphanet_gene_set}
+import org.kidsfirstdrc.dwh.utils.Environment.Environment
+import org.kidsfirstdrc.dwh.utils.{Catalog, DataSource, Environment}
 
 import scala.util.{Failure, Success, Try}
 
-object SetGlueTableComments {
+object UpdateTableComments extends App {
+
+  val Array(jobType, runEnv) = args
+  implicit val spark: SparkSession = SparkSession.builder
+    .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
+    .enableHiveSupport()
+    .appName(s"Update table comments - $jobType").getOrCreate()
+
+  implicit val env: Environment = Try(Environment.withName(runEnv)).getOrElse(Environment.PROD)
+
+  jobType match {
+    case "all" => Set(clinvar, orphanet_gene_set).foreach(t => run(t))
+    case s: String =>
+      val names = s.split(",")
+      Catalog.sources.filter(ds => names.contains(ds.name)).foreach(t => run(t))
+  }
+
+  def run(table: DataSource)(implicit spark: SparkSession, env: Environment): Unit = {
+    println(table.database)
+    println(table.name)
+    println(table.documentationPath)
+    run(table.database, table.name, table.documentationPath)
+  }
 
   def run(database: String, table: String, metadata_file: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
@@ -38,7 +63,3 @@ object SetGlueTableComments {
   }
 
 }
-
-case class GlueFieldComment(col_name: String,
-                            data_type: String,
-                            comment: String)

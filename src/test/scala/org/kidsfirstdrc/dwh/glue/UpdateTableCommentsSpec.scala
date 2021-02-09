@@ -6,13 +6,13 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class SetGlueTableCommentsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class UpdateTableCommentsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   val database = "variant"
   val table = "orphanet_gene_set"
 
   "clearComments" should "remove all comments" in {
-    SetGlueTableComments.clearComments(database, table)
+    UpdateTableComments.clearComments(database, table)
     val describeTableDF = spark.sql(s"DESCRIBE $database.$table")
     describeTableDF.show(false)
     describeTableDF.where(col("comment") =!= "").count() shouldBe 0
@@ -25,7 +25,7 @@ class SetGlueTableCommentsSpec extends AnyFlatSpec with GivenWhenThen with WithS
 
     spark.sql(s"DESCRIBE $database.$table").show(false)
 
-    SetGlueTableComments.run(database, table, metadata_file)
+    UpdateTableComments.run(database, table, metadata_file)
 
     val describeTableDF = spark.sql(s"DESCRIBE $database.$table")
 
