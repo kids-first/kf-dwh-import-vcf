@@ -2,6 +2,7 @@ package org.kidsfirstdrc.dwh.external
 
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
+import org.kidsfirstdrc.dwh.external.dbnsfp.ImportAnnovarScores
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetJob
 import org.kidsfirstdrc.dwh.updates.UpdateVariant
@@ -28,8 +29,9 @@ object ImportExternal extends App {
           new UpdateVariant(env)
             .run("s3a://kf-strides-variant-parquet-prd", "s3a://kf-strides-variant-parquet-prd")
       }
-    case "omim"     => new ImportOmimGeneSet(env).run()
-    case "orphanet" => new ImportOrphanetJob(env).run()
+    case "omim"           => new ImportOmimGeneSet(env).run()
+    case "orphanet"       => new ImportOrphanetJob(env).run()
+    case "annovar_scores" => new ImportAnnovarScores(env).run()
   }
 
 }

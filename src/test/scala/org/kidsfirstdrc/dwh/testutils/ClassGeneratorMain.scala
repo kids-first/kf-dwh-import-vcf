@@ -1,6 +1,8 @@
 package org.kidsfirstdrc.dwh.testutils
 
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import org.kidsfirstdrc.dwh.external.ImportHPOGeneSet.{input, spark}
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetJob
 import org.kidsfirstdrc.dwh.testutils.ClassGeneratorImplicits._
@@ -8,6 +10,7 @@ import org.kidsfirstdrc.dwh.testutils.external.OmimInput
 import org.kidsfirstdrc.dwh.utils.Catalog.Raw
 import org.kidsfirstdrc.dwh.utils.Catalog.Raw._
 import org.kidsfirstdrc.dwh.utils.Environment
+import org.kidsfirstdrc.dwh.utils.Environment.LOCAL
 
 object ClassGeneratorMain extends App with WithSparkSession {
 
@@ -49,6 +52,7 @@ object ClassGeneratorMain extends App with WithSparkSession {
     .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","OrphanetOutput", root)
    */
 
+    /*
   val omimInput = new ImportOmimGeneSet(Environment.LOCAL)
     .extract()
   omimInput(Raw.omim_genemap2)
@@ -57,5 +61,40 @@ object ClassGeneratorMain extends App with WithSparkSession {
 
   new ImportOmimGeneSet(Environment.LOCAL).transform(Map(omim_genemap2 -> Seq(OmimInput()).toDF))
     .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","OmimOutput", root)
+
+
+  spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.path(Environment.LOCAL))
+    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusInput", root)
+
+
+  spark.read.format("csv")
+    .option("inferSchema", "true")
+    .option("comment", "#")
+    .option("header", "false")
+    .option("sep", "\t")
+    .option("nullValue", "-").load(Raw.hpo_genes_to_phenotype.path(Environment.LOCAL))
+    .where("_c2='HP:0012227'")
+    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","HpoGenesPhenotypeInput", root)
+
+
+  spark.read.format("csv")
+    .option("inferSchema", "true")
+    .option("header", "true")
+    .option("sep", "\t")
+    .option("nullValue", "-")
+    .load(Raw.refseq_homo_sapiens_gene.path(LOCAL))
+    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","RefseqHomoSapiensGeneInput", root)
+
+  spark.read
+    .option("sep", "\t")
+    .option("header", "true")
+    .option("nullValue", ".")
+    .csv(Raw.dbNSFP_csv.path(LOCAL))
+    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","DbnsfpInput", root)
+
+     */
+  spark.read.option("header", "true").csv(ddd_gene_census.path(LOCAL))
+    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","DddGeneCensusInput", root)
+
 
 }
