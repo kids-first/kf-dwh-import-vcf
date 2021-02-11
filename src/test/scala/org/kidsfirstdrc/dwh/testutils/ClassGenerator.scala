@@ -54,12 +54,12 @@ object ClassGenerator {
       df.schema.fields.map {
         case StructField(name, dataType, _, _) if getValue.isDefinedAt(name, values, dataType) && getType.isDefinedAt(dataType)=>
           if(values.getAs(name) == null)
-            s"""$name: Option[${getType(dataType)}] = None"""
+            s"""`$name`: Option[${getType(dataType)}] = None"""
           else
-            s"""$name: ${getType(dataType)} = ${getValue(name, values, dataType)}"""
+            s"""`$name`: ${getType(dataType)} = ${getValue(name, values, dataType)}"""
 
-        case StructField(name, StructType(_), _, _) => s"""$name: ${name.toUpperCase} = ${name.toUpperCase}() """
-        case StructField(name, ArrayType(StructType(_), _), _, _) => s"""$name: List[${name.toUpperCase}] = List(${name.toUpperCase}()) """
+        case StructField(name, StructType(_), _, _) => s"""`$name`: ${name.toUpperCase} = ${name.toUpperCase}() """
+        case StructField(name, ArrayType(StructType(_), _), _, _) => s"""`$name`: List[${name.toUpperCase}] = List(${name.toUpperCase}()) """
         case structField: StructField => structField.toString()
 
       }
