@@ -2,9 +2,8 @@
 release_id=$1
 input=${2:-"s3a://kf-strides-variant-parquet-prd"}
 output=${3:-"s3a://kf-strides-variant-parquet-prd"}
-jarV=${4:-"0.1"}
-number_instance=${5:-"10"}
-instance_type=${6:-"r5.4xlarge"}
+number_instance=${4:-"10"}
+instance_type=${5:-"r5.4xlarge"}
 
 steps=$(cat <<EOF
 [
@@ -15,7 +14,7 @@ steps=$(cat <<EOF
       "client",
       "--class",
       "org.kidsfirstdrc.dwh.variantDb.json.VariantsToJson",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf-${jarV}.jar",
+      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
       "${release_id}",
       "${input}",
       "${output}"

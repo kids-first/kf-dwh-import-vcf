@@ -15,7 +15,7 @@ object ImportDataservice extends App {
   build(studyIds, releaseId, input, output, mergeExisting, tables)
 
   def parseArgs(args: Array[String]): (Set[String], String, String, String, Boolean, Set[String]) = {
-    def multi(s: String) = s.split(",").toSet
+    def multi(s: String): Set[String] = s.split(",").toSet
 
     val Array(studyIds, releaseId, input, output, mergeExisting) = args.take(5)
     val tables = if (args.length == 6 && args(5) != "all") multi(args(5)) else {

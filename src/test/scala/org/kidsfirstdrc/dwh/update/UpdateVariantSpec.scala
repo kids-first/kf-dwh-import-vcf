@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.update
 
-import org.kidsfirstdrc.dwh.external.ImportClinVarJob
+import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.ClinvarOutput
 import org.kidsfirstdrc.dwh.testutils.variant.Variant

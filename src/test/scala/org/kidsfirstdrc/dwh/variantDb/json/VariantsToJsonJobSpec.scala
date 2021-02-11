@@ -1,12 +1,13 @@
 package org.kidsfirstdrc.dwh.variantDb.json
 
 import org.apache.spark.sql.DataFrame
-import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
+import org.apache.spark.sql.functions._
 import org.kidsfirstdrc.dwh.join.JoinConsequences
 import org.kidsfirstdrc.dwh.testutils.Model.{JoinConsequenceOutput, JoinVariantOutput}
 import org.kidsfirstdrc.dwh.testutils.VariantToJsonJobModel.Frequency
 import org.kidsfirstdrc.dwh.testutils.external.Omim
 import org.kidsfirstdrc.dwh.testutils.{VariantToJsonJobModel, WithSparkSession}
+import org.kidsfirstdrc.dwh.utils.Catalog.Public
 import org.kidsfirstdrc.dwh.vcf.Variants
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
@@ -55,12 +56,15 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
   val data = Map(
     Variants.TABLE_NAME -> joinVariantDf,
     JoinConsequences.TABLE_NAME -> joinConsequencesDf,
-    ImportOmimGeneSet.tableName -> ominDf
+    Public.omim_gene_set.name -> ominDf
   )
 
   "VariantDbJson" should "transform data to the right format" in {
 
     val result = new VariantsToJsonJob(realeaseId).transform(data)
+    result.withColumn("study", explode(col("studies")))
+      .select("study.study_id", "study.full_consent_codes", "study.short_consent_codes", "study.nih_study_ids")
+      .show(false)
     val parsedResult = result.as[VariantToJsonJobModel.Output].collect()
     val `1k_genomes`: Frequency =
       result.select(

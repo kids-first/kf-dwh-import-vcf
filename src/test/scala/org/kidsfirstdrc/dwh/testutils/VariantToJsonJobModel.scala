@@ -7,11 +7,16 @@ object VariantToJsonJobModel {
   case class StudyFrequency(hmb: Frequency, gru: Frequency)
 
   case class Frequency(an: Long = 20,
-                       ac: Long = 10, af: BigDecimal = 0.5,
+                       ac: Long = 10,
+                       af: BigDecimal = 0.5,
                        homozygotes: Long = 10,
                        heterozygotes: Long = 10)
 
-  case class Study(study_id: String, consent_codes: List[String], frequencies: StudyFrequency)
+  case class Study(study_id: String,
+                   full_consent_codes: List[String],
+                   short_consent_codes: List[String],
+                   nih_study_ids: List[String],
+                   frequencies: StudyFrequency)
 
   case class InternalFrequencies(hmb: Frequency = Frequency(27,12,0.444444444400000000,9,7),
                                  gru: Frequency = Frequency(7,2,0.285714285700000000,5,1))

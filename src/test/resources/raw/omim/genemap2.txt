@@ -1,0 +1,5 @@
+# Copyright (c) 1966-2020 Johns Hopkins University. Use of this file adheres to the terms specified at https://omim.org/help/agreement.
+# Generated: 2020-08-18
+# See end of file for additional documentation on specific fields
+# Chromosome	Genomic Position Start	Genomic Position End	Cyto Location	Computed Cyto Location	MIM Number	Gene Symbols	Gene Name	Approved Symbol	Entrez Gene ID	Ensembl Gene ID	Comments	Phenotypes	Mouse Gene Symbol/ID
+chr1	2228318	2310212	1p36.3	1p36.33-p36.32	164780	SKI, SGS	SKI proto-oncogene	SKI	6497	ENSG00000157933	formerly mapped to 1q22-q24	Shprintzen-Goldberg syndrome, 182212 (3), Autosomal dominant	Ski (MGI:98310)

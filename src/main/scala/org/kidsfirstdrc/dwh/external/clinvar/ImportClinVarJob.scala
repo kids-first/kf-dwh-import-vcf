@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.external
+package org.kidsfirstdrc.dwh.external.clinvar
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedFunction

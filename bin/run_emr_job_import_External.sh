@@ -1,10 +1,17 @@
 #!/bin/bash
-runEnv=${1:-"DEV"}
-instance_count=${2:-"5"}
-instance_type=${3:-"m5.xlarge"}
+job_type=${1:-"clinvar"}
+run_env=${2:-"DEV"}
+update_dependencies=${3:-"false"}
+instance_count=${4:-"4"}
+instance_type=${5:-"m5.xlarge"}
 
-aws s3 cp bootstrap-actions/orphanet_ingestion.sh s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions/orphanet_ingestion.sh
-aws s3 cp documentation/orphanet_gene_set.json s3://kf-strides-variant-parquet-prd/jobs/documentation/orphanet_gene_set.json
+aws s3 cp bootstrap-actions s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions --recursive
+aws s3 cp documentation s3://kf-strides-variant-parquet-prd/jobs/documentation --recursive
+
+bootstrapAction="no_bootstrap"
+
+if [ ${job_type} == "clinvar" ]; then bootstrapAction="clinvar_ingestion"; fi
+if [ ${job_type} == "orphanet" ]; then bootstrapAction="orphanet_ingestion"; fi
 
 steps=$(cat <<EOF
 [
@@ -16,9 +23,11 @@ steps=$(cat <<EOF
       "org.apache.httpcomponents:httpcore,org.apache.httpcomponents:httpclient",
       "--deploy-mode",
       "client",
-      "--class", "org.kidsfirstdrc.dwh.external.ImportOrphanet",
+      "--class", "org.kidsfirstdrc.dwh.external.ImportExternal",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
-      "${runEnv}"
+      "${job_type}",
+      "${run_env}",
+      "${update_dependencies}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",
@@ -37,9 +46,9 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --enable-debugging \
 --release-label emr-6.2.0 \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
---bootstrap-actions Path="s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions/orphanet_ingestion.sh" \
+--bootstrap-actions Path="s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions/${bootstrapAction}.sh" \
 --steps "${steps}" \
---name "Import Orphanet ${runEnv}" \
+--name "Import ${job_type} with dep ${update_dependencies} [${run_env}]" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \

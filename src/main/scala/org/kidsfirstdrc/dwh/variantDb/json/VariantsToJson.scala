@@ -2,7 +2,7 @@ package org.kidsfirstdrc.dwh.variantDb.json
 
 import org.apache.spark.sql.SparkSession
 
-object VariantsToJson  extends App {
+object VariantsToJson extends App {
 
   val Array(releaseId, input, output) = args
 
