@@ -120,17 +120,17 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         .saveAsTable("topmed_bravo")
 
       And("A table gnomad_genomes_2_1_1_liftover_grch38 exists")
-      Seq(FrequencyEntry()).toDF().write.mode(SaveMode.Overwrite).option("path", s"$outputDir/gnomad_genomes_2_1_1_liftover_grch38")
+      Seq(GnomadFrequencyEntry()).toDF().write.mode(SaveMode.Overwrite).option("path", s"$outputDir/gnomad_genomes_2_1_1_liftover_grch38")
         .format("parquet")
         .saveAsTable("gnomad_genomes_2_1_1_liftover_grch38")
 
       And("A table gnomad_exomes_2_1_1_liftover_grch38 exists")
-      Seq(FrequencyEntry()).toDF().write.mode(SaveMode.Overwrite).option("path", s"$outputDir/gnomad_exomes_2_1_1_liftover_grch38")
+      Seq(GnomadFrequencyEntry()).toDF().write.mode(SaveMode.Overwrite).option("path", s"$outputDir/gnomad_exomes_2_1_1_liftover_grch38")
         .format("parquet")
         .saveAsTable("gnomad_exomes_2_1_1_liftover_grch38")
 
       And("A table gnomad_genomes_3_0 exists")
-      Seq(FrequencyEntry()).toDF().write.mode(SaveMode.Overwrite).option("path", s"$outputDir/gnomad_genomes_3_0")
+      Seq(GnomadFrequencyEntry()).toDF().write.mode(SaveMode.Overwrite).option("path", s"$outputDir/gnomad_genomes_3_0")
         .format("parquet")
         .saveAsTable("gnomad_genomes_3_0")
 

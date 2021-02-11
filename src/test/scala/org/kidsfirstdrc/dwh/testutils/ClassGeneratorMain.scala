@@ -7,10 +7,10 @@ import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetJob
 import org.kidsfirstdrc.dwh.testutils.ClassGeneratorImplicits._
 import org.kidsfirstdrc.dwh.testutils.external.OmimInput
-import org.kidsfirstdrc.dwh.utils.Catalog.Raw
-import org.kidsfirstdrc.dwh.utils.Catalog.Raw._
-import org.kidsfirstdrc.dwh.utils.Environment
-import org.kidsfirstdrc.dwh.utils.Environment.LOCAL
+import org.kidsfirstdrc.dwh.conf.Catalog.Raw
+import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
+import org.kidsfirstdrc.dwh.conf.Environment
+import Environment.LOCAL
 
 object ClassGeneratorMain extends App with WithSparkSession {
 

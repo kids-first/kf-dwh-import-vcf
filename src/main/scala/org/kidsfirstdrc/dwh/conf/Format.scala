@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.utils
+package org.kidsfirstdrc.dwh.conf
 
 /**
  * Sealed trait expressing the definition of a format.

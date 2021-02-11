@@ -3,10 +3,11 @@ package org.kidsfirstdrc.dwh.variantDb.json
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{explode, _}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
+import org.kidsfirstdrc.dwh.conf.Catalog.Public
+import org.kidsfirstdrc.dwh.conf.Environment
+import org.kidsfirstdrc.dwh.jobs.MultiSourceEtlJob
 import org.kidsfirstdrc.dwh.join.JoinConsequences
-import org.kidsfirstdrc.dwh.utils.Catalog.Public
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
-import org.kidsfirstdrc.dwh.utils.{Environment, MultiSourceEtlJob}
 import org.kidsfirstdrc.dwh.variantDb.json.VariantsToJsonJob._
 import org.kidsfirstdrc.dwh.vcf.Variants
 
@@ -51,7 +52,8 @@ class VariantsToJsonJob(releaseId: String) extends MultiSourceEtlJob(Environment
       .withStudies
       .withFrequencies
       .withClinVar
-      .select("chromosome", "start", "end", "reference", "alternate", "studies", "frequencies", "clinvar", "dbsnp_id", "release_id")
+      .select("chromosome", "start", "end", "reference", "alternate", "studies", "hmb_participant_number",
+        "gru_participant_number", "frequencies", "clinvar", "dbsnp_id", "release_id")
       .joinByLocus(consequencesWithOmim)
   }
 
@@ -71,7 +73,8 @@ object VariantsToJsonJob {
       col(s"$colName.ac") as "ac",
       col(s"$colName.an") as "an",
       col(s"$colName.af") as "af",
-      col(s"$colName.hom") as "homozygotes"
+      col(s"$colName.homozygotes") as "homozygotes",
+      col(s"$colName.heterozygotes") as "heterozygotes"
     ).as(colName)
   }
 
@@ -101,11 +104,7 @@ object VariantsToJsonJob {
       df.join(df2, locus.map(_.toString), "left")
     }
 
-    def short_consent_codes_udf: UserDefinedFunction = udf { array: mutable.WrappedArray[String] =>
-      array.map(fullConsentCode => fullConsentCode.split('.')(1)).distinct
-    }
-
-    def nih_study_ids: UserDefinedFunction = udf { array: mutable.WrappedArray[String] =>
+    def external_study_ids: UserDefinedFunction = udf { array: mutable.WrappedArray[String] =>
       array.map(fullConsentCode => fullConsentCode.split('.')(0)).distinct
     }
 
@@ -113,22 +112,32 @@ object VariantsToJsonJob {
       val inputColumns: Seq[Column] = df.columns.filterNot(_.equals("studies")).map(col)
       df
         .select(inputColumns :+ explode(col("studies")).as("study_id"):_*)
-        .withColumn("full_consent_codes", col("consent_codes_by_study")(col("study_id")))
-        .withColumn("short_consent_codes", short_consent_codes_udf(col("full_consent_codes")))
-        .withColumn("nih_study_ids", nih_study_ids(col("full_consent_codes")))
+        .withColumn("acls", col("consent_codes_by_study")(col("study_id")))
+        .withColumn("external_study_ids", external_study_ids(col("acls")))
+        .withColumn("hmb_participant_number",
+          col("hmb_homozygotes_by_study")(col("study_id")) +
+            col("hmb_heterozygotes_by_study")(col("study_id")))
+        .withColumn("gru_participant_number",
+          col("gru_homozygotes_by_study")(col("study_id")) +
+            col("gru_heterozygotes_by_study")(col("study_id")))
         .withColumn("study", struct(
           col("study_id"),
-          col("short_consent_codes"),
-          col("full_consent_codes"),
-          col("nih_study_ids"),
+          col("acls"),
+          col("external_study_ids"),
           struct(
             frequenciesByStudiesFor("hmb"),
             frequenciesByStudiesFor("gru")
-          ).as("frequencies")))
+          ).as("frequencies"),
+          col("hmb_participant_number"),
+          col("gru_participant_number")))
         .groupBy(locus:_*)
         .agg(
           collect_set("study").as("studies"),
-          (inputColumns.toSet -- locus.toSet).map(c => first(c).as(c.toString)).toList:_*)
+          (inputColumns.toSet -- locus.toSet).map(c => first(c).as(c.toString)).toList :+
+            sum(col("hmb_participant_number")).as("hmb_participant_number"):+
+            sum(col("gru_participant_number")).as("gru_participant_number"):+
+            flatten(collect_set("acls")).as("acls"):+
+            flatten(collect_set("external_study_ids")).as("external_study_ids"):_*)
     }
 
     def withFrequencies: DataFrame = {
@@ -137,14 +146,16 @@ object VariantsToJsonJob {
           struct(
             col("1k_genomes.ac") as "ac",
             col("1k_genomes.an") as "an",
-            col("1k_genomes.af") as "af"
+            col("1k_genomes.af") as "af",
+            col("1k_genomes.heterozygotes") as "heterozygotes",
+            col("1k_genomes.homozygotes") as "homozygotes"
           ).as("1k_genomes"),
           struct(
             col("topmed.ac") as "ac",
             col("topmed.an") as "an",
             col("topmed.af") as "af",
-            col("topmed.het") as "heterozygotes",
-            col("topmed.hom") as "heterozygotes"
+            col("topmed.heterozygotes") as "heterozygotes",
+            col("topmed.homozygotes") as "homozygotes"
           ).as("topmed"),
           frequenciesForGnomad("gnomad_genomes_2_1"),
           frequenciesForGnomad("gnomad_exomes_2_1"),

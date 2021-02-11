@@ -151,12 +151,12 @@ object Model {
                                gru_af: BigDecimal = 0,
                                gru_homozygotes: Long = 0,
                                gru_heterozygotes: Long = 0,
-                               //1k_genomes: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
-                               one_k_genomes: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
-                               topmed: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
-                               gnomad_genomes_2_1: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
-                               gnomad_exomes_2_1: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
-                               gnomad_genomes_3_0: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
+                               //1k_genomes: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), Some(10))),
+                               one_k_genomes: Option[Freq] = Some(Freq(20, 10, 0.5, None, None)),
+                               topmed: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), Some(10))),
+                               gnomad_genomes_2_1: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), None)),
+                               gnomad_exomes_2_1: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), None)),
+                               gnomad_genomes_3_0: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), None)),
                                clinvar_id: Option[String] = Some("RCV000436956"),
                                clin_sig: Option[String] = Some("Pathogenic"),
                                dbsnp_id: Option[String] = Some("rs1234567"),
@@ -332,8 +332,20 @@ object Model {
                          cds_strand: Option[Int] = None,
                          sift_score: Option[Double] = Some(0.99)
                         )
+  case class Freq(an: Long = 20,
+                  ac: Long = 10,
+                  af: BigDecimal = 0.5,
+                  homozygotes: Option[Long] = Some(10),
+                  heterozygotes: Option[Long] = Some(10))
 
-  case class Freq(an: Long, ac: Long, af: BigDecimal, homozygotes: Long, heterozygotes: Long)
+  case class GnomadFrequencyEntry(chromosome: String = "2",
+                                  start: Long = 165310406,
+                                  reference: String = "G",
+                                  alternate: String = "A",
+                                  ac: Long = 10,
+                                  an: Long = 20,
+                                  af: BigDecimal = 0.5,
+                                  hom: Long = 10)
 
   case class FrequencyEntry(chromosome: String = "2",
                             start: Long = 165310406,

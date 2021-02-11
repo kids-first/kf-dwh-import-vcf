@@ -121,11 +121,11 @@ Import clinvar
    sbt assembly
    aws s3 cp target/scala-2.12/kf-dwh-import-vcf-$VERSION.jar s3://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf-$VERSION.jar
    ```
-3) run `bin/run_emr_job_import_clinvar.sh`
+3) run `bin/run_emr_job_import_external.sh`
 
    ```shell
    cd bin
-   ./run_emr_job_import_External.sh
+   ./run_emr_job_import_external.sh clinvar PROD
    ```
 
 

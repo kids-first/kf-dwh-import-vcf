@@ -1,10 +1,10 @@
-package org.kidsfirstdrc.dwh.utils
+package org.kidsfirstdrc.dwh.conf
 
-import org.kidsfirstdrc.dwh.utils.Formats.{CSV, PARQUET, VCF, XML}
+import org.kidsfirstdrc.dwh.conf.Formats._
 
 object Catalog {
 
-  object Raw  extends StoreFolder {
+  object Raw extends StoreFolder {
     val bucket = "s3a://kf-strides-variant-parquet-prd"
 
     val annovar_dbnsfp            = DataSource("annovar_dbnsfp"           , "", bucket, "/raw/annovar/dbNSFP/hg38_dbnsfp41a.txt", CSV)
@@ -17,18 +17,31 @@ object Catalog {
     val orphanet_gene_association = DataSource("en_product6"              , "", bucket, "/raw/orphanet/en_product6.xml"         , XML)
     val orphanet_disease_history  = DataSource("en_product9_ages"         , "", bucket, "/raw/orphanet/en_product9_ages.xml"    , XML)
     val refseq_homo_sapiens_gene  = DataSource("refseq_homo_sapiens_gene" , "", bucket, "/raw/refseq/Homo_sapiens.gene_info.gz" , CSV)
-
+    val topmed_bravo_dbsnp        = DataSource("topmed_bravo_dbsnp"       , "", bucket, "/raw/topmed/bravo-dbsnp-all.vcf.gz"    , VCF)
   }
 
   object Public extends StoreFolder {
+
     import Raw._
+
     val bucket = "s3a://kf-strides-variant-parquet-prd"
 
     val clinvar           = DataSource("clinvar"          , "variant", bucket, "/public/clinvar"          , PARQUET, List(clinvar_vcf))
+    val dbnsfp            = DataSource("bdnsfp"           , "variant", bucket, "/public/dbnsfp/variant"   , PARQUET, List())
     val dbnsfp_annovar    = DataSource("dbnsfp_annovar"   , "variant", bucket, "/public/annovar/dbnsfp"   , PARQUET, List(annovar_dbnsfp))
+    val dbnsfp_original   = DataSource("dbnsfp_original"  , "variant", bucket, "/public/dbnsfp/scores"    , PARQUET, List(dbnsfp))
     val omim_gene_set     = DataSource("omim_gene_set"    , "variant", bucket, "/public/omim_gene_set"    , PARQUET, List(omim_genemap2))
     val orphanet_gene_set = DataSource("orphanet_gene_set", "variant", bucket, "/public/orphanet_gene_set", PARQUET, List(orphanet_gene_association, orphanet_disease_history))
+    val topmed_bravo      = DataSource("topmed_bravo"     , "variant", bucket, "/public/topmed_bravo"     , PARQUET, List())
+  }
 
+  object Clinical extends StoreFolder {
+
+    import Public._
+
+    val bucket = "s3a://kf-strides-variant-parquet-prd"
+
+    val variants = DataSource("variants", "variant", bucket, "/variants/variants_re_*", PARQUET, List(clinvar, topmed_bravo))
   }
 
   def sources: Set[DataSource] = Raw.sources ++ Public.sources

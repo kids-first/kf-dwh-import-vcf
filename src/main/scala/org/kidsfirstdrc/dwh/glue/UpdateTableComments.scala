@@ -1,9 +1,9 @@
 package org.kidsfirstdrc.dwh.glue
 
 import org.apache.spark.sql.SparkSession
-import org.kidsfirstdrc.dwh.utils.Catalog.Public.{clinvar, orphanet_gene_set}
-import org.kidsfirstdrc.dwh.utils.Environment.Environment
-import org.kidsfirstdrc.dwh.utils.{Catalog, DataSource, Environment}
+import org.kidsfirstdrc.dwh.conf.{Catalog, DataSource, Environment}
+import org.kidsfirstdrc.dwh.conf.Catalog.Public.{clinvar, orphanet_gene_set}
+import org.kidsfirstdrc.dwh.conf.Environment.Environment
 
 import scala.util.{Failure, Success, Try}
 

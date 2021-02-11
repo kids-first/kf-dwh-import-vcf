@@ -1,7 +1,6 @@
-package org.kidsfirstdrc.dwh.utils
+package org.kidsfirstdrc.dwh.conf
 
-import org.kidsfirstdrc.dwh.utils.Environment._
-
+import org.kidsfirstdrc.dwh.conf.Environment._
 
 case class DataSource(name: String,
                       database: String,

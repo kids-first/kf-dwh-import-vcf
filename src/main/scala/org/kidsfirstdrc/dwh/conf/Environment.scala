@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.utils
+package org.kidsfirstdrc.dwh.conf
 
 object Environment extends Enumeration {
   type Environment = Value

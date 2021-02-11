@@ -1,16 +1,17 @@
 package org.kidsfirstdrc.dwh.external.orphanet
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.utils.Catalog.Public
-import org.kidsfirstdrc.dwh.utils.Catalog.Raw._
-import org.kidsfirstdrc.dwh.utils.Environment.Environment
-import org.kidsfirstdrc.dwh.utils.{DataSource, DataSourceEtl}
+import org.kidsfirstdrc.dwh.conf.Catalog.Public
+import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
+import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Environment.Environment
+import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 
 import scala.xml.{Elem, Node, XML}
 
 class ImportOrphanetJob(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
-  override val target: DataSource = Public.orphanet_gene_set
+  override val destination: DataSource = Public.orphanet_gene_set
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     import spark.implicits._
@@ -120,5 +121,7 @@ class ImportOrphanetJob(runEnv: Environment) extends DataSourceEtl(runEnv) {
       )
     }
   }
+
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = super.load(data.coalesce(1))
 
 }

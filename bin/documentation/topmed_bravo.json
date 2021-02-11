@@ -1,0 +1,59 @@
+[
+  {
+    "col_name": "chromosome",
+    "comment": ""
+  },
+  {
+    "col_name": "start",
+    "comment": ""
+  },
+  {
+    "col_name": "end",
+    "comment": ""
+  },
+  {
+    "col_name": "name",
+    "comment": ""
+  },
+  {
+    "col_name": "reference",
+    "comment": ""
+  },
+  {
+    "col_name": "alternate",
+    "comment": ""
+  },
+  {
+    "col_name": "ac",
+    "comment": ""
+  },
+  {
+    "col_name": "af",
+    "comment": ""
+  },
+  {
+    "col_name": "an",
+    "comment": ""
+  },
+  {
+    "col_name": "homozygotes",
+    "comment": ""
+  },
+  {
+    "col_name": "heterozygotes",
+    "comment": ""
+  },
+  {
+    "col_name": "qual",
+    "comment": ""
+  },
+  {
+    "col_name": "filters",
+    "comment": ""
+  },
+  {
+    "col_name": "qual_filter",
+    "comment": ""
+  }
+]
+

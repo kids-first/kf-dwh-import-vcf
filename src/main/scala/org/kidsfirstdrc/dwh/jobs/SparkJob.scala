@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.utils
+package org.kidsfirstdrc.dwh.jobs
 
 import org.apache.spark.sql.SparkSession
 

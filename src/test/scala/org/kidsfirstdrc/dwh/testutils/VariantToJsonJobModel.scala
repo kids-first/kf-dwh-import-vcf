@@ -1,31 +1,26 @@
 package org.kidsfirstdrc.dwh.testutils
 
-import org.kidsfirstdrc.dwh.testutils.Model.{Exon, Intron, RefAlt}
+import org.kidsfirstdrc.dwh.testutils.Model.{Exon, Freq, Intron, RefAlt}
 
 object VariantToJsonJobModel {
 
-  case class StudyFrequency(hmb: Frequency, gru: Frequency)
-
-  case class Frequency(an: Long = 20,
-                       ac: Long = 10,
-                       af: BigDecimal = 0.5,
-                       homozygotes: Long = 10,
-                       heterozygotes: Long = 10)
+  case class StudyFrequency(hmb: Freq, gru: Freq)
 
   case class Study(study_id: String,
-                   full_consent_codes: List[String],
-                   short_consent_codes: List[String],
-                   nih_study_ids: List[String],
-                   frequencies: StudyFrequency)
+                   acls: List[String],
+                   external_study_ids: List[String],
+                   frequencies: StudyFrequency,
+                   hmb_participant_number: Long,
+                   gru_participant_number: Long)
 
-  case class InternalFrequencies(hmb: Frequency = Frequency(27,12,0.444444444400000000,9,7),
-                                 gru: Frequency = Frequency(7,2,0.285714285700000000,5,1))
+  case class InternalFrequencies(hmb: Freq = Freq(27,12,0.444444444400000000, Some(9), Some(7)),
+                                 gru: Freq = Freq(7,2,0.285714285700000000, Some(5), Some(1)))
 
-  case class Frequencies(/*ignored - tested separately  `1k_genomes`: Frequency,*/
-                         topmed: Frequency = Frequency(),
-                         gnomad_genomes_2_1: Frequency = Frequency(),
-                         gnomad_exomes_2_1: Frequency = Frequency(),
-                         gnomad_genomes_3_0: Frequency = Frequency(),
+  case class Frequencies(/*ignored - tested separately  `1k_genomes`: Freq,*/
+                         topmed: Freq = Freq(),
+                         gnomad_genomes_2_1: Freq = Freq(heterozygotes = None),
+                         gnomad_exomes_2_1: Freq = Freq(heterozygotes = None),
+                         gnomad_genomes_3_0: Freq = Freq(heterozygotes = None),
                          internal: InternalFrequencies = InternalFrequencies())
 
   case class Clinvar(name: String, clin_sig: String)
@@ -78,6 +73,8 @@ object VariantToJsonJobModel {
                     reference: String,
                     alternate: String,
                     studies: List[Study],
+                    hmb_participant_number: Long,
+                    gru_participant_number: Long,
                     frequencies: Frequencies,
                     clinvar: Clinvar,
                     dbsnp_id: String,

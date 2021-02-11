@@ -1,12 +1,13 @@
 package org.kidsfirstdrc.dwh.external
 
 import org.apache.spark.sql.SparkSession
+import org.kidsfirstdrc.dwh.conf.Catalog.Public
+import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.external.dbnsfp.ImportAnnovarScores
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetJob
 import org.kidsfirstdrc.dwh.updates.UpdateVariant
-import org.kidsfirstdrc.dwh.utils.Environment
 
 import scala.util.Try
 
@@ -26,12 +27,17 @@ object ImportExternal extends App {
       new ImportClinVarJob(env).run()
       Try {
         if (updateDependencies.toBoolean)
-          new UpdateVariant(env)
-            .run("s3a://kf-strides-variant-parquet-prd", "s3a://kf-strides-variant-parquet-prd")
+          new UpdateVariant(Public.clinvar, env).run()
       }
     case "omim"           => new ImportOmimGeneSet(env).run()
     case "orphanet"       => new ImportOrphanetJob(env).run()
     case "annovar_scores" => new ImportAnnovarScores(env).run()
+    case "topmed_bravo"   =>
+      new ImportTopMed(env).run()
+      Try {
+        if (updateDependencies.toBoolean)
+          new UpdateVariant(Public.topmed_bravo, env).run()
+      }
   }
 
 }
