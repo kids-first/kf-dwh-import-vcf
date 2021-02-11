@@ -3,8 +3,8 @@ package org.kidsfirstdrc.dwh.external
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external._
-import org.kidsfirstdrc.dwh.utils.Catalog.Raw._
-import org.kidsfirstdrc.dwh.utils.Environment
+import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
+import org.kidsfirstdrc.dwh.conf.Environment
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -53,7 +53,7 @@ class ImportOrphanetProductSpec extends AnyFlatSpec with GivenWhenThen with With
     val job = new ImportOrphanetJob(Environment.LOCAL)
 
     job.run()
-    val resultDF = spark.table(s"${job.target.database}.${job.target.name}")
+    val resultDF = spark.table(s"${job.destination.database}.${job.destination.name}")
 
     resultDF.show(false)
     resultDF.where($"orpha_code" === 166024).as[OrphanetOutput].collect().head shouldBe OrphanetOutput()

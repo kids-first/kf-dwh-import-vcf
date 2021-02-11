@@ -2,14 +2,15 @@ package org.kidsfirstdrc.dwh.external.dbnsfp
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.utils.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.utils.Environment.Environment
-import org.kidsfirstdrc.dwh.utils.{DataSource, DataSourceEtl}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
+import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Environment.Environment
+import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 
 class ImportAnnovarScores(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
     val source: DataSource = Raw.annovar_dbnsfp
-    val target: DataSource = Public.dbnsfp_annovar
+    val destination: DataSource = Public.dbnsfp_annovar
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     val annovar_dbnsfp = spark.read
@@ -89,9 +90,9 @@ class ImportAnnovarScores(runEnv: Environment) extends DataSourceEtl(runEnv) {
       .sortWithinPartitions("start")
       .write.mode("overwrite")
       .partitionBy("chromosome")
-      .format(target.format.sparkFormat)
-      .option("path", target.path)
-      .saveAsTable(s"${target.database}.${target.name}")
+      .format(destination.format.sparkFormat)
+      .option("path", destination.path)
+      .saveAsTable(s"${destination.database}.${destination.name}")
     data
   }
 }

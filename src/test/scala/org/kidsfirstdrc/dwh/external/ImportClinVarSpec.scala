@@ -3,8 +3,8 @@ package org.kidsfirstdrc.dwh.external
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.{ClinvarInput, ClinvarOutput}
-import org.kidsfirstdrc.dwh.utils.Catalog.Raw.clinvar_vcf
-import org.kidsfirstdrc.dwh.utils.Environment
+import org.kidsfirstdrc.dwh.conf.Catalog.Raw.clinvar_vcf
+import org.kidsfirstdrc.dwh.conf.Environment
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

@@ -3,17 +3,20 @@ package org.kidsfirstdrc.dwh.external.dbnsfp
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DoubleType, IntegerType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.utils.EtlJob
+import org.kidsfirstdrc.dwh.conf.Catalog.Public
+import org.kidsfirstdrc.dwh.conf.{Catalog, DataSource, Environment}
+import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 
-object ImportScores extends App with EtlJob {
+object ImportScores extends DataSourceEtl(Environment.PROD) with App {
 
-  override val database = "variant"
-  override val tableName = "dbnsfp"
+  override val destination = Catalog.Public.dbnsfp_original
 
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
     .enableHiveSupport()
     .appName("Import DBSNFP Scores to DWH").getOrCreate()
+
+  run()
 
   def split_semicolon(colName: String, outputColName: String): Column = split(col(colName), ";") as outputColName
 
@@ -26,12 +29,14 @@ object ImportScores extends App with EtlJob {
 
   def pred(colName: String): Column = when(element_at_postion(colName) === ".", null).otherwise(element_at_postion(colName)) as colName
 
-  override def extract(input: String)(implicit spark: SparkSession): DataFrame = {
-    spark.table(input)
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    Map(
+      Public.dbnsfp -> spark.table(s"${Public.dbnsfp.database}.${Public.dbnsfp.name}")
+    )
   }
 
-  override def transform(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    data.select(
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    data(Public.dbnsfp).select(
       col("chromosome"),
       col("start"),
       col("reference"),
@@ -297,22 +302,16 @@ object ImportScores extends App with EtlJob {
 
   }
 
-  override def load(data: DataFrame, output: String)(implicit spark: SparkSession): Unit = {
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data
       .repartition(col("chromosome"))
       .sortWithinPartitions("start")
       .write.mode("overwrite")
       .partitionBy("chromosome")
       .format("parquet")
-      .option("path", output)
-      .saveAsTable("variant.dbnsfp_original")
+      .option("path", destination.path)
+      .saveAsTable(s"${destination.database}.${destination.name}")
+    data
   }
-
-  val input = "variant.dbnsfp"
-  val output = "s3a://kf-strides-variant-parquet-prd/public/dbnsfp/scores"
-
-  val inputDf = extract(input)
-  val outputDf = transform(inputDf)
-  load(outputDf, output)
 }
 

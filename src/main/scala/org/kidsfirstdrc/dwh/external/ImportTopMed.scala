@@ -1,42 +1,47 @@
 package org.kidsfirstdrc.dwh.external
 
-import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
+import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Environment.Environment
+import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-object ImportTopMed extends App {
+class ImportTopMed(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
-  implicit val spark: SparkSession = SparkSession.builder
-    .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
-    .enableHiveSupport()
-    .appName("Import TopMed - Bravo").getOrCreate()
+  override val destination: DataSource = Public.topmed_bravo
 
-  import spark.implicits._
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    Map(Raw.topmed_bravo_dbsnp -> vcf(Raw.topmed_bravo_dbsnp.path)(spark))
+  }
 
-  val input = "s3://kf-variant-parquet-prd/raw/topmed/bravo-dbsnp-all.vcf.gz"
-  val output = "s3a://kf-strides-variant-parquet-prd/public"
-  vcf(input)(spark)
-    .select(chromosome,
-      start,
-      end,
-      name,
-      reference,
-      alternate,
-      ac,
-      af,
-      an,
-      $"INFO_HOM"(0) as "hom",
-      $"INFO_HET"(0) as "het",
-      $"qual",
-      $"filters",
-      when(size($"filters") === 1 && $"filters"(0) === "PASS", "PASS").when(array_contains($"filters","PASS"), "PASS+FAIL").otherwise("FAIL") as "qual_filter"
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+    data(Raw.topmed_bravo_dbsnp)
+      .select(chromosome,
+        start,
+        end,
+        name,
+        reference,
+        alternate,
+        ac,
+        af,
+        an,
+        $"INFO_HOM"(0) as "homozygotes",
+        $"INFO_HET"(0) as "heterozygotes",
+        $"qual",
+        $"INFO_FILTERS" as "filters",
+        when(size($"INFO_FILTERS") === 1 && $"INFO_FILTERS"(0) === "PASS", "PASS").when(array_contains($"INFO_FILTERS", "PASS"), "PASS+FAIL").otherwise("FAIL") as "qual_filter"
+      )
+  }
+
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    super.load(
+      data
+        .repartition(col("chromosome"))
+        .sortWithinPartitions("start")
     )
-    .repartition($"chromosome")
-    .sortWithinPartitions("start")
-    .write
-    .mode(SaveMode.Overwrite)
-    .format("parquet")
-    .option("path", s"$output/topmed_bravo")
-    .saveAsTable("variant.topmed_bravo")
+  }
 }

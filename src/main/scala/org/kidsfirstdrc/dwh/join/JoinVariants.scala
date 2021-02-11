@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.join
 
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
@@ -137,10 +138,23 @@ object JoinVariants {
   def joinWithPopulations(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
     //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
     val genomes = spark.table("1000_genomes").dropDuplicates(locusColumNames)
+      .withColumn("heterozygotes", lit(null).cast(IntegerType))
+      .withColumn("homozygotes", lit(null).cast(IntegerType))
+
     val topmed = spark.table("topmed_bravo").dropDuplicates(locusColumNames)
+
     val gnomad_genomes_2_1 = spark.table("gnomad_genomes_2_1_1_liftover_grch38").dropDuplicates(locusColumNames)
+      .withColumnRenamed("hom", "homozygotes")
+      .withColumn("heterozygotes", lit(null).cast(IntegerType))
+
     val gnomad_exomes_2_1 = spark.table("gnomad_exomes_2_1_1_liftover_grch38").dropDuplicates(locusColumNames)
-    val gnomad_genomes_3_0 = spark.table("gnomad_genomes_3_0").dropDuplicates(locusColumNames)
+      .withColumnRenamed("hom", "homozygotes")
+      .withColumn("heterozygotes", lit(null).cast(IntegerType))
+
+    val gnomad_genomes_3_0 =
+      spark.table("gnomad_genomes_3_0").dropDuplicates(locusColumNames)
+        .withColumnRenamed("hom", "homozygotes")
+        .withColumn("heterozygotes", lit(null).cast(IntegerType))
 
     variants
       .joinAndMerge(genomes, "1k_genomes")

@@ -1,8 +1,9 @@
 #!/bin/bash
-table=${1:-"variants"}
-runEnv=${2:-"DEV"}
-number_instance=${3:-"10"}
-instance_type=${4:-"r5.4xlarge"}
+source=${1:-"clinvar"}
+destination=${2:-"variants"}
+runEnv=${3:-"DEV"}
+number_instance=${4:-"10"}
+instance_type=${5:-"r5.4xlarge"}
 
 steps=$(cat <<EOF
 [
@@ -14,9 +15,9 @@ steps=$(cat <<EOF
       "--class",
       "org.kidsfirstdrc.dwh.updates.Update",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
-      "${table}",
-      "${runEnv}",
-      "s3a://kf-strides-variant-parquet-prd"
+      "${source}",
+      "${destination}",
+      "${runEnv}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",
@@ -37,7 +38,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --release-label emr-6.2.0 \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --steps "${steps}" \
---name "Update ${table} ${runEnv}" \
+--name "Update ${destination} based on ${source} [${runEnv}]" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \

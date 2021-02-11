@@ -1,11 +1,12 @@
-package org.kidsfirstdrc.dwh.utils
+package org.kidsfirstdrc.dwh.jobs
 
 import org.apache.spark.sql.functions.{col, lit, regexp_extract, trim}
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.utils.Environment.Environment
+import org.kidsfirstdrc.dwh.conf.Environment.Environment
 
 import scala.util.Try
 
+@deprecated("use org.kidsfirstdrc.dwh.jobs.DataSourceEtl instead")
 abstract class MultiSourceEtlJob(runEnv: Environment) {
 
   val database: String

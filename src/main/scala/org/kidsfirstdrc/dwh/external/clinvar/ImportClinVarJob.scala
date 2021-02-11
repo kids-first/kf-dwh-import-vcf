@@ -3,18 +3,19 @@ package org.kidsfirstdrc.dwh.external.clinvar
 import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.kidsfirstdrc.dwh.utils.Catalog.Public.clinvar
-import org.kidsfirstdrc.dwh.utils.Catalog.Raw.clinvar_vcf
-import org.kidsfirstdrc.dwh.utils.Environment.Environment
+import org.kidsfirstdrc.dwh.conf.Catalog.Public.clinvar
+import org.kidsfirstdrc.dwh.conf.Catalog.Raw.clinvar_vcf
+import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Environment.Environment
+import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
-import org.kidsfirstdrc.dwh.utils.{DataSource, DataSourceEtl}
 
 import scala.collection.mutable
 
 class ImportClinVarJob(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
-  override val target: DataSource = clinvar
+  override val destination: DataSource = clinvar
 
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
@@ -54,6 +55,8 @@ class ImportClinVarJob(runEnv: Environment) extends DataSourceEtl(runEnv) {
       .drop("clin_sig_original", "clndn")
 
   }
+
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = super.load(data.coalesce(1))
 
   def info_fields(df: DataFrame, excludes: String*): Seq[Column] = {
     df.columns.collect { case c if c.startsWith("INFO") && !excludes.contains(c) => col(c) as c.replace("INFO_", "").toLowerCase }

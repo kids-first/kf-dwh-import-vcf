@@ -3,13 +3,14 @@ package org.kidsfirstdrc.dwh.external.omim
 import org.apache.spark.sql.functions.{col, explode, split}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.external.omim.OmimPhenotype.parse_pheno
-import org.kidsfirstdrc.dwh.utils.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.utils.Environment._
-import org.kidsfirstdrc.dwh.utils.{DataSource, DataSourceEtl}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
+import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Environment._
+import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 
 class ImportOmimGeneSet(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
-  override val target: DataSource = Public.omim_gene_set
+  override val destination: DataSource = Public.omim_gene_set
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     val df = spark.read.format("csv")
@@ -43,5 +44,7 @@ class ImportOmimGeneSet(runEnv: Environment) extends DataSourceEtl(runEnv) {
       .withColumn("phenotype", parse_pheno(col("raw_phenotype")))
       .drop("raw_phenotype")
   }
+
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = super.load(data.coalesce(1))
 }
 
