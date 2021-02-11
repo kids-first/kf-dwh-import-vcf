@@ -22,9 +22,9 @@ object Update extends App {
     val env = Try(Environment.withName(runEnv)).getOrElse(Environment.DEV)
 
     (source, destination) match {
-        case ("clinvar", "variants") => new UpdateVariant(Public.clinvar, env).run()
-        case ("topmed_bravo", "variants") => new UpdateVariant(Public.clinvar, env).run()
-        case _ => throw new IllegalArgumentException(s"No job found for ARGS: [${args.mkString(",")}]")
+        case ("clinvar", "variants")      => new UpdateVariant(Public.clinvar, env).run()
+        case ("topmed_bravo", "variants") => new UpdateVariant(Public.topmed_bravo, env).run()
+        case _ => throw new IllegalArgumentException(s"No job found for : ($source, $destination)")
     }
   }
 
