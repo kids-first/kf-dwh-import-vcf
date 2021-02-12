@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.testutils
 
-import org.kidsfirstdrc.dwh.testutils.Model.{Exon, Freq, GnomadFreq, Intron, RefAlt}
+import org.kidsfirstdrc.dwh.testutils.Model._
 
 object VariantToJsonJobModel {
 
@@ -10,17 +10,17 @@ object VariantToJsonJobModel {
                    acls: List[String],
                    external_study_ids: List[String],
                    frequencies: StudyFrequency,
-                   hmb_participant_number: Long,
-                   gru_participant_number: Long)
+                   participant_number: Long)
 
-  case class InternalFrequencies(hmb: Freq = Freq(27,12,0.444444444400000000, 9, 7),
+  case class InternalFrequencies(combined: Freq = Freq(34,14,0.411764705882352900, 14, 8),
+                                 hmb: Freq = Freq(27,12,0.444444444400000000, 9, 7),
                                  gru: Freq = Freq(7,2,0.285714285700000000, 5, 1))
 
   case class Frequencies(/*ignored - tested separately  `1k_genomes`: Freq,*/
                          topmed: Freq = Freq(),
-                         gnomad_genomes_2_1: GnomadFreq = GnomadFreq(),
-                         gnomad_exomes_2_1: GnomadFreq = GnomadFreq(),
-                         gnomad_genomes_3_0: GnomadFreq = GnomadFreq(),
+                         gnomad_genomes_2_1: GnomadFreqOutput = GnomadFreqOutput(),
+                         gnomad_exomes_2_1: GnomadFreqOutput = GnomadFreqOutput(),
+                         gnomad_genomes_3_0: GnomadFreqOutput = GnomadFreqOutput(),
                          internal: InternalFrequencies = InternalFrequencies())
 
   case class Clinvar(name: String, clin_sig: String)
@@ -73,8 +73,9 @@ object VariantToJsonJobModel {
                     reference: String,
                     alternate: String,
                     studies: List[Study],
-                    hmb_participant_number: Long,
-                    gru_participant_number: Long,
+                    participant_number: Long,
+                    acls: List[String],
+                    external_study_ids: List[String],
                     frequencies: Frequencies,
                     clinvar: Clinvar,
                     dbsnp_id: String,

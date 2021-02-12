@@ -10,10 +10,10 @@ trait WithSparkSession {
 
   private val tmp = new File("tmp").getAbsolutePath
   implicit lazy val spark: SparkSession = SparkSession.builder()
-    .config("spark.ui.enabled", value = false)
-    .config("spark.sql.warehouse.dir", s"$tmp/wharehouse")
-    .config("spark.driver.extraJavaOptions", s"-Dderby.system.home=$tmp/derby")
-    .enableHiveSupport()
+    //.config("spark.ui.enabled", value = false)
+    //.config("spark.sql.warehouse.dir", s"$tmp/wharehouse")
+    //.config("spark.driver.extraJavaOptions", s"-Dderby.system.home=$tmp/derby")
+    //.enableHiveSupport()
     .master("local")
     .getOrCreate()
 

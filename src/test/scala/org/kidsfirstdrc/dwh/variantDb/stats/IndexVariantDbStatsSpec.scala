@@ -90,7 +90,7 @@ class IndexVariantDbStatsSpec extends AnyFlatSpec with GivenWhenThen with WithSp
   it should "get variant db stats from input dataframe" in {
     val inputDf = table1.union(table2)
     val stats = StatsUtils.getStats(inputDf)
-    val expectedStats = VariantDbStats(2,5,4,5)
+    val expectedStats = VariantDbStats(2, 5, 4, 5)
 
     stats should equal(expectedStats)
   }

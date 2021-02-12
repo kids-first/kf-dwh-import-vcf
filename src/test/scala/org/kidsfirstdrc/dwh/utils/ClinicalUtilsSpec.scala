@@ -19,6 +19,17 @@ class ClinicalUtilsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
   "getGenomicFiles" should "return a dataframe with filenames and corresponding acls" in {
     withOutputFolder("tmp") { output =>
 
+      spark.sql("CREATE DATABASE IF NOT EXISTS variant")
+
+      val manifestDF = Seq(
+        ("RE_ABCDEF", "file1")
+      ).toDF("study_id", "file_name")
+
+      manifestDF.write.mode(SaveMode.Overwrite)
+        .option("path", s"$output/genomic_files_override")
+        .format("json")
+        .saveAsTable("variant.genomic_files_override")
+
       val df = Seq(
         (Seq("SD_123456", "SD_123456.c1"), "file1", "SD_123456"),
         (Seq("SD_123456.c2"), "file2", "SD_123456"),
@@ -33,6 +44,7 @@ class ClinicalUtilsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
         .option("path", s"$output/genomic_files_re_abcdef")
         .format("json")
         .saveAsTable("genomic_files_re_abcdef")
+
       val res = getGenomicFiles(studyId, releaseId)
 
       res.show(false)
