@@ -26,15 +26,16 @@ class UpdateVariant(source: DataSource, runEnv: Environment) extends DataSourceE
   }
 
   private def updateClinvar(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    val variant = data(destination).drop("clinvar_id", "clin_sig")
+    val variant = data(destination)
     val clinvar = data(Public.clinvar)
     variant
+      .drop("clinvar_id", "clin_sig")
       .joinByLocus(clinvar)
       .select(variant("*"), clinvar("name") as "clinvar_id", clinvar("clin_sig") as "clin_sig")
   }
 
   private def updateTopmed(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    val variant = data(destination).drop("clinvar_id", "clin_sig")
+    val variant = data(destination)
     val topmed = data(Public.topmed_bravo)
     variant
       .drop("topmed")

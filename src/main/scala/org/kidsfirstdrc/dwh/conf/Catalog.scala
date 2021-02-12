@@ -41,7 +41,18 @@ object Catalog {
 
     val bucket = "s3a://kf-strides-variant-parquet-prd"
 
-    val variants = DataSource("variants", "variant", bucket, "/variants/variants_re_*", PARQUET, List(clinvar, topmed_bravo))
+    val consequences = DataSource("consequences", "variant", bucket, "/consequences/consequences_re_*", PARQUET, List())
+    val occurrences  = DataSource("occurrences" , "variant", bucket, "/occurrences/occurrences_re_*"  , PARQUET, List())
+    val variants     = DataSource("variants"    , "variant", bucket, "/variants/variants_re_*"        , PARQUET, List(clinvar, topmed_bravo))
+  }
+
+  object ElasticsearchJson extends StoreFolder {
+
+    import Clinical._
+
+    val bucket = "s3a://kf-strides-variant-parquet-prd"
+
+    val variantsJson = DataSource("variants_index", "", bucket, "/es_index/variants_index_re_*", JSON, List(variants))
   }
 
   def sources: Set[DataSource] = Raw.sources ++ Public.sources

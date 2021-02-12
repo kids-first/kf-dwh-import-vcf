@@ -1,7 +1,5 @@
 #!/bin/bash
 release_id=$1
-input=${2:-"s3a://kf-strides-variant-parquet-prd"}
-output=${3:-"s3a://kf-strides-variant-parquet-prd"}
 number_instance=${4:-"10"}
 instance_type=${5:-"r5.4xlarge"}
 
@@ -15,9 +13,7 @@ steps=$(cat <<EOF
       "--class",
       "org.kidsfirstdrc.dwh.variantDb.json.VariantsToJson",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
-      "${release_id}",
-      "${input}",
-      "${output}"
+      "${release_id}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",
@@ -38,7 +34,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --release-label emr-6.2.0 \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --steps "${steps}" \
---name "Variant index - Release ${release_id}" \
+--name "Variant index to Json - ${release_id}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \

@@ -4,17 +4,13 @@ import org.apache.spark.sql.SparkSession
 
 object VariantsToJson extends App {
 
-  val Array(releaseId, input, output) = args
+  val Array(releaseId) = args
 
   implicit lazy val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
     .enableHiveSupport()
-    .appName(s"Import VariantsToJson - $releaseId").getOrCreate()
+    .appName(s"Export variant_index - $releaseId").getOrCreate()
 
-  val job = new VariantsToJsonJob(releaseId)
-
-  val sources = job.extract(input)
-  val destination = job.transform(sources)
-  job.load(destination, output)
+  new VariantsToJsonJob(releaseId).run()
 
 }
