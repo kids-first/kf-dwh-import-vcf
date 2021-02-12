@@ -4,7 +4,7 @@
  */
 package org.kidsfirstdrc.dwh.testutils.variant
 
-import org.kidsfirstdrc.dwh.testutils.Model.Freq
+import org.kidsfirstdrc.dwh.testutils.Model.{Freq, ThousandGenomesFreq}
 
 case class Variant(chromosome: String = "2",
                    start: Long = 69359261,
@@ -25,11 +25,11 @@ case class Variant(chromosome: String = "2",
                    gru_homozygotes: Long = 0,
                    gru_heterozygotes: Long = 0,
                    //1k_genomes: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), Some(10))),
-                   onek_genomes: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), Some(10))),
-                   topmed: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), Some(10))),
-                   gnomad_genomes_2_1: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), Some(10))),
-                   gnomad_exomes_2_1: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), Some(10))),
-                   gnomad_genomes_3_0: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), Some(10))),
+                   onek_genomes: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
+                   topmed: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
+                   gnomad_genomes_2_1: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
+                   gnomad_exomes_2_1: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
+                   gnomad_genomes_3_0: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
                    clinvar_id: Option[String] = Some("RCV000436956"),
                    clin_sig: List[String] = List("Pathogenic"),
                    dbsnp_id: Option[String] = Some("rs1234567"),

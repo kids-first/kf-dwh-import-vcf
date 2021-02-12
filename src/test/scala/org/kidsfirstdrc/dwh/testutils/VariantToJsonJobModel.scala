@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.testutils
 
-import org.kidsfirstdrc.dwh.testutils.Model.{Exon, Freq, Intron, RefAlt}
+import org.kidsfirstdrc.dwh.testutils.Model.{Exon, Freq, GnomadFreq, Intron, RefAlt}
 
 object VariantToJsonJobModel {
 
@@ -13,14 +13,14 @@ object VariantToJsonJobModel {
                    hmb_participant_number: Long,
                    gru_participant_number: Long)
 
-  case class InternalFrequencies(hmb: Freq = Freq(27,12,0.444444444400000000, Some(9), Some(7)),
-                                 gru: Freq = Freq(7,2,0.285714285700000000, Some(5), Some(1)))
+  case class InternalFrequencies(hmb: Freq = Freq(27,12,0.444444444400000000, 9, 7),
+                                 gru: Freq = Freq(7,2,0.285714285700000000, 5, 1))
 
   case class Frequencies(/*ignored - tested separately  `1k_genomes`: Freq,*/
                          topmed: Freq = Freq(),
-                         gnomad_genomes_2_1: Freq = Freq(heterozygotes = None),
-                         gnomad_exomes_2_1: Freq = Freq(heterozygotes = None),
-                         gnomad_genomes_3_0: Freq = Freq(heterozygotes = None),
+                         gnomad_genomes_2_1: GnomadFreq = GnomadFreq(),
+                         gnomad_exomes_2_1: GnomadFreq = GnomadFreq(),
+                         gnomad_genomes_3_0: GnomadFreq = GnomadFreq(),
                          internal: InternalFrequencies = InternalFrequencies())
 
   case class Clinvar(name: String, clin_sig: String)

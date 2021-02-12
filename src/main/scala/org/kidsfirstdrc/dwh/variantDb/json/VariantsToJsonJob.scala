@@ -3,40 +3,38 @@ package org.kidsfirstdrc.dwh.variantDb.json
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{explode, _}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.Public
-import org.kidsfirstdrc.dwh.conf.Environment
-import org.kidsfirstdrc.dwh.jobs.MultiSourceEtlJob
-import org.kidsfirstdrc.dwh.join.JoinConsequences
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, ElasticsearchJson, Public}
+import org.kidsfirstdrc.dwh.conf._
+import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 import org.kidsfirstdrc.dwh.variantDb.json.VariantsToJsonJob._
-import org.kidsfirstdrc.dwh.vcf.Variants
 
 import scala.collection.mutable
 
-class VariantsToJsonJob(releaseId: String) extends MultiSourceEtlJob(Environment.DEV) {
+class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PROD) {
 
-  override val database: String = "variant"
-  override val tableName: String = "variant_index"
+  override val destination: DataSource = ElasticsearchJson.variantsJson
+  val tableName: String = "variant_index"
 
-  override def extract(input: String)(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(
-      Variants.TABLE_NAME -> spark.table(s"variant.${Variants.TABLE_NAME}_$releaseId"),
-      JoinConsequences.TABLE_NAME -> spark.table(s"variant.${JoinConsequences.TABLE_NAME}_$releaseId"),
-      Public.omim_gene_set.name -> spark.table(s"${Public.omim_gene_set.database}.${Public.omim_gene_set.name}")
+      Clinical.variants -> spark.table(s"${Clinical.variants.database}.${Clinical.variants.name}"),
+      Clinical.consequences -> spark.table(s"${Clinical.consequences.database}.${Clinical.consequences.name}"),
+      Public.omim_gene_set -> spark.table(s"${Public.omim_gene_set.database}.${Public.omim_gene_set.name}")
     )
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    val variants = data(Variants.TABLE_NAME)
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    val variants = data(Clinical.variants)
 
-    val consequences = data(JoinConsequences.TABLE_NAME)
+    val consequences = data(Clinical.consequences)
 
     val consequencesColumns = Set("chromosome", "start", "reference", "alternate", "symbol", "ensembl_gene_id", "consequences",
       "name", "impact", "symbol", "strand", "biotype", "variant_class", "exon", "intron", "hgvsc", "hgvsp", "hgvsg",
       "cds_position", "cdna_position", "protein_position", "amino_acids", "codons", "canonical", "aa_change", "coding_dna_change",
       "ensembl_transcript_id", "ensembl_regulatory_id", "feature_type", "scores")
 
-    val omim = data(Public.omim_gene_set.name)
+    val omim = data(Public.omim_gene_set)
       .select("ensembl_gene_id", "entrez_gene_id", "omim_gene_id")
 
     val consequenceColumnsWithOmim: Set[String] = consequencesColumns ++ omim.columns.toSet -- Set("chromosome", "start", "reference", "alternate")
@@ -57,11 +55,11 @@ class VariantsToJsonJob(releaseId: String) extends MultiSourceEtlJob(Environment
       .joinByLocus(consequencesWithOmim)
   }
 
-  override def load(data: DataFrame, output: String)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data
       .write
       .mode(SaveMode.Overwrite)
-      .json(s"$output/tmp/${this.tableName}_${this.releaseId}")
+      .json(s"${destination.bucket}/es_index/${destination.name}_${this.releaseId}")
     data
   }
 }
@@ -73,8 +71,7 @@ object VariantsToJsonJob {
       col(s"$colName.ac") as "ac",
       col(s"$colName.an") as "an",
       col(s"$colName.af") as "af",
-      col(s"$colName.homozygotes") as "homozygotes",
-      col(s"$colName.heterozygotes") as "heterozygotes"
+      col(s"$colName.hom") as "homozygotes"
     ).as(colName)
   }
 
@@ -146,9 +143,7 @@ object VariantsToJsonJob {
           struct(
             col("1k_genomes.ac") as "ac",
             col("1k_genomes.an") as "an",
-            col("1k_genomes.af") as "af",
-            col("1k_genomes.heterozygotes") as "heterozygotes",
-            col("1k_genomes.homozygotes") as "homozygotes"
+            col("1k_genomes.af") as "af"
           ).as("1k_genomes"),
           struct(
             col("topmed.ac") as "ac",

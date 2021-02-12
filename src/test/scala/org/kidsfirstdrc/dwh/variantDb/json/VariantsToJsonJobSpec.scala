@@ -1,10 +1,9 @@
 package org.kidsfirstdrc.dwh.variantDb.json
 
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions._
-import org.kidsfirstdrc.dwh.conf.Catalog.Public
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.join.JoinConsequences
-import org.kidsfirstdrc.dwh.testutils.Model.{Freq, JoinConsequenceOutput, JoinVariantOutput}
+import org.kidsfirstdrc.dwh.testutils.Model.{JoinConsequenceOutput, JoinVariantOutput, ThousandGenomesFreq}
 import org.kidsfirstdrc.dwh.testutils.external.Omim
 import org.kidsfirstdrc.dwh.testutils.{VariantToJsonJobModel, WithSparkSession}
 import org.kidsfirstdrc.dwh.vcf.Variants
@@ -53,23 +52,21 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
   ).toDF()
 
   val data = Map(
-    Variants.TABLE_NAME -> joinVariantDf,
-    JoinConsequences.TABLE_NAME -> joinConsequencesDf,
-    Public.omim_gene_set.name -> ominDf
+    Clinical.variants -> joinVariantDf,
+    Clinical.consequences -> joinConsequencesDf,
+    Public.omim_gene_set -> ominDf
   )
 
   "VariantDbJson" should "transform data to the right format" in {
 
     val result = new VariantsToJsonJob(realeaseId).transform(data)
     val parsedResult = result.as[VariantToJsonJobModel.Output].collect()
-    val `1k_genomes`: Freq =
+    val `1k_genomes`: ThousandGenomesFreq =
       result.select(
         "frequencies.1k_genomes.an",
         "frequencies.1k_genomes.ac",
-        "frequencies.1k_genomes.af",
-        "frequencies.1k_genomes.homozygotes",
-        "frequencies.1k_genomes.heterozygotes")
-      .as[Freq].collect().head
+        "frequencies.1k_genomes.af")
+      .as[ThousandGenomesFreq].collect().head
     val variant = parsedResult.head
 
     result.columns should contain allOf
@@ -93,7 +90,7 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
     //3. frequencies validation in two steps as `1k_genomes` is not a valid name for java variable it needs to be tested
     //   separately
     variant.frequencies shouldBe VariantToJsonJobModel.Frequencies()
-    `1k_genomes` shouldBe Freq(homozygotes = None, heterozygotes = None)
+    `1k_genomes` shouldBe ThousandGenomesFreq()
 
   }
 }

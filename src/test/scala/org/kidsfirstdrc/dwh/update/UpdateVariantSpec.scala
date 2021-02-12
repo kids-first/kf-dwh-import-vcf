@@ -3,8 +3,9 @@ package org.kidsfirstdrc.dwh.update
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
+import org.kidsfirstdrc.dwh.testutils.Model.Freq
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
-import org.kidsfirstdrc.dwh.testutils.external.ClinvarOutput
+import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, TopmedBravoOutput}
 import org.kidsfirstdrc.dwh.testutils.variant.Variant
 import org.kidsfirstdrc.dwh.updates.UpdateVariant
 import org.kidsfirstdrc.dwh.vcf.Variants
@@ -23,7 +24,7 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
   spark.sql("CREATE DATABASE IF NOT EXISTS variant_live")
   spark.sql("CREATE DATABASE IF NOT EXISTS variant")
 
-  "transform method" should "return expected data given controlled input" in {
+  "transform method for clinvar" should "return expected data given controlled input" in {
 
     val variant = Variant()
     val clinvar = ClinvarOutput()
@@ -42,6 +43,26 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
       variant.clin_sig should not be clinvar.clin_sig
     // Checks the output values are the same as expected
       resultDF.as[Variant].collect().head shouldBe expectedResult
+  }
+
+  "transform method for topmed" should "return expected data given controlled input" in {
+
+    val variant = Variant()
+    val topmed = TopmedBravoOutput()
+
+    val variantDF = Seq(variant).toDF()
+    val topmedDF = Seq(topmed).toDF()
+    val data = Map(Clinical.variants -> variantDF, Public.topmed_bravo -> topmedDF)
+
+    val job = new UpdateVariant(Public.topmed_bravo, Environment.LOCAL)
+    val resultDF = job.transform(data)
+
+    val expectedResult = variant.copy(topmed = Some(Freq(10, 5, 0.5, 5, 0)))
+
+    // Checks the input values were not the same before the join
+    variant.topmed should not be Some(Freq(10, 5, 0.5, 5, 0))
+    // Checks the output values are the same as expected
+    resultDF.as[Variant].collect().head shouldBe expectedResult
   }
 
   "load method" should "overwrite data" in {

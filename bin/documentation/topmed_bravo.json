@@ -1,27 +1,27 @@
 [
   {
     "col_name": "chromosome",
-    "comment": ""
+    "comment": "chromosomial position of the variant"
   },
   {
     "col_name": "start",
-    "comment": ""
+    "comment": "starting position of the variant on the chromosome"
   },
   {
     "col_name": "end",
-    "comment": ""
+    "comment": "ending position of the variant on the chromosome"
   },
   {
     "col_name": "name",
-    "comment": ""
+    "comment": "name of the variant"
   },
   {
     "col_name": "reference",
-    "comment": ""
+    "comment": "reference letter"
   },
   {
     "col_name": "alternate",
-    "comment": ""
+    "comment": "alternate letter"
   },
   {
     "col_name": "ac",
@@ -37,23 +37,23 @@
   },
   {
     "col_name": "homozygotes",
-    "comment": ""
+    "comment": "number of homozygotes"
   },
   {
     "col_name": "heterozygotes",
-    "comment": ""
+    "comment": "number of heterozygotes"
   },
   {
     "col_name": "qual",
-    "comment": ""
+    "comment": "quality"
   },
   {
     "col_name": "filters",
-    "comment": ""
+    "comment": "filters"
   },
   {
     "col_name": "qual_filter",
-    "comment": ""
+    "comment": "either PASS or failed (SVM, DISC or EXHET)"
   }
 ]
 
