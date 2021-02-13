@@ -12,6 +12,17 @@ import java.net.URI
 
 object SparkUtils {
 
+  implicit class SparkUtilsOperations(df: DataFrame) {
+    def withCombinedFrequencies(combined: String, prefix1: String, prefix2: String): DataFrame = {
+      df
+        .withColumn(s"${combined}_ac", col(s"${prefix1}_ac") + col(s"${prefix2}_ac"))
+        .withColumn(s"${combined}_an", col(s"${prefix1}_an") + col(s"${prefix2}_an"))
+        .withColumn(s"${combined}_af", (col(s"${combined}_ac") / col(s"${combined}_an")).cast(DecimalType(38, 18)) )
+        .withColumn(s"${combined}_heterozygotes", col(s"${prefix1}_heterozygotes") + col(s"${prefix2}_heterozygotes"))
+        .withColumn(s"${combined}_homozygotes", col(s"${prefix1}_homozygotes") + col(s"${prefix2}_homozygotes"))
+    }
+  }
+
   val filename: Column = regexp_extract(input_file_name(), ".*/(.*)", 1)
 
   /**

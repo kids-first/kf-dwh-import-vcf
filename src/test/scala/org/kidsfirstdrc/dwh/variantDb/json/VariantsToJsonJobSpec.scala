@@ -2,11 +2,9 @@ package org.kidsfirstdrc.dwh.variantDb.json
 
 import org.apache.spark.sql.DataFrame
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
-import org.kidsfirstdrc.dwh.join.JoinConsequences
 import org.kidsfirstdrc.dwh.testutils.Model.{JoinConsequenceOutput, JoinVariantOutput, ThousandGenomesFreq}
 import org.kidsfirstdrc.dwh.testutils.external.Omim
 import org.kidsfirstdrc.dwh.testutils.{VariantToJsonJobModel, WithSparkSession}
-import org.kidsfirstdrc.dwh.vcf.Variants
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -60,6 +58,9 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
   "VariantDbJson" should "transform data to the right format" in {
 
     val result = new VariantsToJsonJob(realeaseId).transform(data)
+
+    result.select("acls", "participant_number").show(false)
+
     val parsedResult = result.as[VariantToJsonJobModel.Output].collect()
     val `1k_genomes`: ThousandGenomesFreq =
       result.select(
@@ -85,8 +86,7 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
     variant.end shouldBe 165310406
     variant.reference shouldBe "G"
     variant.alternate shouldBe "A"
-    variant.gru_participant_number shouldBe 6
-    variant.hmb_participant_number shouldBe 16
+    variant.participant_number shouldBe 22
     //3. frequencies validation in two steps as `1k_genomes` is not a valid name for java variable it needs to be tested
     //   separately
     variant.frequencies shouldBe VariantToJsonJobModel.Frequencies()

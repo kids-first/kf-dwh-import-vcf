@@ -16,6 +16,7 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0" % "test"
 libraryDependencies += "org.apache.spark" %% "spark-hive" % spark_version % "test"
 
 parallelExecution in test := false
+fork := true
 
 test in assembly := {}
 

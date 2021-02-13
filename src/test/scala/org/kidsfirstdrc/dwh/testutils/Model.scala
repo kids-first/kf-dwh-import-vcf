@@ -2,7 +2,6 @@ package org.kidsfirstdrc.dwh.testutils
 
 object Model {
 
-
   case class VariantInput(chromosome: String = "2",
                           start: Long = 165310406,
                           end: Long = 165310406,
@@ -154,9 +153,9 @@ object Model {
                                //1k_genomes: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), Some(10))),
                                one_k_genomes: Option[ThousandGenomesFreq] = Some(ThousandGenomesFreq(20, 10, 0.5)),
                                topmed: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
-                               gnomad_genomes_2_1: Option[GnomadFreq] = Some(GnomadFreq(20, 10, 0.5, 10)),
-                               gnomad_exomes_2_1: Option[GnomadFreq] = Some(GnomadFreq(20, 10, 0.5, 10)),
-                               gnomad_genomes_3_0: Option[GnomadFreq] = Some(GnomadFreq(20, 10, 0.5, 10)),
+                               gnomad_genomes_2_1: Option[GnomadFreq] = Some(GnomadFreq(10, 20, 0.5, 10)),
+                               gnomad_exomes_2_1: Option[GnomadFreq] = Some(GnomadFreq(10, 20, 0.5, 10)),
+                               gnomad_genomes_3_0: Option[GnomadFreq] = Some(GnomadFreq(10, 20, 0.5, 10)),
                                clinvar_id: Option[String] = Some("RCV000436956"),
                                clin_sig: Option[String] = Some("Pathogenic"),
                                dbsnp_id: Option[String] = Some("rs1234567"),
@@ -337,10 +336,15 @@ object Model {
                                  ac: Long = 10,
                                  af: BigDecimal = 0.5)
 
-  case class GnomadFreq(an: Long = 20,
-                        ac: Long = 10,
+  case class GnomadFreq(ac: Long = 10,
+                        an: Long = 20,
                         af: BigDecimal = 0.5,
-                        homozygotes: Long = 10)
+                        hom: Long = 10)
+
+  case class GnomadFreqOutput(ac: Long = 10,
+                              an: Long = 20,
+                              af: BigDecimal = 0.5,
+                              homozygotes: Long = 10)
 
   case class Freq(an: Long = 20,
                   ac: Long = 10,

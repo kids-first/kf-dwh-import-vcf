@@ -8,6 +8,7 @@ import org.kidsfirstdrc.dwh.conf._
 import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 import org.kidsfirstdrc.dwh.variantDb.json.VariantsToJsonJob._
+import org.kidsfirstdrc.dwh.utils.SparkUtils._
 
 import scala.collection.mutable
 
@@ -50,8 +51,8 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
       .withStudies
       .withFrequencies
       .withClinVar
-      .select("chromosome", "start", "end", "reference", "alternate", "studies", "hmb_participant_number",
-        "gru_participant_number", "frequencies", "clinvar", "dbsnp_id", "release_id")
+      .select("chromosome", "start", "end", "reference", "alternate", "studies", "participant_number",
+        "acls", "external_study_ids", "frequencies", "clinvar", "dbsnp_id", "release_id")
       .joinByLocus(consequencesWithOmim)
   }
 
@@ -111,11 +112,10 @@ object VariantsToJsonJob {
         .select(inputColumns :+ explode(col("studies")).as("study_id"):_*)
         .withColumn("acls", col("consent_codes_by_study")(col("study_id")))
         .withColumn("external_study_ids", external_study_ids(col("acls")))
-        .withColumn("hmb_participant_number",
+        .withColumn("participant_number",
           col("hmb_homozygotes_by_study")(col("study_id")) +
-            col("hmb_heterozygotes_by_study")(col("study_id")))
-        .withColumn("gru_participant_number",
-          col("gru_homozygotes_by_study")(col("study_id")) +
+            col("hmb_heterozygotes_by_study")(col("study_id")) +
+            col("gru_homozygotes_by_study")(col("study_id")) +
             col("gru_heterozygotes_by_study")(col("study_id")))
         .withColumn("study", struct(
           col("study_id"),
@@ -125,20 +125,18 @@ object VariantsToJsonJob {
             frequenciesByStudiesFor("hmb"),
             frequenciesByStudiesFor("gru")
           ).as("frequencies"),
-          col("hmb_participant_number"),
-          col("gru_participant_number")))
+          col("participant_number")))
         .groupBy(locus:_*)
         .agg(
           collect_set("study").as("studies"),
           (inputColumns.toSet -- locus.toSet).map(c => first(c).as(c.toString)).toList :+
-            sum(col("hmb_participant_number")).as("hmb_participant_number"):+
-            sum(col("gru_participant_number")).as("gru_participant_number"):+
+            sum(col("participant_number")).as("participant_number"):+
             flatten(collect_set("acls")).as("acls"):+
             flatten(collect_set("external_study_ids")).as("external_study_ids"):_*)
     }
 
     def withFrequencies: DataFrame = {
-      df
+      df.withCombinedFrequencies("combined", "hmb", "gru")
         .withColumn("frequencies", struct(
           struct(
             col("1k_genomes.ac") as "ac",
@@ -156,6 +154,7 @@ object VariantsToJsonJob {
           frequenciesForGnomad("gnomad_exomes_2_1"),
           frequenciesForGnomad("gnomad_genomes_3_0"),
           struct(
+            frequenciesForPrefix("combined"),
             frequenciesForPrefix("hmb"),
             frequenciesForPrefix("gru")
           ).as("internal")
