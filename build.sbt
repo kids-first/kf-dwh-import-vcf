@@ -15,6 +15,8 @@ libraryDependencies += "io.projectglow" %% "glow" % "0.5.0" % Provided
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0" % "test"
 libraryDependencies += "org.apache.spark" %% "spark-hive" % spark_version % "test"
 
+coverageMinimum := 67 //TODO increase this - current coverage is 67%
+
 parallelExecution in test := false
 fork := true
 

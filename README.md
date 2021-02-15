@@ -11,6 +11,12 @@ Spark Jobs to import VCF and others references databases into the datawarehosue.
 sbt assembly
 ```
 
+#### Run test coverage
+```
+sbt clean coverage test
+sbt coverageReport
+```
+
 #### Upload Jar to s3
 note that the current version can be found in `kf-dwh-import-vcf/version.sbt`
 
@@ -27,5 +33,11 @@ aws s3 cp target/scala-2.12/kf-dwh-import-vcf-$VERSION.jar s3://kf-strides-varia
 #### Run a join
 ```
 ./run_emr_job_join.sh SD_46SK55A3,SD_6FPYJQBR,SD_9PYZAHHE,SD_DYPMEHHF,SD_DZTB5HRR,SD_PREASA7S,SD_R0EPRSGS,SD_YGVA0E1C RE_000004
+```
+
+#### Run scalastyle
+
+```
+sbt scalastyle
 ```
 
