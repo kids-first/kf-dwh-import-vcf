@@ -5,7 +5,6 @@
 package org.kidsfirstdrc.dwh.testutils.external
 
 /*
-
 case class DbnsfpInput(`#chr`: String = "Y",
                        `pos(1-based)`: String = "2786989",
                        `ref`: String = "C",

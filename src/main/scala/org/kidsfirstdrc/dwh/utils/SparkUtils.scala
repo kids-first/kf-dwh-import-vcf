@@ -198,6 +198,7 @@ object SparkUtils {
 
     def optional_info(df: DataFrame, colName: String, alias: String, colType: String = "string"): Column = (if (df.columns.contains(colName)) col(colName) else lit(null).cast(colType)).as(alias)
 
+    //the order matters, do not change it
     val locusColumNames: Seq[String] = Seq("chromosome", "start", "reference", "alternate")
 
     val locus: Seq[Column] = locusColumNames.map(col)

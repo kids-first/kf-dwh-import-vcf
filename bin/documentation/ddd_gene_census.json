@@ -1,0 +1,39 @@
+[
+  {
+    "col_name": "symbol",
+    "comment": "gene symbol"
+  },
+  {
+    "col_name": "omim_gene_id",
+    "comment": "Omim (https://www.omim.org/) gene id"
+  },
+  {
+    "col_name": "disease_name",
+    "comment": "name of the disease that can occur"
+  },
+  {
+    "col_name": "ddd_category",
+    "comment": ""
+  },
+  {
+    "col_name": "mutation_consequence",
+    "comment": ""
+  },
+  {
+    "col_name": "phenotypes",
+    "comment": "list of phenotype ids as HP:0000XXX"
+  },
+  {
+    "col_name": "organ_specificity",
+    "comment": "list of organs affected"
+  },
+  {
+    "col_name": "panel",
+    "comment": ""
+  },
+  {
+    "col_name": "hgnc_id",
+    "comment": "id in HGNC (https://www.genenames.org/)"
+  }
+]
+

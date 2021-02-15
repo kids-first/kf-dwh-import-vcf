@@ -23,7 +23,7 @@ object VariantToJsonJobModel {
                          gnomad_genomes_3_0: GnomadFreqOutput = GnomadFreqOutput(),
                          internal: InternalFrequencies = InternalFrequencies())
 
-  case class Clinvar(name: String, clin_sig: String)
+  case class Clinvar(clinvar_id: String, clin_sig: String)
 
   case class ScoreConservations(phylo_p17way_primate_rankscore: Double)
 
@@ -41,20 +41,16 @@ object VariantToJsonJobModel {
   case class ConsequenceScore(conservations: ScoreConservations,
                               predictions: ScorePredictions)
 
-  case class Consequence(symbol: String = "SCN2A",
-                         impact: String = "MODERATE",
+  case class Consequence(impact: String = "MODERATE",
                          ensembl_gene_id: String = "ENSG00000136531",
                          ensembl_transcript_id: Option[String] = Some("ENST00000283256.10"),
                          ensembl_regulatory_id: Option[String] = None,
                          feature_type: String = "Transcript",
                          consequences: Seq[String] = Seq("missense_variant"),
                          biotype: Option[String] = Some("protein_coding"),
-                         name: Option[String] = Some("rs1057520413"),
+                         rsnumber: Option[String] = Some("rs1057520413"),
                          variant_class: String = "SNV",
                          strand: Int = 1,
-                         hgvsg: Option[String] = Some("chr2:g.166166916G>A"),
-                         hgvsc: Option[String] = Some("ENST00000283256.10:c.781G>A"),
-                         hgvsp: Option[String] = Some("ENSP00000283256.6:p.Val261Met"),
                          exon: Option[Exon] = Some(Exon(7, 27)),
                          intron: Option[Intron] = None,
                          cdna_position: Option[Int] = Some(937),
@@ -78,7 +74,16 @@ object VariantToJsonJobModel {
                     external_study_ids: List[String],
                     frequencies: Frequencies,
                     clinvar: Clinvar,
-                    dbsnp_id: String,
+                    rsnumber: String,
                     release_id: String,
-                    consequences: List[Consequence])
+                    consequences: List[Consequence],
+                    symbols: List[String],
+                    orphanet_disorder_id: Option[Long] = Some(17601),
+                    panel: Option[String] = Some("Multiple epiphyseal dysplasia, Al-Gazali type"),
+                    inheritance: List[String] = List("Autosomal recessive"),
+                    hgvsg: Option[String] = Some("chr2:g.166166916G>A"),
+                    hgvsc: Option[String] = Some("ENST00000283256.10:c.781G>A"),
+                    hgvsp: Option[String] = Some("ENSP00000283256.6:p.Val261Met"),
+                    disease_names: List[String],
+                    tumour_types_germline: List[String])
 }

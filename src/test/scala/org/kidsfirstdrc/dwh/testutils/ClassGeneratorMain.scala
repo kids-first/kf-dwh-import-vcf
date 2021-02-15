@@ -6,11 +6,12 @@ import org.kidsfirstdrc.dwh.external.ImportHPOGeneSet.{input, spark}
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetJob
 import org.kidsfirstdrc.dwh.testutils.ClassGeneratorImplicits._
-import org.kidsfirstdrc.dwh.testutils.external.OmimInput
+import org.kidsfirstdrc.dwh.testutils.external.{CosmicCancerGeneCensusInput, DddGeneCensusInput, OmimInput}
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
 import org.kidsfirstdrc.dwh.conf.Environment
 import Environment.LOCAL
+import org.kidsfirstdrc.dwh.external.{ImportCancerGeneCensus, ImportDDDGeneCensus}
 
 object ClassGeneratorMain extends App with WithSparkSession {
 
@@ -63,8 +64,6 @@ object ClassGeneratorMain extends App with WithSparkSession {
     .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","OmimOutput", root)
 
 
-  spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.path(Environment.LOCAL))
-    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusInput", root)
 
 
   spark.read.format("csv")
@@ -94,7 +93,17 @@ object ClassGeneratorMain extends App with WithSparkSession {
 
      */
   spark.read.option("header", "true").csv(ddd_gene_census.path(LOCAL))
-    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","DddGeneCensusInput", root)
+    //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","DddGeneCensusInput", root)
+
+  new ImportDDDGeneCensus(Environment.LOCAL).transform(Map(Raw.ddd_gene_census -> Seq(DddGeneCensusInput()).toDF()))
+    //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","DddGeneCensusOutput", root)
+
+
+  spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.path(Environment.LOCAL))
+    //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusInput", root)
+
+  new ImportCancerGeneCensus(Environment.LOCAL).transform(Map(Raw.cosmic_cancer_gene_census -> Seq(CosmicCancerGeneCensusInput()).toDF()))
+  //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusOutput", root)
 
 
 }

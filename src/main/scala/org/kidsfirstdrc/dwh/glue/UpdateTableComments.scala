@@ -1,9 +1,9 @@
 package org.kidsfirstdrc.dwh.glue
 
 import org.apache.spark.sql.SparkSession
-import org.kidsfirstdrc.dwh.conf.{Catalog, DataSource, Environment}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public.{clinvar, orphanet_gene_set}
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
+import org.kidsfirstdrc.dwh.conf.{Catalog, DataSource, Environment}
 
 import scala.util.{Failure, Success, Try}
 
@@ -34,14 +34,22 @@ object UpdateTableComments extends App {
   def run(database: String, table: String, metadata_file: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
 
-    val commentsDF = spark.read.option("multiline", "true").json(metadata_file).drop("data_type")
+    Try {
+      val commentsDF = spark.read.option("multiline", "true").json(metadata_file).drop("data_type")
 
-    val describeTableDF = spark.sql(s"DESCRIBE $database.$table")
+      val describeTableDF = spark.sql(s"DESCRIBE $database.$table")
 
-    val comments = describeTableDF.drop("comment").join(commentsDF, Seq("col_name"))
-      .as[GlueFieldComment].collect()
+      val comments = describeTableDF.drop("comment").join(commentsDF, Seq("col_name"))
+        .as[GlueFieldComment].collect()
 
-    setComments(comments, database, table)
+      setComments(comments, database, table)
+    } match {
+      case Failure(e) =>
+        println(s"Tried to update $table comments but found: ${e.getMessage}")
+        e.printStackTrace()
+      case Success(_) => println(s"[INFO] $table updated")
+    }
+
   }
 
   def setComments(comments: Array[GlueFieldComment], database: String, table: String)(implicit spark: SparkSession): Unit = {
