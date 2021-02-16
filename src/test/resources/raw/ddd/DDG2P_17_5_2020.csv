@@ -1,0 +1,2 @@
+"gene symbol","gene mim","disease name","disease mim","DDD category","allelic requirement","mutation consequence",phenotypes,"organ specificity list",pmids,panel,"prev symbols","hgnc id","gene disease pair entry date"
+BRAF,164757,"NOONAN SYNDROME TYPE 7",613706,confirmed,monoallelic,activating,HP:0000953;HP:0000268;HP:0001249;HP:0008872;HP:0000006;HP:0000391;HP:0004322;HP:0000369;HP:0001252;HP:0001631;HP:0001642;HP:0000316;HP:0011220,Skin;Brain/Cognition;Heart/Cardiovasculature/Lymphatic,19206169,DD,,1097,"2015-07-22 16:14:11"

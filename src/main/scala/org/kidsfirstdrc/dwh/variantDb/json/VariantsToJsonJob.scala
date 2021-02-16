@@ -15,45 +15,52 @@ import scala.collection.mutable
 class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PROD) {
 
   override val destination: DataSource = ElasticsearchJson.variantsJson
-  val tableName: String = "variant_index"
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(
-      Clinical.variants -> spark.table(s"${Clinical.variants.database}.${Clinical.variants.name}"),
-      Clinical.consequences -> spark.table(s"${Clinical.consequences.database}.${Clinical.consequences.name}"),
-      Public.omim_gene_set -> spark.table(s"${Public.omim_gene_set.database}.${Public.omim_gene_set.name}")
+      Clinical.variants        -> spark.table(s"${Clinical.variants.database}.${Clinical.variants.name}"),
+      Clinical.consequences    -> spark.table(s"${Clinical.consequences.database}.${Clinical.consequences.name}"),
+      Public.omim_gene_set     -> spark.table(s"${Public.omim_gene_set.database}.${Public.omim_gene_set.name}"),
+      Public.orphanet_gene_set -> spark.table(s"${Public.orphanet_gene_set.database}.${Public.orphanet_gene_set.name}"),
+      Public.ddd_gene_set      -> spark.table(s"${Public.ddd_gene_set.database}.${Public.ddd_gene_set.name}"),
+      Public.clinvar           -> spark.table(s"${Public.clinvar.database}.${Public.clinvar.name}"),
+      Public.cosmic_gene_set   -> spark.table(s"${Public.cosmic_gene_set.database}.${Public.cosmic_gene_set.name}")
     )
   }
 
   override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val variants = data(Clinical.variants)
+      .withColumnRenamed("dbsnp_id", "rsnumber")
 
     val consequences = data(Clinical.consequences)
-
-    val consequencesColumns = Set("chromosome", "start", "reference", "alternate", "symbol", "ensembl_gene_id", "consequences",
-      "name", "impact", "symbol", "strand", "biotype", "variant_class", "exon", "intron", "hgvsc", "hgvsp", "hgvsg",
-      "cds_position", "cdna_position", "protein_position", "amino_acids", "codons", "canonical", "aa_change", "coding_dna_change",
-      "ensembl_transcript_id", "ensembl_regulatory_id", "feature_type", "scores")
+      .withColumnRenamed("name", "rsnumber")
 
     val omim = data(Public.omim_gene_set)
       .select("ensembl_gene_id", "entrez_gene_id", "omim_gene_id")
 
-    val consequenceColumnsWithOmim: Set[String] = consequencesColumns ++ omim.columns.toSet -- Set("chromosome", "start", "reference", "alternate")
+    val ddd_gene_set = data(Public.ddd_gene_set)
+      .select("disease_name", "symbol")
 
-    val consequencesWithOmim = consequences
-      .withScores
-      .join(omim, Seq("ensembl_gene_id"), "left")
-      .withColumn("consequence", struct(consequenceColumnsWithOmim.toSeq.map(col):_*))
-      .groupBy(locus:_*)
-      .agg(collect_set(col("consequence")).as("consequences"))
+    val cosmic_gene_set = data(Public.cosmic_gene_set)
+      .select("symbol", "tumour_types_germline")
+
+    val orphanet = data(Public.orphanet_gene_set)
+      .select(
+        col("gene_symbol").as("symbol"),
+        col("disorder_id").as("orphanet_disorder_id"),
+        col("name").as("panel"),
+        col("type_of_inheritance").as("inheritance"))
 
     variants
+      .withColumn("locus", concat_ws("-", locus:_*))
       .withStudies
       .withFrequencies
       .withClinVar
+      .withConsequences(consequences, omim, orphanet, ddd_gene_set, cosmic_gene_set)
       .select("chromosome", "start", "end", "reference", "alternate", "studies", "participant_number",
-        "acls", "external_study_ids", "frequencies", "clinvar", "dbsnp_id", "release_id")
-      .joinByLocus(consequencesWithOmim)
+        "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "symbols",
+        "orphanet_disorder_id", "panel", "inheritance", "hgvsc", "hgvsp", "hgvsg", "disease_names", "tumour_types_germline"
+      )
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -97,6 +104,48 @@ object VariantsToJsonJob {
   }
 
   implicit class DataFrameOperations(df: DataFrame) {
+
+    def withConsequences(consequences: DataFrame, omim: DataFrame, orphanet: DataFrame, ddd_gene_set: DataFrame,
+                         cosmic_gene_set: DataFrame): DataFrame = {
+
+      val consequenceWithScores =
+        consequences
+          .withScores
+          .select("chromosome", "start", "reference", "alternate", "symbol", "ensembl_gene_id", "consequences",
+            "rsnumber", "impact", "symbol", "strand", "biotype", "variant_class", "exon", "intron", "hgvsc", "hgvsp", "cds_position",
+            "cdna_position", "protein_position", "amino_acids", "codons", "canonical", "aa_change", "coding_dna_change",
+            "ensembl_transcript_id", "ensembl_regulatory_id", "feature_type", "scores")
+
+      val columnsAtGeneLevel: Set[String] = Set("hgvsc", "hgvsp") ++
+        orphanet.columns.toSet ++
+        ddd_gene_set.columns.toSet ++
+        cosmic_gene_set.columns.toSet
+
+      val consequenceOutputColumns: Set[String] =
+        consequenceWithScores.columns.toSet ++
+          omim.columns.toSet ++
+          Set("gene_symbol_aa_change") --
+          columnsAtGeneLevel --
+          Set("chromosome", "start", "reference", "alternate")
+
+      val consequencesDf =
+        consequenceWithScores
+          .join(omim, Seq("ensembl_gene_id"), "left")
+          .join(orphanet, Seq("symbol"), "left")
+          .join(ddd_gene_set, Seq("symbol"), "left")
+          .join(cosmic_gene_set, Seq("symbol"), "left")
+          .withColumn("gene_symbol_aa_change", concat_ws(" ", col("symbol"), col("aa_change")))
+          .withColumn("consequence", struct(consequenceOutputColumns.toSeq.map(col):_*))
+          .groupBy(locus:_*)
+          .agg(
+            collect_set(col("symbol")).as("symbols"),
+            columnsAtGeneLevel.map(c => first(c).as(c)).toSeq :+
+              collect_set(col("disease_name")).as("disease_names"):+
+              collect_set(col("consequence")).as("consequences"):_*
+          )
+
+      df.joinByLocus(consequencesDf)
+    }
 
     def joinByLocus(df2: DataFrame): DataFrame = {
       df.join(df2, locus.map(_.toString), "left")
@@ -164,7 +213,7 @@ object VariantsToJsonJob {
     def withClinVar: DataFrame = {
       df
         .withColumn("clinvar", struct(
-          col("clinvar_id").as("name"),
+          col("clinvar_id").as("clinvar_id"),
           col("clin_sig").as("clin_sig")
         ))
     }

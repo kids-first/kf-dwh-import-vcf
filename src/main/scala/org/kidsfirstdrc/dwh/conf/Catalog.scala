@@ -27,9 +27,11 @@ object Catalog {
     val bucket = "s3a://kf-strides-variant-parquet-prd"
 
     val clinvar           = DataSource("clinvar"          , "variant", bucket, "/public/clinvar"          , PARQUET, List(clinvar_vcf))
+    val cosmic_gene_set   = DataSource("cosmic_gene_set"  , "variant", bucket, "/public/cosmic_gene_set"  , PARQUET, List(cosmic_cancer_gene_census))
     val dbnsfp            = DataSource("bdnsfp"           , "variant", bucket, "/public/dbnsfp/variant"   , PARQUET, List())
     val dbnsfp_annovar    = DataSource("dbnsfp_annovar"   , "variant", bucket, "/public/annovar/dbnsfp"   , PARQUET, List(annovar_dbnsfp))
     val dbnsfp_original   = DataSource("dbnsfp_original"  , "variant", bucket, "/public/dbnsfp/scores"    , PARQUET, List(dbnsfp))
+    val ddd_gene_set      = DataSource("ddd_gene_set"     , "variant", bucket, "/public/ddd_gene_set"     , PARQUET, List(ddd_gene_census))
     val omim_gene_set     = DataSource("omim_gene_set"    , "variant", bucket, "/public/omim_gene_set"    , PARQUET, List(omim_genemap2))
     val orphanet_gene_set = DataSource("orphanet_gene_set", "variant", bucket, "/public/orphanet_gene_set", PARQUET, List(orphanet_gene_association, orphanet_disease_history))
     val topmed_bravo      = DataSource("topmed_bravo"     , "variant", bucket, "/public/topmed_bravo"     , PARQUET, List())
@@ -49,10 +51,11 @@ object Catalog {
   object ElasticsearchJson extends StoreFolder {
 
     import Clinical._
+    import Public._
 
     val bucket = "s3a://kf-strides-variant-parquet-prd"
 
-    val variantsJson = DataSource("variants_index", "", bucket, "/es_index/variants_index_re_*", JSON, List(variants))
+    val variantsJson = DataSource("variants_index", "", bucket, "/es_index/variants_index_re_*", JSON, List(variants, consequences, omim_gene_set, orphanet_gene_set, ddd_gene_set, clinvar, cosmic_gene_set))
   }
 
   def sources: Set[DataSource] = Raw.sources ++ Public.sources

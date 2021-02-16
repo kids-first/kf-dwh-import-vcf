@@ -3,7 +3,7 @@ package org.kidsfirstdrc.dwh.variantDb.json
 import org.apache.spark.sql.DataFrame
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.testutils.Model.{JoinConsequenceOutput, JoinVariantOutput, ThousandGenomesFreq}
-import org.kidsfirstdrc.dwh.testutils.external.Omim
+import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, CosmicCancerGeneCensusOutput, DddGeneCensusOutput, Omim, OrphanetOutput}
 import org.kidsfirstdrc.dwh.testutils.{VariantToJsonJobModel, WithSparkSession}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
@@ -49,10 +49,31 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
     Omim.Output().copy(ensembl_gene_id = "ENSG00000136532")
   ).toDF()
 
+  val orphanetDf: DataFrame = Seq(
+    OrphanetOutput(),
+    OrphanetOutput().copy(gene_symbol = "SCN2A")
+  ).toDF()
+
+  val dddDf: DataFrame = Seq(
+  DddGeneCensusOutput()
+  ).toDF()
+
+  val clinvarDf: DataFrame = Seq(
+  ClinvarOutput()
+  ).toDF()
+
+  val cosmicDf: DataFrame = Seq(
+    CosmicCancerGeneCensusOutput()
+  ).toDF()
+
   val data = Map(
     Clinical.variants -> joinVariantDf,
     Clinical.consequences -> joinConsequencesDf,
-    Public.omim_gene_set -> ominDf
+    Public.omim_gene_set -> ominDf,
+    Public.orphanet_gene_set -> orphanetDf,
+    Public.ddd_gene_set -> dddDf,
+    Public.clinvar -> clinvarDf,
+    Public.cosmic_gene_set -> cosmicDf
   )
 
   "VariantDbJson" should "transform data to the right format" in {
@@ -72,7 +93,7 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
 
     result.columns should contain allOf
       ("chromosome", "start", "end", "reference", "alternate", "studies",
-        "frequencies", "clinvar", "dbsnp_id", "release_id", "consequences")
+        "frequencies", "clinvar", "rsnumber", "release_id", "consequences")
 
     //1. make sure we have only 1 row in the result
     parsedResult.length shouldBe 1

@@ -20,11 +20,10 @@ abstract class DataSourceEtl(runEnv: Environment) {
 
   def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data
-      //.coalesce(1)
       .write
       .mode("overwrite")
       .format("parquet")
-      .option("path", destination.path)
+      .option("path", destination.path(runEnv))
       .saveAsTable(s"${destination.database}.${destination.name}")
 
     UpdateTableComments.run(destination.database, destination.name, destination.documentationPath)

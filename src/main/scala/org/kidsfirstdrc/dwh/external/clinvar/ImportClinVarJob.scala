@@ -17,7 +17,6 @@ class ImportClinVarJob(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
   override val destination: DataSource = clinvar
 
-
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(clinvar_vcf -> vcf(clinvar_vcf.path))
   }
@@ -56,7 +55,9 @@ class ImportClinVarJob(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = super.load(data.coalesce(1))
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    super.load(data.coalesce(1))
+  }
 
   def info_fields(df: DataFrame, excludes: String*): Seq[Column] = {
     df.columns.collect { case c if c.startsWith("INFO") && !excludes.contains(c) => col(c) as c.replace("INFO_", "").toLowerCase }

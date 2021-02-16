@@ -23,16 +23,18 @@ object ImportExternal extends App {
   val env = Try(Environment.withName(runEnv)).getOrElse(Environment.DEV)
 
   jobType.toLowerCase match {
-    case "clinvar"  =>
+    case "clinvar"         =>
       new ImportClinVarJob(env).run()
       Try {
         if (updateDependencies.toBoolean)
           new UpdateVariant(Public.clinvar, env).run()
       }
-    case "omim"           => new ImportOmimGeneSet(env).run()
-    case "orphanet"       => new ImportOrphanetJob(env).run()
-    case "annovar_scores" => new ImportAnnovarScores(env).run()
-    case "topmed_bravo"   =>
+    case "cosmic_gene_set" => new ImportCancerGeneCensus(env).run()
+    case "ddd_gene_set"    => new ImportDDDGeneCensus(env).run()
+    case "omim_gene_set"   => new ImportOmimGeneSet(env).run()
+    case "orphanet"        => new ImportOrphanetJob(env).run()
+    case "annovar_scores"  => new ImportAnnovarScores(env).run()
+    case "topmed_bravo"    =>
       new ImportTopMed(env).run()
       Try {
         if (updateDependencies.toBoolean)
