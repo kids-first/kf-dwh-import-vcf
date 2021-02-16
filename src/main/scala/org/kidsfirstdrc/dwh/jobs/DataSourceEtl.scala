@@ -26,7 +26,7 @@ abstract class DataSourceEtl(runEnv: Environment) {
       .option("path", destination.path(runEnv))
       .saveAsTable(s"${destination.database}.${destination.name}")
 
-    UpdateTableComments.run(destination.database, destination.name, destination.documentationPath)
+    UpdateTableComments.run(destination)
     if (runEnv == Environment.PROD) {
       spark.sql(s"create or replace view variant_live.${destination.name} as select * from ${destination.database}.${destination.name}")
     }

@@ -25,31 +25,22 @@ object UpdateTableComments extends App {
   }
 
   def run(table: DataSource)(implicit spark: SparkSession, env: Environment): Unit = {
-    println(table.database)
-    println(table.name)
-    println(table.documentationPath)
     run(table.database, table.name, table.documentationPath)
   }
 
   def run(database: String, table: String, metadata_file: String)(implicit spark: SparkSession): Unit = {
-    import spark.implicits._
-
     Try {
-      val commentsDF = spark.read.option("multiline", "true").json(metadata_file).drop("data_type")
+      spark.read.option("multiline", "true").json(metadata_file).drop("data_type")
+    }.fold(_ => println(s"[ERROR] documentation ${metadata_file} not found."),
+      documentationDf => {
+         import spark.implicits._
+         val describeTableDF = spark.sql(s"DESCRIBE $database.$table")
+         val comments = describeTableDF.drop("comment").join(documentationDf, Seq("col_name"))
+           .as[GlueFieldComment].collect()
 
-      val describeTableDF = spark.sql(s"DESCRIBE $database.$table")
-
-      val comments = describeTableDF.drop("comment").join(commentsDF, Seq("col_name"))
-        .as[GlueFieldComment].collect()
-
-      setComments(comments, database, table)
-    } match {
-      case Failure(e) =>
-        println(s"Tried to update $table comments but found: ${e.getMessage}")
-        e.printStackTrace()
-      case Success(_) => println(s"[INFO] $table updated")
-    }
-
+        setComments(comments, database, table)
+      }
+    )
   }
 
   def setComments(comments: Array[GlueFieldComment], database: String, table: String)(implicit spark: SparkSession): Unit = {

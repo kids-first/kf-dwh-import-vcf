@@ -2,6 +2,8 @@ package org.kidsfirstdrc.dwh.conf
 
 trait StoreFolder {
 
+  val bucket: String
+
   private def getClassFields: Set[Any] =
     this
       .getClass
