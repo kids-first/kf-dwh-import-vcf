@@ -23,7 +23,7 @@ object VariantToJsonJobModel {
                          gnomad_genomes_3_0: GnomadFreqOutput = GnomadFreqOutput(),
                          internal: InternalFrequencies = InternalFrequencies())
 
-  case class Clinvar(clinvar_id: String, clin_sig: String)
+  case class Clinvar(clinvar_id: String = "", clin_sig: String = "")
 
   case class ScoreConservations(phylo_p17way_primate_rankscore: Double)
 
@@ -42,13 +42,11 @@ object VariantToJsonJobModel {
                               predictions: ScorePredictions)
 
   case class Consequence(impact: String = "MODERATE",
-                         ensembl_gene_id: String = "ENSG00000136531",
                          ensembl_transcript_id: Option[String] = Some("ENST00000283256.10"),
                          ensembl_regulatory_id: Option[String] = None,
                          feature_type: String = "Transcript",
                          consequences: Seq[String] = Seq("missense_variant"),
                          biotype: Option[String] = Some("protein_coding"),
-                         rsnumber: Option[String] = Some("rs1057520413"),
                          variant_class: String = "SNV",
                          strand: Int = 1,
                          exon: Option[Exon] = Some(Exon(7, 27)),
@@ -63,27 +61,31 @@ object VariantToJsonJobModel {
                          canonical: Boolean = true,
                          scores: ConsequenceScore)
 
-  case class Output(chromosome: String,
-                    start: Long,
-                    end: Long,
-                    reference: String,
-                    alternate: String,
-                    studies: List[Study],
-                    participant_number: Long,
-                    acls: List[String],
-                    external_study_ids: List[String],
-                    frequencies: Frequencies,
-                    clinvar: Clinvar,
-                    rsnumber: String,
-                    release_id: String,
-                    consequences: List[Consequence],
-                    symbols: List[String],
-                    orphanet_disorder_id: Option[Long] = Some(17601),
-                    panel: Option[String] = Some("Multiple epiphyseal dysplasia, Al-Gazali type"),
-                    inheritance: List[String] = List("Autosomal recessive"),
+  case class Output(chromosome: String = "2",
+                    start: Long = 165310406,
+                    end: Long = 165310406,
+                    reference: String = "G",
+                    alternate: String = "A",
+                    locus: String = "2-165310406-G-A",
+                    studies: List[Study] = List(),
+                    participant_number: Long = 22,
+                    acls: List[String] = List("SD_456.c1", "SD_123.c1", "SD_789.c99"),
+                    external_study_ids: List[String] = List("SD_456", "SD_123", "SD_789"),
+                    frequencies: Frequencies = Frequencies(),
+                    clinvar: Clinvar = Clinvar("RCV000436956", "pathogenic"),
+                    rsnumber: String = "rs1234567",
+                    release_id: String = "RE_ABCDEF",
+                    consequences: List[Consequence] = List(),
+                    symbols: List[String] = List("SCN2A"),
+                    orphanet_disorder_ids: List[Long] = List(17601),
+                    panels: List[String] = List("Multiple epiphyseal dysplasia, Al-Gazali type"),
+                    inheritances: List[String] = List("Autosomal recessive"),
                     hgvsg: Option[String] = Some("chr2:g.166166916G>A"),
                     hgvsc: Option[String] = Some("ENST00000283256.10:c.781G>A"),
                     hgvsp: Option[String] = Some("ENSP00000283256.6:p.Val261Met"),
-                    disease_names: List[String],
-                    tumour_types_germline: List[String])
+                    disease_names: List[String] = List("OCULOAURICULAR SYNDROME"),
+                    tumour_types_germlines: List[String] = List(),
+                    omim_gene_ids: List[String] = List("23234234"),
+                    entrez_gene_ids: List[String] = List("12345"),
+                    ensembl_gene_ids: List[String] = List("ENSG00000189337"))
 }

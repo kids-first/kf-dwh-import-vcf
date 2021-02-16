@@ -2,8 +2,9 @@ package org.kidsfirstdrc.dwh.variantDb.json
 
 import org.apache.spark.sql.DataFrame
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
-import org.kidsfirstdrc.dwh.testutils.Model.{JoinConsequenceOutput, JoinVariantOutput, ThousandGenomesFreq}
-import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, CosmicCancerGeneCensusOutput, DddGeneCensusOutput, Omim, OrphanetOutput}
+import org.kidsfirstdrc.dwh.testutils.Model.{Exon, Freq, JoinConsequenceOutput, JoinVariantOutput, RefAlt, ThousandGenomesFreq}
+import org.kidsfirstdrc.dwh.testutils.VariantToJsonJobModel._
+import org.kidsfirstdrc.dwh.testutils.external.{CosmicCancerGeneCensusOutput, DddGeneCensusOutput, Omim, OrphanetOutput}
 import org.kidsfirstdrc.dwh.testutils.{VariantToJsonJobModel, WithSparkSession}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
@@ -40,13 +41,13 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
   ).toDF().withColumnRenamed("one_k_genomes", "1k_genomes")
 
   val joinConsequencesDf: DataFrame = Seq(
-    JoinConsequenceOutput(),
-    JoinConsequenceOutput().copy(ensembl_gene_id = "ENSG00000136532")
+    JoinConsequenceOutput().copy(ensembl_gene_id = "ENSG00000189337", ensembl_transcript_id = Some("ENST00000636564")),
+    JoinConsequenceOutput().copy(ensembl_gene_id = "ENSG00000189337", ensembl_transcript_id = Some("ENST00000636203"))
   ).toDF()
 
   val ominDf: DataFrame = Seq(
     Omim.Output(),
-    Omim.Output().copy(ensembl_gene_id = "ENSG00000136532")
+    Omim.Output().copy(ensembl_gene_id = "ENSG00000189337")
   ).toDF()
 
   val orphanetDf: DataFrame = Seq(
@@ -55,15 +56,11 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
   ).toDF()
 
   val dddDf: DataFrame = Seq(
-  DddGeneCensusOutput()
-  ).toDF()
-
-  val clinvarDf: DataFrame = Seq(
-  ClinvarOutput()
+  DddGeneCensusOutput(`symbol` = "SCN2A")
   ).toDF()
 
   val cosmicDf: DataFrame = Seq(
-    CosmicCancerGeneCensusOutput()
+    CosmicCancerGeneCensusOutput(`symbol` = "SCN2A")
   ).toDF()
 
   val data = Map(
@@ -72,15 +69,26 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
     Public.omim_gene_set -> ominDf,
     Public.orphanet_gene_set -> orphanetDf,
     Public.ddd_gene_set -> dddDf,
-    Public.clinvar -> clinvarDf,
     Public.cosmic_gene_set -> cosmicDf
   )
+
+  val expectedStudies = List(
+    Study("SD_456", List("SD_456.c1"), List("SD_456"), StudyFrequency(Freq(10,5,0.5,2,3),Freq(0,0,0,0,0)),5),
+    Study("SD_789", List("SD_789.c99"), List("SD_789"), StudyFrequency(Freq(7,2,0.2857142857,5,1),Freq(7,2,0.2857142857,5,1)),12),
+    Study("SD_123", List("SD_123.c1"), List("SD_123"), StudyFrequency(Freq(10,5,0.5,2,3),Freq(0,0,0,0,0)),5)
+  )
+
+  val expectedConsequences: List[Consequence] = List(
+    Consequence("MODERATE",Some("ENST00000636564"),None,"Transcript",List("missense_variant"),Some("protein_coding"),"SNV",1,Some(Exon(7,27)),None,Some(937),Some(781),Some(RefAlt("V","M")),Some(RefAlt("GTG","ATG")),Some(261),Some("V261M"),Some("781G>A"),true,
+      ConsequenceScore(ScoreConservations(0.5),ScorePredictions(0.1,"SIFT_pred",0.2,"HVAR_pred","FATHMM_rankscore","FATHMM_pred","CADD_raw_rankscore","DANN_rankscore",0.3,0.4,"LRT_pred"))),
+    Consequence("MODERATE",Some("ENST00000636203"),None,"Transcript",List("missense_variant"),Some("protein_coding"),"SNV",1,Some(Exon(7,27)),None,Some(937),Some(781),Some(RefAlt("V","M")),Some(RefAlt("GTG","ATG")),Some(261),Some("V261M"),Some("781G>A"),true,
+      ConsequenceScore(ScoreConservations(0.5),ScorePredictions(0.1,"SIFT_pred",0.2,"HVAR_pred","FATHMM_rankscore","FATHMM_pred","CADD_raw_rankscore","DANN_rankscore",0.3,0.4,"LRT_pred")))
+  )
+
 
   "VariantDbJson" should "transform data to the right format" in {
 
     val result = new VariantsToJsonJob(realeaseId).transform(data)
-
-    result.select("acls", "participant_number").show(false)
 
     val parsedResult = result.as[VariantToJsonJobModel.Output].collect()
     val `1k_genomes`: ThousandGenomesFreq =
@@ -91,26 +99,10 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
       .as[ThousandGenomesFreq].collect().head
     val variant = parsedResult.head
 
-    result.columns should contain allOf
-      ("chromosome", "start", "end", "reference", "alternate", "studies",
-        "frequencies", "clinvar", "rsnumber", "release_id", "consequences")
-
     //1. make sure we have only 1 row in the result
     parsedResult.length shouldBe 1
     //2. data validation of that row
-    variant.studies.size shouldBe 3
-    variant.studies.map(_.study_id).toSet shouldBe Set(studyId1, studyId2, studyId3)
-    variant.consequences.size shouldBe 2
-    variant.consequences.map(_.ensembl_gene_id).toSet shouldBe Set("ENSG00000136531", "ENSG00000136532")
-    variant.chromosome shouldBe "2"
-    variant.start shouldBe 165310406
-    variant.end shouldBe 165310406
-    variant.reference shouldBe "G"
-    variant.alternate shouldBe "A"
-    variant.participant_number shouldBe 22
-    //3. frequencies validation in two steps as `1k_genomes` is not a valid name for java variable it needs to be tested
-    //   separately
-    variant.frequencies shouldBe VariantToJsonJobModel.Frequencies()
+    variant shouldBe VariantToJsonJobModel.Output(studies = expectedStudies, consequences = expectedConsequences)
     `1k_genomes` shouldBe ThousandGenomesFreq()
 
   }
