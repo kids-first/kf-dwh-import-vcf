@@ -1,16 +1,16 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{DoubleType, IntegerType}
+import org.apache.spark.sql.types.{DoubleType, IntegerType, LongType}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
+import org.kidsfirstdrc.dwh.conf.DataSource
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.conf.{Catalog, DataSource}
 import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 
 class ImportScores(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
-  override val destination: DataSource = Catalog.Public.dbnsfp_original
+  override val destination: DataSource = Public.dbnsfp_original
 
   def split_semicolon(colName: String, outputColName: String): Column = split(col(colName), ";") as outputColName
 
@@ -33,7 +33,7 @@ class ImportScores(runEnv: Environment) extends DataSourceEtl(runEnv) {
   override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(Public.dbnsfp_variant).select(
       col("chromosome"),
-      col("start"),
+      col("start").cast(LongType),
       col("reference"),
       col("alternate"),
       split_semicolon("aapos"),

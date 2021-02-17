@@ -3,7 +3,7 @@ package org.kidsfirstdrc.dwh.testutils.external
 object ImportScores {
 
   case class Input(chromosome: String = "X",
-                   start: Long = 165310406,
+                   start: String = "165310406",
                    reference: String = "G",
                    alternate: String = "A",
                    aapos: String = "00",
