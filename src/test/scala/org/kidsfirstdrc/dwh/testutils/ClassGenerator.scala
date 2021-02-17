@@ -3,7 +3,6 @@ package org.kidsfirstdrc.dwh.testutils
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.kidsfirstdrc.dwh.testutils.ClassGenerator.getClass
 
 import java.io._
 import java.time.LocalDateTime
@@ -18,6 +17,8 @@ object ClassGenerator {
     case DoubleType                           => "Double"
     case LongType                             => "Long"
     case DecimalType()                        => "Double"
+    case DateType                             => "Date"
+    case TimestampType                        => "Timestamp"
     case ArrayType(StringType, _)             => "List[String]"
     case ArrayType(FloatType, _)              => "List[Float]"
     case ArrayType(IntegerType, _)            => "List[Int]"
@@ -37,6 +38,8 @@ object ClassGenerator {
     case (name, values, DoubleType)                                    => values.getAs(name)
     case (name, values, LongType)                                      => values.getAs(name)
     case (name, values, DecimalType())                                 => values.getAs(name)
+    case (name, values, DateType)                                      => s"""Date.valueOf("${values.getAs(name)}")"""
+    case (name, values, TimestampType)                                 => s"""Timestamp.valueOf("${values.getAs(name)}")"""
     case (name, values, ArrayType(StringType,_))                       => s"""List(${values.getAs[List[String]](name).mkString("\"", "\", \"", "\"")})"""
     case (name, values, ArrayType(FloatType,_))                        => values.getAs[List[Float]](name).mkString("List(", ", ", ")")
     case (name, values, ArrayType(IntegerType,_))                      => values.getAs[List[Int]](name).mkString("List(", ", ", ")")
