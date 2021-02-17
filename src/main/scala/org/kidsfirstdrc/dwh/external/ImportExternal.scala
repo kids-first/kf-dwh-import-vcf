@@ -4,7 +4,7 @@ import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
-import org.kidsfirstdrc.dwh.external.dbnsfp.ImportAnnovarScores
+import org.kidsfirstdrc.dwh.external.dbnsfp.{ImportAnnovarScores, ImportRaw, ImportScores}
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetJob
 import org.kidsfirstdrc.dwh.updates.UpdateVariant
@@ -23,6 +23,7 @@ object ImportExternal extends App {
   val env = Try(Environment.withName(runEnv)).getOrElse(Environment.DEV)
 
   jobType.toLowerCase match {
+    case "1000genomes"     => new Import1k(env).run()
     case "clinvar"         =>
       new ImportClinVarJob(env).run()
       Try {
@@ -31,6 +32,8 @@ object ImportExternal extends App {
       }
     case "cosmic_gene_set" => new ImportCancerGeneCensus(env).run()
     case "ddd_gene_set"    => new ImportDDDGeneCensus(env).run()
+    case "dbnsfp_variant"  => new ImportRaw(env).run()
+    case "dbnsfp_original" => new ImportScores(env).run()
     case "omim_gene_set"   => new ImportOmimGeneSet(env).run()
     case "orphanet"        => new ImportOrphanetJob(env).run()
     case "annovar_scores"  => new ImportAnnovarScores(env).run()

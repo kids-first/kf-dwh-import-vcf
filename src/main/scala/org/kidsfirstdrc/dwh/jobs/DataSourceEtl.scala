@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.jobs
 
 import org.apache.spark.sql.functions.{col, lit, regexp_extract, trim}
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
 import org.kidsfirstdrc.dwh.conf.{DataSource, Environment}
 import org.kidsfirstdrc.dwh.glue.UpdateTableComments
@@ -21,7 +21,7 @@ abstract class DataSourceEtl(runEnv: Environment) {
   def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data
       .write
-      .mode("overwrite")
+      .mode(SaveMode.Overwrite)
       .format("parquet")
       .option("path", destination.path(runEnv))
       .saveAsTable(s"${destination.database}.${destination.name}")

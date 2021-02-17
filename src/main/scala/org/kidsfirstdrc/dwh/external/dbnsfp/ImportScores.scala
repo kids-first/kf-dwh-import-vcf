@@ -2,21 +2,15 @@ package org.kidsfirstdrc.dwh.external.dbnsfp
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DoubleType, IntegerType}
-import org.apache.spark.sql.{Column, DataFrame, SparkSession}
+import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
-import org.kidsfirstdrc.dwh.conf.{Catalog, DataSource, Environment}
+import org.kidsfirstdrc.dwh.conf.Environment.Environment
+import org.kidsfirstdrc.dwh.conf.{Catalog, DataSource}
 import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 
-object ImportScores extends DataSourceEtl(Environment.PROD) with App {
+class ImportScores(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
-  override val destination = Catalog.Public.dbnsfp_original
-
-  implicit val spark: SparkSession = SparkSession.builder
-    .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
-    .enableHiveSupport()
-    .appName("Import DBSNFP Scores to DWH").getOrCreate()
-
-  run()
+  override val destination: DataSource = Catalog.Public.dbnsfp_original
 
   def split_semicolon(colName: String, outputColName: String): Column = split(col(colName), ";") as outputColName
 
@@ -25,18 +19,19 @@ object ImportScores extends DataSourceEtl(Environment.PROD) with App {
   def element_at_postion(colName: String): Column = element_at(col(colName), col("position")) as colName
 
   def score(colName: String): Column = when(element_at_postion(colName) === ".", null).otherwise(element_at_postion(colName).cast(DoubleType)) as colName
+
   def cast(colName: String): Column = col(colName).cast(DoubleType) as colName
 
   def pred(colName: String): Column = when(element_at_postion(colName) === ".", null).otherwise(element_at_postion(colName)) as colName
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(
-      Public.dbnsfp -> spark.table(s"${Public.dbnsfp.database}.${Public.dbnsfp.name}")
+      Public.dbnsfp_variant -> spark.table(s"${Public.dbnsfp_variant.database}.${Public.dbnsfp_variant.name}")
     )
   }
 
   override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    data(Public.dbnsfp).select(
+    data(Public.dbnsfp_variant).select(
       col("chromosome"),
       col("start"),
       col("reference"),
@@ -306,7 +301,8 @@ object ImportScores extends DataSourceEtl(Environment.PROD) with App {
     data
       .repartition(col("chromosome"))
       .sortWithinPartitions("start")
-      .write.mode("overwrite")
+      .write
+      .mode(SaveMode.Overwrite)
       .partitionBy("chromosome")
       .format("parquet")
       .option("path", destination.path)
