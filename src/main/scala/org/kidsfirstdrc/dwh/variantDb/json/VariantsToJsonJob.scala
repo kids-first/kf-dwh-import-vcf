@@ -23,7 +23,6 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
       Public.omim_gene_set     -> spark.table(s"${Public.omim_gene_set.database}.${Public.omim_gene_set.name}"),
       Public.orphanet_gene_set -> spark.table(s"${Public.orphanet_gene_set.database}.${Public.orphanet_gene_set.name}"),
       Public.ddd_gene_set      -> spark.table(s"${Public.ddd_gene_set.database}.${Public.ddd_gene_set.name}"),
-      Public.clinvar           -> spark.table(s"${Public.clinvar.database}.${Public.clinvar.name}"),
       Public.cosmic_gene_set   -> spark.table(s"${Public.cosmic_gene_set.database}.${Public.cosmic_gene_set.name}")
     )
   }
@@ -33,7 +32,6 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
       .withColumnRenamed("dbsnp_id", "rsnumber")
 
     val consequences = data(Clinical.consequences)
-      .withColumnRenamed("name", "rsnumber")
 
     val omim = data(Public.omim_gene_set)
       .select("ensembl_gene_id", "entrez_gene_id", "omim_gene_id")
@@ -57,10 +55,10 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
       .withFrequencies
       .withClinVar
       .withConsequences(consequences, omim, orphanet, ddd_gene_set, cosmic_gene_set)
-      .select("chromosome", "start", "end", "reference", "alternate", "studies", "participant_number",
+      .select("chromosome", "start", "end", "reference", "alternate", "locus", "studies", "participant_number",
         "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "symbols",
-        "orphanet_disorder_id", "panel", "inheritance", "hgvsc", "hgvsp", "hgvsg", "disease_names", "tumour_types_germline"
-      )
+        "orphanet_disorder_ids", "panels", "inheritances", "hgvsc", "hgvsp", "hgvsg", "disease_names", "tumour_types_germlines",
+        "omim_gene_ids", "entrez_gene_ids", "ensembl_gene_ids")
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -69,6 +67,17 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
       .mode(SaveMode.Overwrite)
       .json(s"${destination.bucket}/es_index/${destination.name}_${this.releaseId}")
     data
+  }
+
+  override def publish(view_db: String)(implicit spark: SparkSession): Unit = {
+    //no publish
+  }
+
+  override def run()(implicit spark: SparkSession): DataFrame = {
+    val inputDF = extract()
+    val outputDF = transform(inputDF)
+    load(outputDF)
+    outputDF
   }
 }
 
@@ -112,18 +121,19 @@ object VariantsToJsonJob {
         consequences
           .withScores
           .select("chromosome", "start", "reference", "alternate", "symbol", "ensembl_gene_id", "consequences",
-            "rsnumber", "impact", "symbol", "strand", "biotype", "variant_class", "exon", "intron", "hgvsc", "hgvsp", "cds_position",
+            "impact", "symbol", "strand", "biotype", "variant_class", "exon", "intron", "hgvsc", "hgvsp", "cds_position",
             "cdna_position", "protein_position", "amino_acids", "codons", "canonical", "aa_change", "coding_dna_change",
             "ensembl_transcript_id", "ensembl_regulatory_id", "feature_type", "scores")
 
-      val columnsAtGeneLevel: Set[String] = Set("hgvsc", "hgvsp") ++
+      val columnsAtGeneLevel: Set[String] =
         orphanet.columns.toSet ++
-        ddd_gene_set.columns.toSet ++
-        cosmic_gene_set.columns.toSet
+          omim.columns.toSet ++
+          ddd_gene_set.columns.toSet ++
+          cosmic_gene_set.columns.toSet --
+          Set("hgvsc", "hgvsp", "inheritance", "tumour_types_germline")
 
       val consequenceOutputColumns: Set[String] =
         consequenceWithScores.columns.toSet ++
-          omim.columns.toSet ++
           Set("gene_symbol_aa_change") --
           columnsAtGeneLevel --
           Set("chromosome", "start", "reference", "alternate")
@@ -134,14 +144,18 @@ object VariantsToJsonJob {
           .join(orphanet, Seq("symbol"), "left")
           .join(ddd_gene_set, Seq("symbol"), "left")
           .join(cosmic_gene_set, Seq("symbol"), "left")
-          .withColumn("gene_symbol_aa_change", concat_ws(" ", col("symbol"), col("aa_change")))
+          .withColumn("gene_symbol_aa_change",
+            when(col("aa_change").isNotNull, concat_ws(" ", col("symbol"), col("aa_change")))
+              .otherwise(lit(null)))
           .withColumn("consequence", struct(consequenceOutputColumns.toSeq.map(col):_*))
           .groupBy(locus:_*)
           .agg(
-            collect_set(col("symbol")).as("symbols"),
-            columnsAtGeneLevel.map(c => first(c).as(c)).toSeq :+
-              collect_set(col("disease_name")).as("disease_names"):+
-              collect_set(col("consequence")).as("consequences"):_*
+            collect_set(col("consequence")).as("consequences"),
+            columnsAtGeneLevel.map(c => collect_set(col(c)).as(s"${c}s")).toSeq :+
+              flatten(collect_set(col("inheritance"))).as("inheritances") :+
+              flatten(collect_set(col("tumour_types_germline"))).as("tumour_types_germlines") :+
+              first("hgvsc").as("hgvsc") :+
+              first("hgvsp").as("hgvsp"):_*
           )
 
       df.joinByLocus(consequencesDf)

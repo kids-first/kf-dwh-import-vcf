@@ -4,8 +4,10 @@ import org.kidsfirstdrc.dwh.conf.Formats._
 
 object Catalog {
 
+  val kfStridesVariantBucket = "s3a://kf-strides-variant-parquet-prd"
+
   object Raw extends StoreFolder {
-    val bucket = "s3a://kf-strides-variant-parquet-prd"
+    override val bucket: String  = kfStridesVariantBucket
 
     val annovar_dbnsfp            = DataSource("annovar_dbnsfp"           , "", bucket, "/raw/annovar/dbNSFP/hg38_dbnsfp41a.txt", CSV)
     val clinvar_vcf               = DataSource("clinvar_vcf"              , "", bucket, "/raw/clinvar/clinvar.vcf.gz"           , VCF)
@@ -24,7 +26,7 @@ object Catalog {
 
     import Raw._
 
-    val bucket = "s3a://kf-strides-variant-parquet-prd"
+    override val bucket: String  = kfStridesVariantBucket
 
     val clinvar           = DataSource("clinvar"          , "variant", bucket, "/public/clinvar"          , PARQUET, List(clinvar_vcf))
     val cosmic_gene_set   = DataSource("cosmic_gene_set"  , "variant", bucket, "/public/cosmic_gene_set"  , PARQUET, List(cosmic_cancer_gene_census))
@@ -41,7 +43,7 @@ object Catalog {
 
     import Public._
 
-    val bucket = "s3a://kf-strides-variant-parquet-prd"
+    override val bucket: String  = kfStridesVariantBucket
 
     val consequences = DataSource("consequences", "variant", bucket, "/consequences/consequences_re_*", PARQUET, List())
     val occurrences  = DataSource("occurrences" , "variant", bucket, "/occurrences/occurrences_re_*"  , PARQUET, List())
@@ -50,10 +52,10 @@ object Catalog {
 
   object ElasticsearchJson extends StoreFolder {
 
+    override val bucket: String = kfStridesVariantBucket
+
     import Clinical._
     import Public._
-
-    val bucket = "s3a://kf-strides-variant-parquet-prd"
 
     val variantsJson = DataSource("variants_index", "", bucket, "/es_index/variants_index_re_*", JSON, List(variants, consequences, omim_gene_set, orphanet_gene_set, ddd_gene_set, clinvar, cosmic_gene_set))
   }
