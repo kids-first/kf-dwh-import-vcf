@@ -2,13 +2,14 @@ package org.kidsfirstdrc.dwh.utils
 
 import io.projectglow.Glow
 import org.apache.hadoop.fs.Path
-import org.apache.spark.sql.expressions.{Window, WindowSpec}
+import org.apache.spark.sql.expressions.{UserDefinedFunction, Window, WindowSpec}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{ArrayType, DecimalType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getGenomicFiles
 
 import java.net.URI
+import scala.collection.mutable
 
 object SparkUtils {
 
@@ -203,4 +204,5 @@ object SparkUtils {
 
     val locus: Seq[Column] = locusColumNames.map(col)
   }
+
 }

@@ -1,12 +1,15 @@
 package org.kidsfirstdrc.dwh.external
 
+import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.IntegerType
+import org.apache.spark.sql.types.{ArrayType, IntegerType, StringType, StructField}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.conf.DataSource
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
 import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+
+import scala.collection.mutable
 
 class ImportCancerGeneCensus(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
@@ -16,9 +19,22 @@ class ImportCancerGeneCensus(runEnv: Environment) extends DataSourceEtl(runEnv) 
     Map(Raw.cosmic_cancer_gene_census -> spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.path))
   }
 
+  def trim_array_udf: UserDefinedFunction = udf { array: mutable.WrappedArray[String] =>
+    if (array != null) {
+      array.map {
+        case null => null
+        case str => str.trim()
+      }
+    } else {
+      array
+    }
+  }
+
   override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    data(Raw.cosmic_cancer_gene_census)
+    spark.udf.register("trim_array", trim_array_udf)
+
+    val df = data(Raw.cosmic_cancer_gene_census)
       .select(
         $"Gene Symbol" as "symbol",
         $"Name" as "name",
@@ -41,6 +57,11 @@ class ImportCancerGeneCensus(runEnv: Environment) extends DataSourceEtl(runEnv) 
         split($"Other Syndrome", ",") as "other_syndrome",
         split($"Synonyms", ",") as "synonyms"
      )
+      df.schema
+        .fields
+        .collect { case s @ StructField(_, ArrayType(StringType, _), _, _) => s }             // take only array type fields
+        .foldLeft(df)((d, f) => d.withColumn(f.name, trim_array_udf(col(f.name)))) // apply trim on each elements of each array
+
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {

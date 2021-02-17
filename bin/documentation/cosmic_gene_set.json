@@ -1,6 +1,22 @@
 [
-  {
-    "col_name": "symbol",
-    "comment": "gene symbol"
-  }
+  {"col_name": "symbol", "comment": "common gene symbol used in the literature"},
+  {"col_name": "name", "comment": ""},
+  {"col_name": "entrez_gene_id", "comment": "id in NCBI (https://www.ncbi.nlm.nih.gov/gene)"},
+  {"col_name": "Tier", "comment": ""},
+  {"col_name": "genome_location", "comment": "location of the gene chr-start-end"},
+  {"col_name": "hallmark", "comment": ""},
+  {"col_name": "chr_band", "comment": ""},
+  {"col_name": "somatic", "comment": "is somatic flag"},
+  {"col_name": "germline", "comment": "is germline flag"},
+  {"col_name": "tumour_types_somatic", "comment": ""},
+  {"col_name": "tumour_types_germline", "comment": ""},
+  {"col_name": "cancer_syndrome", "comment": ""},
+  {"col_name": "tissue_type", "comment": ""},
+  {"col_name": "molecular_genetics", "comment": ""},
+  {"col_name": "role_in_cancer", "comment": ""},
+  {"col_name": "mutation_types", "comment": "types of mutation"},
+  {"col_name": "translocation_partner", "comment": ""},
+  {"col_name": "other_germline_mutation", "comment": ""},
+  {"col_name": "other_syndrome", "comment": "list of syndrome that can be associated"},
+  {"col_name": "synonyms", "comment": "list of synonyms for this gene"}
 ]

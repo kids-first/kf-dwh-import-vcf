@@ -103,7 +103,7 @@ object ClassGeneratorMain extends App with WithSparkSession {
     //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusInput", root)
 
   new ImportCancerGeneCensus(Environment.LOCAL).transform(Map(Raw.cosmic_cancer_gene_census -> Seq(CosmicCancerGeneCensusInput()).toDF()))
-  //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusOutput", root)
+  .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusOutput", root)
 
 
 }
