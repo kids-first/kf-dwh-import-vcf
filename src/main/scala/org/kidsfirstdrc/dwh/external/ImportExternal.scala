@@ -23,6 +23,7 @@ object ImportExternal extends App {
   val env = Try(Environment.withName(runEnv)).getOrElse(Environment.DEV)
 
   jobType.toLowerCase match {
+    case "1000genomes"     => new Import1k(env).run()
     case "clinvar"         =>
       new ImportClinVarJob(env).run()
       Try {

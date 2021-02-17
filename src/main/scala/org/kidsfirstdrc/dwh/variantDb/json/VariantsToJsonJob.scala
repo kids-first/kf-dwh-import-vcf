@@ -65,7 +65,9 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
     data
       .write
       .mode(SaveMode.Overwrite)
-      .json(s"${destination.bucket}/es_index/${destination.name}_${this.releaseId}")
+      .format("json")
+      .option("path", s"${destination.bucket}/es_index/${destination.name}_${this.releaseId}")
+      .saveAsTable(s"${destination.database}.${destination.name}_${this.releaseId}")
     data
   }
 

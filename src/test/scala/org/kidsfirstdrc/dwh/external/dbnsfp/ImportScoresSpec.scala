@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
+import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.ImportScores._
 import org.scalatest.GivenWhenThen
@@ -14,8 +15,8 @@ class ImportScoresSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
   "ImportScores" should "transform data into expected format" in {
 
-    val inputDf = Map(Public.dbnsfp -> Seq(Input()).toDF())
-    val outputDf = ImportScores.transform(inputDf)
+    val inputDf = Map(Public.dbnsfp_variant -> Seq(Input()).toDF())
+    val outputDf = new ImportScores(Environment.LOCAL).transform(inputDf)
 
     outputDf.as[Output].collect() should contain theSameElementsAs Seq(Output())
 
