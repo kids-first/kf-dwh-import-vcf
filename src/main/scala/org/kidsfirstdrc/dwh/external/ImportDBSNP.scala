@@ -1,10 +1,9 @@
 package org.kidsfirstdrc.dwh.external
 
-import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
-import org.apache.spark.sql.types.IntegerType
 
 object ImportDBSNP extends App {
 

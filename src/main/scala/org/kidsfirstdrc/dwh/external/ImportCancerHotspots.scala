@@ -3,7 +3,6 @@ package org.kidsfirstdrc.dwh.external
 import io.projectglow.functions.lift_over_coordinates
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns
 
 object ImportCancerHotspots extends App {
   implicit val spark: SparkSession = SparkSession.builder
