@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.testutils
 
+import org.apache.spark.sql.functions.when
 import org.kidsfirstdrc.dwh.testutils.Model._
 
 object VariantToJsonJobModel {
@@ -44,6 +45,8 @@ object VariantToJsonJobModel {
   case class Consequence(impact: String = "MODERATE",
                          ensembl_transcript_id: Option[String] = Some("ENST00000283256.10"),
                          ensembl_regulatory_id: Option[String] = None,
+                         hgvsc: Option[String] = Some("ENST00000283256.10:c.781G>A"),
+                         hgvsp: Option[String] = Some("ENSP00000283256.6:p.Val261Met"),
                          feature_type: String = "Transcript",
                          consequences: Seq[String] = Seq("missense_variant"),
                          biotype: Option[String] = Some("protein_coding"),
@@ -58,8 +61,10 @@ object VariantToJsonJobModel {
                          protein_position: Option[Int] = Some(261),
                          aa_change: Option[String] = Some("V261M"),
                          coding_dna_change: Option[String] = Some("781G>A"),
+                         impact_score: Int = 3,
                          canonical: Boolean = true,
                          scores: ConsequenceScore)
+
 
   case class Output(chromosome: String = "2",
                     start: Long = 165310406,
@@ -81,8 +86,6 @@ object VariantToJsonJobModel {
                     panels: List[String] = List("Multiple epiphyseal dysplasia, Al-Gazali type"),
                     inheritances: List[String] = List("Autosomal recessive"),
                     hgvsg: Option[String] = Some("chr2:g.166166916G>A"),
-                    hgvsc: Option[String] = Some("ENST00000283256.10:c.781G>A"),
-                    hgvsp: Option[String] = Some("ENSP00000283256.6:p.Val261Met"),
                     disease_names: List[String] = List("OCULOAURICULAR SYNDROME"),
                     tumour_types_germlines: List[String] = List(),
                     omim_gene_ids: List[String] = List("23234234"),

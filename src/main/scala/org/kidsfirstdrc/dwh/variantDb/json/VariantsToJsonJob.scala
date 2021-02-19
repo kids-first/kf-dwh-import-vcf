@@ -57,7 +57,7 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
       .withConsequences(consequences, omim, orphanet, ddd_gene_set, cosmic_gene_set)
       .select("chromosome", "start", "end", "reference", "alternate", "locus", "studies", "participant_number",
         "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "symbols",
-        "orphanet_disorder_ids", "panels", "inheritances", "hgvsc", "hgvsp", "hgvsg", "disease_names", "tumour_types_germlines",
+        "orphanet_disorder_ids", "panels", "inheritances", "hgvsg", "disease_names", "tumour_types_germlines",
         "omim_gene_ids", "entrez_gene_ids", "ensembl_gene_ids")
   }
 
@@ -132,11 +132,11 @@ object VariantsToJsonJob {
           omim.columns.toSet ++
           ddd_gene_set.columns.toSet ++
           cosmic_gene_set.columns.toSet --
-          Set("hgvsc", "hgvsp", "inheritance", "tumour_types_germline")
+          Set("inheritance", "tumour_types_germline")
 
       val consequenceOutputColumns: Set[String] =
         consequenceWithScores.columns.toSet ++
-          Set("gene_symbol_aa_change") --
+          Set("impact_score") --
           columnsAtGeneLevel --
           Set("chromosome", "start", "reference", "alternate")
 
@@ -146,18 +146,19 @@ object VariantsToJsonJob {
           .join(orphanet, Seq("symbol"), "left")
           .join(ddd_gene_set, Seq("symbol"), "left")
           .join(cosmic_gene_set, Seq("symbol"), "left")
-          .withColumn("gene_symbol_aa_change",
-            when(col("aa_change").isNotNull, concat_ws(" ", col("symbol"), col("aa_change")))
-              .otherwise(lit(null)))
+          .withColumn("impact_score",
+            when(col("impact") === "MODIFIER", 1)
+              .when(col("impact") === "LOW", 2)
+              .when(col("impact") === "MODERATE", 3)
+              .when(col("impact") === "HIGH", 4)
+              .otherwise(0))
           .withColumn("consequence", struct(consequenceOutputColumns.toSeq.map(col):_*))
           .groupBy(locus:_*)
           .agg(
             collect_set(col("consequence")).as("consequences"),
             columnsAtGeneLevel.map(c => collect_set(col(c)).as(s"${c}s")).toSeq :+
               flatten(collect_set(col("inheritance"))).as("inheritances") :+
-              flatten(collect_set(col("tumour_types_germline"))).as("tumour_types_germlines") :+
-              first("hgvsc").as("hgvsc") :+
-              first("hgvsp").as("hgvsp"):_*
+              flatten(collect_set(col("tumour_types_germline"))).as("tumour_types_germlines"):_*
           )
 
       df.joinByLocus(consequencesDf)
