@@ -6,7 +6,7 @@ import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.external.dbnsfp.{ImportAnnovarScores, ImportRaw, ImportScores}
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
-import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetJob
+import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetGeneSet
 import org.kidsfirstdrc.dwh.updates.UpdateVariant
 
 import scala.util.Try
@@ -24,6 +24,7 @@ object ImportExternal extends App {
 
   jobType.toLowerCase match {
     case "1000genomes"     => new Import1k(env).run()
+    case "annovar_scores"  => new ImportAnnovarScores(env).run()
     case "cancer_hotspots" => new ImportCancerHotspots(env).run()
     case "clinvar"         =>
       new ImportClinVarJob(env).run()
@@ -37,10 +38,9 @@ object ImportExternal extends App {
     case "dbnsfp_original" => new ImportScores(env).run()
     case "dbsnp"           => new ImportDBSNP(env).run()
     case "hpo_gene_set"    => new ImportHPOGeneSet(env).run()
-    case "human_genes"     => new ImportRefSeq(env).run()
+    case "human_genes"     => new ImportHumanGenes(env).run()
     case "omim_gene_set"   => new ImportOmimGeneSet(env).run()
-    case "orphanet"        => new ImportOrphanetJob(env).run()
-    case "annovar_scores"  => new ImportAnnovarScores(env).run()
+    case "orphanet"        => new ImportOrphanetGeneSet(env).run()
     case "topmed_bravo"    =>
       new ImportTopMed(env).run()
       Try {

@@ -9,7 +9,7 @@ import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 
 import scala.xml.{Elem, Node, XML}
 
-class ImportOrphanetJob(runEnv: Environment) extends DataSourceEtl(runEnv) {
+class ImportOrphanetGeneSet(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
   override val destination: DataSource = Public.orphanet_gene_set
 

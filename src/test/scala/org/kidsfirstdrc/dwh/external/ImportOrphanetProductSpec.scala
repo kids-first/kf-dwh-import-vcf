@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.external
 
-import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetJob
+import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetGeneSet
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external._
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
@@ -15,7 +15,7 @@ class ImportOrphanetProductSpec extends AnyFlatSpec with GivenWhenThen with With
   "extract" should "return xml files parsed into a dataframes" in {
     import spark.implicits._
 
-    val extractedData = new ImportOrphanetJob(Environment.LOCAL).extract()
+    val extractedData = new ImportOrphanetGeneSet(Environment.LOCAL).extract()
     val gene_associationDF = extractedData(orphanet_gene_association)
     val disease_historyDF = extractedData(orphanet_disease_history)
 
@@ -34,7 +34,7 @@ class ImportOrphanetProductSpec extends AnyFlatSpec with GivenWhenThen with With
 
     import spark.implicits._
 
-    val job = new ImportOrphanetJob(Environment.LOCAL)
+    val job = new ImportOrphanetGeneSet(Environment.LOCAL)
 
     val extractedData = job.extract()
     val outputDF = job.transform(extractedData)
@@ -50,7 +50,7 @@ class ImportOrphanetProductSpec extends AnyFlatSpec with GivenWhenThen with With
 
     import spark.implicits._
 
-    val job = new ImportOrphanetJob(Environment.LOCAL)
+    val job = new ImportOrphanetGeneSet(Environment.LOCAL)
 
     job.run()
     val resultDF = spark.table(s"${job.destination.database}.${job.destination.name}")

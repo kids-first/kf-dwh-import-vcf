@@ -4,7 +4,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.kidsfirstdrc.dwh.external.ImportHPOGeneSet
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
-import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetJob
+import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetGeneSet
 import org.kidsfirstdrc.dwh.testutils.ClassGeneratorImplicits._
 import org.kidsfirstdrc.dwh.testutils.external.{CosmicCancerGeneCensusInput, DddGeneCensusInput, OmimInput}
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
