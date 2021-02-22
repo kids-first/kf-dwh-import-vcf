@@ -103,7 +103,15 @@ object ClassGeneratorMain extends App with WithSparkSession {
     //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusInput", root)
 
   new ImportCancerGeneCensus(Environment.LOCAL).transform(Map(Raw.cosmic_cancer_gene_census -> Seq(CosmicCancerGeneCensusInput()).toDF()))
-  .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusOutput", root)
+    //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusOutput", root)
+
+  // test class
+  //case class TestNestedClass(a: String = "a", b: Long = 2, c: List[String] = List("c"), d: NestedClass = NestedClass())
+  //case class NestedClass(e: String = "e", f: Long = 1, aa: NestedNestedClass = NestedNestedClass(), bb: List[NestedNestedClass] = List(NestedNestedClass()))
+  //case class NestedNestedClass(g: String = "g", h: Long = 1)
+  //  Seq(
+  //    (TestNestedClass())
+  //  ).toDF.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","TestNestedClass", root)
 
 
 }
