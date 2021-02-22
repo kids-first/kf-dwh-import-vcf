@@ -24,6 +24,7 @@ object ImportExternal extends App {
 
   jobType.toLowerCase match {
     case "1000genomes"     => new Import1k(env).run()
+    case "cancer_hotspots" => new ImportCancerHotspots(env).run()
     case "clinvar"         =>
       new ImportClinVarJob(env).run()
       Try {
@@ -34,6 +35,9 @@ object ImportExternal extends App {
     case "ddd_gene_set"    => new ImportDDDGeneCensus(env).run()
     case "dbnsfp_variant"  => new ImportRaw(env).run()
     case "dbnsfp_original" => new ImportScores(env).run()
+    case "dbsnp"           => new ImportDBSNP(env).run()
+    case "hpo_gene_set"    => new ImportHPOGeneSet(env).run()
+    case "human_genes"     => new ImportRefSeq(env).run()
     case "omim_gene_set"   => new ImportOmimGeneSet(env).run()
     case "orphanet"        => new ImportOrphanetJob(env).run()
     case "annovar_scores"  => new ImportAnnovarScores(env).run()

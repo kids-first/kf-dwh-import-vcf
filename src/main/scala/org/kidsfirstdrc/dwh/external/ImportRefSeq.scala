@@ -1,63 +1,67 @@
 package org.kidsfirstdrc.dwh.external
 
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.expressions.UserDefinedFunction
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.{split, udf}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
+import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Environment.Environment
+import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 
-object ImportRefSeq extends App {
+class ImportRefSeq(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
-  implicit val spark: SparkSession = SparkSession.builder
-    .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
-    .enableHiveSupport()
-    .appName("Import Refseq").getOrCreate()
+  override val destination: DataSource = Public.human_genes
 
-  import spark.implicits._
-
-  val splitToMapFn : String=>Option[Map[String,String] ]= line => {
-    if(line == null)
-      None
-    else{
-      val elements = line.split("\\|")
-      val m = elements.map{ e =>
-        val Array(key,value) = e.split(":", 2)
-        key.toLowerCase.replaceAll("/", "_").replaceAll("-", "_") -> value
-      }
-      Some(m.toMap)
-    }
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    val df = spark.read.format("csv")
+      .option("inferSchema", "true")
+      .option("header", "true")
+      .option("sep", "\t")
+      .option("nullValue", "-")
+      .load(Raw.refseq_homo_sapiens_gene.path)
+    Map(Raw.refseq_homo_sapiens_gene -> df)
   }
 
-  val splitToMap = udf(splitToMapFn)
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+    data(Raw.refseq_homo_sapiens_gene)
+      .select(
+        $"#tax_id" as "tax_id",
+        $"GeneID" as "entrez_gene_id",
+        $"Symbol" as "symbol",
+        $"LocusTag" as "locus_tag",
+        split($"Synonyms", "\\|") as "synonyms",
+        splitToMap($"dbXrefs") as "external_references",
+        $"chromosome",
+        $"map_location",
+        $"description",
+        $"type_of_gene",
+        $"Symbol_from_nomenclature_authority" as "symbol_from_nomenclature_authority",
+        $"Full_name_from_nomenclature_authority" as "full_name_from_nomenclature_authority",
+        $"Nomenclature_status" as "nomenclature_status",
+        split($"Other_designations", "\\|") as "other_designations",
+        splitToMap($"Feature_type") as "feature_types"
+      )
+      .withColumn("ensembl_gene_id", $"external_references.ensembl")
+      .withColumn("omim_gene_id", $"external_references.mim")
 
-  val input = "s3a://kf-strides-variant-parquet-prd/raw/refseq/Homo_sapiens.gene_info.gz"
-  val output = "s3a://kf-strides-variant-parquet-prd/public"
-  spark.read.format("csv")
-    .option("inferSchema", "true")
-    .option("header", "true")
-    .option("sep", "\t")
-    .option("nullValue", "-")
-    .load("s3a://kf-strides-variant-parquet-prd/raw/refseq/Homo_sapiens.gene_info.gz")
-    .select(
-      $"#tax_id" as "tax_id",
-      $"GeneID" as "entrez_gene_id",
-      $"Symbol" as "symbol",
-      $"LocusTag" as "locus_tag",
-      split($"Synonyms", "\\|") as "synonyms",
-      splitToMap($"dbXrefs") as "external_references",
-      $"chromosome",
-      $"map_location",
-      $"description",
-      $"type_of_gene",
-      $"Symbol_from_nomenclature_authority" as "symbol_from_nomenclature_authority",
-      $"Full_name_from_nomenclature_authority" as "full_name_from_nomenclature_authority",
-      $"Nomenclature_status" as "nomenclature_status",
-      split($"Other_designations", "\\|") as "other_designations",
-      splitToMap($"Feature_type") as "feature_types"
-    )
-    .withColumn("ensembl_gene_id", $"external_references.ensembl")
-    .withColumn("omim_gene_id", $"external_references.mim")
-    .coalesce(1)
-    .write
-    .mode("overwrite")
-    .format("parquet")
-    .option("path", s"$output/human_genes")
-    .saveAsTable("variant.human_genes")
+  }
+
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    super.load(data.coalesce(1))
+  }
+
+  val splitToMapFn : String => Option[Map[String, String]] = {line =>
+    Option(line)
+      .map {l =>
+        val elements = l.split("\\|")
+        val m = elements.map { e =>
+          val Array(key,value) = e.split(":", 2)
+          key.toLowerCase.replaceAll("/", "_").replaceAll("-", "_") -> value
+        }
+        m.toMap
+      }
+  }
+
+  val splitToMap: UserDefinedFunction = udf(splitToMapFn)
 }

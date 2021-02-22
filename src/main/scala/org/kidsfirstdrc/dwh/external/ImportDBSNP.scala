@@ -1,39 +1,52 @@
 package org.kidsfirstdrc.dwh.external
 
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
+import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Environment.Environment
+import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-object ImportDBSNP extends App {
+class ImportDBSNP(runEnv: Environment) extends DataSourceEtl(runEnv) with App {
 
-  implicit val spark: SparkSession = SparkSession.builder
-    .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
-    .enableHiveSupport()
-    .appName("Import DBSNP").getOrCreate()
+  override val destination = Public.dbsnp
 
-  import spark.implicits._
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    Map(Raw.dbsnp_vcf -> vcf(Raw.dbsnp_vcf.path))
+  }
 
-  val input = "s3a://kf-strides-variant-parquet-prd/raw/dbsnp/GCF_000001405.38.gz"
-  val output = "s3a://kf-strides-variant-parquet-prd/public"
-  vcf(input)(spark)
-    .where($"contigName" like "NC_%")
-    .withColumn("chromosome", regexp_extract($"contigName", "NC_(\\d+).(\\d+)", 1).cast("int"))
-    .select(
-      when($"chromosome" === 23, "X").when($"chromosome" === 24, "Y").when($"chromosome" === 12920, "M").otherwise($"chromosome".cast("string")) as "chromosome",
-      start,
-      end,
-      name,
-      reference,
-      alternate,
-      $"contigName" as "original_contig_name"
-    )
-    .repartition($"chromosome")
-    .sortWithinPartitions("start")
-    .write
-    .partitionBy("chromosome")
-    .mode(SaveMode.Overwrite)
-    .format("parquet")
-    .option("path", s"$output/dbsnp")
-    .saveAsTable("variant.dbsnp")
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+    data(Raw.dbsnp_vcf)
+      .where($"contigName" like "NC_%")
+      .withColumn("chromosome", regexp_extract($"contigName", "NC_(\\d+).(\\d+)", 1).cast("int"))
+      .select(
+        when($"chromosome" === 23, "X")
+          .when($"chromosome" === 24, "Y")
+          .when($"chromosome" === 12920, "M")
+          .otherwise($"chromosome".cast("string")) as "chromosome",
+        start,
+        end,
+        name,
+        reference,
+        alternate,
+        $"contigName" as "original_contig_name"
+      )
+  }
+
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+    data
+      .repartition($"chromosome")
+      .sortWithinPartitions("start")
+      .write
+      .partitionBy("chromosome")
+      .mode(SaveMode.Overwrite)
+      .format(destination.format.sparkFormat)
+      .option("path", destination.path)
+      .saveAsTable(s"${destination.database}.${destination.name}")
+    data
+  }
 }
