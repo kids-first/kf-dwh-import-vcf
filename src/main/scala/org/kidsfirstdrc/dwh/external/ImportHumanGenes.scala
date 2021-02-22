@@ -1,14 +1,14 @@
 package org.kidsfirstdrc.dwh.external
 
 import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.{split, udf}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.conf.DataSource
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
 import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 
-class ImportRefSeq(runEnv: Environment) extends DataSourceEtl(runEnv) {
+class ImportHumanGenes(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
   override val destination: DataSource = Public.human_genes
 

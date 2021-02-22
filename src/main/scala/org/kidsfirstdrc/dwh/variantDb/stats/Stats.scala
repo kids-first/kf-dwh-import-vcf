@@ -33,7 +33,7 @@ object Stats extends App {
 
   post.setEntity(new StringEntity(write(stats)))
 
-  try{
+  try {
     client.execute(post)
   } finally {
     client.close()
