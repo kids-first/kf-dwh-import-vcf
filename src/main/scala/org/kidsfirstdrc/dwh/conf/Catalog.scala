@@ -65,7 +65,7 @@ object Catalog {
     import Clinical._
     import Public._
 
-    val variantsJson = DataSource("variants_index", "es_index", bucket, "/es_index/variants_index_re_*", JSON, List(variants, consequences, omim_gene_set, orphanet_gene_set, ddd_gene_set, cosmic_gene_set))
+    val variantsJson = DataSource("variants_index", "variant", bucket, "/es_index/variants_index_re_*", JSON, List(variants, consequences, omim_gene_set, orphanet_gene_set, ddd_gene_set, cosmic_gene_set))
   }
 
   def sources: Set[DataSource] = Raw.sources ++ Public.sources ++ Clinical.sources ++ ElasticsearchJson.sources
