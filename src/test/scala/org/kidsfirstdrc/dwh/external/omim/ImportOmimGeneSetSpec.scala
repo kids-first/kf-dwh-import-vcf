@@ -1,9 +1,9 @@
 package org.kidsfirstdrc.dwh.external.omim
 
-import org.kidsfirstdrc.dwh.testutils.WithSparkSession
-import org.kidsfirstdrc.dwh.testutils.external.{Omim, OmimInput, OmimOutput}
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
 import org.kidsfirstdrc.dwh.conf.Environment
+import org.kidsfirstdrc.dwh.testutils.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.external.{OmimInput, OmimOutput}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

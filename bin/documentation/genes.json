@@ -1,0 +1,23 @@
+[
+  {
+    "col_name": "chromosome",
+    "comment": "chromosome where the variant is located"
+  },
+  {
+    "col_name": "start",
+    "comment": "starting position of the variant"
+  },
+  {
+    "col_name": "end",
+    "comment": "end position of the variant"
+  },
+  {
+    "col_name": "reference",
+    "comment": "reference letter of the variant"
+  },
+  {
+    "col_name": "alternate",
+    "comment": "alternative letter found for this variant"
+  }
+]
+

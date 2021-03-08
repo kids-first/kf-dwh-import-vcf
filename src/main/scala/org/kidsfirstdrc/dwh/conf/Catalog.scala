@@ -31,20 +31,21 @@ object Catalog {
 
     override val bucket: String  = kfStridesVariantBucket
 
-    val `1000_genomes`    = DataSource("1000_genomes"     , "variant", bucket, "/public/1000_genomes"     , PARQUET, List(`1000genomes_vcf`))
-    val cancer_hotspots   = DataSource("cancer_hotspots"  , "variant", bucket, "/public/cancer_hotspots"  , PARQUET, List(cancerhotspots_csv))
-    val clinvar           = DataSource("clinvar"          , "variant", bucket, "/public/clinvar"          , PARQUET, List(clinvar_vcf))
-    val cosmic_gene_set   = DataSource("cosmic_gene_set"  , "variant", bucket, "/public/cosmic_gene_set"  , PARQUET, List(cosmic_cancer_gene_census))
-    val dbnsfp_variant    = DataSource("bdnsfp"           , "variant", bucket, "/public/dbnsfp/variant"   , PARQUET, List(dbNSFP_csv))
-    val dbnsfp_annovar    = DataSource("dbnsfp_annovar"   , "variant", bucket, "/public/annovar/dbnsfp"   , PARQUET, List(annovar_dbnsfp))
-    val dbnsfp_original   = DataSource("dbnsfp_original"  , "variant", bucket, "/public/dbnsfp/scores"    , PARQUET, List(dbnsfp_variant))
-    val dbsnp             = DataSource("dbsnp"            , "variant", bucket, "/public/dbsnp"            , PARQUET, List(dbsnp_vcf))
-    val ddd_gene_set      = DataSource("ddd_gene_set"     , "variant", bucket, "/public/ddd_gene_set"     , PARQUET, List(ddd_gene_census))
-    val human_genes       = DataSource("human_genes"      , "variant", bucket, "/public/human_genes"      , PARQUET, List(refseq_homo_sapiens_gene))
-    val hpo_gene_set      = DataSource("hpo_gene_set"     , "variant", bucket, "/public/hpo_gene_set"     , PARQUET, List(hpo_genes_to_phenotype, human_genes))
-    val omim_gene_set     = DataSource("omim_gene_set"    , "variant", bucket, "/public/omim_gene_set"    , PARQUET, List(omim_genemap2))
-    val orphanet_gene_set = DataSource("orphanet_gene_set", "variant", bucket, "/public/orphanet_gene_set", PARQUET, List(orphanet_gene_association, orphanet_disease_history))
-    val topmed_bravo      = DataSource("topmed_bravo"     , "variant", bucket, "/public/topmed_bravo"     , PARQUET, List(topmed_bravo_dbsnp))
+    val `1000_genomes`    = DataSource("1000_genomes"     , "variant", bucket, "/public/1000_genomes"     , PARQUET)
+    val cancer_hotspots   = DataSource("cancer_hotspots"  , "variant", bucket, "/public/cancer_hotspots"  , PARQUET)
+    val clinvar           = DataSource("clinvar"          , "variant", bucket, "/public/clinvar"          , PARQUET)
+    val cosmic_gene_set   = DataSource("cosmic_gene_set"  , "variant", bucket, "/public/cosmic_gene_set"  , PARQUET)
+    val dbnsfp_variant    = DataSource("bdnsfp"           , "variant", bucket, "/public/dbnsfp/variant"   , PARQUET)
+    val dbnsfp_annovar    = DataSource("dbnsfp_annovar"   , "variant", bucket, "/public/annovar/dbnsfp"   , PARQUET)
+    val dbnsfp_original   = DataSource("dbnsfp_original"  , "variant", bucket, "/public/dbnsfp/scores"    , PARQUET)
+    val dbsnp             = DataSource("dbsnp"            , "variant", bucket, "/public/dbsnp"            , PARQUET)
+    val ddd_gene_set      = DataSource("ddd_gene_set"     , "variant", bucket, "/public/ddd_gene_set"     , PARQUET)
+    val genes             = DataSource("genes"            , "variant", bucket, "/public/genes"            , PARQUET)
+    val human_genes       = DataSource("human_genes"      , "variant", bucket, "/public/human_genes"      , PARQUET)
+    val hpo_gene_set      = DataSource("hpo_gene_set"     , "variant", bucket, "/public/hpo_gene_set"     , PARQUET)
+    val omim_gene_set     = DataSource("omim_gene_set"    , "variant", bucket, "/public/omim_gene_set"    , PARQUET)
+    val orphanet_gene_set = DataSource("orphanet_gene_set", "variant", bucket, "/public/orphanet_gene_set", PARQUET)
+    val topmed_bravo      = DataSource("topmed_bravo"     , "variant", bucket, "/public/topmed_bravo"     , PARQUET)
   }
 
   object Clinical extends StoreFolder {
@@ -53,9 +54,9 @@ object Catalog {
 
     override val bucket: String  = kfStridesVariantBucket
 
-    val consequences = DataSource("consequences", "variant", bucket, "/consequences/consequences_re_*", PARQUET, List())
-    val occurrences  = DataSource("occurrences" , "variant", bucket, "/occurrences/occurrences_re_*"  , PARQUET, List())
-    val variants     = DataSource("variants"    , "variant", bucket, "/variants/variants_re_*"        , PARQUET, List(clinvar, topmed_bravo))
+    val consequences = DataSource("consequences", "variant", bucket, "/consequences/consequences_re_*", PARQUET)
+    val occurrences  = DataSource("occurrences" , "variant", bucket, "/occurrences/occurrences_re_*"  , PARQUET)
+    val variants     = DataSource("variants"    , "variant", bucket, "/variants/variants_re_*"        , PARQUET)
   }
 
   object ElasticsearchJson extends StoreFolder {
@@ -65,7 +66,7 @@ object Catalog {
     import Clinical._
     import Public._
 
-    val variantsJson = DataSource("variants_index", "variant", bucket, "/es_index/variants_index_re_*", JSON, List(variants, consequences, omim_gene_set, orphanet_gene_set, ddd_gene_set, cosmic_gene_set))
+    val variantsJson = DataSource("variants_index", "variant", bucket, "/es_index/variants_index_re_*", JSON)
   }
 
   def sources: Set[DataSource] = Raw.sources ++ Public.sources ++ Clinical.sources ++ ElasticsearchJson.sources
