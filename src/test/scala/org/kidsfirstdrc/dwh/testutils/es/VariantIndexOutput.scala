@@ -1,9 +1,8 @@
-package org.kidsfirstdrc.dwh.testutils
+package org.kidsfirstdrc.dwh.testutils.es
 
-import org.apache.spark.sql.functions.when
 import org.kidsfirstdrc.dwh.testutils.Model._
 
-object VariantToJsonJobModel {
+object VariantIndexOutput {
 
   case class StudyFrequency(hmb: Freq, gru: Freq)
 
@@ -13,9 +12,9 @@ object VariantToJsonJobModel {
                    frequencies: StudyFrequency,
                    participant_number: Long)
 
-  case class InternalFrequencies(combined: Freq = Freq(34,14,0.411764705882352900, 14, 8),
-                                 hmb: Freq = Freq(27,12,0.444444444400000000, 9, 7),
-                                 gru: Freq = Freq(7,2,0.285714285700000000, 5, 1))
+  case class InternalFrequencies(combined: Freq = Freq(34, 14, 0.411764705882352900, 14, 8),
+                                 hmb: Freq = Freq(27, 12, 0.444444444400000000, 9, 7),
+                                 gru: Freq = Freq(7, 2, 0.285714285700000000, 5, 1))
 
   case class Frequencies(/*ignored - tested separately  `1k_genomes`: Freq,*/
                          topmed: Freq = Freq(),
@@ -24,7 +23,11 @@ object VariantToJsonJobModel {
                          gnomad_genomes_3_0: GnomadFreqOutput = GnomadFreqOutput(),
                          internal: InternalFrequencies = InternalFrequencies())
 
-  case class Clinvar(clinvar_id: String = "", clin_sig: String = "")
+  case class CLINVAR(`clinvar_id`: String = "257668",
+                     `clin_sig`: List[String] = List("Benign"),
+                     `conditions`: List[String] = List("Congenital myasthenic syndrome 12", "not specified", "not provided"),
+                     `inheritance`: List[String] = List("germline"),
+                     `interpretations`: List[String] = List("", "Benign"))
 
   case class ScoreConservations(phylo_p17way_primate_rankscore: Double)
 
@@ -39,10 +42,12 @@ object VariantToJsonJobModel {
                               revel_rankscore: Double,
                               lrt_converted_rankscore: Double,
                               lrt_pred: String)
+
   case class ConsequenceScore(conservations: ScoreConservations,
                               predictions: ScorePredictions)
 
-  case class Consequence(impact: String = "MODERATE",
+  case class Consequence(vep_impact: String = "MODERATE",
+                         symbol: String,
                          ensembl_transcript_id: Option[String] = Some("ENST00000283256.10"),
                          ensembl_regulatory_id: Option[String] = None,
                          hgvsc: Option[String] = Some("ENST00000283256.10:c.781G>A"),
@@ -63,7 +68,8 @@ object VariantToJsonJobModel {
                          coding_dna_change: Option[String] = Some("781G>A"),
                          impact_score: Int = 3,
                          canonical: Boolean = true,
-                         scores: ConsequenceScore)
+                         conservations: ScoreConservations,
+                         predictions: ScorePredictions)
 
 
   case class Output(chromosome: String = "2",
@@ -77,11 +83,11 @@ object VariantToJsonJobModel {
                     acls: List[String] = List("SD_456.c1", "SD_123.c1", "SD_789.c99"),
                     external_study_ids: List[String] = List("SD_456", "SD_123", "SD_789"),
                     frequencies: Frequencies = Frequencies(),
-                    clinvar: Clinvar = Clinvar("RCV000436956", "pathogenic"),
+                    clinvar: CLINVAR = CLINVAR(),
                     rsnumber: String = "rs1234567",
                     release_id: String = "RE_ABCDEF",
                     consequences: List[Consequence] = List(),
-                    symbols: List[String] = List("SCN2A"),
+                    //symbols: List[String] = List("SCN2A"),
                     orphanet_disorder_ids: List[Long] = List(17601),
                     panels: List[String] = List("Multiple epiphyseal dysplasia, Al-Gazali type"),
                     inheritances: List[String] = List("Autosomal recessive"),
@@ -91,4 +97,5 @@ object VariantToJsonJobModel {
                     omim_gene_ids: List[String] = List("23234234"),
                     entrez_gene_ids: List[String] = List("12345"),
                     ensembl_gene_ids: List[String] = List("ENSG00000189337"))
+
 }

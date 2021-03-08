@@ -9,6 +9,7 @@ import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 import org.kidsfirstdrc.dwh.variantDb.json.VariantsToJsonJob._
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
+import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 
 import scala.collection.mutable
 
@@ -23,7 +24,8 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
       Public.omim_gene_set     -> spark.table(s"${Public.omim_gene_set.database}.${Public.omim_gene_set.name}"),
       Public.orphanet_gene_set -> spark.table(s"${Public.orphanet_gene_set.database}.${Public.orphanet_gene_set.name}"),
       Public.ddd_gene_set      -> spark.table(s"${Public.ddd_gene_set.database}.${Public.ddd_gene_set.name}"),
-      Public.cosmic_gene_set   -> spark.table(s"${Public.cosmic_gene_set.database}.${Public.cosmic_gene_set.name}")
+      Public.cosmic_gene_set   -> spark.table(s"${Public.cosmic_gene_set.database}.${Public.cosmic_gene_set.name}"),
+      Public.clinvar           -> spark.table(s"${Public.clinvar.database}.${Public.clinvar.name}")
     )
   }
 
@@ -32,6 +34,7 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
       .withColumnRenamed("dbsnp_id", "rsnumber")
 
     val consequences = data(Clinical.consequences)
+      .withColumnRenamed("impact", "vep_impact")
 
     val omim = data(Public.omim_gene_set)
       .select("ensembl_gene_id", "entrez_gene_id", "omim_gene_id")
@@ -41,6 +44,15 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
 
     val cosmic_gene_set = data(Public.cosmic_gene_set)
       .select("symbol", "tumour_types_germline")
+
+    val clinvar = data(Public.clinvar)
+      .selectLocus(
+        col("name") as "clinvar_id",
+        col("clin_sig"),
+        col("conditions"),
+        col("inheritance"),
+        col("interpretations"))
+
 
     val orphanet = data(Public.orphanet_gene_set)
       .select(
@@ -53,10 +65,10 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
       .withColumn("locus", concat_ws("-", locus:_*))
       .withStudies
       .withFrequencies
-      .withClinVar
+      .withClinVar(clinvar)
       .withConsequences(consequences, omim, orphanet, ddd_gene_set, cosmic_gene_set)
       .select("chromosome", "start", "end", "reference", "alternate", "locus", "studies", "participant_number",
-        "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "symbols",
+        "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences",
         "orphanet_disorder_ids", "panels", "inheritances", "hgvsg", "disease_names", "tumour_types_germlines",
         "omim_gene_ids", "entrez_gene_ids", "ensembl_gene_ids")
   }
@@ -122,16 +134,16 @@ object VariantsToJsonJob {
         consequences
           .withScores
           .select("chromosome", "start", "reference", "alternate", "symbol", "ensembl_gene_id", "consequences",
-            "impact", "symbol", "strand", "biotype", "variant_class", "exon", "intron", "hgvsc", "hgvsp", "cds_position",
+            "vep_impact", "symbol", "strand", "biotype", "variant_class", "exon", "intron", "hgvsc", "hgvsp", "cds_position",
             "cdna_position", "protein_position", "amino_acids", "codons", "canonical", "aa_change", "coding_dna_change",
-            "ensembl_transcript_id", "ensembl_regulatory_id", "feature_type", "scores")
+            "ensembl_transcript_id", "ensembl_regulatory_id", "feature_type", "predictions", "conservations")
 
       val columnsAtGeneLevel: Set[String] =
         orphanet.columns.toSet ++
           omim.columns.toSet ++
           ddd_gene_set.columns.toSet ++
           cosmic_gene_set.columns.toSet --
-          Set("inheritance", "tumour_types_germline")
+          Set("inheritance", "tumour_types_germline", "symbol")
 
       val consequenceOutputColumns: Set[String] =
         consequenceWithScores.columns.toSet ++
@@ -146,10 +158,10 @@ object VariantsToJsonJob {
           .join(ddd_gene_set, Seq("symbol"), "left")
           .join(cosmic_gene_set, Seq("symbol"), "left")
           .withColumn("impact_score",
-            when(col("impact") === "MODIFIER", 1)
-              .when(col("impact") === "LOW", 2)
-              .when(col("impact") === "MODERATE", 3)
-              .when(col("impact") === "HIGH", 4)
+            when(col("vep_impact") === "MODIFIER", 1)
+              .when(col("vep_impact") === "LOW", 2)
+              .when(col("vep_impact") === "MODERATE", 3)
+              .when(col("vep_impact") === "HIGH", 4)
               .otherwise(0))
           .withColumn("consequence", struct(consequenceOutputColumns.toSeq.map(col):_*))
           .groupBy(locus:_*)
@@ -160,11 +172,7 @@ object VariantsToJsonJob {
               flatten(collect_set(col("tumour_types_germline"))).as("tumour_types_germlines"):_*
           )
 
-      df.joinByLocus(consequencesDf)
-    }
-
-    def joinByLocus(df2: DataFrame): DataFrame = {
-      df.join(df2, locus.map(_.toString), "left")
+      df.joinByLocus(consequencesDf, "left")
     }
 
     def external_study_ids: UserDefinedFunction = udf { array: mutable.WrappedArray[String] =>
@@ -226,18 +234,14 @@ object VariantsToJsonJob {
         ))
     }
 
-    def withClinVar: DataFrame = {
-      df
-        .withColumn("clinvar", struct(
-          col("clinvar_id").as("clinvar_id"),
-          col("clin_sig").as("clin_sig")
-        ))
+    def withClinVar(clinvar: DataFrame): DataFrame = {
+      df.drop("clinvar_id", "clin_sig")
+        .joinAndMerge(clinvar, "clinvar", "left")
     }
 
     def withScores: DataFrame = {
       df
-        .withColumn("scores",
-          struct(
+        .withColumn("predictions",
             struct(
               col("SIFT_converted_rankscore") as "sift_converted_rank_score",
               col("SIFT_pred") as "sift_pred",
@@ -250,11 +254,10 @@ object VariantsToJsonJob {
               col("REVEL_rankscore") as "revel_rankscore",
               col("LRT_converted_rankscore") as "lrt_converted_rankscore",
               col("LRT_pred") as "lrt_pred"
-            ).as("predictions"),
+            ))
+        .withColumn("conservations",
             struct(
-              col("phyloP17way_primate_rankscore") as "phylo_p17way_primate_rankscore"
-            ).as("conservations")
-          )
+              col("phyloP17way_primate_rankscore") as "phylo_p17way_primate_rankscore")
         )
     }
   }

@@ -2,20 +2,32 @@ package org.kidsfirstdrc.dwh.utils
 
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{Column, DataFrame, RelationalGroupedDataset, SparkSession}
 
 object ClinicalUtils {
 
   implicit class DataFrameOps(df: DataFrame) {
 
-    def joinByLocus(df2: DataFrame): DataFrame = {
-      df.join(df2, df("chromosome") === df2("chromosome") && df("start") === df2("start") && df("reference") === df2("reference") && df("alternate") === df2("alternate"), "left")
+    def joinAndMerge(other: DataFrame, outputColumnName: String, joinType: String = "inner"): DataFrame = {
+      val otherFields = other.drop("chromosome", "start", "end", "name", "reference", "alternate")
+      df.joinByLocus(other, joinType)
+        .withColumn(outputColumnName, when(col(otherFields.columns.head).isNotNull, struct(otherFields("*"))).otherwise(lit(null)))
+        .select(df.columns.map(col) :+ col(outputColumnName): _*)
     }
 
-    def joinAndMerge(df2: DataFrame, outputColumnName: String): DataFrame = {
-      df.joinByLocus(df2)
-        .select(df("*"), when(df2("chromosome").isNull, lit(null)).otherwise(struct(df2.drop("chromosome", "start", "end", "name", "reference", "alternate")("*"))) as outputColumnName)
+    def joinByLocus(other: DataFrame, joinType: String): DataFrame = {
+      df.join(other, Seq("chromosome", "start", "reference", "alternate"), joinType)
     }
+
+    def groupByLocus(): RelationalGroupedDataset = {
+      df.groupBy(col("chromosome"), col("start"), col("reference"), col("alternate"))
+    }
+
+    def selectLocus(cols: Column*): DataFrame = {
+      val allCols = col("chromosome") :: col("start") :: col("reference") :: col("alternate") :: cols.toList
+      df.select(allCols: _*)
+    }
+
   }
 
   private def loadClinicalTable(studyId: String, releaseId: String, tableName: String)(implicit spark: SparkSession): DataFrame = {

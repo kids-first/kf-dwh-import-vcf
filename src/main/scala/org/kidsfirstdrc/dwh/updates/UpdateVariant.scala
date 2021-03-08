@@ -29,13 +29,15 @@ class UpdateVariant(source: DataSource, runEnv: Environment) extends DataSourceE
     val variant = data(destination).drop("clinvar_id", "clin_sig")
     val clinvar = data(Public.clinvar)
     variant
-      .joinByLocus(clinvar)
+      .joinByLocus(clinvar, "left")
       .select(variant("*"), clinvar("name") as "clinvar_id", clinvar("clin_sig") as "clin_sig")
   }
 
   private def updateTopmed(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
     val variant = data(destination)
     val topmed = data(Public.topmed_bravo)
+      .selectLocus($"ac", $"an", $"af", $"homozygotes", $"heterozygotes")
     variant
       .drop("topmed")
       .joinAndMerge(topmed, "topmed")
