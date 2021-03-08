@@ -1,10 +1,10 @@
 package org.kidsfirstdrc.dwh.external
 
+import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
+import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetGeneSet
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external._
-import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
-import org.kidsfirstdrc.dwh.conf.Environment
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

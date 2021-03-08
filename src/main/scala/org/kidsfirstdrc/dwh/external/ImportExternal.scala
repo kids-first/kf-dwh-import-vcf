@@ -37,6 +37,7 @@ object ImportExternal extends App {
     case "dbnsfp_variant"  => new ImportRaw(env).run()
     case "dbnsfp_original" => new ImportScores(env).run()
     case "dbsnp"           => new ImportDBSNP(env).run()
+    case "genes"           => new ImportGenesTable(env).run()
     case "hpo_gene_set"    => new ImportHPOGeneSet(env).run()
     case "human_genes"     => new ImportHumanGenes(env).run()
     case "omim_gene_set"   => new ImportOmimGeneSet(env).run()

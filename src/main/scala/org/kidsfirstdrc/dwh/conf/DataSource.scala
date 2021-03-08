@@ -6,8 +6,7 @@ case class DataSource(name: String,
                       database: String,
                       bucket: String,
                       relativePath: String,
-                      format: Format,
-                      dependsOn: List[DataSource] = List.empty[DataSource]) {
+                      format: Format) {
 
   def path(implicit env: Environment): String = {
     env match {
