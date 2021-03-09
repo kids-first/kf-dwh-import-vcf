@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.testutils.es
 
 import org.kidsfirstdrc.dwh.testutils.Model._
+import org.kidsfirstdrc.dwh.testutils.{HPO, OMIM, ORPHANET}
 
 object VariantIndexOutput {
 
@@ -71,6 +72,19 @@ object VariantIndexOutput {
                          conservations: ScoreConservations,
                          predictions: ScorePredictions)
 
+  case class GENES(`symbol`: Option[String] = Some("SCN2A"),
+                   `entrez_gene_id`: Option[Int] = Some(777),
+                   `omim_gene_id`: Option[String] = Some("601013"),
+                   `hgnc`: Option[String] = Some("HGNC:1392"),
+                   `ensembl_gene_id`: Option[String] = Some("ENSG00000189337"),
+                   `location`: Option[String] = Some("1q25.3"),
+                   `name`: Option[String] = Some("calcium voltage-gated channel subunit alpha1 E"),
+                   `alias`: Option[List[String]] = Some(List("BII", "CACH6", "CACNL1A6", "Cav2.3", "EIEE69", "gm139")),
+                   `biotype`: Option[String] = Some("protein_coding"),
+                   `orphanet`: List[ORPHANET] = List(ORPHANET()),
+                   `hpo`: List[HPO] = List(HPO()),
+                   `omim`: List[OMIM] = List(OMIM()))
+
 
   case class Output(chromosome: String = "2",
                     start: Long = 165310406,
@@ -87,15 +101,10 @@ object VariantIndexOutput {
                     rsnumber: String = "rs1234567",
                     release_id: String = "RE_ABCDEF",
                     consequences: List[Consequence] = List(),
-                    //symbols: List[String] = List("SCN2A"),
-                    orphanet_disorder_ids: List[Long] = List(17601),
-                    panels: List[String] = List("Multiple epiphyseal dysplasia, Al-Gazali type"),
-                    inheritances: List[String] = List("Autosomal recessive"),
                     hgvsg: Option[String] = Some("chr2:g.166166916G>A"),
                     disease_names: List[String] = List("OCULOAURICULAR SYNDROME"),
                     tumour_types_germlines: List[String] = List(),
-                    omim_gene_ids: List[String] = List("23234234"),
-                    entrez_gene_ids: List[String] = List("12345"),
-                    ensembl_gene_ids: List[String] = List("ENSG00000189337"))
+                    genes: List[GENES] = List(GENES()),
+                    omim: List[String] = List("618285"))
 
 }

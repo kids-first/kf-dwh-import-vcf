@@ -6,10 +6,10 @@ import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, ElasticsearchJson, Public}
 import org.kidsfirstdrc.dwh.conf._
 import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
+import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 import org.kidsfirstdrc.dwh.variantDb.json.VariantsToJsonJob._
-import org.kidsfirstdrc.dwh.utils.SparkUtils._
-import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 
 import scala.collection.mutable
 
@@ -21,11 +21,10 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
     Map(
       Clinical.variants        -> spark.table(s"${Clinical.variants.database}.${Clinical.variants.name}"),
       Clinical.consequences    -> spark.table(s"${Clinical.consequences.database}.${Clinical.consequences.name}"),
-      Public.omim_gene_set     -> spark.table(s"${Public.omim_gene_set.database}.${Public.omim_gene_set.name}"),
-      Public.orphanet_gene_set -> spark.table(s"${Public.orphanet_gene_set.database}.${Public.orphanet_gene_set.name}"),
       Public.ddd_gene_set      -> spark.table(s"${Public.ddd_gene_set.database}.${Public.ddd_gene_set.name}"),
       Public.cosmic_gene_set   -> spark.table(s"${Public.cosmic_gene_set.database}.${Public.cosmic_gene_set.name}"),
-      Public.clinvar           -> spark.table(s"${Public.clinvar.database}.${Public.clinvar.name}")
+      Public.clinvar           -> spark.table(s"${Public.clinvar.database}.${Public.clinvar.name}"),
+      Public.genes             -> spark.table(s"${Public.genes.database}.${Public.genes.name}")
     )
   }
 
@@ -35,9 +34,6 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
 
     val consequences = data(Clinical.consequences)
       .withColumnRenamed("impact", "vep_impact")
-
-    val omim = data(Public.omim_gene_set)
-      .select("ensembl_gene_id", "entrez_gene_id", "omim_gene_id")
 
     val ddd_gene_set = data(Public.ddd_gene_set)
       .select("disease_name", "symbol")
@@ -53,24 +49,19 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
         col("inheritance"),
         col("interpretations"))
 
-
-    val orphanet = data(Public.orphanet_gene_set)
-      .select(
-        col("gene_symbol").as("symbol"),
-        col("disorder_id").as("orphanet_disorder_id"),
-        col("name").as("panel"),
-        col("type_of_inheritance").as("inheritance"))
+    val genes = data(Public.genes)
+      .withColumnRenamed("chromosome", "genes_chromosome")
 
     variants
       .withColumn("locus", concat_ws("-", locus:_*))
       .withStudies
       .withFrequencies
       .withClinVar(clinvar)
-      .withConsequences(consequences, omim, orphanet, ddd_gene_set, cosmic_gene_set)
+      .withConsequences(consequences, ddd_gene_set, cosmic_gene_set)
+      .withGenes(genes)
       .select("chromosome", "start", "end", "reference", "alternate", "locus", "studies", "participant_number",
-        "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences",
-        "orphanet_disorder_ids", "panels", "inheritances", "hgvsg", "disease_names", "tumour_types_germlines",
-        "omim_gene_ids", "entrez_gene_ids", "ensembl_gene_ids")
+        "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "genes", "omim",
+        "hgvsg", "disease_names", "tumour_types_germlines")
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -127,8 +118,7 @@ object VariantsToJsonJob {
 
   implicit class DataFrameOperations(df: DataFrame) {
 
-    def withConsequences(consequences: DataFrame, omim: DataFrame, orphanet: DataFrame, ddd_gene_set: DataFrame,
-                         cosmic_gene_set: DataFrame): DataFrame = {
+    def withConsequences(consequences: DataFrame, ddd_gene_set: DataFrame, cosmic_gene_set: DataFrame): DataFrame = {
 
       val consequenceWithScores =
         consequences
@@ -139,8 +129,6 @@ object VariantsToJsonJob {
             "ensembl_transcript_id", "ensembl_regulatory_id", "feature_type", "predictions", "conservations")
 
       val columnsAtGeneLevel: Set[String] =
-        orphanet.columns.toSet ++
-          omim.columns.toSet ++
           ddd_gene_set.columns.toSet ++
           cosmic_gene_set.columns.toSet --
           Set("inheritance", "tumour_types_germline", "symbol")
@@ -153,8 +141,6 @@ object VariantsToJsonJob {
 
       val consequencesDf =
         consequenceWithScores
-          .join(omim, Seq("ensembl_gene_id"), "left")
-          .join(orphanet, Seq("symbol"), "left")
           .join(ddd_gene_set, Seq("symbol"), "left")
           .join(cosmic_gene_set, Seq("symbol"), "left")
           .withColumn("impact_score",
@@ -168,7 +154,7 @@ object VariantsToJsonJob {
           .agg(
             collect_set(col("consequence")).as("consequences"),
             columnsAtGeneLevel.map(c => collect_set(col(c)).as(s"${c}s")).toSeq :+
-              flatten(collect_set(col("inheritance"))).as("inheritances") :+
+              collect_set(col("symbol")).as("symbols") :+
               flatten(collect_set(col("tumour_types_germline"))).as("tumour_types_germlines"):_*
           )
 
@@ -259,6 +245,21 @@ object VariantsToJsonJob {
             struct(
               col("phyloP17way_primate_rankscore") as "phylo_p17way_primate_rankscore")
         )
+    }
+
+    def withGenes(genes: DataFrame)(implicit spark: SparkSession): DataFrame = {
+      val genesWithoutChromosome = genes.drop("genes_chromosome")
+
+      df
+        .join(genes, col("chromosome") === col("genes_chromosome") && array_contains(df("symbols"), genes("symbol")), "left")
+        .drop("genes_chromosome")
+        .groupByLocus()
+        .agg(
+          first(struct(df("*"))) as "variant",
+          collect_list(struct(genesWithoutChromosome("*"))) as "genes",
+          flatten(collect_set("omim.omim_id")) as "omim"
+        )
+        .select("variant.*", "genes", "omim")
     }
   }
 }
