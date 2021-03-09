@@ -5,7 +5,7 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.testutils.Model._
 import org.kidsfirstdrc.dwh.testutils.es.VariantIndexOutput
 import org.kidsfirstdrc.dwh.testutils.es.VariantIndexOutput._
-import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, CosmicCancerGeneCensusOutput, DddGeneCensusOutput}
+import org.kidsfirstdrc.dwh.testutils.external.ClinvarOutput
 import org.kidsfirstdrc.dwh.testutils.{GenesOutput, WithSparkSession}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
@@ -46,14 +46,6 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
     JoinConsequenceOutput().copy(ensembl_gene_id = "ENSG00000189337", ensembl_transcript_id = Some("ENST00000636203"))
   ).toDF()
 
-  val dddDf: DataFrame = Seq(
-  DddGeneCensusOutput(`symbol` = "SCN2A")
-  ).toDF()
-
-  val cosmicDf: DataFrame = Seq(
-    CosmicCancerGeneCensusOutput(`symbol` = "SCN2A")
-  ).toDF()
-
   val clinvarDf: DataFrame = Seq(
     ClinvarOutput().copy(start = 165310406, end = 165310406, reference = "G", alternate = "A")
   ).toDF()
@@ -65,8 +57,6 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
   val data = Map(
     Clinical.variants -> joinVariantDf,
     Clinical.consequences -> joinConsequencesDf,
-    Public.ddd_gene_set -> dddDf,
-    Public.cosmic_gene_set -> cosmicDf,
     Public.clinvar -> clinvarDf,
     Public.genes -> genesDf
   )

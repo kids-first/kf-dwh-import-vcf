@@ -16,7 +16,9 @@ class ImportGenesTable(runEnv: Environment) extends DataSourceEtl(runEnv) {
       Public.omim_gene_set     -> spark.table(s"${Public.omim_gene_set.database}.${Public.omim_gene_set.name}"),
       Public.orphanet_gene_set -> spark.table(s"${Public.orphanet_gene_set.database}.${Public.orphanet_gene_set.name}"),
       Public.hpo_gene_set      -> spark.table(s"${Public.hpo_gene_set.database}.${Public.hpo_gene_set.name}"),
-      Public.human_genes       -> spark.table(s"${Public.human_genes.database}.${Public.human_genes.name}")
+      Public.human_genes       -> spark.table(s"${Public.human_genes.database}.${Public.human_genes.name}"),
+      Public.ddd_gene_set      -> spark.table(s"${Public.ddd_gene_set.database}.${Public.ddd_gene_set.name}"),
+      Public.cosmic_gene_set   -> spark.table(s"${Public.cosmic_gene_set.database}.${Public.cosmic_gene_set.name}")
     )
   }
 
@@ -33,42 +35,45 @@ class ImportGenesTable(runEnv: Environment) extends DataSourceEtl(runEnv) {
         regexp_replace($"type_of_gene", "-", "_") as "biotype")
 
     val orphanet = data(Public.orphanet_gene_set)
-      .select($"gene_symbol", $"disorder_id", $"name" as "panel", $"type_of_inheritance" as "inheritance")
+      .select($"gene_symbol" as "symbol", $"disorder_id", $"name" as "panel", $"type_of_inheritance" as "inheritance")
 
-    val omim = data(Public.omim_gene_set).select($"omim_gene_id", $"phenotype")
+    val omim = data(Public.omim_gene_set)
+      .select($"omim_gene_id",
+        $"phenotype.name" as "name",
+        $"phenotype.omim_id" as "omim_id",
+        $"phenotype.inheritance" as "inheritance")
 
     val hpo = data(Public.hpo_gene_set)
       .select($"entrez_gene_id", $"hpo_term_id", $"hpo_term_name")
       .distinct()
       .withColumn("hpo_term_label", concat($"hpo_term_name", lit(" ("), $"hpo_term_id", lit(")")))
 
-    val withOrphanet = humanGenes
-      .join(orphanet, humanGenes("symbol") === orphanet("gene_symbol"), "left")
-      .groupBy(humanGenes("symbol"))
-      .agg(
-        first(struct(humanGenes("*"))) as "hg",
-        when(first(orphanet("gene_symbol")).isNotNull,
-          collect_list(struct($"disorder_id", $"panel", $"inheritance"))).otherwise(lit(null)) as "orphanet",
-      )
-      .select($"hg.*", $"orphanet")
+    val ddd_gene_set = data(Public.ddd_gene_set)
+      .select("disease_name", "symbol")
 
-    val withHpo = withOrphanet
-      .join(hpo, Seq("entrez_gene_id"), "left")
-      .groupBy(withOrphanet("symbol"))
-      .agg(
-        first(struct(withOrphanet("*"))) as "hg",
-        when(first(col("entrez_gene_id")).isNotNull, collect_list(struct($"hpo_term_id", $"hpo_term_name", $"hpo_term_label"))).otherwise(lit(null)) as "hpo"
-      )
-      .select($"hg.*", $"hpo")
+    val cosmic_gene_set = data(Public.cosmic_gene_set)
+      .select("symbol", "tumour_types_germline")
 
-    withHpo
-      .join(omim, Seq("omim_gene_id"), "left")
-      .groupBy(withHpo("symbol"))
-      .agg(
-        first(struct(withHpo("*"))) as "hg",
-        when(first(col("omim_gene_id")).isNotNull, collect_list($"phenotype")).otherwise(lit(null)) as "omim"
-      )
-      .select($"hg.*", $"omim")
+    humanGenes
+      .joinAndMergeWith(orphanet, Seq("symbol"), "orphanet")
+      .joinAndMergeWith(hpo, Seq("entrez_gene_id"), "hpo")
+      .joinAndMergeWith(omim, Seq("omim_gene_id"), "omim")
+      .joinAndMergeWith(ddd_gene_set, Seq("symbol"), "ddd")
+      .joinAndMergeWith(cosmic_gene_set, Seq("symbol"), "cosmic")
+
+  }
+
+  implicit class DataFrameOps(df: DataFrame) {
+    def joinAndMergeWith(gene_set: DataFrame, joinOn: Seq[String], asColumnName: String) = {
+      df
+        .join(gene_set, joinOn, "left")
+        .groupBy("symbol")
+        .agg(
+          first(struct(df("*"))) as "hg",
+          collect_list(struct(gene_set.drop(joinOn:_*)("*"))) as asColumnName
+        )
+        .select(col("hg.*"), col(asColumnName))
+    }
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
