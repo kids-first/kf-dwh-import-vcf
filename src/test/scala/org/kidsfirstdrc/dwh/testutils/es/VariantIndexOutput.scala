@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.testutils.es
 
 import org.kidsfirstdrc.dwh.testutils.Model._
-import org.kidsfirstdrc.dwh.testutils.{HPO, OMIM, ORPHANET}
+import org.kidsfirstdrc.dwh.testutils.{COSMIC, DDD, HPO, OMIM, ORPHANET}
 
 object VariantIndexOutput {
 
@@ -83,7 +83,9 @@ object VariantIndexOutput {
                    `biotype`: Option[String] = Some("protein_coding"),
                    `orphanet`: List[ORPHANET] = List(ORPHANET()),
                    `hpo`: List[HPO] = List(HPO()),
-                   `omim`: List[OMIM] = List(OMIM()))
+                   `omim`: List[OMIM] = List(OMIM()),
+                   `ddd`: List[DDD] = List(DDD()),
+                   `cosmic`: List[COSMIC] = List(COSMIC()))
 
 
   case class Output(chromosome: String = "2",
@@ -102,8 +104,6 @@ object VariantIndexOutput {
                     release_id: String = "RE_ABCDEF",
                     consequences: List[Consequence] = List(),
                     hgvsg: Option[String] = Some("chr2:g.166166916G>A"),
-                    disease_names: List[String] = List("OCULOAURICULAR SYNDROME"),
-                    tumour_types_germlines: List[String] = List(),
                     genes: List[GENES] = List(GENES()),
                     omim: List[String] = List("618285"))
 
