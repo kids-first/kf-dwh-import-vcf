@@ -41,7 +41,8 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
         col("inheritance"),
         col("interpretations"))
 
-    val genes = data(Public.genes).drop("chromosome")
+    val genes = data(Public.genes)
+      .withColumnRenamed("chromosome", "genes_chromosome")
 
     variants
       .withColumn("locus", concat_ws("-", locus:_*))
@@ -227,11 +228,13 @@ object VariantsToJsonJob {
 
     def withGenes(genes: DataFrame)(implicit spark: SparkSession): DataFrame = {
       df
-        .join(genes, array_contains(df("symbols"), genes("symbol")), "left")
+        .join(broadcast(genes), col("chromosome") === col("genes_chromosome") &&
+          array_contains(df("symbols"), genes("symbol")), "left")
+        .drop("genes_chromosome")
         .groupByLocus()
         .agg(
           first(struct(df("*"))) as "variant",
-          collect_list(struct(genes("*"))) as "genes",
+          collect_list(struct(genes.drop("genes_chromosome")("*"))) as "genes",
           flatten(collect_set("omim.omim_id")) as "omim"
         )
         .select("variant.*", "genes", "omim")
