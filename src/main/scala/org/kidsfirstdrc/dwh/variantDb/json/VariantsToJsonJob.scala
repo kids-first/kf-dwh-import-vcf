@@ -180,7 +180,7 @@ object VariantsToJsonJob {
             col("1k_genomes.ac") as "ac",
             col("1k_genomes.an") as "an",
             col("1k_genomes.af") as "af"
-          ).as("1k_genomes"),
+          ).as("oneThousandGenomes"),
           struct(
             col("topmed.ac") as "ac",
             col("topmed.an") as "an",

@@ -154,7 +154,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
       And("this table should contain all merged data")
       val output = variantReleaseTable
-        .withColumnRenamed("1k_genomes", "one_k_genomes")
+        .withColumnRenamed("1k_genomes", "oneThousandGenomes")
         .as[JoinVariantOutput]
 
       val expectedOutput = Seq(
@@ -184,7 +184,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           studies = Set(studyId1),
           consent_codes = variant2.consent_codes,
           consent_codes_by_study = Map(studyId1 -> variant2.consent_codes),
-          one_k_genomes = None,
+          oneThousandGenomes = None,
           gnomad_exomes_2_1 = None,
           gnomad_genomes_3_0 = None),
         JoinVariantOutput(
@@ -196,11 +196,11 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           studies = Set(studyId2),
           consent_codes = variant3.consent_codes,
           consent_codes_by_study = Map(studyId2 -> variant3.consent_codes),
-          one_k_genomes = None,
+          oneThousandGenomes = None,
           gnomad_exomes_2_1 = None,
           gnomad_genomes_3_0 = None),
         existingVariant2.copy(release_id = releaseId,
-          one_k_genomes = None,
+          oneThousandGenomes = None,
           gnomad_exomes_2_1 = None,
           gnomad_genomes_3_0 = None)
       )

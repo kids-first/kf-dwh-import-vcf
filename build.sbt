@@ -7,9 +7,12 @@ javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
 
 val spark_version = "3.0.1"
 
+resolvers += "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots"
+
 /* Runtime */
 libraryDependencies += "org.apache.spark" %% "spark-sql" % spark_version % Provided
 libraryDependencies += "io.projectglow" %% "glow" % "0.5.0" % Provided
+libraryDependencies += "bio.ferlab" %% "datalake-core" % "0.0.1" % Provided
 
 /* Test */
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"

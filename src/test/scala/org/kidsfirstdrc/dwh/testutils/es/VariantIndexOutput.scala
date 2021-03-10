@@ -17,7 +17,7 @@ object VariantIndexOutput {
                                  hmb: Freq = Freq(27, 12, 0.444444444400000000, 9, 7),
                                  gru: Freq = Freq(7, 2, 0.285714285700000000, 5, 1))
 
-  case class Frequencies(/*ignored - tested separately  `1k_genomes`: Freq,*/
+  case class Frequencies(oneThousandGenomes: OneThousandGenomesFreq = OneThousandGenomesFreq(),
                          topmed: Freq = Freq(),
                          gnomad_genomes_2_1: GnomadFreqOutput = GnomadFreqOutput(),
                          gnomad_exomes_2_1: GnomadFreqOutput = GnomadFreqOutput(),
