@@ -111,8 +111,7 @@ object Model {
                                gru_af: BigDecimal = 0,
                                gru_homozygotes: Long = 0,
                                gru_heterozygotes: Long = 0,
-                               //1k_genomes: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), Some(10))),
-                               one_k_genomes: Option[ThousandGenomesFreq] = Some(ThousandGenomesFreq(20, 10, 0.5)),
+                               oneThousandGenomes: Option[OneThousandGenomesFreq] = Some(OneThousandGenomesFreq(20, 10, 0.5)),
                                topmed: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
                                gnomad_genomes_2_1: Option[GnomadFreq] = Some(GnomadFreq(10, 20, 0.5, 10)),
                                gnomad_exomes_2_1: Option[GnomadFreq] = Some(GnomadFreq(10, 20, 0.5, 10)),
@@ -293,9 +292,9 @@ object Model {
                          sift_score: Option[Double] = Some(0.99)
                         )
 
-  case class ThousandGenomesFreq(an: Long = 20,
-                                 ac: Long = 10,
-                                 af: BigDecimal = 0.5)
+  case class OneThousandGenomesFreq(an: Long = 20,
+                                    ac: Long = 10,
+                                    af: BigDecimal = 0.5)
 
   case class GnomadFreq(ac: Long = 10,
                         an: Long = 20,

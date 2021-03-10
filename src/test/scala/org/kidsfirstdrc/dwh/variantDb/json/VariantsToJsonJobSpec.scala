@@ -39,7 +39,7 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
       release_id = realeaseId,
       clin_sig = Some("pathogenic"),
       clinvar_id = Some("RCV000436956"))
-  ).toDF().withColumnRenamed("one_k_genomes", "1k_genomes")
+  ).toDF().withColumnRenamed("oneThousandGenomes", "1k_genomes")
 
   val joinConsequencesDf: DataFrame = Seq(
     JoinConsequenceOutput().copy(ensembl_gene_id = "ENSG00000189337", ensembl_transcript_id = Some("ENST00000636564")),
@@ -81,12 +81,6 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
     val result = new VariantsToJsonJob(realeaseId).transform(data)
 
     val parsedResult = result.as[VariantIndexOutput.Output].collect()
-    val `1k_genomes`: ThousandGenomesFreq =
-      result.select(
-        "frequencies.1k_genomes.an",
-        "frequencies.1k_genomes.ac",
-        "frequencies.1k_genomes.af")
-      .as[ThousandGenomesFreq].collect().head
     val variant = parsedResult.head
 
     //1. make sure we have only 1 row in the result
@@ -96,7 +90,6 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
     variant.studies should contain allElementsOf expectedStudies
     variant.genes should contain allElementsOf expectedGenes
     variant.copy(consequences = List(), studies = List(), genes = List()) shouldBe VariantIndexOutput.Output(studies = List(), consequences = List(), `genes` = List())
-    `1k_genomes` shouldBe ThousandGenomesFreq()
 
   }
 }
