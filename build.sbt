@@ -12,7 +12,7 @@ resolvers += "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/r
 /* Runtime */
 libraryDependencies += "org.apache.spark" %% "spark-sql" % spark_version % Provided
 libraryDependencies += "io.projectglow" %% "glow" % "0.5.0" % Provided
-libraryDependencies += "bio.ferlab" %% "datalake-core" % "0.0.2" % Provided
+libraryDependencies += "bio.ferlab" %% "datalake-core" % "0.0.2"
 
 /* Test */
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"
