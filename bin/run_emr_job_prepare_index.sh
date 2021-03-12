@@ -1,5 +1,5 @@
 #!/bin/bash
-jobType=${1:-"variant_centric"}
+job_type=${1:-"gene_centric"}
 release_id=${2:-"re_000010"}
 number_instance=${3:-"10"}
 instance_type=${4:-"r5.4xlarge"}
@@ -12,9 +12,9 @@ steps=$(cat <<EOF
       "--deploy-mode",
       "client",
       "--class",
-      "org.kidsfirstdrc.dwh.variantDb.json.VariantsToJson",
+      "org.kidsfirstdrc.dwh.variantDb.json.PrepareIndex",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
-      "${jobType},
+      "${job_type}",
       "${release_id}"
     ],
     "Type": "CUSTOM_JAR",
@@ -36,7 +36,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --release-label emr-6.2.0 \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --steps "${steps}" \
---name "Prepare ${jobType} to Json - ${release_id}" \
+--name "Prepare ${job_type} to Json - ${release_id}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \

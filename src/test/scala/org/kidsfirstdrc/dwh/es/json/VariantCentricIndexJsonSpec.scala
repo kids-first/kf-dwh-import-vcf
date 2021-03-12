@@ -39,7 +39,7 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
       release_id = realeaseId,
       clin_sig = Some("pathogenic"),
       clinvar_id = Some("RCV000436956"))
-  ).toDF().withColumnRenamed("oneThousandGenomes", "1k_genomes")
+  ).toDF().withColumnRenamed("one_thousand_genomes", "1k_genomes")
 
   val joinConsequencesDf: DataFrame = Seq(
     JoinConsequenceOutput().copy(ensembl_gene_id = "ENSG00000189337", ensembl_transcript_id = Some("ENST00000636564")),

@@ -182,7 +182,7 @@ object VariantCentricIndexJson {
             col("1k_genomes.ac") as "ac",
             col("1k_genomes.an") as "an",
             col("1k_genomes.af") as "af"
-          ).as("oneThousandGenomes"),
+          ).as("one_thousand_genomes"),
           struct(
             col("topmed.ac") as "ac",
             col("topmed.an") as "an",

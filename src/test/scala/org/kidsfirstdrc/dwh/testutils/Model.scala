@@ -111,7 +111,7 @@ object Model {
                                gru_af: BigDecimal = 0,
                                gru_homozygotes: Long = 0,
                                gru_heterozygotes: Long = 0,
-                               oneThousandGenomes: Option[OneThousandGenomesFreq] = Some(OneThousandGenomesFreq(20, 10, 0.5)),
+                               one_thousand_genomes: Option[OneThousandGenomesFreq] = Some(OneThousandGenomesFreq(20, 10, 0.5)),
                                topmed: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
                                gnomad_genomes_2_1: Option[GnomadFreq] = Some(GnomadFreq(10, 20, 0.5, 10)),
                                gnomad_exomes_2_1: Option[GnomadFreq] = Some(GnomadFreq(10, 20, 0.5, 10)),

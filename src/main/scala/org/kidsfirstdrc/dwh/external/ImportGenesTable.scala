@@ -70,7 +70,7 @@ class ImportGenesTable(runEnv: Environment) extends DataSourceEtl(runEnv) {
         .groupBy("symbol")
         .agg(
           first(struct(df("*"))) as "hg",
-          collect_list(struct(gene_set.drop(joinOn:_*)("*"))) as asColumnName
+          when(first(col(gene_set.columns.head)).isNotNull, collect_list(struct(gene_set.drop(joinOn:_*)("*")))).otherwise(lit(null)) as asColumnName
         )
         .select(col("hg.*"), col(asColumnName))
     }

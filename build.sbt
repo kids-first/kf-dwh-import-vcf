@@ -1,11 +1,11 @@
 
 name := "kf-dwh-import-vcf"
 
-scalaVersion := "2.12.12"
+scalaVersion := "2.12.13"
 
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
 
-val spark_version = "3.0.1"
+val spark_version = "3.0.2"
 
 resolvers += "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots"
 
