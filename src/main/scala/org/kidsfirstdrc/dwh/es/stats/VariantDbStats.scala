@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.variantDb.stats
+package org.kidsfirstdrc.dwh.es.stats
 
 case class VariantDbStats(studiesCount: Long,
                           participantsCount: Long,

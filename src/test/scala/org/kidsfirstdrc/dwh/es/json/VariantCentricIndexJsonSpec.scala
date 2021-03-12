@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.variantDb.json
+package org.kidsfirstdrc.dwh.es.json
 
 import org.apache.spark.sql.DataFrame
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
@@ -12,7 +12,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 
-class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
   val studyId1 = "SD_123"
   val studyId2 = "SD_456"
@@ -78,7 +78,7 @@ class VariantsToJsonJobSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
 
   "VariantDbJson" should "transform data to the right format" in {
 
-    val result = new VariantsToJsonJob(realeaseId).transform(data)
+    val result = new VariantCentricIndexJson(realeaseId).transform(data)
 
     val parsedResult = result.as[VariantIndexOutput.Output].collect()
     val variant = parsedResult.head

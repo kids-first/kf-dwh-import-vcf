@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.variantDb.stats
+package org.kidsfirstdrc.dwh.es.stats
 
 import org.apache.spark.sql.functions.not
 import org.apache.spark.sql.{DataFrame, SparkSession}

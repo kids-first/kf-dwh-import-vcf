@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.conf
 
+import bio.ferlab.datalake.core.etl.Format
 import org.kidsfirstdrc.dwh.conf.Environment._
 
 case class DataSource(name: String,
