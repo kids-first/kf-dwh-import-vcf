@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.variantDb.stats
+package org.kidsfirstdrc.dwh.es.stats
 
 import org.apache.http.HttpHeaders
 import org.apache.http.client.methods.HttpPost

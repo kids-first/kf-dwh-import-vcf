@@ -1,18 +1,23 @@
 #!/bin/bash
-release_id=$1
-number_instance=${4:-"10"}
-instance_type=${5:-"r5.4xlarge"}
+job_type=${1:-"gene_centric"}
+release_id=${2:-"re_000010"}
+number_instance=${3:-"10"}
+instance_type=${4:-"r5.4xlarge"}
 
 steps=$(cat <<EOF
 [
   {
     "Args": [
       "spark-submit",
+      "--packages","io.projectglow:glow_2.12:0.5.0,bio.ferlab:datalake-lib_2.12:0.0.2",
+      "--exclude-packages",
+      "org.apache.httpcomponents:httpcore,org.apache.httpcomponents:httpclient",
       "--deploy-mode",
       "client",
       "--class",
-      "org.kidsfirstdrc.dwh.variantDb.json.VariantsToJson",
+      "org.kidsfirstdrc.dwh.es.json.PrepareIndex",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
+      "${job_type}",
       "${release_id}"
     ],
     "Type": "CUSTOM_JAR",
@@ -34,7 +39,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --release-label emr-6.2.0 \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --steps "${steps}" \
---name "Variant index to Json - ${release_id}" \
+--name "Prepare ${job_type} to Json - ${release_id}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \

@@ -23,6 +23,9 @@ steps=$(cat <<EOF
   {
     "Args": [
       "spark-submit",
+      "--packages","io.projectglow:glow_2.12:0.5.0,bio.ferlab:datalake-lib_2.12:0.0.2",
+      "--exclude-packages",
+      "org.apache.httpcomponents:httpcore,org.apache.httpcomponents:httpclient",
       "--deploy-mode", "client",
       "--class", "org.kidsfirstdrc.dwh.variantDb.stats.Stats",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",

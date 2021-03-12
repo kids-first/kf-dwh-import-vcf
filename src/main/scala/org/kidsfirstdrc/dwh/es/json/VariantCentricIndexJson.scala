@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.variantDb.json
+package org.kidsfirstdrc.dwh.es.json
 
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{explode, _}
@@ -9,11 +9,11 @@ import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
-import org.kidsfirstdrc.dwh.variantDb.json.VariantsToJsonJob._
+import org.kidsfirstdrc.dwh.es.json.VariantCentricIndexJson._
 
 import scala.collection.mutable
 
-class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PROD) {
+class VariantCentricIndexJson(releaseId: String) extends DataSourceEtl(Environment.PROD) {
 
   override val destination: DataSource = ElasticsearchJson.variantsJson
 
@@ -70,13 +70,15 @@ class VariantsToJsonJob(releaseId: String) extends DataSourceEtl(Environment.PRO
 
   override def run()(implicit spark: SparkSession): DataFrame = {
     val inputDF = extract()
-    val outputDF = transform(inputDF)
+    val outputDF = transform(inputDF).persist()
+    println(s"count: ${outputDF.count}")
+    println(s"distinct locus: ${outputDF.dropDuplicates("locus").count()}")
     load(outputDF)
     outputDF
   }
 }
 
-object VariantsToJsonJob {
+object VariantCentricIndexJson {
 
   private def frequenciesForGnomad(colName: String): Column = {
     struct(
@@ -180,7 +182,7 @@ object VariantsToJsonJob {
             col("1k_genomes.ac") as "ac",
             col("1k_genomes.an") as "an",
             col("1k_genomes.af") as "af"
-          ).as("oneThousandGenomes"),
+          ).as("one_thousand_genomes"),
           struct(
             col("topmed.ac") as "ac",
             col("topmed.an") as "an",
