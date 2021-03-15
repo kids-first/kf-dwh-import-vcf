@@ -14,7 +14,7 @@ case class DataSource(name: String,
       case PROD   => s"$bucket$relativePath"
       case QA     => s"$bucket/qa$relativePath"
       case DEV    => s"$bucket/dev$relativePath"
-      case LOCAL  => s"${this.getClass.getResource(relativePath)}"
+      case LOCAL  => s"""${this.getClass.getClassLoader.getResource(".").getFile + s"$relativePath"}"""
     }
   }
 
@@ -23,7 +23,7 @@ case class DataSource(name: String,
       case PROD   => s"$bucket/jobs/documentation/$name.json"
       case QA     => s"$bucket/qa/jobs/documentation/$name.json"
       case DEV    => s"$bucket/dev/jobs/documentation/$name.json"
-      case LOCAL  => s"${this.getClass.getResource("/documentation")}/$name.json"
+      case LOCAL  => s"${this.getClass.getClassLoader.getResource("/documentation")}/$name.json"
     }
   }
 }
