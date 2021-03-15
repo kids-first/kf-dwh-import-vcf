@@ -88,7 +88,8 @@ object VariantIndexOutput {
                    `cosmic`: List[COSMIC] = List(COSMIC()))
 
 
-  case class Output(chromosome: String = "2",
+  case class Output(hash: String = "ba3d35feba14451058e6fc93eeba163c800a8e09",
+                    chromosome: String = "2",
                     start: Long = 165310406,
                     end: Long = 165310406,
                     reference: String = "G",
