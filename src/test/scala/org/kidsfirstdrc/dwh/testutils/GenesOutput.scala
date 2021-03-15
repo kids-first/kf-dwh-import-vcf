@@ -1,7 +1,6 @@
 package org.kidsfirstdrc.dwh.testutils
 
-case class GenesOutput(`hash`: String = "9b8016c31b93a7504a8314ce3d060792f67ca2ad",
-                       `symbol`: String = "OR4F5",
+case class GenesOutput(`symbol`: String = "OR4F5",
                        `entrez_gene_id`: Int = 777,
                        `omim_gene_id`: String = "601013",
                        `hgnc`: String = "HGNC:1392",

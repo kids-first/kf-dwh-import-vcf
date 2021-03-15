@@ -50,6 +50,8 @@ class ImportOrphanetProductSpec extends AnyFlatSpec with GivenWhenThen with With
 
     import spark.implicits._
 
+    spark.sql("CREATE DATABASE IF NOT EXISTS variant")
+
     val job = new ImportOrphanetGeneSet(Environment.LOCAL)
 
     job.run()

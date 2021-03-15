@@ -7,6 +7,11 @@ object EsCatalog {
 
   val alias = "kf-strides-variant"
 
+  object Clinical {
+    val variants     = DataSource(alias, "/variants/variants_re_*"        , "variant", "variants"    , PARQUET)
+    val consequences = DataSource(alias, "/consequences/consequences_re_*", "variant", "consequences", PARQUET)
+  }
+
   object Public {
     val relativePath = "/public"
     val genes = DataSource(alias, s"$relativePath/Genes", "variant", "genes", PARQUET)
@@ -14,7 +19,8 @@ object EsCatalog {
 
   object Es {
     val relativePath = s"/es_index"
-    val gene_centric = DataSource(alias, s"$relativePath/gene_centric", "", "gene_centric", JSON)
+    val gene_centric    = DataSource(alias, s"$relativePath/gene_centric"   , "", "gene_centric"   , JSON)
+    val suggester_index = DataSource(alias, s"$relativePath/suggester_index", "", "suggester_index", JSON)
   }
 
 }

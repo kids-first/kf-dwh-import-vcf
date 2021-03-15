@@ -3,7 +3,7 @@ package org.kidsfirstdrc.dwh.es.json
 import bio.ferlab.datalake.core.config.Configuration
 import org.apache.spark.sql.DataFrame
 import org.kidsfirstdrc.dwh.es.json.EsCatalog.Public
-import org.kidsfirstdrc.dwh.testutils.{GenesOutput, WithSparkSession}
+import org.kidsfirstdrc.dwh.testutils.{GeneCentricOutput, GenesOutput, WithSparkSession}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -26,6 +26,6 @@ class GeneCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithS
 
     val result = new GeneCentricIndexJson().transform(data)
     result.columns should contain allElementsOf Seq("hash")
-    result.as[GenesOutput].collect() should contain allElementsOf Seq(GenesOutput())
+    result.as[GeneCentricOutput].collect() should contain allElementsOf Seq(GeneCentricOutput())
   }
 }
