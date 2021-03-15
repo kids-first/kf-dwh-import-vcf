@@ -5,11 +5,11 @@ import org.apache.spark.sql.functions.{explode, _}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, ElasticsearchJson, Public}
 import org.kidsfirstdrc.dwh.conf._
+import org.kidsfirstdrc.dwh.es.json.VariantCentricIndexJson._
 import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
-import org.kidsfirstdrc.dwh.es.json.VariantCentricIndexJson._
 
 import scala.collection.mutable
 
@@ -46,12 +46,13 @@ class VariantCentricIndexJson(releaseId: String) extends DataSourceEtl(Environme
 
     variants
       .withColumn("locus", concat_ws("-", locus:_*))
+      .withColumn("hash", sha1(col("locus")))
       .withStudies
       .withFrequencies
       .withClinVar(clinvar)
       .withConsequences(consequences)
       .withGenes(genes)
-      .select("chromosome", "start", "end", "reference", "alternate", "locus", "studies", "participant_number",
+      .select("hash", "chromosome", "start", "end", "reference", "alternate", "locus", "studies", "participant_number",
         "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "genes", "omim", "hgvsg")
   }
 
