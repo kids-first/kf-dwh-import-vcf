@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.es.json
 
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions.{col, to_json}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.testutils.Model._
 import org.kidsfirstdrc.dwh.testutils.es.VariantIndexOutput

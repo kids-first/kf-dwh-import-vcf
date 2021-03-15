@@ -240,6 +240,7 @@ object VariantCentricIndexJson {
           flatten(collect_set("omim.omim_id")) as "omim"
         )
         .select("variant.*", "genes", "omim")
+        .withColumn("genes", when(to_json(col("genes")) === lit("[{}]"), array()).otherwise(col("genes")))
     }
   }
 }

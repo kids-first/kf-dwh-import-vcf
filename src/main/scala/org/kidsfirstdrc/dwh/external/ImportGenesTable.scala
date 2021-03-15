@@ -64,15 +64,16 @@ class ImportGenesTable(runEnv: Environment) extends DataSourceEtl(runEnv) {
   }
 
   implicit class DataFrameOps(df: DataFrame) {
-    def joinAndMergeWith(gene_set: DataFrame, joinOn: Seq[String], asColumnName: String) = {
+    def joinAndMergeWith(gene_set: DataFrame, joinOn: Seq[String], asColumnName: String): DataFrame = {
       df
         .join(gene_set, joinOn, "left")
         .groupBy("symbol")
         .agg(
           first(struct(df("*"))) as "hg",
-          when(first(col(gene_set.columns.head)).isNotNull, collect_list(struct(gene_set.drop(joinOn:_*)("*")))).otherwise(lit(null)) as asColumnName
-        )
+          collect_list(struct(gene_set.drop(joinOn:_*)("*"))) as asColumnName,
+         )
         .select(col("hg.*"), col(asColumnName))
+        .withColumn(asColumnName, when(to_json(col(asColumnName)) === lit("[{}]"), array()).otherwise(col(asColumnName)))
     }
   }
 
