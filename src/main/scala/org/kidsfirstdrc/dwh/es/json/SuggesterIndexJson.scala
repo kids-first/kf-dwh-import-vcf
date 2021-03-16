@@ -44,19 +44,22 @@ class SuggesterIndexJson(releaseId: String)(override implicit val conf: Configur
   def getVariantSuggest(variants: DataFrame, consequence: DataFrame): DataFrame = {
 
     val groupedByLocusConsequences = consequence
-      .withColumn("symbol_aa_change", concat_ws(" ", col("symbol"), col("aa_change")))
+      .withColumn("aa_change", when(col("aa_change").isNull, lit("")).otherwise(trim(col("aa_change"))))
+      .withColumn("symbol", when(col("symbol").isNull, lit("")).otherwise(trim(col("symbol"))))
+      .withColumn("symbol_aa_change", trim(concat_ws(" ", col("symbol"), col("aa_change"))))
       .groupBy(locus:_*)
       .agg(
         collect_set(col("symbol")) as "symbol",
         collect_set(col("aa_change")) as "aa_change",
-        collect_set(struct(
+        array_remove(collect_set(struct(
           col("symbol") as "symbol",
           col("aa_change") as "aa_change"
-        )) as "consequences" ,
+        )), struct(lit("") as "symbol", lit("") as "aa_change")) as "consequences" ,
         collect_set(col("symbol_aa_change")) as "symbol_aa_change"
       )
 
     variants
+      .withColumn("hgvsg", when(col("hgvsg").isNull, lit("")).otherwise(trim(col("hgvsg"))))
       .joinByLocus(groupedByLocusConsequences, "left")
       .withColumn("type", lit("variant"))
       .withColumn("locus", concat_ws("-", locus:_*))
@@ -64,13 +67,13 @@ class SuggesterIndexJson(releaseId: String)(override implicit val conf: Configur
       .withColumn("hgvsg", col("hgvsg"))
       .withColumn("suggest", array(
         struct(
-          flatten(array(col("symbol_aa_change"), array(col("hgvsg")), array(col("locus")))) as "input",
+          array_remove(flatten(array(col("symbol_aa_change"), array(col("hgvsg")), array(col("locus")))), "") as "input",
           lit(variantSymbolAaChangeWeight) as "weight"),
         struct(
-          col("symbol") as "input",
+          array_remove(col("symbol"), "") as "input",
           lit(variantSymbolWeight) as "weight"),
         ))
-      .select("type", "locus", "suggestion_id", "hgvsg", "suggest")
+      .select("type", "locus", "suggestion_id", "hgvsg", "suggest", "consequences")
   }
 
   def getGenesSuggest(genes: DataFrame): DataFrame = {
@@ -84,6 +87,6 @@ class SuggesterIndexJson(releaseId: String)(override implicit val conf: Configur
         array(col("symbol")) as "input",
         lit(geneSymbolWeight) as "weight"
       )))
-      .select("type", "locus", "suggestion_id", "hgvsg", "suggest")
+      .select("type", "locus", "suggestion_id", "hgvsg", "suggest", "consequences")
   }
 }
