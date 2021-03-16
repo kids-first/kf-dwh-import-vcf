@@ -44,20 +44,17 @@ object VariantIndexOutput {
                               lrt_converted_rankscore: Double,
                               lrt_pred: String)
 
-  case class ConsequenceScore(conservations: ScoreConservations,
-                              predictions: ScorePredictions)
-
-  case class Consequence(vep_impact: String = "MODERATE",
-                         symbol: String,
-                         ensembl_transcript_id: Option[String] = Some("ENST00000283256.10"),
-                         ensembl_regulatory_id: Option[String] = None,
+  case class Consequence(vep_impact: String = "MODERATE", // index true
+                         symbol: String, // index false
+                         ensembl_transcript_id: Option[String] = Some("ENST00000283256.10"), //index false
+                         ensembl_regulatory_id: Option[String] = None, //index false
                          hgvsc: Option[String] = Some("ENST00000283256.10:c.781G>A"),
                          hgvsp: Option[String] = Some("ENSP00000283256.6:p.Val261Met"),
                          feature_type: String = "Transcript",
-                         consequences: Seq[String] = Seq("missense_variant"),
-                         biotype: Option[String] = Some("protein_coding"),
-                         variant_class: String = "SNV",
-                         strand: Int = 1,
+                         consequences: Seq[String] = Seq("missense_variant"), // index true
+                         biotype: Option[String] = Some("protein_coding"), // index true
+                         variant_class: String = "SNV", // index true
+                         strand: Int = 1, // index true
                          exon: Option[Exon] = Some(Exon(7, 27)),
                          intron: Option[Intron] = None,
                          cdna_position: Option[Int] = Some(937),
@@ -67,20 +64,20 @@ object VariantIndexOutput {
                          protein_position: Option[Int] = Some(261),
                          aa_change: Option[String] = Some("V261M"),
                          coding_dna_change: Option[String] = Some("781G>A"),
-                         impact_score: Int = 3,
-                         canonical: Boolean = true,
-                         conservations: ScoreConservations,
-                         predictions: ScorePredictions)
+                         impact_score: Int = 3, // index true
+                         canonical: Boolean = true, // index true
+                         conservations: ScoreConservations, // index true
+                         predictions: ScorePredictions) // index true
 
-  case class GENES(`symbol`: Option[String] = Some("SCN2A"),
-                   `entrez_gene_id`: Option[Int] = Some(777),
-                   `omim_gene_id`: Option[String] = Some("601013"),
-                   `hgnc`: Option[String] = Some("HGNC:1392"),
-                   `ensembl_gene_id`: Option[String] = Some("ENSG00000189337"),
-                   `location`: Option[String] = Some("1q25.3"),
-                   `name`: Option[String] = Some("calcium voltage-gated channel subunit alpha1 E"),
-                   `alias`: Option[List[String]] = Some(List("BII", "CACH6", "CACNL1A6", "Cav2.3", "EIEE69", "gm139")),
-                   `biotype`: Option[String] = Some("protein_coding"),
+  case class GENES(`symbol`: Option[String] = Some("SCN2A"), //index true
+                   `entrez_gene_id`: Option[Int] = Some(777), //index false
+                   `omim_gene_id`: Option[String] = Some("601013"), //index false
+                   `hgnc`: Option[String] = Some("HGNC:1392"), //index false
+                   `ensembl_gene_id`: Option[String] = Some("ENSG00000189337"), //index false
+                   `location`: Option[String] = Some("1q25.3"),//index false
+                   `name`: Option[String] = Some("calcium voltage-gated channel subunit alpha1 E"),//index false
+                   `alias`: Option[List[String]] = Some(List("BII", "CACH6", "CACNL1A6", "Cav2.3", "EIEE69", "gm139")),//index false
+                   `biotype`: Option[String] = Some("protein_coding"), //remove
                    `orphanet`: List[ORPHANET] = List(ORPHANET()),
                    `hpo`: List[HPO] = List(HPO()),
                    `omim`: List[OMIM] = List(OMIM()),
@@ -89,23 +86,23 @@ object VariantIndexOutput {
 
 
   case class Output(hash: String = "ba3d35feba14451058e6fc93eeba163c800a8e09",
-                    chromosome: String = "2",
-                    start: Long = 165310406,
-                    end: Long = 165310406,
-                    reference: String = "G",
-                    alternate: String = "A",
-                    locus: String = "2-165310406-G-A",
-                    studies: List[Study] = List(),
-                    participant_number: Long = 22,
-                    acls: List[String] = List("SD_456.c1", "SD_123.c1", "SD_789.c99"),
-                    external_study_ids: List[String] = List("SD_456", "SD_123", "SD_789"),
-                    frequencies: Frequencies = Frequencies(),
-                    clinvar: CLINVAR = CLINVAR(),
-                    rsnumber: String = "rs1234567",
-                    release_id: String = "RE_ABCDEF",
+                    chromosome: String = "2", //index true
+                    start: Long = 165310406, //index true
+                    end: Long = 165310406, //remove
+                    reference: String = "G", //index false
+                    alternate: String = "A", //index false
+                    locus: String = "2-165310406-G-A", //index false
+                    studies: List[Study] = List(), //index true
+                    participant_number: Long = 22, //index true
+                    acls: List[String] = List("SD_456.c1", "SD_123.c1", "SD_789.c99"), //index true
+                    external_study_ids: List[String] = List("SD_456", "SD_123", "SD_789"), //index true
+                    frequencies: Frequencies = Frequencies(), //index true
+                    clinvar: CLINVAR = CLINVAR(), //index true
+                    rsnumber: String = "rs1234567", //index false
+                    release_id: String = "RE_ABCDEF", //index false
                     consequences: List[Consequence] = List(),
-                    hgvsg: Option[String] = Some("chr2:g.166166916G>A"),
+                    hgvsg: Option[String] = Some("chr2:g.166166916G>A"), //index false
                     genes: List[GENES] = List(GENES()),
-                    omim: List[String] = List("618285"))
+                    omim: List[String] = List("618285")) //remove
 
 }
