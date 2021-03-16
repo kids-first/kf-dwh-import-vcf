@@ -3,8 +3,10 @@ package org.kidsfirstdrc.dwh.es.json
 import bio.ferlab.datalake.core.config.Configuration
 import org.apache.spark.sql.DataFrame
 import org.kidsfirstdrc.dwh.es.json.EsCatalog.{Clinical, Public}
-import org.kidsfirstdrc.dwh.testutils.Model.{JoinConsequenceOutput, JoinVariantOutput}
 import org.kidsfirstdrc.dwh.testutils._
+import org.kidsfirstdrc.dwh.testutils.es.{CONSEQUENCE, SUGGEST, SuggesterIndexOutput}
+import org.kidsfirstdrc.dwh.testutils.external.GenesOutput
+import org.kidsfirstdrc.dwh.testutils.join.{JoinConsequenceOutput, JoinVariantOutput}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -74,9 +76,9 @@ class SuggesterIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSpa
     val result = new SuggesterIndexJson("re_000010").transform(data)
     result.show(false)
 
-    result.as[SuggesterOutput].collect() should contain allElementsOf Seq(
-      SuggesterOutput(),
-      SuggesterOutput(
+    result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
+      SuggesterIndexOutput(),
+      SuggesterIndexOutput(
         `type` = "gene",
         `locus` = null,
         `suggestion_id` = "9b8016c31b93a7504a8314ce3d060792f67ca2ad",
@@ -95,12 +97,12 @@ class SuggesterIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSpa
       .write.mode("overwrite")
       .json(getClass.getClassLoader.getResource(".").getFile + "test_result")
 
-    val expectedResult = SuggesterOutput(
+    val expectedResult = SuggesterIndexOutput(
       `hgvsg` = "",
       `suggest` = List(SUGGEST(List("SCN2A", "SCN2A.2", "2-165310406-G-A")), SUGGEST(List("SCN2A", "SCN2A.2"), 2)),
       `consequences` = List(CONSEQUENCE("SCN2A", ""), CONSEQUENCE("SCN2A.2", "")))
 
-    result.as[SuggesterOutput].collect() should contain allElementsOf Seq(
+    result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
       expectedResult
     )
   }

@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import org.kidsfirstdrc.dwh.testutils.{VariantInput, VariantOutput, WithSparkSession}
+import org.kidsfirstdrc.dwh.testutils.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.vcf.{VariantInput, VariantOutput}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

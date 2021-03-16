@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.testutils
+package org.kidsfirstdrc.dwh.testutils.vcf
 
 case class VariantInput(chromosome: String = "2",
                         start: Long = 165310406,
