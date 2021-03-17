@@ -3,9 +3,9 @@ package org.kidsfirstdrc.dwh.update
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
-import org.kidsfirstdrc.dwh.testutils.Model.Freq
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, TopmedBravoOutput}
+import org.kidsfirstdrc.dwh.testutils.join.Freq
 import org.kidsfirstdrc.dwh.testutils.variant.Variant
 import org.kidsfirstdrc.dwh.updates.UpdateVariant
 import org.kidsfirstdrc.dwh.vcf.Variants

@@ -23,4 +23,3 @@ case class OmimOutput(chromosome: String = "chr1",
 case class PHENOTYPE(name: String = "Shprintzen-Goldberg syndrome",
                      omim_id: String = "182212",
                      inheritance: List[String] = List("AD"))
-

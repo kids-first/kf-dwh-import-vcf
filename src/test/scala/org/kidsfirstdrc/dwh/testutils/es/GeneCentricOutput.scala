@@ -1,4 +1,6 @@
-package org.kidsfirstdrc.dwh.testutils
+package org.kidsfirstdrc.dwh.testutils.es
+
+import org.kidsfirstdrc.dwh.testutils.external._
 
 case class GeneCentricOutput(`hash`: String = "9b8016c31b93a7504a8314ce3d060792f67ca2ad",
                              `symbol`: String = "OR4F5",

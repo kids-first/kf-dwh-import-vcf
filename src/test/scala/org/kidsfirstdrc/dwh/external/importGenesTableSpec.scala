@@ -4,8 +4,8 @@ import org.apache.spark.sql.functions
 import org.apache.spark.sql.functions.col
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Environment
-import org.kidsfirstdrc.dwh.testutils._
-import org.kidsfirstdrc.dwh.testutils.external.{CosmicCancerGeneCensusOutput, DddGeneCensusOutput, OmimOutput, OrphanetOutput}
+import org.kidsfirstdrc.dwh.testutils.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.external._
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

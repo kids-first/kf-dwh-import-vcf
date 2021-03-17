@@ -1,9 +1,15 @@
 package org.kidsfirstdrc.dwh.testutils.es
 
-import org.kidsfirstdrc.dwh.testutils.Model._
-import org.kidsfirstdrc.dwh.testutils.{COSMIC, DDD, HPO, OMIM, ORPHANET}
+import org.kidsfirstdrc.dwh.testutils.external._
+import org.kidsfirstdrc.dwh.testutils.join.{Freq, OneThousandGenomesFreq}
+import org.kidsfirstdrc.dwh.testutils.vcf.{Exon, Intron, RefAlt}
 
-object VariantIndexOutput {
+object VariantCentricOutput {
+
+  case class GnomadFreqOutput(ac: Long = 10,
+                              an: Long = 20,
+                              af: BigDecimal = 0.5,
+                              homozygotes: Long = 10)
 
   case class StudyFrequency(hmb: Freq, gru: Freq)
 
@@ -77,7 +83,6 @@ object VariantIndexOutput {
                    `location`: Option[String] = Some("1q25.3"),//index false
                    `name`: Option[String] = Some("calcium voltage-gated channel subunit alpha1 E"),//index false
                    `alias`: Option[List[String]] = Some(List("BII", "CACH6", "CACNL1A6", "Cav2.3", "EIEE69", "gm139")),//index false
-                   `biotype`: Option[String] = Some("protein_coding"), //remove
                    `orphanet`: List[ORPHANET] = List(ORPHANET()),
                    `hpo`: List[HPO] = List(HPO()),
                    `omim`: List[OMIM] = List(OMIM()),
@@ -88,7 +93,6 @@ object VariantIndexOutput {
   case class Output(hash: String = "ba3d35feba14451058e6fc93eeba163c800a8e09",
                     chromosome: String = "2", //index true
                     start: Long = 165310406, //index true
-                    end: Long = 165310406, //remove
                     reference: String = "G", //index false
                     alternate: String = "A", //index false
                     locus: String = "2-165310406-G-A", //index false
@@ -102,7 +106,6 @@ object VariantIndexOutput {
                     release_id: String = "RE_ABCDEF", //index false
                     consequences: List[Consequence] = List(),
                     hgvsg: Option[String] = Some("chr2:g.166166916G>A"), //index false
-                    genes: List[GENES] = List(GENES()),
-                    omim: List[String] = List("618285")) //remove
+                    genes: List[GENES] = List(GENES()))
 
 }

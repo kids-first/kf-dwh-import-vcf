@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.testutils
+package org.kidsfirstdrc.dwh.testutils.external
 
 case class HpoGeneSetOutput(`entrez_gene_id`: Int = 777,
                             `symbol`: String = "CACNA1E",

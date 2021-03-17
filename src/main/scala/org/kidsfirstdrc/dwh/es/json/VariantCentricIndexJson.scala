@@ -28,6 +28,7 @@ class VariantCentricIndexJson(releaseId: String) extends DataSourceEtl(Environme
 
   override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val variants = data(Clinical.variants)
+      .drop("end")
       .withColumnRenamed("dbsnp_id", "rsnumber")
 
     val consequences = data(Clinical.consequences)
@@ -41,7 +42,7 @@ class VariantCentricIndexJson(releaseId: String) extends DataSourceEtl(Environme
         col("inheritance"),
         col("interpretations"))
 
-    val genes = data(Public.genes)
+    val genes = data(Public.genes).drop("biotype")
       .withColumnRenamed("chromosome", "genes_chromosome")
 
     variants
@@ -52,8 +53,8 @@ class VariantCentricIndexJson(releaseId: String) extends DataSourceEtl(Environme
       .withClinVar(clinvar)
       .withConsequences(consequences)
       .withGenes(genes)
-      .select("hash", "chromosome", "start", "end", "reference", "alternate", "locus", "studies", "participant_number",
-        "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "genes", "omim", "hgvsg")
+      .select("hash", "chromosome", "start", "reference", "alternate", "locus", "studies", "participant_number",
+        "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "genes", "hgvsg")
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -237,10 +238,9 @@ object VariantCentricIndexJson {
         .groupByLocus()
         .agg(
           first(struct(df("*"))) as "variant",
-          collect_list(struct(genes.drop("genes_chromosome")("*"))) as "genes",
-          flatten(collect_set("omim.omim_id")) as "omim"
+          collect_list(struct(genes.drop("genes_chromosome")("*"))) as "genes"
         )
-        .select("variant.*", "genes", "omim")
+        .select("variant.*", "genes")
         .withColumn("genes", when(to_json(col("genes")) === lit("[{}]"), array()).otherwise(col("genes")))
     }
   }

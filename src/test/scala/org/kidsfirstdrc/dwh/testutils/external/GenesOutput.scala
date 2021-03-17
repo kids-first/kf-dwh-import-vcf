@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.testutils
+package org.kidsfirstdrc.dwh.testutils.external
 
 case class GenesOutput(`symbol`: String = "OR4F5",
                        `entrez_gene_id`: Int = 777,

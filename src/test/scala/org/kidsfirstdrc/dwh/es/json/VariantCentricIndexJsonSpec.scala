@@ -3,10 +3,12 @@ package org.kidsfirstdrc.dwh.es.json
 import org.apache.spark.sql.DataFrame
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.testutils.Model._
-import org.kidsfirstdrc.dwh.testutils.es.VariantIndexOutput
-import org.kidsfirstdrc.dwh.testutils.es.VariantIndexOutput._
-import org.kidsfirstdrc.dwh.testutils.external.ClinvarOutput
-import org.kidsfirstdrc.dwh.testutils.{GenesOutput, WithSparkSession}
+import org.kidsfirstdrc.dwh.testutils.es.VariantCentricOutput
+import org.kidsfirstdrc.dwh.testutils.es.VariantCentricOutput._
+import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, GenesOutput}
+import org.kidsfirstdrc.dwh.testutils.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.join.{Freq, JoinConsequenceOutput, JoinVariantOutput}
+import org.kidsfirstdrc.dwh.testutils.vcf.{Exon, RefAlt}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -80,7 +82,7 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
 
     val result = new VariantCentricIndexJson(realeaseId).transform(data)
 
-    val parsedResult = result.as[VariantIndexOutput.Output].collect()
+    val parsedResult = result.as[VariantCentricOutput.Output].collect()
     val variant = parsedResult.head
 
     //1. make sure we have only 1 row in the result
@@ -89,7 +91,7 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
     variant.consequences should contain allElementsOf expectedConsequences
     variant.studies should contain allElementsOf expectedStudies
     variant.genes should contain allElementsOf expectedGenes
-    variant.copy(consequences = List(), studies = List(), genes = List()) shouldBe VariantIndexOutput.Output(studies = List(), consequences = List(), `genes` = List())
+    variant.copy(consequences = List(), studies = List(), genes = List()) shouldBe VariantCentricOutput.Output(studies = List(), consequences = List(), `genes` = List())
 
   }
 }

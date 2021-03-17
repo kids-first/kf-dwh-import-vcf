@@ -4,7 +4,7 @@
  */
 package org.kidsfirstdrc.dwh.testutils.variant
 
-import org.kidsfirstdrc.dwh.testutils.Model.Freq
+import org.kidsfirstdrc.dwh.testutils.join.Freq
 
 case class Variant(chromosome: String = "2",
                    start: Long = 69359261,
