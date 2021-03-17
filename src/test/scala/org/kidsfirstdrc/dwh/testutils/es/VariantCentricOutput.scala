@@ -89,23 +89,25 @@ object VariantCentricOutput {
                    `ddd`: List[DDD] = List(DDD()),
                    `cosmic`: List[COSMIC] = List(COSMIC()))
 
+  case class PARTICIPANT(`id`: String = "PT_000003")
 
-  case class Output(hash: String = "ba3d35feba14451058e6fc93eeba163c800a8e09",
-                    chromosome: String = "2", //index true
-                    start: Long = 165310406, //index true
-                    reference: String = "G", //index false
-                    alternate: String = "A", //index false
-                    locus: String = "2-165310406-G-A", //index false
-                    studies: List[Study] = List(), //index true
-                    participant_number: Long = 22, //index true
-                    acls: List[String] = List("SD_456.c1", "SD_123.c1", "SD_789.c99"), //index true
-                    external_study_ids: List[String] = List("SD_456", "SD_123", "SD_789"), //index true
-                    frequencies: Frequencies = Frequencies(), //index true
-                    clinvar: CLINVAR = CLINVAR(), //index true
-                    rsnumber: String = "rs1234567", //index false
-                    release_id: String = "RE_ABCDEF", //index false
-                    consequences: List[Consequence] = List(),
-                    hgvsg: Option[String] = Some("chr2:g.166166916G>A"), //index false
-                    genes: List[GENES] = List(GENES()))
+  case class Output(`hash`: String = "ba3d35feba14451058e6fc93eeba163c800a8e09",
+                    `chromosome`: String = "2", //index true
+                    `start`: Long = 165310406, //index true
+                    `reference`: String = "G", //index false
+                    `alternate`: String = "A", //index false
+                    `locus`: String = "2-165310406-G-A", //index false
+                    `studies`: List[Study] = List(), //index true
+                    `participant_number`: Long = 22, //index true
+                    `acls`: List[String] = List("SD_456.c1", "SD_123.c1", "SD_789.c99"), //index true
+                    `external_study_ids`: List[String] = List("SD_456", "SD_123", "SD_789"), //index true
+                    `frequencies`: Frequencies = Frequencies(), //index true
+                    `clinvar`: CLINVAR = CLINVAR(), //index true
+                    `rsnumber`: String = "rs1234567", //index false
+                    `release_id`: String = "RE_ABCDEF", //index false
+                    `consequences`: List[Consequence] = List(),
+                    `hgvsg`: Option[String] = Some("chr2:g.166166916G>A"), //index false
+                    `genes`: List[GENES] = List(GENES()),
+                    `participants`: List[PARTICIPANT] = List(PARTICIPANT()))
 
 }
