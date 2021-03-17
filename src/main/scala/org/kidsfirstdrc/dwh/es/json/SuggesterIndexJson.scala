@@ -6,8 +6,8 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.es.json.EsCatalog.{Clinical, Public}
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
+import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 
 class SuggesterIndexJson(releaseId: String)(override implicit val conf: Configuration) extends ETL(EsCatalog.Es.suggester_index) {
 
@@ -51,10 +51,6 @@ class SuggesterIndexJson(releaseId: String)(override implicit val conf: Configur
       .agg(
         collect_set(col("symbol")) as "symbol",
         collect_set(col("aa_change")) as "aa_change",
-        array_remove(collect_set(struct(
-          col("symbol") as "symbol",
-          col("aa_change") as "aa_change"
-        )), struct(lit("") as "symbol", lit("") as "aa_change")) as "consequences" ,
         collect_set(col("symbol_aa_change")) as "symbol_aa_change"
       )
 
@@ -73,7 +69,7 @@ class SuggesterIndexJson(releaseId: String)(override implicit val conf: Configur
           array_remove(col("symbol"), "") as "input",
           lit(variantSymbolWeight) as "weight"),
         ))
-      .select("type", "locus", "suggestion_id", "hgvsg", "suggest", "consequences")
+      .select("type", "locus", "suggestion_id", "hgvsg", "suggest")
   }
 
   def getGenesSuggest(genes: DataFrame): DataFrame = {
@@ -82,11 +78,10 @@ class SuggesterIndexJson(releaseId: String)(override implicit val conf: Configur
       .withColumn("suggestion_id", sha1(col("symbol"))) //this maps to `hash` column in gene_centric index
       .withColumn("hgvsg", lit(null).cast(StringType))
       .withColumn("locus", lit(null).cast(StringType))
-      .withColumn("consequences", array())
       .withColumn("suggest", array(struct(
         array(col("symbol")) as "input",
         lit(geneSymbolWeight) as "weight"
       )))
-      .select("type", "locus", "suggestion_id", "hgvsg", "suggest", "consequences")
+      .select("type", "locus", "suggestion_id", "hgvsg", "suggest")
   }
 }
