@@ -27,8 +27,6 @@ object Catalog {
 
   object Public extends StoreFolder {
 
-    import Raw._
-
     override val alias: String  = kfStridesVariantBucket
 
     val `1000_genomes`    = DataSource("1000_genomes"     , "variant", alias, "/public/1000_genomes"     , PARQUET)
@@ -48,23 +46,25 @@ object Catalog {
     val topmed_bravo      = DataSource("topmed_bravo"     , "variant", alias, "/public/topmed_bravo"     , PARQUET)
   }
 
-  object Clinical extends StoreFolder {
-
-    import Public._
+  object DataService extends StoreFolder {
 
     override val alias: String  = kfStridesVariantBucket
 
-    val consequences = DataSource("consequences", "variant", alias, "/consequences/consequences_re_*", PARQUET)
-    val occurrences  = DataSource("occurrences" , "variant", alias, "/occurrences/occurrences_re_*"  , PARQUET)
-    val variants     = DataSource("variants"    , "variant", alias, "/variants/variants_re_*"        , PARQUET)
+    val studies = DataSource("studies", "variant", alias, "/dataservice/studies/studies_re_*"     , PARQUET)
+  }
+
+  object Clinical extends StoreFolder {
+
+    override val alias: String  = kfStridesVariantBucket
+
+    val consequences = DataSource("consequences", "variant", alias, "/consequences/consequences_re_*"     , PARQUET)
+    val occurrences  = DataSource("occurrences" , "variant", alias, "/occurrences/occurrences_sd_*_re_*"  , PARQUET)
+    val variants     = DataSource("variants"    , "variant", alias, "/variants/variants_re_*"             , PARQUET)
   }
 
   object ElasticsearchJson extends StoreFolder {
 
     override val alias: String = kfStridesVariantBucket
-
-    import Clinical._
-    import Public._
 
     val variantsJson = DataSource("variants_index", "variant", alias, "/es_index/variants_index_re_*", JSON)
   }
