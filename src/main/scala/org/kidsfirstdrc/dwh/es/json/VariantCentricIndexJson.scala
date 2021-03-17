@@ -3,7 +3,7 @@ package org.kidsfirstdrc.dwh.es.json
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{explode, _}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, ElasticsearchJson, Public}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, ElasticsearchJson, Public}
 import org.kidsfirstdrc.dwh.conf._
 import org.kidsfirstdrc.dwh.es.json.VariantCentricIndexJson._
 import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
@@ -12,16 +12,26 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 
 import scala.collection.mutable
+import scala.util.{Success, Try}
 
 class VariantCentricIndexJson(releaseId: String) extends DataSourceEtl(Environment.PROD) {
 
   override val destination: DataSource = ElasticsearchJson.variantsJson
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    import spark.implicits._
+    val occurrences: DataFrame = spark
+      .table(s"${DataService.studies.database}.${DataService.studies.name}")
+      .select("study_id")
+      .as[String].collect()
+      .map(study_id => Try(spark.table(s"${Clinical.occurrences.database}.${Clinical.occurrences.name}_${study_id.toLowerCase}")))
+      .collect { case Success(df) => df }
+      .reduce( (df1, df2) => df1.unionByName(df2))
+
     Map(
       Clinical.variants        -> spark.table(s"${Clinical.variants.database}.${Clinical.variants.name}"),
       Clinical.consequences    -> spark.table(s"${Clinical.consequences.database}.${Clinical.consequences.name}"),
-      Clinical.occurrences     -> spark.table(s"${Clinical.occurrences.database}.${Clinical.occurrences.name}"),
+      Clinical.occurrences     -> occurrences,
       Public.clinvar           -> spark.table(s"${Public.clinvar.database}.${Public.clinvar.name}"),
       Public.genes             -> spark.table(s"${Public.genes.database}.${Public.genes.name}")
     )
