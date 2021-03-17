@@ -4,7 +4,7 @@ import bio.ferlab.datalake.core.config.Configuration
 import org.apache.spark.sql.DataFrame
 import org.kidsfirstdrc.dwh.es.json.EsCatalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.testutils._
-import org.kidsfirstdrc.dwh.testutils.es.{CONSEQUENCE, SUGGEST, SuggesterIndexOutput}
+import org.kidsfirstdrc.dwh.testutils.es.{SUGGEST, SuggesterIndexOutput}
 import org.kidsfirstdrc.dwh.testutils.external.GenesOutput
 import org.kidsfirstdrc.dwh.testutils.join.{JoinConsequenceOutput, JoinVariantOutput}
 import org.scalatest.GivenWhenThen
@@ -83,8 +83,7 @@ class SuggesterIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSpa
         `locus` = null,
         `suggestion_id` = "9b8016c31b93a7504a8314ce3d060792f67ca2ad",
         `hgvsg` = null,
-        `suggest` = List(SUGGEST(List("OR4F5"), 5)),
-        `consequences` = List())
+        `suggest` = List(SUGGEST(List("OR4F5"), 5)))
     )
   }
 
@@ -99,8 +98,7 @@ class SuggesterIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSpa
 
     val expectedResult = SuggesterIndexOutput(
       `hgvsg` = "",
-      `suggest` = List(SUGGEST(List("SCN2A", "SCN2A.2", "2-165310406-G-A")), SUGGEST(List("SCN2A", "SCN2A.2"), 2)),
-      `consequences` = List(CONSEQUENCE("SCN2A", ""), CONSEQUENCE("SCN2A.2", "")))
+      `suggest` = List(SUGGEST(List("SCN2A", "SCN2A.2", "2-165310406-G-A")), SUGGEST(List("SCN2A", "SCN2A.2"), 2)))
 
     result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
       expectedResult
