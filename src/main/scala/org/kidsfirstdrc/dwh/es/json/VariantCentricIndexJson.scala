@@ -21,6 +21,7 @@ class VariantCentricIndexJson(releaseId: String) extends DataSourceEtl(Environme
     Map(
       Clinical.variants        -> spark.table(s"${Clinical.variants.database}.${Clinical.variants.name}"),
       Clinical.consequences    -> spark.table(s"${Clinical.consequences.database}.${Clinical.consequences.name}"),
+      Clinical.occurrences     -> spark.table(s"${Clinical.occurrences.database}.${Clinical.occurrences.name}"),
       Public.clinvar           -> spark.table(s"${Public.clinvar.database}.${Public.clinvar.name}"),
       Public.genes             -> spark.table(s"${Public.genes.database}.${Public.genes.name}")
     )
@@ -33,6 +34,9 @@ class VariantCentricIndexJson(releaseId: String) extends DataSourceEtl(Environme
 
     val consequences = data(Clinical.consequences)
       .withColumnRenamed("impact", "vep_impact")
+
+    val occurrences = data(Clinical.occurrences)
+      .selectLocus(col("participant_id"), col("is_hmb"), col("is_gru"))
 
     val clinvar = data(Public.clinvar)
       .selectLocus(
@@ -53,8 +57,10 @@ class VariantCentricIndexJson(releaseId: String) extends DataSourceEtl(Environme
       .withClinVar(clinvar)
       .withConsequences(consequences)
       .withGenes(genes)
+      .withParticipants(occurrences)
       .select("hash", "chromosome", "start", "reference", "alternate", "locus", "studies", "participant_number",
-        "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "genes", "hgvsg")
+        "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "genes", "hgvsg",
+        "participants")
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -241,7 +247,21 @@ object VariantCentricIndexJson {
           collect_list(struct(genes.drop("genes_chromosome")("*"))) as "genes"
         )
         .select("variant.*", "genes")
+        //TODO find better solution than to_json() === lit("[{}]")
         .withColumn("genes", when(to_json(col("genes")) === lit("[{}]"), array()).otherwise(col("genes")))
+    }
+
+    def withParticipants(occurrences: DataFrame)(implicit spark: SparkSession): DataFrame = {
+
+      val occurrencesWithParticipants =
+        occurrences
+          .where(col("is_gru") || col("is_hmb"))
+          .groupByLocus()
+          .agg(collect_list(struct(col("participant_id") as "id")) as "participants")
+
+      df.joinByLocus(occurrencesWithParticipants, "left")
+        //TODO find better solution than to_json() === lit("[{}]")
+        .withColumn("participants", when(to_json(col("participants")) === lit("[{}]"), array()).otherwise(col("participants")))
     }
   }
 }

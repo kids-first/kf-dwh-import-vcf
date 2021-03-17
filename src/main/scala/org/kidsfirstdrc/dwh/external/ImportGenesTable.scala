@@ -73,6 +73,7 @@ class ImportGenesTable(runEnv: Environment) extends DataSourceEtl(runEnv) {
           collect_list(struct(gene_set.drop(joinOn:_*)("*"))) as asColumnName,
          )
         .select(col("hg.*"), col(asColumnName))
+        //TODO find better solution than to_json() === lit("[{}]")
         .withColumn(asColumnName, when(to_json(col(asColumnName)) === lit("[{}]"), array()).otherwise(col(asColumnName)))
     }
   }

@@ -8,7 +8,7 @@ import org.kidsfirstdrc.dwh.testutils.es.VariantCentricOutput._
 import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, GenesOutput}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.join.{Freq, JoinConsequenceOutput, JoinVariantOutput}
-import org.kidsfirstdrc.dwh.testutils.vcf.{Exon, RefAlt}
+import org.kidsfirstdrc.dwh.testutils.vcf.{Exon, OccurrenceOutput, RefAlt}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -48,6 +48,12 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
     JoinConsequenceOutput().copy(ensembl_gene_id = "ENSG00000189337", ensembl_transcript_id = Some("ENST00000636203"))
   ).toDF()
 
+  val occurrencesDf: DataFrame = Seq(
+    OccurrenceOutput().copy(is_gru = false, is_hmb = false, participant_id = "PT_000001"), //should not be in the result
+    OccurrenceOutput().copy(is_gru = true , is_hmb = false, participant_id = "PT_000002"), //should be in the result
+    OccurrenceOutput().copy(is_gru = false, is_hmb = true , participant_id = "PT_000003")  //should be in the result
+  ).toDF()
+
   val clinvarDf: DataFrame = Seq(
     ClinvarOutput().copy(start = 165310406, end = 165310406, reference = "G", alternate = "A")
   ).toDF()
@@ -59,6 +65,7 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
   val data = Map(
     Clinical.variants -> joinVariantDf,
     Clinical.consequences -> joinConsequencesDf,
+    Clinical.occurrences -> occurrencesDf,
     Public.clinvar -> clinvarDf,
     Public.genes -> genesDf
   )
@@ -78,6 +85,8 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
 
   val expectedGenes = List(GENES())
 
+  val expectedParticipants = List(PARTICIPANT("PT_000003"), PARTICIPANT("PT_000002"))
+
   "VariantDbJson" should "transform data to the right format" in {
 
     val result = new VariantCentricIndexJson(realeaseId).transform(data)
@@ -88,10 +97,12 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
     //1. make sure we have only 1 row in the result
     parsedResult.length shouldBe 1
     //2. data validation of that row
+    variant.participants should contain allElementsOf expectedParticipants
     variant.consequences should contain allElementsOf expectedConsequences
     variant.studies should contain allElementsOf expectedStudies
     variant.genes should contain allElementsOf expectedGenes
-    variant.copy(consequences = List(), studies = List(), genes = List()) shouldBe VariantCentricOutput.Output(studies = List(), consequences = List(), `genes` = List())
+    variant.copy(consequences = List(), studies = List(), genes = List(), participants = List()) shouldBe
+      VariantCentricOutput.Output(studies = List(), consequences = List(), `genes` = List(), participants = List())
 
   }
 }
