@@ -1,16 +1,16 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DoubleType, IntegerType, LongType}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.Public
-import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.CatalogV2.Public
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportScores(runEnv: Environment) extends DataSourceEtl(runEnv) {
-
-  override val destination: DataSource = Public.dbnsfp_original
+class ImportScores(runEnv: Environment)(implicit conf: Configuration)
+  extends StandardETL(Public.dbnsfp_original)(runEnv, conf) {
 
   def split_semicolon(colName: String, outputColName: String): Column = split(col(colName), ";") as outputColName
 
@@ -297,7 +297,7 @@ class ImportScores(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame)(implicit spark: SparkSession): Unit = {
     data
       .repartition(col("chromosome"))
       .sortWithinPartitions("start")
@@ -305,9 +305,8 @@ class ImportScores(runEnv: Environment) extends DataSourceEtl(runEnv) {
       .mode(SaveMode.Overwrite)
       .partitionBy("chromosome")
       .format("parquet")
-      .option("path", destination.path)
+      .option("path", destination.location)
       .saveAsTable(s"${destination.database}.${destination.name}")
-    data
   }
 }
 

@@ -3,17 +3,17 @@ package org.kidsfirstdrc.dwh.external.orphanet
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
-import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.jobs.DsETL
 
 import scala.xml.{Elem, Node, XML}
 
-class ImportOrphanetGeneSet(runEnv: Environment) extends DataSourceEtl(runEnv) {
+class ImportOrphanetGeneSet(runEnv: Environment) extends DsETL(runEnv) {
 
-  override val destination: DataSource = Public.orphanet_gene_set
+  override val destination: Ds = Public.orphanet_gene_set
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
     import spark.implicits._
 
     def loadXML: String => Elem = str => XML.loadString(spark.read.text(str).collect().map(_.getString(0)).mkString("\n"))
@@ -25,7 +25,7 @@ class ImportOrphanetGeneSet(runEnv: Environment) extends DataSourceEtl(runEnv) {
 
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(orphanet_gene_association)
       .join(
         data(orphanet_disease_history).select("orpha_code", "average_age_of_onset", "average_age_of_death","type_of_inheritance"),

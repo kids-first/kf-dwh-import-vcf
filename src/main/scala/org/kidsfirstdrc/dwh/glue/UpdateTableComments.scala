@@ -3,7 +3,7 @@ package org.kidsfirstdrc.dwh.glue
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog.Public.{clinvar, orphanet_gene_set}
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.conf.{Catalog, DataSource, Environment}
+import org.kidsfirstdrc.dwh.conf.{Catalog, Ds, Environment}
 
 import scala.util.{Failure, Success, Try}
 
@@ -24,7 +24,7 @@ object UpdateTableComments extends App {
       Catalog.sources.filter(ds => names.contains(ds.name)).foreach(t => run(t))
   }
 
-  def run(table: DataSource)(implicit spark: SparkSession, env: Environment): Unit = {
+  def run(table: Ds)(implicit spark: SparkSession, env: Environment): Unit = {
     run(table.database, table.name, table.documentationPath)
   }
 

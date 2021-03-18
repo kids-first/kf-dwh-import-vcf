@@ -1,23 +1,24 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.CatalogV2.{Public, Raw}
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportAnnovarScores(runEnv: Environment) extends DataSourceEtl(runEnv) {
+class ImportAnnovarScores(runEnv: Environment)(implicit conf: Configuration)
+  extends StandardETL(Public.dbnsfp_annovar)(runEnv, conf) {
 
     val source: DataSource = Raw.annovar_dbnsfp
-    val destination: DataSource = Public.dbnsfp_annovar
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     val annovar_dbnsfp = spark.read
       .option("sep", "\t")
       .option("header", "true")
       .option("nullValue", ".")
-      .csv(source.path)
+      .csv(source.location)
 
     Map(source -> annovar_dbnsfp)
   }
@@ -85,15 +86,14 @@ class ImportAnnovarScores(runEnv: Environment) extends DataSourceEtl(runEnv) {
       )
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame)(implicit spark: SparkSession): Unit = {
     data.repartition(col("chromosome"))
       .sortWithinPartitions("start")
       .write.mode("overwrite")
       .partitionBy("chromosome")
       .format(destination.format.sparkFormat)
-      .option("path", destination.path)
+      .option("path", destination.location)
       .saveAsTable(s"${destination.database}.${destination.name}")
-    data
   }
 }
 

@@ -4,15 +4,15 @@ import io.projectglow.functions.lift_over_coordinates
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.jobs.DsETL
 
-class ImportCancerHotspots(runEnv: Environment) extends DataSourceEtl(runEnv) with App {
+class ImportCancerHotspots(runEnv: Environment) extends DsETL(runEnv) with App {
   val chain = "/home/hadoop/b37ToHg38.over.chain"
   override val destination = Public.cancer_hotspots
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
     val df = spark.read
       .option("comment", "#")
       .option("header", "true")
@@ -20,7 +20,7 @@ class ImportCancerHotspots(runEnv: Environment) extends DataSourceEtl(runEnv) wi
     Map(Raw.cancerhotspots_csv -> df)
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     val lifted: Dataset[Row] =
       data(Raw.cancerhotspots_csv)

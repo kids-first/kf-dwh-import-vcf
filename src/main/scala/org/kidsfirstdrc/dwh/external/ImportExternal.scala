@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.external
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Environment
@@ -21,6 +22,7 @@ object ImportExternal extends App {
     .appName("Import").getOrCreate()
 
   val env = Try(Environment.withName(runEnv)).getOrElse(Environment.DEV)
+  implicit val conf: Configuration = Configuration(List(StorageConf("kf-strides-variant-parquet", "s3a://kf-strides-variant-parquet-prd")))
 
   jobType.toLowerCase match {
     case "1000genomes"     => new Import1k(env).run()
