@@ -1,29 +1,29 @@
 package org.kidsfirstdrc.dwh.external.omim
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions.{col, explode, split}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment._
 import org.kidsfirstdrc.dwh.external.omim.OmimPhenotype.parse_pheno
-import org.kidsfirstdrc.dwh.jobs.DsETL
+import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportOmimGeneSet(runEnv: Environment) extends DsETL(runEnv) {
+class ImportOmimGeneSet(runEnv: Environment)(implicit conf: Configuration)
+  extends StandardETL(Public.omim_gene_set)(runEnv, conf) {
 
-  override val destination: Ds = Public.omim_gene_set
-
-  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     val df = spark.read.format("csv")
       .option("inferSchema", "true")
       .option("comment", "#")
       .option("header", "false")
       .option("sep", "\t")
-      .load(Raw.omim_genemap2.path)
+      .load(Raw.omim_genemap2.location)
 
     Map(Raw.omim_genemap2 -> df)
   }
 
-  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(Raw.omim_genemap2)
       .select(
         col("_c0") as "chromosome",

@@ -1,23 +1,23 @@
 package org.kidsfirstdrc.dwh.external
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DsETL
+import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class ImportDBSNP(runEnv: Environment) extends DsETL(runEnv) with App {
+class ImportDBSNP(runEnv: Environment)(implicit conf: Configuration)
+  extends StandardETL(Public.dbsnp)(runEnv, conf) {
 
-  override val destination = Public.dbsnp
-
-  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
-    Map(Raw.dbsnp_vcf -> vcf(Raw.dbsnp_vcf.path))
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    Map(Raw.dbsnp_vcf -> vcf(Raw.dbsnp_vcf.location))
   }
 
-  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     data(Raw.dbsnp_vcf)
       .where($"contigName" like "NC_%")
@@ -45,7 +45,7 @@ class ImportDBSNP(runEnv: Environment) extends DsETL(runEnv) with App {
       .partitionBy("chromosome")
       .mode(SaveMode.Overwrite)
       .format(destination.format.sparkFormat)
-      .option("path", destination.path)
+      .option("path", destination.location)
       .saveAsTable(s"${destination.database}.${destination.name}")
     data
   }

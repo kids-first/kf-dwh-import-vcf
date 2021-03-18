@@ -1,28 +1,28 @@
 package org.kidsfirstdrc.dwh.external
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{split, udf}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DsETL
+import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportHumanGenes(runEnv: Environment) extends DsETL(runEnv) {
+class ImportHumanGenes(runEnv: Environment)(implicit conf: Configuration)
+  extends StandardETL(Public.human_genes)(runEnv, conf) {
 
-  override val destination: Ds = Public.human_genes
-
-  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     val df = spark.read.format("csv")
       .option("inferSchema", "true")
       .option("header", "true")
       .option("sep", "\t")
       .option("nullValue", "-")
-      .load(Raw.refseq_homo_sapiens_gene.path)
+      .load(Raw.refseq_homo_sapiens_gene.location)
     Map(Raw.refseq_homo_sapiens_gene -> df)
   }
 
-  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     data(Raw.refseq_homo_sapiens_gene)
       .select(

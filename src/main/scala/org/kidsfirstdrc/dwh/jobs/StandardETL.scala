@@ -1,10 +1,10 @@
 package org.kidsfirstdrc.dwh.jobs
 
-
 import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.{DataSource, ETL}
+import org.apache.spark.sql.functions.{col, lit, regexp_extract, trim}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Ds._
+import org.kidsfirstdrc.dwh.conf.DataSourceImplicit._
 import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
 import org.kidsfirstdrc.dwh.glue.UpdateTableComments
@@ -16,13 +16,14 @@ abstract class StandardETL(override val destination: DataSource)
 
   val view_db = "variant_live"
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): Unit = {
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data
       .write
       .mode(SaveMode.Overwrite)
       .format("parquet")
       .option("path", destination.location)
       .saveAsTable(s"${destination.database}.${destination.name}")
+    data
   }
 
   override def publish()(implicit spark: SparkSession): Unit = {
@@ -33,11 +34,17 @@ abstract class StandardETL(override val destination: DataSource)
     }
   }
 
-  override def run()(implicit spark: SparkSession): Unit = {
-    val inputDF = extract()
-    val outputDF = transform(inputDF)
-    load(outputDF)
-    publish()
+  private def regexp_extractFromCreateStatement[T](regex: String, defaultValue: T)(implicit spark: SparkSession): T = {
+    Try {
+      spark.sql(s"show create table ${destination.database}.${destination.name}")
+        .withColumn("extracted_value", regexp_extract(col("createtab_stmt"), regex, 1))
+        .where(trim(col("extracted_value")) =!= lit(""))
+        .select("extracted_value")
+        .collect().head.getAs[T](0)
+    }.getOrElse(defaultValue)
   }
+
+  def lastReleaseId(implicit spark: SparkSession): String =
+    regexp_extractFromCreateStatement("(re_\\d{6})", "re_000001")
 }
 

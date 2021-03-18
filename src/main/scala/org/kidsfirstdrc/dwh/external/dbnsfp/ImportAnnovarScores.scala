@@ -4,7 +4,7 @@ import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.conf.CatalogV2.{Public, Raw}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
@@ -86,7 +86,7 @@ class ImportAnnovarScores(runEnv: Environment)(implicit conf: Configuration)
       )
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): Unit = {
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data.repartition(col("chromosome"))
       .sortWithinPartitions("start")
       .write.mode("overwrite")
@@ -94,6 +94,7 @@ class ImportAnnovarScores(runEnv: Environment)(implicit conf: Configuration)
       .format(destination.format.sparkFormat)
       .option("path", destination.location)
       .saveAsTable(s"${destination.database}.${destination.name}")
+      data
   }
 }
 

@@ -1,74 +1,78 @@
 package org.kidsfirstdrc.dwh.conf
 
+import bio.ferlab.datalake.core.etl.DataSource
 import bio.ferlab.datalake.core.loader.Formats._
+import bio.ferlab.datalake.core.loader.LoadTypes.OverWrite
 
 object Catalog {
 
-  val kfStridesVariantBucket = "s3a://kf-strides-variant-parquet-prd"
+  val kfStridesVariantBucket = "kf-strides-variant"
 
   object Raw extends StoreFolder {
     override val alias: String  = kfStridesVariantBucket
 
-    //val `1000genomes_vcf`         = Ds("1000genomes_vcf"          , "", alias, "/raw/1000Genomes/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz", VCF)
-    //val annovar_dbnsfp            = Ds("annovar_dbnsfp"           , "", alias, "/raw/annovar/dbNSFP/hg38_dbnsfp41a.txt"      , CSV)
-    val cancerhotspots_csv        = Ds("cancerhotspots_csv"       , "", alias, "/raw/cancerhotspots/cancerhotspots.v2.maf.gz", CSV)
-    val clinvar_vcf               = Ds("clinvar_vcf"              , "", alias, "/raw/clinvar/clinvar.vcf.gz"                 , VCF)
-    val cosmic_cancer_gene_census = Ds("cosmic_cancer_gene_census", "", alias, "/raw/cosmic/cancer_gene_census.csv"          , CSV)
-    val dbsnp_vcf                 = Ds("dbsnp_vcf"                , "", alias, "/raw/dbsnp/GCF_000001405.38.gz"              , VCF)
-    //val dbNSFP_csv                = Ds("dbNSFP_csv"               , "", alias, "/raw/dbNSFP/*.gz"                            , CSV)
-    val ddd_gene_census           = Ds("ddd_gene_census"          , "", alias, "/raw/ddd/DDG2P_17_5_2020.csv"                , CSV)
-    val hpo_genes_to_phenotype    = Ds("hpo_genes_to_phenotype"   , "", alias, "/raw/hpo/genes_to_phenotype.txt"             , CSV)
-    val omim_genemap2             = Ds("omim_genemap2"            , "", alias, "/raw/omim/genemap2.txt"                      , CSV)
-    val orphanet_gene_association = Ds("en_product6"              , "", alias, "/raw/orphanet/en_product6.xml"               , XML)
-    val orphanet_disease_history  = Ds("en_product9_ages"         , "", alias, "/raw/orphanet/en_product9_ages.xml"          , XML)
-    val refseq_homo_sapiens_gene  = Ds("refseq_homo_sapiens_gene" , "", alias, "/raw/refseq/Homo_sapiens.gene_info.gz"       , CSV)
-    val topmed_bravo_dbsnp        = Ds("topmed_bravo_dbsnp"       , "", alias, "/raw/topmed/bravo-dbsnp-all.vcf.gz"          , VCF)
+    val `1000genomes_vcf`         = DataSource(alias, "/raw/1000Genomes/ALL.*.sites.vcf.gz"    , "", "1000genomes_vcf"          ,    VCF, OverWrite)
+    val annovar_dbnsfp            = DataSource(alias, "/raw/annovar/dbNSFP/hg38_dbnsfp41a.txt" , "", "annovar_dbnsfp"           ,    CSV, OverWrite)
+    val cancerhotspots_csv        = DataSource(alias, "/raw/cancerhotspots/cancerhotspots.*.gz", "", "cancerhotspots_csv"       ,    CSV, OverWrite)
+    val clinvar_vcf               = DataSource(alias, "/raw/clinvar/clinvar.vcf.gz"            , "", "clinvar_vcf"              ,    VCF, OverWrite)
+    val cosmic_cancer_gene_census = DataSource(alias, "/raw/cosmic/cancer_gene_census.csv"     , "", "cosmic_cancer_gene_census",    CSV, OverWrite)
+    val dbsnp_vcf                 = DataSource(alias, "/raw/dbsnp/GCF_000001405.38.gz"         , "", "dbsnp_vcf"                ,    VCF, OverWrite)
+    val dbNSFP_csv                = DataSource(alias, "/raw/dbNSFP/*.gz"                       , "", "dbNSFP_csv"               ,    CSV, OverWrite)
+    val ddd_gene_census           = DataSource(alias, "/raw/ddd/DDG2P_17_5_2020.csv"           , "", "ddd_gene_census"          ,    CSV, OverWrite)
+    val hpo_genes_to_phenotype    = DataSource(alias, "/raw/hpo/genes_to_phenotype.txt"        , "", "hpo_genes_to_phenotype"   ,    CSV, OverWrite)
+    val omim_genemap2             = DataSource(alias, "/raw/omim/genemap2.txt"                 , "", "omim_genemap2"            ,    CSV, OverWrite)
+    val orphanet_gene_association = DataSource(alias, "/raw/orphanet/en_product6.xml"          , "", "en_product6"              ,    XML, OverWrite)
+    val orphanet_disease_history  = DataSource(alias, "/raw/orphanet/en_product9_ages.xml"     , "", "en_product9_ages"         ,    XML, OverWrite)
+    val refseq_homo_sapiens_gene  = DataSource(alias, "/raw/refseq/Homo_sapiens.gene_info.gz"  , "", "refseq_homo_sapiens_gene" ,    CSV, OverWrite)
+    val topmed_bravo_dbsnp        = DataSource(alias, "/raw/topmed/bravo-dbsnp-all.vcf.gz"     , "", "topmed_bravo_dbsnp"       ,    VCF, OverWrite)
   }
 
   object Public extends StoreFolder {
 
     override val alias: String  = kfStridesVariantBucket
 
-    val `1000_genomes`    = Ds("1000_genomes"     , "variant", alias, "/public/1000_genomes"     , PARQUET)
-    val cancer_hotspots   = Ds("cancer_hotspots"  , "variant", alias, "/public/cancer_hotspots"  , PARQUET)
-    val clinvar           = Ds("clinvar"          , "variant", alias, "/public/clinvar"          , PARQUET)
-    val cosmic_gene_set   = Ds("cosmic_gene_set"  , "variant", alias, "/public/cosmic_gene_set"  , PARQUET)
-    val dbnsfp_variant    = Ds("bdnsfp"           , "variant", alias, "/public/dbnsfp/variant"   , PARQUET)
-    val dbnsfp_annovar    = Ds("dbnsfp_annovar"   , "variant", alias, "/public/annovar/dbnsfp"   , PARQUET)
-    val dbnsfp_original   = Ds("dbnsfp_original"  , "variant", alias, "/public/dbnsfp/scores"    , PARQUET)
-    val dbsnp             = Ds("dbsnp"            , "variant", alias, "/public/dbsnp"            , PARQUET)
-    val ddd_gene_set      = Ds("ddd_gene_set"     , "variant", alias, "/public/ddd_gene_set"     , PARQUET)
-    val genes             = Ds("genes"            , "variant", alias, "/public/genes"            , PARQUET)
-    val human_genes       = Ds("human_genes"      , "variant", alias, "/public/human_genes"      , PARQUET)
-    val hpo_gene_set      = Ds("hpo_gene_set"     , "variant", alias, "/public/hpo_gene_set"     , PARQUET)
-    val omim_gene_set     = Ds("omim_gene_set"    , "variant", alias, "/public/omim_gene_set"    , PARQUET)
-    val orphanet_gene_set = Ds("orphanet_gene_set", "variant", alias, "/public/orphanet_gene_set", PARQUET)
-    val topmed_bravo      = Ds("topmed_bravo"     , "variant", alias, "/public/topmed_bravo"     , PARQUET)
+    val `1000_genomes`    = DataSource(alias, "/public/1000_genomes"     , "variant", "1000_genomes"     , PARQUET, OverWrite)
+    val cancer_hotspots   = DataSource(alias, "/public/cancer_hotspots"  , "variant", "cancer_hotspots"  , PARQUET, OverWrite)
+    val clinvar           = DataSource(alias, "/public/clinvar"          , "variant", "clinvar"          , PARQUET, OverWrite)
+    val cosmic_gene_set   = DataSource(alias, "/public/cosmic_gene_set"  , "variant", "cosmic_gene_set"  , PARQUET, OverWrite)
+    val dbnsfp_variant    = DataSource(alias, "/public/dbnsfp/variant"   , "variant", "bdnsfp"           , PARQUET, OverWrite)
+    val dbnsfp_annovar    = DataSource(alias, "/public/annovar/dbnsfp"   , "variant", "dbnsfp_annovar"   , PARQUET, OverWrite)
+    val dbnsfp_original   = DataSource(alias, "/public/dbnsfp/scores"    , "variant", "dbnsfp_original"  , PARQUET, OverWrite)
+    val dbsnp             = DataSource(alias, "/public/dbsnp"            , "variant", "dbsnp"            , PARQUET, OverWrite)
+    val ddd_gene_set      = DataSource(alias, "/public/ddd_gene_set"     , "variant", "ddd_gene_set"     , PARQUET, OverWrite)
+    val genes             = DataSource(alias, "/public/genes"            , "variant", "genes"            , PARQUET, OverWrite)
+    val human_genes       = DataSource(alias, "/public/human_genes"      , "variant", "human_genes"      , PARQUET, OverWrite)
+    val hpo_gene_set      = DataSource(alias, "/public/hpo_gene_set"     , "variant", "hpo_gene_set"     , PARQUET, OverWrite)
+    val omim_gene_set     = DataSource(alias, "/public/omim_gene_set"    , "variant", "omim_gene_set"    , PARQUET, OverWrite)
+    val orphanet_gene_set = DataSource(alias, "/public/orphanet_gene_set", "variant", "orphanet_gene_set", PARQUET, OverWrite)
+    val topmed_bravo      = DataSource(alias, "/public/topmed_bravo"     , "variant", "topmed_bravo"     , PARQUET, OverWrite)
   }
 
   object DataService extends StoreFolder {
 
     override val alias: String  = kfStridesVariantBucket
 
-    val studies = Ds("studies", "variant", alias, "/dataservice/studies/studies_re_*"     , PARQUET)
+    val studies = DataSource(alias, "/dataservice/studies/studies_re_*", "variant", "studies",  PARQUET, OverWrite)
   }
 
   object Clinical extends StoreFolder {
 
     override val alias: String  = kfStridesVariantBucket
 
-    val consequences = Ds("consequences", "variant", alias, "/consequences/consequences_re_*"     , PARQUET)
-    val occurrences  = Ds("occurrences" , "variant", alias, "/occurrences/occurrences_sd_*_re_*"  , PARQUET)
-    val variants     = Ds("variants"    , "variant", alias, "/variants/variants_re_*"             , PARQUET)
+    val consequences = DataSource(alias, "/consequences/consequences_re_*"   , "variant", "consequences", PARQUET, OverWrite)
+    val occurrences  = DataSource(alias, "/occurrences/occurrences_sd_*_re_*", "variant", "occurrences" , PARQUET, OverWrite)
+    val variants     = DataSource(alias, "/variants/variants_re_*"           , "variant", "variants"    , PARQUET, OverWrite)
   }
 
-  object ElasticsearchJson extends StoreFolder {
+  object Es extends StoreFolder {
 
     override val alias: String = kfStridesVariantBucket
-
-    val variantsJson = Ds("variants_index", "variant", alias, "/es_index/variants_index_re_*", JSON)
+    val relativePath = s"/es_index"
+    val variantsJson        = DataSource(alias, s"$relativePath/variants_index_re_*", "", "variants_index"     , JSON, OverWrite)
+    val gene_centric        = DataSource(alias, s"$relativePath/gene_centric"       , "", "gene_centric"       , JSON, OverWrite)
+    val genomic_suggestions = DataSource(alias, s"$relativePath/genomic_suggestions", "", "genomic_suggestions", JSON, OverWrite)
   }
 
-  def sources: Set[Ds] = Raw.ds ++ Public.ds ++ Clinical.ds ++ ElasticsearchJson.ds
+  def sources: Set[DataSource] = Raw.sources ++ Public.sources ++ Clinical.sources ++ Es.sources
 
 }

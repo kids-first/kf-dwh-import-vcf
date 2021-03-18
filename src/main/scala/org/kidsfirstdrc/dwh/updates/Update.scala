@@ -1,9 +1,9 @@
 package org.kidsfirstdrc.dwh.updates
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Environment
-import org.kidsfirstdrc.dwh.conf.Environment._
 
 import scala.util.Try
 
@@ -14,6 +14,9 @@ object Update extends App {
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
     .enableHiveSupport()
     .appName(s"Update $destination from $source").getOrCreate()
+
+  implicit val conf: Configuration = Configuration(List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")))
+
 
   run(source, destination, runEnv)
 

@@ -16,7 +16,5 @@ trait StoreFolder {
           acc :+ f.get(this)
       }.toSet
 
-
-  def ds: Set[Ds] = getClassFields.filter(_.isInstanceOf[Ds]).map(_.asInstanceOf[Ds])
   def sources: Set[DataSource] = getClassFields.filter(_.isInstanceOf[DataSource]).map(_.asInstanceOf[DataSource])
 }

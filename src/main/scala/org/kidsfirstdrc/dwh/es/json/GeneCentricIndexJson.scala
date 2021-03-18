@@ -4,9 +4,9 @@ import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions.{col, sha1}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.es.json.EsCatalog.Public
+import org.kidsfirstdrc.dwh.conf.Catalog.{Es, Public}
 
-class GeneCentricIndexJson()(override implicit val conf: Configuration) extends ETL(EsCatalog.Es.gene_centric) {
+class GeneCentricIndexJson()(override implicit val conf: Configuration) extends ETL(Es.gene_centric) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(
@@ -19,15 +19,16 @@ class GeneCentricIndexJson()(override implicit val conf: Configuration) extends 
       .withColumn("hash", sha1(col("symbol")))
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): Unit = {
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data
       .write
       .mode(SaveMode.Overwrite)
       .format("json")
       .json(s"${destination.location}")
+    data
   }
 
-  override def run()(implicit spark: SparkSession): Unit = {
+  override def run()(implicit spark: SparkSession): DataFrame = {
     val inputDF = extract()
     val outputDF = transform(inputDF).persist()
     println(s"count: ${outputDF.count}")

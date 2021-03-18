@@ -22,7 +22,7 @@ object ImportExternal extends App {
     .appName("Import").getOrCreate()
 
   val env = Try(Environment.withName(runEnv)).getOrElse(Environment.DEV)
-  implicit val conf: Configuration = Configuration(List(StorageConf("kf-strides-variant-parquet", "s3a://kf-strides-variant-parquet-prd")))
+  implicit val conf: Configuration = Configuration(List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")))
 
   jobType.toLowerCase match {
     case "1000genomes"     => new Import1k(env).run()

@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
-import org.kidsfirstdrc.dwh.conf.CatalogV2.Raw
+import org.kidsfirstdrc.dwh.conf.Catalog.Raw
 import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.{OneKGenomesInput, OneKGenomesOutput}
@@ -16,7 +16,7 @@ class Import1kgenomesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkS
   implicit val conf: Configuration =
     Configuration(
       List(StorageConf(
-        "kf-strides-variant-parquet",
+        "kf-strides-variant",
         getClass.getClassLoader.getResource(".").getFile)))
 
 

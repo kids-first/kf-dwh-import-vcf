@@ -3,7 +3,7 @@ package org.kidsfirstdrc.dwh.external.dbnsfp
 import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.CatalogV2.{Public, Raw}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
@@ -26,7 +26,7 @@ class ImportRaw(runEnv: Environment)(implicit conf: Configuration)
       .withColumnRenamed("position_1-based", "start")
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): Unit = {
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data
       .write
       .mode(SaveMode.Overwrite)
@@ -34,6 +34,7 @@ class ImportRaw(runEnv: Environment)(implicit conf: Configuration)
       .format("parquet")
       .option("path", destination.location)
       .saveAsTable(s"${destination.database}.${destination.name}")
+    data
   }
 }
 

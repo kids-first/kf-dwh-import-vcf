@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.external
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
 import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetGeneSet
@@ -11,6 +12,12 @@ import org.scalatest.matchers.should.Matchers
 
 
 class ImportOrphanetProductSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+
+  implicit val conf: Configuration =
+    Configuration(
+      List(StorageConf(
+        "kf-strides-variant",
+        getClass.getClassLoader.getResource(".").getFile)))
 
   "extract" should "return xml files parsed into a dataframes" in {
     import spark.implicits._

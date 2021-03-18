@@ -5,11 +5,12 @@ import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
-import org.kidsfirstdrc.dwh.es.json.EsCatalog.{Clinical, Public}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 
-class GenomicSuggestionsIndexJson(releaseId: String)(override implicit val conf: Configuration) extends ETL(EsCatalog.Es.genomic_suggestions) {
+class GenomicSuggestionsIndexJson(releaseId: String)
+                                 (override implicit val conf: Configuration) extends ETL(Es.genomic_suggestions) {
 
   final val geneSymbolWeight = 5
   final val geneAliasesWeight = 3
@@ -34,12 +35,13 @@ class GenomicSuggestionsIndexJson(releaseId: String)(override implicit val conf:
     getGenesSuggest(genes).unionByName(getVariantSuggest(variants, consequences))
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): Unit = {
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data
       .write
       .mode(SaveMode.Overwrite)
       .format("json")
       .json(s"${destination.location}")
+    data
   }
 
   def getVariantSuggest(variants: DataFrame, consequence: DataFrame): DataFrame = {

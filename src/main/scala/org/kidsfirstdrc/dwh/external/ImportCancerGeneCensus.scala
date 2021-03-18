@@ -1,22 +1,22 @@
 package org.kidsfirstdrc.dwh.external
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{ArrayType, IntegerType, StringType, StructField}
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Ds
+import org.kidsfirstdrc.dwh.conf.Catalog._
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DsETL
+import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 import scala.collection.mutable
 
-class ImportCancerGeneCensus(runEnv: Environment) extends DsETL(runEnv) {
+class ImportCancerGeneCensus(runEnv: Environment)(implicit conf: Configuration)
+  extends StandardETL(Public.cosmic_gene_set)(runEnv, conf) {
 
-  override val destination: Ds = Public.cosmic_gene_set
-
-  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
-    Map(Raw.cosmic_cancer_gene_census -> spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.path))
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    Map(Raw.cosmic_cancer_gene_census -> spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.location))
   }
 
   def trim_array_udf: UserDefinedFunction = udf { array: mutable.WrappedArray[String] =>
@@ -30,7 +30,7 @@ class ImportCancerGeneCensus(runEnv: Environment) extends DsETL(runEnv) {
     }
   }
 
-  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     spark.udf.register("trim_array", trim_array_udf)
 

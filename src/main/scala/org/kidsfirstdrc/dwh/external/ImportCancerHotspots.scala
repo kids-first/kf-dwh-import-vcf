@@ -1,26 +1,27 @@
 package org.kidsfirstdrc.dwh.external
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.DataSource
 import io.projectglow.functions.lift_over_coordinates
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DsETL
+import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportCancerHotspots(runEnv: Environment) extends DsETL(runEnv) with App {
+class ImportCancerHotspots(runEnv: Environment)
+                          (implicit conf: Configuration) extends StandardETL(Public.cancer_hotspots)(runEnv, conf) with App {
   val chain = "/home/hadoop/b37ToHg38.over.chain"
-  override val destination = Public.cancer_hotspots
 
-  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     val df = spark.read
       .option("comment", "#")
       .option("header", "true")
-      .option("sep", "\t").csv(Raw.cancerhotspots_csv.path)
+      .option("sep", "\t").csv(Raw.cancerhotspots_csv.location)
     Map(Raw.cancerhotspots_csv -> df)
   }
 
-  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     val lifted: Dataset[Row] =
       data(Raw.cancerhotspots_csv)

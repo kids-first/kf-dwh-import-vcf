@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.external
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
 import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
@@ -11,6 +12,12 @@ import org.scalatest.matchers.should.Matchers
 
 class ImportCancerGeneCensusSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
+
+  implicit val conf: Configuration =
+    Configuration(
+      List(StorageConf(
+        "kf-strides-variant",
+        getClass.getClassLoader.getResource(".").getFile)))
 
   "run" should "creates cosmic gene set table" in {
 
