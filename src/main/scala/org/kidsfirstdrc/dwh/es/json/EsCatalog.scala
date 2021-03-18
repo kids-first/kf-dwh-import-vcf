@@ -19,8 +19,8 @@ object EsCatalog {
 
   object Es {
     val relativePath = s"/es_index"
-    val gene_centric    = DataSource(alias, s"$relativePath/gene_centric"   , "", "gene_centric"   , JSON)
-    val suggester_index = DataSource(alias, s"$relativePath/suggester_index", "", "suggester_index", JSON)
+    val gene_centric        = DataSource(alias, s"$relativePath/gene_centric"       , "", "gene_centric"       , JSON)
+    val genomic_suggestions = DataSource(alias, s"$relativePath/genomic_suggestions", "", "genomic_suggestions", JSON)
   }
 
 }
