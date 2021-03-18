@@ -6,6 +6,7 @@ import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
 import org.kidsfirstdrc.dwh.jobs.DsETL
+import org.kidsfirstdrc.dwh.utils.SparkUtils.removeEmptyObjectsIn
 
 class ImportGenesTable(runEnv: Environment) extends DsETL(runEnv) {
 
@@ -73,9 +74,12 @@ class ImportGenesTable(runEnv: Environment) extends DsETL(runEnv) {
           collect_list(struct(gene_set.drop(joinOn:_*)("*"))) as asColumnName,
          )
         .select(col("hg.*"), col(asColumnName))
-        //TODO find better solution than to_json() === lit("[{}]")
-        .withColumn(asColumnName, when(to_json(col(asColumnName)) === lit("[{}]"), array()).otherwise(col(asColumnName)))
+        .withColumn(asColumnName, removeEmptyObjectsIn(asColumnName))
     }
+
+
+
+
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {

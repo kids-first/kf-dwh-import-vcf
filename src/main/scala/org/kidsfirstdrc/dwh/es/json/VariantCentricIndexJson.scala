@@ -257,8 +257,7 @@ object VariantCentricIndexJson {
           collect_list(struct(genes.drop("genes_chromosome")("*"))) as "genes"
         )
         .select("variant.*", "genes")
-        //TODO find better solution than to_json() === lit("[{}]")
-        .withColumn("genes", when(to_json(col("genes")) === lit("[{}]"), array()).otherwise(col("genes")))
+        .withColumn("genes", removeEmptyObjectsIn("genes"))
     }
 
     def withParticipants(occurrences: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -270,8 +269,7 @@ object VariantCentricIndexJson {
           .agg(collect_list(struct(col("participant_id") as "participant_id")) as "participants")
 
       df.joinByLocus(occurrencesWithParticipants, "left")
-        //TODO find better solution than to_json() === lit("[{}]")
-        .withColumn("participants", when(to_json(col("participants")) === lit("[{}]"), array()).otherwise(col("participants")))
+        .withColumn("participants", removeEmptyObjectsIn("participants"))
     }
   }
 }
