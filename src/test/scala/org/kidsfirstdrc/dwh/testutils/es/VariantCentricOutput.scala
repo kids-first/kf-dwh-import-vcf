@@ -89,7 +89,7 @@ object VariantCentricOutput {
                    `ddd`: List[DDD] = List(DDD()),
                    `cosmic`: List[COSMIC] = List(COSMIC()))
 
-  case class PARTICIPANT(`id`: String = "PT_000003")
+  case class PARTICIPANT(`participant_id`: String = "PT_000003")
 
   case class Output(`hash`: String = "ba3d35feba14451058e6fc93eeba163c800a8e09",
                     `chromosome`: String = "2", //index true
