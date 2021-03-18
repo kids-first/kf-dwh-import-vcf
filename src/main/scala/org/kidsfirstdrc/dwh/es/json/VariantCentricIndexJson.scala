@@ -267,7 +267,7 @@ object VariantCentricIndexJson {
         occurrences
           .where(col("is_gru") || col("is_hmb"))
           .groupByLocus()
-          .agg(collect_list(struct(col("participant_id") as "id")) as "participants")
+          .agg(collect_list(struct(col("participant_id") as "participant_id")) as "participants")
 
       df.joinByLocus(occurrencesWithParticipants, "left")
         //TODO find better solution than to_json() === lit("[{}]")
