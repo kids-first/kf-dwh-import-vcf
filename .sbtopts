@@ -4,3 +4,4 @@
 -J-Xmx3g
 -J-XX:MaxMetaspaceSize=800m
 -J-XX:MetaspaceSize=400m
+-J-Xss1024m

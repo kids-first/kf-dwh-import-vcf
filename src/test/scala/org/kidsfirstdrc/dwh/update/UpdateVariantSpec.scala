@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.update
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
@@ -15,9 +16,14 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.util.Try
 
-
 class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
+
+  implicit val conf: Configuration =
+    Configuration(
+      List(StorageConf(
+        "kf-strides-variant",
+        getClass.getClassLoader.getResource(".").getFile)))
 
   Try(spark.sql("DROP TABLE IF EXISTS variant.variants"))
   Try(spark.sql("DROP VIEW IF EXISTS variant.variants"))
@@ -90,6 +96,7 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
     val expectedResult = variant.copy(clinvar_id = Some(clinvar.name), clin_sig = clinvar.clin_sig)
 
     //runs the whole ETL job locally
+
     val resultJobDF = job.run()
 
     // Checks the job returned the same data as written on disk

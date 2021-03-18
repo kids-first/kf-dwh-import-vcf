@@ -1,31 +1,31 @@
 package org.kidsfirstdrc.dwh.external.orphanet
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
-import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DsETL
+import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 import scala.xml.{Elem, Node, XML}
 
-class ImportOrphanetGeneSet(runEnv: Environment) extends DsETL(runEnv) {
+class ImportOrphanetGeneSet(runEnv: Environment)(implicit conf: Configuration)
+  extends StandardETL(Public.orphanet_gene_set)(runEnv, conf) {
 
-  override val destination: Ds = Public.orphanet_gene_set
-
-  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     import spark.implicits._
 
     def loadXML: String => Elem = str => XML.loadString(spark.read.text(str).collect().map(_.getString(0)).mkString("\n"))
 
     Map(
-      orphanet_gene_association -> parseProduct6XML(loadXML(orphanet_gene_association.path)).toDF,
-      orphanet_disease_history -> parseProduct9XML(loadXML(orphanet_disease_history.path)).toDF
+      orphanet_gene_association -> parseProduct6XML(loadXML(orphanet_gene_association.location)).toDF,
+      orphanet_disease_history -> parseProduct9XML(loadXML(orphanet_disease_history.location)).toDF
     )
 
   }
 
-  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(orphanet_gene_association)
       .join(
         data(orphanet_disease_history).select("orpha_code", "average_age_of_onset", "average_age_of_death","type_of_inheritance"),

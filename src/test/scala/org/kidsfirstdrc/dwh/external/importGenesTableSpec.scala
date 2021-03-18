@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.external
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.functions
 import org.apache.spark.sql.functions.col
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
@@ -12,6 +13,12 @@ import org.scalatest.matchers.should.Matchers
 
 class importGenesTableSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
+
+  implicit val conf: Configuration =
+    Configuration(
+      List(StorageConf(
+        "kf-strides-variant",
+        getClass.getClassLoader.getResource(".").getFile)))
 
   "run" should "creates genes table" in {
 

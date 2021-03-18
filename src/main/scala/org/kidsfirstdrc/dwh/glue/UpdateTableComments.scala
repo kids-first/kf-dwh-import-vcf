@@ -1,9 +1,11 @@
 package org.kidsfirstdrc.dwh.glue
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.SparkSession
+import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.Public.{clinvar, orphanet_gene_set}
-import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.conf.{Catalog, Ds, Environment}
+import org.kidsfirstdrc.dwh.conf.DataSourceImplicit._
 
 import scala.util.{Failure, Success, Try}
 
@@ -15,7 +17,7 @@ object UpdateTableComments extends App {
     .enableHiveSupport()
     .appName(s"Update table comments - $jobType").getOrCreate()
 
-  implicit val env: Environment = Try(Environment.withName(runEnv)).getOrElse(Environment.PROD)
+  implicit val conf: Configuration = Configuration(List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")))
 
   jobType match {
     case "all" => Set(clinvar, orphanet_gene_set).foreach(t => run(t))
@@ -24,7 +26,7 @@ object UpdateTableComments extends App {
       Catalog.sources.filter(ds => names.contains(ds.name)).foreach(t => run(t))
   }
 
-  def run(table: Ds)(implicit spark: SparkSession, env: Environment): Unit = {
+  def run(table: DataSource)(implicit spark: SparkSession): Unit = {
     run(table.database, table.name, table.documentationPath)
   }
 

@@ -2,9 +2,9 @@ package org.kidsfirstdrc.dwh.es.json
 
 import bio.ferlab.datalake.core.config.Configuration
 import org.apache.spark.sql.DataFrame
-import org.kidsfirstdrc.dwh.es.json.EsCatalog.Public
-import org.kidsfirstdrc.dwh.testutils.es.GeneCentricOutput
+import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.es.GeneCentricOutput
 import org.kidsfirstdrc.dwh.testutils.external.GenesOutput
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec

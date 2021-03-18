@@ -1,12 +1,12 @@
 package org.kidsfirstdrc.dwh.es.json
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.DataFrame
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
-import org.kidsfirstdrc.dwh.testutils.Model._
+import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.es.VariantCentricOutput
 import org.kidsfirstdrc.dwh.testutils.es.VariantCentricOutput._
 import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, GenesOutput}
-import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.join.{Freq, JoinConsequenceOutput, JoinVariantOutput}
 import org.kidsfirstdrc.dwh.testutils.vcf.{Exon, OccurrenceOutput, RefAlt}
 import org.scalatest.GivenWhenThen
@@ -20,6 +20,12 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
   val studyId2 = "SD_456"
   val studyId3 = "SD_789"
   val realeaseId = "RE_ABCDEF"
+
+  implicit val conf: Configuration =
+    Configuration(
+      List(StorageConf(
+        "kf-strides-variant",
+        getClass.getClassLoader.getResource(".").getFile)))
 
   val joinVariantDf: DataFrame = Seq(
     JoinVariantOutput(

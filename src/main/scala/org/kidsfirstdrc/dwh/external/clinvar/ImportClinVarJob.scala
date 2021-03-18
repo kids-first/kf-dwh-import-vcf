@@ -1,27 +1,27 @@
 package org.kidsfirstdrc.dwh.external.clinvar
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.kidsfirstdrc.dwh.conf.Catalog.Public.clinvar
+import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw.clinvar_vcf
-import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DsETL
+import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 import scala.collection.mutable
 
-class ImportClinVarJob(runEnv: Environment) extends DsETL(runEnv) {
+class ImportClinVarJob(runEnv: Environment)(implicit conf: Configuration)
+  extends StandardETL(Public.clinvar)(runEnv, conf) {
 
-  override val destination: Ds = clinvar
-
-  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
-    Map(clinvar_vcf -> vcf(clinvar_vcf.path))
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    Map(clinvar_vcf -> vcf(clinvar_vcf.location))
   }
 
-  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
 
     val df = data(clinvar_vcf)
     spark.udf.register("inheritance", inheritance_udf)

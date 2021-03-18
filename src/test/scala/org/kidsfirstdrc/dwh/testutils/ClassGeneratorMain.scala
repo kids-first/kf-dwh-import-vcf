@@ -11,6 +11,7 @@ import org.kidsfirstdrc.dwh.conf.Catalog.Raw
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
 import org.kidsfirstdrc.dwh.conf.Environment
 import Environment.LOCAL
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.external.{ImportCancerGeneCensus, ImportDDDGeneCensus}
 
 object ClassGeneratorMain extends App with WithSparkSession {
@@ -18,6 +19,9 @@ object ClassGeneratorMain extends App with WithSparkSession {
   val root = "src/test/scala/"
 
   import spark.implicits._
+
+  implicit val conf: Configuration = Configuration(List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")))
+
 
   /** PREVENTS re-writting these classes by mistake
    *
@@ -92,18 +96,18 @@ object ClassGeneratorMain extends App with WithSparkSession {
     .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","DbnsfpInput", root)
 
      */
-  spark.read.option("header", "true").csv(ddd_gene_census.path(LOCAL))
+  //spark.read.option("header", "true").csv(ddd_gene_census.path(LOCAL))
     //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","DddGeneCensusInput", root)
 
-  new ImportDDDGeneCensus(Environment.LOCAL).transform(Map(Raw.ddd_gene_census -> Seq(DddGeneCensusInput()).toDF()))
+  //new ImportDDDGeneCensus(Environment.LOCAL).transform(Map(Raw.ddd_gene_census -> Seq(DddGeneCensusInput()).toDF()))
     //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","DddGeneCensusOutput", root)
 
 
-  spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.path(Environment.LOCAL))
+  //spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.path(Environment.LOCAL))
     //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusInput", root)
 
   new ImportCancerGeneCensus(Environment.LOCAL).transform(Map(Raw.cosmic_cancer_gene_census -> Seq(CosmicCancerGeneCensusInput()).toDF()))
-    //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusOutput", root)
+    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusOutput", root)
 
   // test class
   //case class TestNestedClass(a: String = "a", b: Long = 2, c: List[String] = List("c"), d: NestedClass = NestedClass())

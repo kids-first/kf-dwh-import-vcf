@@ -1,18 +1,18 @@
 package org.kidsfirstdrc.dwh.external
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
-import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DsETL
+import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils.removeEmptyObjectsIn
 
-class ImportGenesTable(runEnv: Environment) extends DsETL(runEnv) {
+class ImportGenesTable(runEnv: Environment)(implicit conf: Configuration)
+  extends StandardETL(Public.genes)(runEnv, conf) {
 
-  override val destination: Ds = Public.genes
-
-  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(
       Public.omim_gene_set     -> spark.table(s"${Public.omim_gene_set.database}.${Public.omim_gene_set.name}"),
       Public.orphanet_gene_set -> spark.table(s"${Public.orphanet_gene_set.database}.${Public.orphanet_gene_set.name}"),
@@ -23,7 +23,7 @@ class ImportGenesTable(runEnv: Environment) extends DsETL(runEnv) {
     )
   }
 
-  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val humanGenes = data(Public.human_genes)

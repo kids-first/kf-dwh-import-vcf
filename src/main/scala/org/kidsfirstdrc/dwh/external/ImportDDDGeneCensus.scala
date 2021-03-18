@@ -1,21 +1,21 @@
 package org.kidsfirstdrc.dwh.external
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Ds
+import org.kidsfirstdrc.dwh.conf.Catalog._
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DsETL
+import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportDDDGeneCensus(runEnv: Environment) extends DsETL(runEnv) {
+class ImportDDDGeneCensus(runEnv: Environment)(implicit conf: Configuration)
+  extends StandardETL(Public.ddd_gene_set)(runEnv, conf) {
 
-  override val destination: Ds = Public.ddd_gene_set
-
-  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
-    Map(Raw.ddd_gene_census -> spark.read.option("header", "true").csv(Raw.ddd_gene_census.path))
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    Map(Raw.ddd_gene_census -> spark.read.option("header", "true").csv(Raw.ddd_gene_census.location))
   }
 
-  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     data(Raw.ddd_gene_census)
       .select(

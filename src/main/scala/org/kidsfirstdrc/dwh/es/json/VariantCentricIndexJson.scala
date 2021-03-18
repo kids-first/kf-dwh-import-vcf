@@ -1,12 +1,12 @@
 package org.kidsfirstdrc.dwh.es.json
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{explode, _}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, ElasticsearchJson, Public}
-import org.kidsfirstdrc.dwh.conf._
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, Es, Public}
 import org.kidsfirstdrc.dwh.es.json.VariantCentricIndexJson._
-import org.kidsfirstdrc.dwh.jobs.DsETL
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
@@ -14,11 +14,10 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 import scala.collection.mutable
 import scala.util.{Success, Try}
 
-class VariantCentricIndexJson(releaseId: String) extends DsETL(Environment.PROD) {
+class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
+  extends ETL(Es.variantsJson)(conf) {
 
-  override val destination: Ds = ElasticsearchJson.variantsJson
-
-  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     import spark.implicits._
     val occurrences: DataFrame = spark
       .table(s"${DataService.studies.database}.${DataService.studies.name}")
@@ -37,7 +36,7 @@ class VariantCentricIndexJson(releaseId: String) extends DsETL(Environment.PROD)
     )
   }
 
-  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val variants = data(Clinical.variants)
       .drop("end")
       .withColumnRenamed("dbsnp_id", "rsnumber")
@@ -78,12 +77,8 @@ class VariantCentricIndexJson(releaseId: String) extends DsETL(Environment.PROD)
       .write
       .mode(SaveMode.Overwrite)
       .format("json")
-      .json(s"${destination.bucket}/es_index/${destination.name}_${this.releaseId}")
+      .json(s"${destination.rootPath}/es_index/${destination.name}_${this.releaseId}")
     data
-  }
-
-  override def publish(view_db: String)(implicit spark: SparkSession): Unit = {
-    //no publish
   }
 
   override def run()(implicit spark: SparkSession): DataFrame = {

@@ -2,7 +2,7 @@ package org.kidsfirstdrc.dwh.es.json
 
 import bio.ferlab.datalake.core.config.Configuration
 import org.apache.spark.sql.DataFrame
-import org.kidsfirstdrc.dwh.es.json.EsCatalog.{Clinical, Public}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.testutils._
 import org.kidsfirstdrc.dwh.testutils.es.{SUGGEST, SuggesterIndexOutput}
 import org.kidsfirstdrc.dwh.testutils.external.GenesOutput

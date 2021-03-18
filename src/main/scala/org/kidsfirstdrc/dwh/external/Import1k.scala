@@ -4,7 +4,7 @@ import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.CatalogV2._
+import org.kidsfirstdrc.dwh.conf.Catalog._
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
@@ -37,7 +37,7 @@ class Import1k(runEnv: Environment)(implicit conf: Configuration)
       )
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): Unit = {
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data
       .repartition(col("chromosome"))
       .sortWithinPartitions("start")
@@ -46,5 +46,6 @@ class Import1k(runEnv: Environment)(implicit conf: Configuration)
       .format("parquet")
       .option("path", destination.location)
       .saveAsTable(s"${destination.database}.${destination.name}")
+    data
   }
 }
