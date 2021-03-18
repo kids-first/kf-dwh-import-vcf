@@ -4,14 +4,15 @@ import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
 import org.kidsfirstdrc.dwh.es.json.EsCatalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 
-class SuggesterIndexJson(releaseId: String)(override implicit val conf: Configuration) extends ETL(EsCatalog.Es.suggester_index) {
+class GenomicSuggestionsIndexJson(releaseId: String)(override implicit val conf: Configuration) extends ETL(EsCatalog.Es.genomic_suggestions) {
 
   final val geneSymbolWeight = 5
+  final val geneAliasesWeight = 3
   final val variantSymbolAaChangeWeight = 4
   final val variantSymbolWeight = 2
 
@@ -24,7 +25,7 @@ class SuggesterIndexJson(releaseId: String)(override implicit val conf: Configur
   }
 
   override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    val genes = data(Public.genes).select("symbol")
+    val genes = data(Public.genes).select("symbol", "alias")
     val variants = data(Clinical.variants).selectLocus(col("hgvsg"))
     val consequences = data(Clinical.consequences)
       .selectLocus(col("symbol"), col("aa_change"))
@@ -78,9 +79,13 @@ class SuggesterIndexJson(releaseId: String)(override implicit val conf: Configur
       .withColumn("suggestion_id", sha1(col("symbol"))) //this maps to `hash` column in gene_centric index
       .withColumn("hgvsg", lit(null).cast(StringType))
       .withColumn("locus", lit(null).cast(StringType))
-      .withColumn("suggest", array(struct(
-        array(col("symbol")) as "input",
-        lit(geneSymbolWeight) as "weight"
+      .withColumn("suggest", array(
+        struct(
+          array(col("symbol")) as "input",
+          lit(geneSymbolWeight) as "weight"
+        ), struct(
+          array_remove(functions.transform(col("alias"), c => when(c.isNull, lit("")).otherwise(c)), "") as "input",
+          lit(geneAliasesWeight) as "weight"
       )))
       .select("type", "locus", "suggestion_id", "hgvsg", "suggest")
   }
