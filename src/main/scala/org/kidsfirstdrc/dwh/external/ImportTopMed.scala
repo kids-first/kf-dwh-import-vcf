@@ -3,21 +3,21 @@ package org.kidsfirstdrc.dwh.external
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.jobs.DsETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class ImportTopMed(runEnv: Environment) extends DataSourceEtl(runEnv) {
+class ImportTopMed(runEnv: Environment) extends DsETL(runEnv) {
 
-  override val destination: DataSource = Public.topmed_bravo
+  override val destination: Ds = Public.topmed_bravo
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
     Map(Raw.topmed_bravo_dbsnp -> vcf(Raw.topmed_bravo_dbsnp.path)(spark))
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     data(Raw.topmed_bravo_dbsnp)
       .select(chromosome,

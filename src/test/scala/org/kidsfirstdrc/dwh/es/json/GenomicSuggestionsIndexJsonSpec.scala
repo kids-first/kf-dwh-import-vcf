@@ -12,7 +12,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 
-class SuggesterIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
   val studyId1 = "SD_123"
   val studyId2 = "SD_456"
@@ -60,7 +60,9 @@ class SuggesterIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSpa
   ).toDF()
 
   val genesDf: DataFrame = Seq(
-    GenesOutput()
+    GenesOutput(
+      `alias` = List("BII", "CACH6", "CACNL1A6", "Cav2.3", "", null)
+    )
   ).toDF()
 
   val data = Map(
@@ -73,7 +75,7 @@ class SuggesterIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSpa
 
   "suggester index job" should "transform data to the right format" in {
 
-    val result = new SuggesterIndexJson("re_000010").transform(data)
+    val result = new GenomicSuggestionsIndexJson("re_000010").transform(data)
     result.show(false)
 
     result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
@@ -83,13 +85,15 @@ class SuggesterIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSpa
         `locus` = null,
         `suggestion_id` = "9b8016c31b93a7504a8314ce3d060792f67ca2ad",
         `hgvsg` = null,
-        `suggest` = List(SUGGEST(List("OR4F5"), 5)))
+        `suggest` = List(
+          SUGGEST(List("OR4F5"), 5),
+          SUGGEST(List("BII", "CACH6", "CACNL1A6", "Cav2.3"), 3)))
     )
   }
 
   "suggester from variants" should "remove null and empty values" in {
 
-    val result = new SuggesterIndexJson("").getVariantSuggest(joinVariantWithNullDf, joinConsequencesWithEmptyAndNullDf)
+    val result = new GenomicSuggestionsIndexJson("").getVariantSuggest(joinVariantWithNullDf, joinConsequencesWithEmptyAndNullDf)
     result.show(false)
 
     result.repartition(1)

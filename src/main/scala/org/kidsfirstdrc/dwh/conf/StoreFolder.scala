@@ -1,5 +1,7 @@
 package org.kidsfirstdrc.dwh.conf
 
+import bio.ferlab.datalake.core.etl.DataSource
+
 trait StoreFolder {
 
   val alias: String
@@ -15,5 +17,6 @@ trait StoreFolder {
       }.toSet
 
 
+  def ds: Set[Ds] = getClassFields.filter(_.isInstanceOf[Ds]).map(_.asInstanceOf[Ds])
   def sources: Set[DataSource] = getClassFields.filter(_.isInstanceOf[DataSource]).map(_.asInstanceOf[DataSource])
 }

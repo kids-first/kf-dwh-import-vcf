@@ -2,15 +2,15 @@ package org.kidsfirstdrc.dwh.external.dbnsfp
 
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.jobs.DsETL
 
-class ImportRaw(runEnv: Environment) extends DataSourceEtl(runEnv) {
+class ImportRaw(runEnv: Environment) extends DsETL(runEnv) {
 
-  override val destination: DataSource = Public.dbnsfp_variant
+  override val destination: Ds = Public.dbnsfp_variant
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
     val dbnsfpDF =
       spark.read
         .option("sep", "\t")
@@ -20,7 +20,7 @@ class ImportRaw(runEnv: Environment) extends DataSourceEtl(runEnv) {
     Map(Raw.dbNSFP_csv -> dbnsfpDF)
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(Raw.dbNSFP_csv)
       .withColumnRenamed("#chr", "chr")
       .withColumnRenamed("position_1-based", "start")

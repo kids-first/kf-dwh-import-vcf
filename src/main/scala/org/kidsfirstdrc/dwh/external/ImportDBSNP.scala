@@ -3,21 +3,21 @@ package org.kidsfirstdrc.dwh.external
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.jobs.DsETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class ImportDBSNP(runEnv: Environment) extends DataSourceEtl(runEnv) with App {
+class ImportDBSNP(runEnv: Environment) extends DsETL(runEnv) with App {
 
   override val destination = Public.dbsnp
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
     Map(Raw.dbsnp_vcf -> vcf(Raw.dbsnp_vcf.path))
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     data(Raw.dbsnp_vcf)
       .where($"contigName" like "NC_%")

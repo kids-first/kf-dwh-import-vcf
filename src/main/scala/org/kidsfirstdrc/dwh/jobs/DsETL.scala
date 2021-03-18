@@ -3,20 +3,20 @@ package org.kidsfirstdrc.dwh.jobs
 import org.apache.spark.sql.functions.{col, lit, regexp_extract, trim}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.conf.{DataSource, Environment}
+import org.kidsfirstdrc.dwh.conf.{Ds, Environment}
 import org.kidsfirstdrc.dwh.glue.UpdateTableComments
 
 import scala.util.Try
 
-abstract class DataSourceEtl(runEnv: Environment) {
+abstract class DsETL(runEnv: Environment) {
 
   implicit val env: Environment = runEnv
 
-  val destination: DataSource
+  val destination: Ds
 
-  def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame]
+  def extract()(implicit spark: SparkSession): Map[Ds, DataFrame]
 
-  def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame
+  def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame
 
   def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data

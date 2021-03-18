@@ -3,15 +3,15 @@ package org.kidsfirstdrc.dwh.external
 import org.apache.spark.sql.functions.broadcast
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.jobs.DsETL
 
-class ImportHPOGeneSet(runEnv: Environment) extends DataSourceEtl(runEnv) {
+class ImportHPOGeneSet(runEnv: Environment) extends DsETL(runEnv) {
 
-  override val destination: DataSource = Public.hpo_gene_set
+  override val destination: Ds = Public.hpo_gene_set
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
     val inputDF: DataFrame = spark.read
       .format("csv")
       .option("inferSchema", "true")
@@ -30,7 +30,7 @@ class ImportHPOGeneSet(runEnv: Environment) extends DataSourceEtl(runEnv) {
     )
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val human_genes = data(Public.human_genes)
     val inputDF =
       data(Raw.hpo_genes_to_phenotype)

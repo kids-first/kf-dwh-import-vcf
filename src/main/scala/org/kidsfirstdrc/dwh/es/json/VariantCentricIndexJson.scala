@@ -6,7 +6,7 @@ import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, ElasticsearchJson, Public}
 import org.kidsfirstdrc.dwh.conf._
 import org.kidsfirstdrc.dwh.es.json.VariantCentricIndexJson._
-import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.jobs.DsETL
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
@@ -14,11 +14,11 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 import scala.collection.mutable
 import scala.util.{Success, Try}
 
-class VariantCentricIndexJson(releaseId: String) extends DataSourceEtl(Environment.PROD) {
+class VariantCentricIndexJson(releaseId: String) extends DsETL(Environment.PROD) {
 
-  override val destination: DataSource = ElasticsearchJson.variantsJson
+  override val destination: Ds = ElasticsearchJson.variantsJson
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
     import spark.implicits._
     val occurrences: DataFrame = spark
       .table(s"${DataService.studies.database}.${DataService.studies.name}")
@@ -37,7 +37,7 @@ class VariantCentricIndexJson(releaseId: String) extends DataSourceEtl(Environme
     )
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val variants = data(Clinical.variants)
       .drop("end")
       .withColumnRenamed("dbsnp_id", "rsnumber")

@@ -5,23 +5,23 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.kidsfirstdrc.dwh.conf.Catalog.Public.clinvar
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw.clinvar_vcf
-import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.jobs.DsETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 import scala.collection.mutable
 
-class ImportClinVarJob(runEnv: Environment) extends DataSourceEtl(runEnv) {
+class ImportClinVarJob(runEnv: Environment) extends DsETL(runEnv) {
 
-  override val destination: DataSource = clinvar
+  override val destination: Ds = clinvar
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
     Map(clinvar_vcf -> vcf(clinvar_vcf.path))
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
 
     val df = data(clinvar_vcf)
     spark.udf.register("inheritance", inheritance_udf)

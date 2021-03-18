@@ -3,16 +3,16 @@ package org.kidsfirstdrc.dwh.external.dbnsfp
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.jobs.DsETL
 
-class ImportAnnovarScores(runEnv: Environment) extends DataSourceEtl(runEnv) {
+class ImportAnnovarScores(runEnv: Environment) extends DsETL(runEnv) {
 
-    val source: DataSource = Raw.annovar_dbnsfp
-    val destination: DataSource = Public.dbnsfp_annovar
+    val source: Ds = Raw.annovar_dbnsfp
+    val destination: Ds = Public.dbnsfp_annovar
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
     val annovar_dbnsfp = spark.read
       .option("sep", "\t")
       .option("header", "true")
@@ -22,7 +22,7 @@ class ImportAnnovarScores(runEnv: Environment) extends DataSourceEtl(runEnv) {
     Map(source -> annovar_dbnsfp)
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     data(source)
       .select(

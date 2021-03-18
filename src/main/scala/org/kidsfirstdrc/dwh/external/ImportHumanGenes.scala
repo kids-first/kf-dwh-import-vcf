@@ -4,15 +4,15 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{split, udf}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.jobs.DsETL
 
-class ImportHumanGenes(runEnv: Environment) extends DataSourceEtl(runEnv) {
+class ImportHumanGenes(runEnv: Environment) extends DsETL(runEnv) {
 
-  override val destination: DataSource = Public.human_genes
+  override val destination: Ds = Public.human_genes
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
     val df = spark.read.format("csv")
       .option("inferSchema", "true")
       .option("header", "true")
@@ -22,7 +22,7 @@ class ImportHumanGenes(runEnv: Environment) extends DataSourceEtl(runEnv) {
     Map(Raw.refseq_homo_sapiens_gene -> df)
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     data(Raw.refseq_homo_sapiens_gene)
       .select(

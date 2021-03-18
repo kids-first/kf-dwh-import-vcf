@@ -3,15 +3,15 @@ package org.kidsfirstdrc.dwh.external
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
-import org.kidsfirstdrc.dwh.conf.DataSource
+import org.kidsfirstdrc.dwh.conf.Ds
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DataSourceEtl
+import org.kidsfirstdrc.dwh.jobs.DsETL
 
-class ImportGenesTable(runEnv: Environment) extends DataSourceEtl(runEnv) {
+class ImportGenesTable(runEnv: Environment) extends DsETL(runEnv) {
 
-  override val destination: DataSource = Public.genes
+  override val destination: Ds = Public.genes
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
     Map(
       Public.omim_gene_set     -> spark.table(s"${Public.omim_gene_set.database}.${Public.omim_gene_set.name}"),
       Public.orphanet_gene_set -> spark.table(s"${Public.orphanet_gene_set.database}.${Public.orphanet_gene_set.name}"),
@@ -22,7 +22,7 @@ class ImportGenesTable(runEnv: Environment) extends DataSourceEtl(runEnv) {
     )
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val humanGenes = data(Public.human_genes)

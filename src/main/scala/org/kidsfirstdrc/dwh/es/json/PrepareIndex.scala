@@ -18,7 +18,7 @@ object PrepareIndex extends App {
 
   jobType match {
     case "gene_centric" => new GeneCentricIndexJson().run()
-    case "suggester_index" => new SuggesterIndexJson(releaseId).run()
+    case "genomic_suggestions" => new GenomicSuggestionsIndexJson(releaseId).run()
     case "variant_centric" => new VariantCentricIndexJson(releaseId).run()
   }
 
