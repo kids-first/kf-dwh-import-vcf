@@ -1,16 +1,16 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DoubleType, IntegerType, LongType}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.Public
-import org.kidsfirstdrc.dwh.conf.Ds
+import org.kidsfirstdrc.dwh.conf.CatalogV2.Public
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DsETL
+import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportScores(runEnv: Environment) extends DsETL(runEnv) {
-
-  override val destination: Ds = Public.dbnsfp_original
+class ImportScores(runEnv: Environment)(implicit conf: Configuration)
+  extends StandardETL(Public.dbnsfp_original)(runEnv, conf) {
 
   def split_semicolon(colName: String, outputColName: String): Column = split(col(colName), ";") as outputColName
 
@@ -24,13 +24,13 @@ class ImportScores(runEnv: Environment) extends DsETL(runEnv) {
 
   def pred(colName: String): Column = when(element_at_postion(colName) === ".", null).otherwise(element_at_postion(colName)) as colName
 
-  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(
       Public.dbnsfp_variant -> spark.table(s"${Public.dbnsfp_variant.database}.${Public.dbnsfp_variant.name}")
     )
   }
 
-  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(Public.dbnsfp_variant).select(
       col("chromosome"),
       col("start").cast(LongType),
@@ -297,7 +297,7 @@ class ImportScores(runEnv: Environment) extends DsETL(runEnv) {
 
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame)(implicit spark: SparkSession): Unit = {
     data
       .repartition(col("chromosome"))
       .sortWithinPartitions("start")
@@ -305,9 +305,8 @@ class ImportScores(runEnv: Environment) extends DsETL(runEnv) {
       .mode(SaveMode.Overwrite)
       .partitionBy("chromosome")
       .format("parquet")
-      .option("path", destination.path)
+      .option("path", destination.location)
       .saveAsTable(s"${destination.database}.${destination.name}")
-    data
   }
 }
 

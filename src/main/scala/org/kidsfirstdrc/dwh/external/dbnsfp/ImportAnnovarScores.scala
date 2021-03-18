@@ -1,28 +1,29 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Ds
+import org.kidsfirstdrc.dwh.conf.CatalogV2.{Public, Raw}
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
-import org.kidsfirstdrc.dwh.jobs.DsETL
+import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportAnnovarScores(runEnv: Environment) extends DsETL(runEnv) {
+class ImportAnnovarScores(runEnv: Environment)(implicit conf: Configuration)
+  extends StandardETL(Public.dbnsfp_annovar)(runEnv, conf) {
 
-    val source: Ds = Raw.annovar_dbnsfp
-    val destination: Ds = Public.dbnsfp_annovar
+    val source: DataSource = Raw.annovar_dbnsfp
 
-  override def extract()(implicit spark: SparkSession): Map[Ds, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     val annovar_dbnsfp = spark.read
       .option("sep", "\t")
       .option("header", "true")
       .option("nullValue", ".")
-      .csv(source.path)
+      .csv(source.location)
 
     Map(source -> annovar_dbnsfp)
   }
 
-  override def transform(data: Map[Ds, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     data(source)
       .select(
@@ -85,15 +86,14 @@ class ImportAnnovarScores(runEnv: Environment) extends DsETL(runEnv) {
       )
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame)(implicit spark: SparkSession): Unit = {
     data.repartition(col("chromosome"))
       .sortWithinPartitions("start")
       .write.mode("overwrite")
       .partitionBy("chromosome")
       .format(destination.format.sparkFormat)
-      .option("path", destination.path)
+      .option("path", destination.location)
       .saveAsTable(s"${destination.database}.${destination.name}")
-    data
   }
 }
 

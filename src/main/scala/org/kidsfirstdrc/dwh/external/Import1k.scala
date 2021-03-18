@@ -10,7 +10,8 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class Import1k(runEnv: Environment)(implicit conf: Configuration) extends StandardETL(Public.`1000_genomes`)(runEnv, conf) {
+class Import1k(runEnv: Environment)(implicit conf: Configuration)
+  extends StandardETL(Public.`1000_genomes`)(runEnv, conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(Raw.`1000genomes_vcf` -> vcf(Raw.`1000genomes_vcf`.location))

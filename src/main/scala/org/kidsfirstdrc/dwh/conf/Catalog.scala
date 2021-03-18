@@ -9,13 +9,13 @@ object Catalog {
   object Raw extends StoreFolder {
     override val alias: String  = kfStridesVariantBucket
 
-    val `1000genomes_vcf`         = Ds("1000genomes_vcf"          , "", alias, "/raw/1000Genomes/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz", VCF)
-    val annovar_dbnsfp            = Ds("annovar_dbnsfp"           , "", alias, "/raw/annovar/dbNSFP/hg38_dbnsfp41a.txt"      , CSV)
+    //val `1000genomes_vcf`         = Ds("1000genomes_vcf"          , "", alias, "/raw/1000Genomes/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz", VCF)
+    //val annovar_dbnsfp            = Ds("annovar_dbnsfp"           , "", alias, "/raw/annovar/dbNSFP/hg38_dbnsfp41a.txt"      , CSV)
     val cancerhotspots_csv        = Ds("cancerhotspots_csv"       , "", alias, "/raw/cancerhotspots/cancerhotspots.v2.maf.gz", CSV)
     val clinvar_vcf               = Ds("clinvar_vcf"              , "", alias, "/raw/clinvar/clinvar.vcf.gz"                 , VCF)
     val cosmic_cancer_gene_census = Ds("cosmic_cancer_gene_census", "", alias, "/raw/cosmic/cancer_gene_census.csv"          , CSV)
     val dbsnp_vcf                 = Ds("dbsnp_vcf"                , "", alias, "/raw/dbsnp/GCF_000001405.38.gz"              , VCF)
-    val dbNSFP_csv                = Ds("dbNSFP_csv"               , "", alias, "/raw/dbNSFP/*.gz"                            , CSV)
+    //val dbNSFP_csv                = Ds("dbNSFP_csv"               , "", alias, "/raw/dbNSFP/*.gz"                            , CSV)
     val ddd_gene_census           = Ds("ddd_gene_census"          , "", alias, "/raw/ddd/DDG2P_17_5_2020.csv"                , CSV)
     val hpo_genes_to_phenotype    = Ds("hpo_genes_to_phenotype"   , "", alias, "/raw/hpo/genes_to_phenotype.txt"             , CSV)
     val omim_genemap2             = Ds("omim_genemap2"            , "", alias, "/raw/omim/genemap2.txt"                      , CSV)
