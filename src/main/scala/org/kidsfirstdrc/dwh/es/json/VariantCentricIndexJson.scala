@@ -75,9 +75,10 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data
       .write
+      .partitionBy("chromosome")
       .mode(SaveMode.Overwrite)
       .format("json")
-      .json(s"${destination.rootPath}/es_index/${destination.name}_${this.releaseId}")
+      .json(s"${destination.rootPath}/es_index/${destination.name}_$releaseId")
     data
   }
 
