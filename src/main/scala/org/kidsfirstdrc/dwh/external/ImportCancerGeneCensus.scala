@@ -4,7 +4,7 @@ import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ArrayType, IntegerType, StringType, StructField}
+import org.apache.spark.sql.types.{ArrayType, IntegerType, LongType, StringType, StructField}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog._
 import org.kidsfirstdrc.dwh.conf.Environment.Environment
@@ -35,11 +35,16 @@ class ImportCancerGeneCensus(runEnv: Environment)(implicit conf: Configuration)
     spark.udf.register("trim_array", trim_array_udf)
 
     val df = data(Raw.cosmic_cancer_gene_census)
+      .withColumn("split_loc", split($"Genome Location", ":"))
+      .withColumn("chromosome", $"split_loc"(0))
+      .withColumn("start", split($"split_loc"(1), "-")(0).cast(LongType))
+      .withColumn("end", split($"split_loc"(1), "-")(1).cast(LongType))
       .select(
+        $"chromosome", $"start", $"end",
         $"Gene Symbol" as "symbol",
         $"Name" as "name",
         $"Entrez GeneId" as "entrez_gene_id",
-        $"Tier".cast(IntegerType),
+        $"Tier".cast(IntegerType).as("tier"),
         $"Genome Location" as "genome_location",
         when($"Hallmark" === "Yes", true).otherwise(false) as "hallmark",
         $"Chr Band" as "chr_band",
@@ -56,11 +61,12 @@ class ImportCancerGeneCensus(runEnv: Environment)(implicit conf: Configuration)
         when($"Other Germline Mut" === "yes", true).otherwise(false) as "other_germline_mutation",
         split($"Other Syndrome", ",") as "other_syndrome",
         split($"Synonyms", ",") as "synonyms"
-     )
-      df.schema
-        .fields
-        .collect { case s @ StructField(_, ArrayType(StringType, _), _, _) => s }             // take only array type fields
-        .foldLeft(df)((d, f) => d.withColumn(f.name, trim_array_udf(col(f.name)))) // apply trim on each elements of each array
+      )
+
+    df.schema
+      .fields
+      .collect { case s@StructField(_, ArrayType(StringType, _), _, _) => s } // take only array type fields
+      .foldLeft(df)((d, f) => d.withColumn(f.name, trim_array_udf(col(f.name)))) // apply trim on each elements of each array
 
   }
 
