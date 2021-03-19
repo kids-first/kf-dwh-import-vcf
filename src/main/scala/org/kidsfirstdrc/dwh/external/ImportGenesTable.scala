@@ -76,10 +76,6 @@ class ImportGenesTable(runEnv: Environment)(implicit conf: Configuration)
         .select(col("hg.*"), col(asColumnName))
         .withColumn(asColumnName, removeEmptyObjectsIn(asColumnName))
     }
-
-
-
-
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
