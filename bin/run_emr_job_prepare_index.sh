@@ -1,7 +1,7 @@
 #!/bin/bash
 job_type=${1:-"gene_centric"}
 release_id=${2:-"re_000010"}
-number_instance=${3:-"10"}
+number_instance=${3:-"15"}
 instance_type=${4:-"r5.4xlarge"}
 
 steps=$(cat <<EOF

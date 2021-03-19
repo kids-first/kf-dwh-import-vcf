@@ -72,7 +72,8 @@ class GenomicSuggestionsIndexJson(releaseId: String)
           array_remove(col("symbol"), "") as "input",
           lit(variantSymbolWeight) as "weight"),
         ))
-      .select("type", "locus", "suggestion_id", "hgvsg", "suggest")
+      .withColumn("symbol", col("symbol")(0))
+      .select("type", "symbol", "locus", "suggestion_id", "hgvsg", "suggest")
   }
 
   def getGenesSuggest(genes: DataFrame): DataFrame = {
@@ -89,6 +90,6 @@ class GenomicSuggestionsIndexJson(releaseId: String)
           array_remove(functions.transform(col("alias"), c => when(c.isNull, lit("")).otherwise(c)), "") as "input",
           lit(geneAliasesWeight) as "weight"
       )))
-      .select("type", "locus", "suggestion_id", "hgvsg", "suggest")
+      .select("type", "symbol", "locus", "suggestion_id", "hgvsg", "suggest")
   }
 }

@@ -74,7 +74,10 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data
+      //avoids many small files created by the following partitionBy() operation
+      .repartition(1000, col("chromosome"))
       .write
+      .option("maxRecordsPerFile", 200000)
       .partitionBy("chromosome")
       .mode(SaveMode.Overwrite)
       .format("json")
@@ -86,7 +89,6 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
     val inputDF = extract()
     val outputDF = transform(inputDF).persist()
     println(s"count: ${outputDF.count}")
-    println(s"distinct locus: ${outputDF.dropDuplicates("locus").count()}")
     load(outputDF)
     outputDF
   }
