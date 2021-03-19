@@ -23,7 +23,7 @@ steps=$(cat <<EOF
   {
     "Args": [
       "spark-submit",
-      "--packages","io.projectglow:glow_2.12:0.5.0,bio.ferlab:datalake-core_2.12:0.0.2",
+      "--packages","io.projectglow:glow_2.12:0.5.0",
       "--exclude-packages",
       "org.apache.httpcomponents:httpcore,org.apache.httpcomponents:httpclient",
       "--deploy-mode", "client",
