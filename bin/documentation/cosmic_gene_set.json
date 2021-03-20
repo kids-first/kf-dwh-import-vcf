@@ -1,4 +1,16 @@
 [
+  {
+    "col_name": "chromosome",
+    "comment": "[ADDED]: Extract from Genome Location`"
+  },
+  {
+    "col_name": "start",
+    "comment": "[ADDED]: Extract from Genome Location`"
+  },
+  {
+    "col_name": "end",
+    "comment": "[ADDED]: Extract from Genome Location`"
+  },
   {"col_name": "symbol", "comment": "common gene symbol used in the literature"},
   {"col_name": "name", "comment": ""},
   {"col_name": "entrez_gene_id", "comment": "id in NCBI (https://www.ncbi.nlm.nih.gov/gene)"},
