@@ -15,7 +15,7 @@ import scala.collection.mutable
 import scala.util.{Success, Try}
 
 class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
-  extends ETL(Es.variantsJson)(conf) {
+  extends ETL(Es.variant_centric)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     import spark.implicits._
@@ -74,10 +74,14 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data
+      //avoids many small files created by the following partitionBy() operation
+      .repartition(1000, col("chromosome"))
       .write
+      .option("maxRecordsPerFile", 200000)
+      .partitionBy("chromosome")
       .mode(SaveMode.Overwrite)
       .format("json")
-      .json(s"${destination.rootPath}/es_index/${destination.name}_${this.releaseId}")
+      .json(s"${destination.rootPath}/es_index/${destination.name}_$releaseId")
     data
   }
 
@@ -85,7 +89,6 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
     val inputDF = extract()
     val outputDF = transform(inputDF).persist()
     println(s"count: ${outputDF.count}")
-    println(s"distinct locus: ${outputDF.dropDuplicates("locus").count()}")
     load(outputDF)
     outputDF
   }

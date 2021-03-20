@@ -85,6 +85,7 @@ class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen wit
         `locus` = null,
         `suggestion_id` = "9b8016c31b93a7504a8314ce3d060792f67ca2ad",
         `hgvsg` = null,
+        `symbol` = "OR4F5",
         `suggest` = List(
           SUGGEST(List("OR4F5"), 5),
           SUGGEST(List("BII", "CACH6", "CACNL1A6", "Cav2.3"), 3)))

@@ -8,6 +8,7 @@ case class SuggesterIndexOutput(`type`: String = "variant",
                                 `locus`: String = "2-165310406-G-A",
                                 `suggestion_id`: String = "ba3d35feba14451058e6fc93eeba163c800a8e09",
                                 `hgvsg`: String = "chr2:g.166166916G>A",
+                                `symbol`: String = "SCN2A",
                                 `suggest`: List[SUGGEST] = List(SUGGEST(), SUGGEST(List("SCN2A", "SCN2A.2"), 2)))
 
 

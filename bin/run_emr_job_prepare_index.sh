@@ -1,7 +1,7 @@
 #!/bin/bash
 job_type=${1:-"gene_centric"}
 release_id=${2:-"re_000010"}
-number_instance=${3:-"10"}
+number_instance=${3:-"15"}
 instance_type=${4:-"r5.4xlarge"}
 
 steps=$(cat <<EOF
@@ -9,7 +9,7 @@ steps=$(cat <<EOF
   {
     "Args": [
       "spark-submit",
-      "--packages","io.projectglow:glow_2.12:0.5.0,bio.ferlab:datalake-core_2.12:0.0.2",
+      "--packages","io.projectglow:glow_2.12:0.5.0",
       "--exclude-packages",
       "org.apache.httpcomponents:httpcore,org.apache.httpcomponents:httpclient",
       "--deploy-mode",
