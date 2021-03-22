@@ -68,8 +68,7 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
       .withGenes(genes)
       .withParticipants(occurrences)
       .select("hash", "chromosome", "start", "reference", "alternate", "locus", "studies", "participant_number",
-        "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "genes", "hgvsg",
-        "participants")
+        "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "genes", "hgvsg", "participant_ids")
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -264,10 +263,10 @@ object VariantCentricIndexJson {
         occurrences
           .where(col("is_gru") || col("is_hmb"))
           .groupByLocus()
-          .agg(collect_list(struct(col("participant_id") as "participant_id")) as "participants")
+          .agg(collect_set(col("participant_id")) as "participant_ids")
 
       df.joinByLocus(occurrencesWithParticipants, "left")
-        .withColumn("participants", removeEmptyObjectsIn("participants"))
+        .withColumn("participant_ids", array_remove(col("participant_ids"), ""))
     }
   }
 }

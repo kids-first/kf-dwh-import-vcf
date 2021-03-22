@@ -91,7 +91,7 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
 
   val expectedGenes = List(GENES())
 
-  val expectedParticipants = List(PARTICIPANT("PT_000003"), PARTICIPANT("PT_000002"))
+  val expectedParticipants: List[String] = List("PT_000003", "PT_000002")
 
   "VariantDbJson" should "transform data to the right format" in {
 
@@ -103,12 +103,12 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
     //1. make sure we have only 1 row in the result
     parsedResult.length shouldBe 1
     //2. data validation of that row
-    variant.participants should contain allElementsOf expectedParticipants
+    variant.participant_ids should contain allElementsOf expectedParticipants
     variant.consequences should contain allElementsOf expectedConsequences
     variant.studies should contain allElementsOf expectedStudies
     variant.genes should contain allElementsOf expectedGenes
-    variant.copy(consequences = List(), studies = List(), genes = List(), participants = List()) shouldBe
-      VariantCentricOutput.Output(studies = List(), consequences = List(), `genes` = List(), participants = List())
+    variant.copy(consequences = List(), studies = List(), genes = List(), participant_ids = List()) shouldBe
+      VariantCentricOutput.Output(studies = List(), consequences = List(), genes = List(), participant_ids = List())
 
   }
 }
