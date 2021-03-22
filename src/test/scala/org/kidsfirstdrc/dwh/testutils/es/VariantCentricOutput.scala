@@ -89,7 +89,7 @@ object VariantCentricOutput {
                    `ddd`: List[DDD] = List(DDD()),
                    `cosmic`: List[COSMIC] = List(COSMIC()))
 
-  case class PARTICIPANT(`participant_id`: String = "PT_000003")
+  //case class PARTICIPANT(`participant_id`: String = "PT_000003")
 
   case class Output(`hash`: String = "ba3d35feba14451058e6fc93eeba163c800a8e09",
                     `chromosome`: String = "2", //index true
@@ -108,6 +108,6 @@ object VariantCentricOutput {
                     `consequences`: List[Consequence] = List(),
                     `hgvsg`: Option[String] = Some("chr2:g.166166916G>A"), //index false
                     `genes`: List[GENES] = List(GENES()),
-                    `participants`: List[PARTICIPANT] = List(PARTICIPANT()))
+                    `participant_ids`: List[String] = List("PT_000003"))
 
 }
