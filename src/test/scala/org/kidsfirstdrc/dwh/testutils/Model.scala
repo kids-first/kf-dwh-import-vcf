@@ -46,12 +46,24 @@ object Model {
                         alternate: String = "A",
                         name: String = "rs1234567")
 
-  case class ParticipantInput(kf_id: String = "PT_001", family_id: String = "FM_001", affected_status: String = "alive")
+  //case class ParticipantInput(kf_id: String = "PT_001",
+  //                            family_id: String = "FM_001",
+  //                            affected_status: String = "alive")
 
-  case class BiospecimenInput(kf_id: String = "BS_0001", participant_id: String = "PT_001")
+  case class BiospecimenInput(kf_id: String = "BS_0001",
+                              participant_id: String = "PT_001")
 
-  case class ParticipantOutput(kf_id: String = "PT_001", family_id: String = "FM_001", affected_status: String = "alive", study_id: String = "SD_123", release_id: String = "RE_ABCDEF")
+  case class ParticipantOutput(kf_id: String = "PT_001",
+                               family_id: String = "FM_001",
+                               affected_status: String = "alive",
+                               study_id: String = "SD_123",
+                               release_id: String = "RE_ABCDEF")
 
-  case class BiosepecimenOutput(kf_id: String = "BS_0001", biospecimen_id: String = "BS_0001", participant_id: String = "PT_001", family_id: String = "FM_001", study_id: String = "SD_123", release_id: String = "RE_ABCDEF")
+  case class BiosepecimenOutput(kf_id: String = "BS_0001",
+                                biospecimen_id: String = "BS_0001",
+                                participant_id: String = "PT_001",
+                                family_id: String = "FM_001",
+                                study_id: String = "SD_123",
+                                release_id: String = "RE_ABCDEF")
 
 }

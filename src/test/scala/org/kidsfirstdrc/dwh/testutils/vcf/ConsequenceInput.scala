@@ -19,5 +19,5 @@ case class ConsequenceInput(Allele: String = "A",
                             Amino_acids: Option[RefAlt] = Some(RefAlt("V", "M")),
                             Protein_position: Option[Int] = Some(261),
                             Codons: Option[RefAlt] = Some(RefAlt("GTG", "ATG")),
-                            EXON: Option[Exon] = Some(Exon(7, 27)),
+                            EXON: Option[Exon] = Some(Exon(Some(7), Some(27))),
                             INTRON: Option[Intron] = None)

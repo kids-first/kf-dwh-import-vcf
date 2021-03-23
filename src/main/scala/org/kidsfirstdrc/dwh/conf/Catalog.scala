@@ -7,6 +7,12 @@ import bio.ferlab.datalake.core.loader.LoadTypes.OverWrite
 object Catalog {
 
   val kfStridesVariantBucket = "kf-strides-variant"
+  val kfStudyBucket = "kf-study"
+
+  object HarmonizedData extends StoreFolder {
+    override val alias: String = kfStudyBucket
+    val family_variants_vcf = DataSource(alias, "", "", "", VCF, OverWrite)
+  }
 
   object Raw extends StoreFolder {
     override val alias: String  = kfStridesVariantBucket
@@ -52,7 +58,13 @@ object Catalog {
 
     override val alias: String  = kfStridesVariantBucket
 
-    val studies = DataSource(alias, "/dataservice/studies/studies_re_*", "variant", "studies",  PARQUET, OverWrite)
+    val studies                = DataSource(alias, "/dataservice/studies/studies_re_*"                          , "variant", "studies"               , PARQUET, OverWrite)
+    val biospecimens           = DataSource(alias, "/dataservice/biospecimens/biospecimens_re_*"                , "variant", "biospecimens"          , PARQUET, OverWrite)
+    val family_relationships   = DataSource(alias, "/dataservice/family_relationships/family_relationships_re_*", "variant", "family_relationships"  , PARQUET, OverWrite)
+    val participants           = DataSource(alias, "/dataservice/participants/participants_re_*"                , "variant", "participants"          , PARQUET, OverWrite)
+    val genomic_files          = DataSource(alias, "/dataservice/genomic_files/genomic_files_re_*"              , "variant", "genomic_files"         , PARQUET, OverWrite)
+    val genomic_files_override = DataSource(alias, "/genomic_files_override"                                    , "variant", "genomic_files_override", CSV    , OverWrite)
+
   }
 
   object Clinical extends StoreFolder {

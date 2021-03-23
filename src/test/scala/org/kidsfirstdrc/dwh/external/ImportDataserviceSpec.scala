@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
 import org.apache.spark.sql.SaveMode
-import org.kidsfirstdrc.dwh.testutils.Model.{BiosepecimenOutput, BiospecimenInput, ParticipantInput, ParticipantOutput}
+import org.kidsfirstdrc.dwh.testutils.Model.{BiosepecimenOutput, BiospecimenInput, ParticipantOutput}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
@@ -24,6 +24,7 @@ class ImportDataserviceSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
 
   "build" should "produce new tables when mergeExisting is false" in {
     val (studyId1, studyId2) = ("SD_123", "SD_456")
+
     withOutputFolder("dataservice") { workDir =>
       spark.sql("create database if not exists variant")
       spark.sql("use variant")
@@ -31,19 +32,19 @@ class ImportDataserviceSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
       val output = s"$workDir/output"
       Given("Parquet files for participants of study 1")
       Seq(
-        ParticipantInput(),
-        ParticipantInput(kf_id = "PT_002")
+        ParticipantOutput(kf_id = "PT_001"),
+        ParticipantOutput(kf_id = "PT_002")
       ).toDF().write.parquet(s"$input/participants/$studyId1")
 
       Given("Parquet files for participants of study 2")
       Seq(
-        ParticipantInput(kf_id = "PT_003"),
-        ParticipantInput(kf_id = "PT_004")
+        ParticipantOutput(kf_id = "PT_003"),
+        ParticipantOutput(kf_id = "PT_004")
       ).toDF().write.parquet(s"$input/participants/$studyId2")
 
       Given("Parquet files for participants of a study that is not include in the release")
       Seq(
-        ParticipantInput(kf_id = "PT_999")
+        ParticipantOutput(kf_id = "PT_999")
       ).toDF().write.parquet(s"$input/participants/ignore_studies")
 
       Given("Parquet files for biospecimens of study 1")
@@ -91,13 +92,13 @@ class ImportDataserviceSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
       val output = s"$workDir/output"
       Given("Parquet files for participants of study 1")
       Seq(
-        ParticipantInput(),
-        ParticipantInput(kf_id = "PT_002")
+        ParticipantOutput(kf_id = "PT_001"),
+        ParticipantOutput(kf_id = "PT_002")
       ).toDF().write.parquet(s"$input/participants/$studyId1")
 
       Given("Parquet files for participants of a study that is not include in the release")
       Seq(
-        ParticipantInput(kf_id = "PT_999")
+        ParticipantOutput(kf_id = "PT_999")
       ).toDF().write.parquet(s"$input/participants/ignore_studies")
 
       Given("A table participant that already exist")
