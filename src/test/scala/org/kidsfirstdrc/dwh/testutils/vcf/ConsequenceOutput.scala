@@ -19,7 +19,7 @@ case class ConsequenceOutput(chromosome: String = "2",
                              hgvsg: Option[String] = Some("chr2:g.166166916G>A"),
                              hgvsc: Option[String] = Some("ENST00000283256.10:c.781G>A"),
                              hgvsp: Option[String] = Some("ENSP00000283256.6:p.Val261Met"),
-                             exon: Option[Exon] = Some(Exon(7, 27)),
+                             exon: Option[Exon] = Some(Exon(Some(7), Some(27))),
                              intron: Option[Intron] = None,
                              cdna_position: Option[Int] = Some(937),
                              cds_position: Option[Int] = Some(781),
@@ -30,8 +30,8 @@ case class ConsequenceOutput(chromosome: String = "2",
                              study_id: String = "SD_123456",
                              release_id: String = "RE_ABCDEF")
 
-case class Exon(rank: Int, total: Int)
+//case class Exon(rank: Int, total: Int)
 
-case class Intron(rank: Int, total: Int)
+//case class Intron(rank: Int, total: Int)
 
 case class RefAlt(reference: String, variant: String)

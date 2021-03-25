@@ -55,9 +55,9 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
   ).toDF()
 
   val occurrencesDf: DataFrame = Seq(
-    OccurrenceOutput().copy(is_gru = false, is_hmb = false, participant_id = "PT_000001"), //should not be in the result
-    OccurrenceOutput().copy(is_gru = true , is_hmb = false, participant_id = "PT_000002"), //should be in the result
-    OccurrenceOutput().copy(is_gru = false, is_hmb = true , participant_id = "PT_000003")  //should be in the result
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, is_gru = false, is_hmb = false, participant_id = "PT_000001"), //should not be in the result
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, is_gru = true , is_hmb = false, participant_id = "PT_000002"), //should be in the result
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, is_gru = false, is_hmb = true , participant_id = "PT_000003")  //should be in the result
   ).toDF()
 
   val clinvarDf: DataFrame = Seq(
@@ -83,9 +83,9 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
   )
 
   val expectedConsequences: List[Consequence] = List(
-    Consequence("MODERATE", "SCN2A", Some("ENST00000636203"),None, Some("ENST00000283256.10:c.781G>A"),Some("ENSP00000283256.6:p.Val261Met"),"Transcript",List("missense_variant"),Some("protein_coding"),"SNV",1,Some(Exon(7,27)),None,Some(937),Some(781),Some(RefAlt("V","M")),Some(RefAlt("GTG","ATG")),Some(261),Some("V261M"),Some("781G>A"),3,true,
+    Consequence("MODERATE", "SCN2A", Some("ENST00000636203"),None, Some("ENST00000283256.10:c.781G>A"),Some("ENSP00000283256.6:p.Val261Met"),"Transcript",List("missense_variant"),Some("protein_coding"),"SNV",1,Some(Exon(Some(7), Some(27))),None,Some(937),Some(781),Some(RefAlt("V","M")),Some(RefAlt("GTG","ATG")),Some(261),Some("V261M"),Some("781G>A"),3,true,
       ScoreConservations(0.5), ScorePredictions(0.1,"SIFT_pred",0.2,"HVAR_pred","FATHMM_rankscore","FATHMM_pred","CADD_raw_rankscore","DANN_rankscore",0.3,0.4,"LRT_pred")),
-    Consequence("MODERATE", "SCN2A", Some("ENST00000636564"),None, Some("ENST00000283256.10:c.781G>A"),Some("ENSP00000283256.6:p.Val261Met"),"Transcript",List("missense_variant"),Some("protein_coding"),"SNV",1,Some(Exon(7,27)),None,Some(937),Some(781),Some(RefAlt("V","M")),Some(RefAlt("GTG","ATG")),Some(261),Some("V261M"),Some("781G>A"),3,true,
+    Consequence("MODERATE", "SCN2A", Some("ENST00000636564"),None, Some("ENST00000283256.10:c.781G>A"),Some("ENSP00000283256.6:p.Val261Met"),"Transcript",List("missense_variant"),Some("protein_coding"),"SNV",1,Some(Exon(Some(7), Some(27))),None,Some(937),Some(781),Some(RefAlt("V","M")),Some(RefAlt("GTG","ATG")),Some(261),Some("V261M"),Some("781G>A"),3,true,
       ScoreConservations(0.5), ScorePredictions(0.1,"SIFT_pred",0.2,"HVAR_pred","FATHMM_rankscore","FATHMM_pred","CADD_raw_rankscore","DANN_rankscore",0.3,0.4,"LRT_pred"))
   )
 

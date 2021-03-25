@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SparkSession
 
 import scala.util.Try
@@ -15,6 +16,10 @@ object ImportVcf extends App {
     .enableHiveSupport()
     .appName(s"Import $runType for $studyId - $releaseId").getOrCreate()
 
+  implicit val conf: Configuration = Configuration(List(
+    StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")
+  ))
+
   val isPatternOverriden: Boolean = Try(isPatternOverride.toBoolean).getOrElse(false)
 
   run(studyId, releaseId, input, output, runType, biospecimenIdColumn, isPatternOverriden)
@@ -25,11 +30,11 @@ object ImportVcf extends App {
     spark.sql("use variant")
 
     runType match {
-      case "occurrences" => Occurrences.run(studyId, releaseId, input, output, biospecimenIdColumn, isPatternOverriden)
+      case "occurrences" => new Occurrences(studyId, releaseId, input, output, biospecimenIdColumn, isPatternOverriden).run()
       case "variants" => Variants.run(studyId, releaseId, input, output)
       case "consequences" => Consequences.run(studyId, releaseId, input, output)
       case "all" =>
-        Occurrences.run(studyId, releaseId, input, output, biospecimenIdColumn, isPatternOverriden)
+        new Occurrences(studyId, releaseId, input, output, biospecimenIdColumn, isPatternOverriden).run()
         Variants.run(studyId, releaseId, input, output)
         Consequences.run(studyId, releaseId, input, output)
 

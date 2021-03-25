@@ -61,7 +61,7 @@ object VariantCentricOutput {
                          biotype: Option[String] = Some("protein_coding"), // index true
                          variant_class: String = "SNV", // index true
                          strand: Int = 1, // index true
-                         exon: Option[Exon] = Some(Exon(7, 27)),
+                         exon: Option[Exon] = Some(Exon(Some(7), Some(27))),
                          intron: Option[Intron] = None,
                          cdna_position: Option[Int] = Some(937),
                          cds_position: Option[Int] = Some(781),

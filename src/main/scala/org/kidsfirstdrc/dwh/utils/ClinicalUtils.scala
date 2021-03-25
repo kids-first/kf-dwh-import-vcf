@@ -2,6 +2,7 @@ package org.kidsfirstdrc.dwh.utils
 
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{Column, DataFrame, RelationalGroupedDataset, SparkSession}
 
 object ClinicalUtils {
@@ -71,7 +72,12 @@ object ClinicalUtils {
       )
       .alias("b")
 
-    val p = loadClinicalTable(studyId, releaseId, "participants").select("kf_id", "is_proband", "affected_status").alias("p")
+    val p = loadClinicalTable(studyId, releaseId, "participants")
+      .withColumn("affected_status",
+        when(col("affected_status").cast(StringType) === "true", lit(true))
+          .otherwise(when(col("affected_status") === "affected", lit(true))
+            .otherwise(lit(false))))
+      .select("kf_id", "is_proband", "affected_status").alias("p")
     val all = b.join(p, b("participant_id") === p("kf_id")).select("b.*", "p.is_proband", "p.affected_status")
 
     broadcast(all)

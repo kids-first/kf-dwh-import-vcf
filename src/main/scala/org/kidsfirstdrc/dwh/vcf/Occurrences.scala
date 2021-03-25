@@ -1,27 +1,43 @@
 package org.kidsfirstdrc.dwh.vcf
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{ArrayType, IntegerType, MapType, StringType}
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, HarmonizedData}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils.{getBiospecimens, getRelations}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-object Occurrences {
+class Occurrences(studyId: String, releaseId: String, input: String, output: String,
+                  biospecimenIdColumn: String = "biospecimen_id", isPatternOverriden: Boolean = false)
+                 (implicit conf: Configuration)
+  extends ETL(Clinical.occurrences){
 
-  def run(studyId: String, releaseId: String, input: String, output: String, biospecimenIdColumn: String, isPatternOverriden: Boolean)(implicit spark: SparkSession): Unit = {
-    write(build(studyId, releaseId, input, biospecimenIdColumn, isPatternOverriden), output, studyId, releaseId)
-  }
-
-  def build(studyId: String, releaseId: String, input: String, biospecimenIdColumn: String, isPatternOverriden: Boolean)(implicit spark: SparkSession): DataFrame = {
-    val inputDF: DataFrame =
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    val inputDF: DataFrame = {
       if (isPatternOverriden) loadPostCGP(input, studyId, releaseId)
       else unionCGPFiles(input, studyId, releaseId)
+    }
+    Map(HarmonizedData.family_variants_vcf -> inputDF)
+  }
 
-    val occurrences = selectOccurrences(studyId, releaseId, inputDF)
+  override def run()(implicit spark: SparkSession): DataFrame = {
+    val inputDF: DataFrame = {
+      if (isPatternOverriden) loadPostCGP(input, studyId, releaseId)
+      else unionCGPFiles(input, studyId, releaseId)
+    }
+    val outputDf = build(studyId, releaseId, inputDF, biospecimenIdColumn)
+    write(outputDf, output, studyId, releaseId)
+    outputDf
+  }
+
+  def build(studyId: String, releaseId: String, inputDf: DataFrame, biospecimenIdColumn: String)(implicit spark: SparkSession): DataFrame = {
+
+    val occurrences = selectOccurrences(studyId, releaseId, inputDf)
     val biospecimens = getBiospecimens(studyId, releaseId, biospecimenIdColumn)
     val withClinical = joinOccurrencesWithClinical(occurrences, biospecimens)
-
     val relations = getRelations(studyId, releaseId)
     joinOccurrencesWithInheritance(withClinical, relations)
   }
@@ -182,4 +198,7 @@ object Occurrences {
       .saveAsTable(tableOccurence)
   }
 
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = ???
+
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = ???
 }
