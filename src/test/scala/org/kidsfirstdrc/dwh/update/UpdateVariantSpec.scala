@@ -107,7 +107,7 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
     resultDF.as[Variant].collect().head shouldBe expectedResult
 
     ////checks the hive table was published and up to date
-    val variantsHiveTable = spark.table(s"$database.${Variants.TABLE_NAME}")
+    val variantsHiveTable = spark.table(s"$database.${Clinical.variants.name}")
     variantsHiveTable.as[Variant].collect().head shouldBe expectedResult
   }
 

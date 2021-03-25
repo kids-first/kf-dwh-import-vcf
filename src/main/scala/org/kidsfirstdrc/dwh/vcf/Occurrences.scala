@@ -3,16 +3,14 @@ package org.kidsfirstdrc.dwh.vcf
 import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ArrayType, IntegerType, MapType, StringType}
+import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils
-import org.kidsfirstdrc.dwh.utils.ClinicalUtils.{getBiospecimens, getRelations}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class Occurrences(studyId: String, releaseId: String, input: String, output: String,
-                  biospecimenIdColumn: String = "biospecimen_id", isPatternOverriden: Boolean = false)
+class Occurrences(studyId: String, releaseId: String, input: String, biospecimenIdColumn: String, isPatternOverriden: Boolean = false)
                  (implicit conf: Configuration)
   extends ETL(Clinical.occurrences){
 
@@ -77,6 +75,20 @@ class Occurrences(studyId: String, releaseId: String, input: String, output: Str
         .select($"participant2" as "participant_id", $"relations.Mother" as "mother_id", $"relations.Father" as "father_id")
 
     joinOccurrencesWithInheritance(withClinical, relations)
+  }
+
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+    val tableOccurence = tableName(destination.name, studyId, releaseId)
+    data
+      .repartitionByRange(700, $"has_alt", $"dbgap_consent_code", $"chromosome", $"start")
+      .write.mode("overwrite")
+      .partitionBy("study_id", "has_alt", "dbgap_consent_code", "chromosome")
+      .format("parquet")
+      .option("path", s"${destination.rootPath}/${destination.name}/$tableOccurence")
+      .saveAsTable(tableOccurence)
+
+    data
   }
 
   override def run()(implicit spark: SparkSession): DataFrame = {
@@ -225,19 +237,5 @@ class Occurrences(studyId: String, releaseId: String, input: String, output: Str
     occurrences
       .join(biospecimens, occurrences("biospecimen_id") === biospecimens("joined_sample_id"))
       .drop(occurrences("biospecimen_id")).drop(biospecimens("joined_sample_id"))
-  }
-
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    import spark.implicits._
-    val tableOccurence = tableName("occurrences", studyId, releaseId)
-    data
-      .repartitionByRange(700, $"has_alt", $"dbgap_consent_code", $"chromosome", $"start")
-      .write.mode("overwrite")
-      .partitionBy("study_id", "has_alt", "dbgap_consent_code", "chromosome")
-      .format("parquet")
-      .option("path", s"$output/occurrences/$tableOccurence")
-      .saveAsTable(tableOccurence)
-
-    data
   }
 }

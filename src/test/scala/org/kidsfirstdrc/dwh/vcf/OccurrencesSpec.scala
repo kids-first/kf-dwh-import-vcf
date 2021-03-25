@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.functions.{explode, lit}
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.kidsfirstdrc.dwh.conf.Catalog.{DataService, HarmonizedData}
@@ -19,7 +19,8 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
   val releaseId = "RE_ABCDEF"
   val releaseId_lc = releaseId.toLowerCase
 
-  implicit val conf: Configuration =  Configuration(List())
+  implicit val conf: Configuration =
+    Configuration(List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile)))
 
   val biospecimensDf = Seq(
     BiospecimenOutput(biospecimen_id = "BS_HIJKKL"  , participant_id = "PT_000001", family_id = "FA_000001", study_id = "SD_123456"),
@@ -70,7 +71,7 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
       HarmonizedData.family_variants_vcf -> postCGP
     )
 
-    val outputDf = new Occurrences(studyId, releaseId, "", "" ).transform(inputData)
+    val outputDf = new Occurrences(studyId, releaseId, "", "biospecimen_id").transform(inputData)
 
     outputDf.as[OccurrenceOutput].collect() should contain theSameElementsAs Seq(
       OccurrenceOutput(participant_id = "PT_000002", biospecimen_id = "BS_HIJKKL2"),
@@ -91,7 +92,7 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
 
     spark.sql("use variant")
 
-    val outputDf = new Occurrences(studyId, releaseId, input, output).run()
+    val outputDf = new Occurrences(studyId, releaseId, input, "biospecimen_id").run()
 
     outputDf.as[OccurrenceOutput].count shouldBe 8
   }

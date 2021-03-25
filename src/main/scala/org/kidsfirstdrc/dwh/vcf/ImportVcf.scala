@@ -26,16 +26,16 @@ object ImportVcf extends App {
 
   def run(studyId: String, releaseId: String, input: String, output: String,
           runType: String = "all", biospecimenIdColumn: String = "biospecimen_id", isPatternOverriden: Boolean = false)
-         (implicit spark: SparkSession): Unit = {
+         (implicit spark: SparkSession, conf: Configuration): Unit = {
     spark.sql("use variant")
 
     runType match {
-      case "occurrences" => new Occurrences(studyId, releaseId, input, output, biospecimenIdColumn, isPatternOverriden).run()
-      case "variants" => Variants.run(studyId, releaseId, input, output)
+      case "occurrences" => new Occurrences(studyId, releaseId, input, biospecimenIdColumn, isPatternOverriden).run()
+      case "variants" => new Variants(studyId, releaseId).run()
       case "consequences" => Consequences.run(studyId, releaseId, input, output)
       case "all" =>
-        new Occurrences(studyId, releaseId, input, output, biospecimenIdColumn, isPatternOverriden).run()
-        Variants.run(studyId, releaseId, input, output)
+        new Occurrences(studyId, releaseId, input, biospecimenIdColumn, isPatternOverriden).run()
+        new Variants(studyId, releaseId).run()
         Consequences.run(studyId, releaseId, input, output)
 
     }

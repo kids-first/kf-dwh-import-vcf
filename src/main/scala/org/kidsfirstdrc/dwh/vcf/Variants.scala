@@ -1,31 +1,31 @@
 package org.kidsfirstdrc.dwh.vcf
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
+import org.kidsfirstdrc.dwh.conf.Catalog.Clinical
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-object Variants {
-  val TABLE_NAME = "variants"
+class Variants(studyId: String, releaseId: String)(implicit conf: Configuration)
+  extends ETL(Clinical.variants){
 
-  def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
-    import spark.implicits._
-    val inputDF = spark.table(tableName("occurrences", studyId, releaseId))
-    val variants: DataFrame = build(studyId, releaseId, inputDF)
-    val tableVariants = tableName(TABLE_NAME, studyId, releaseId)
-    variants
-      .repartition($"chromosome")
-      .write.mode(SaveMode.Overwrite)
-      .partitionBy("study_id", "release_id", "chromosome")
-      .format("parquet")
-      .option("path", s"$output/$TABLE_NAME/$tableVariants")
-      .saveAsTable(tableVariants)
-
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    Map(
+      Clinical.occurrences -> spark.table(tableName(Clinical.occurrences.name, studyId, releaseId))
+    )
   }
 
-  def build(studyId: String, releaseId: String, inputDF: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def run()(implicit spark: SparkSession): DataFrame = {
+    val inputDF = extract()(spark)
+    val variants: DataFrame = transform(inputDF)
+    load(variants)
+  }
+
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val variants = inputDF
+    data(Clinical.occurrences)
       .select(
         $"chromosome",
         $"start",
@@ -48,19 +48,29 @@ object Variants {
       .agg(
         firstAs("name"),
         firstAs("hgvsg") +:
-        firstAs("end") +:
-        firstAs("variant_class") +:
-        collect_set($"dbgap_consent_code").as("consent_codes") +:
-        (freqByDuoCode("hmb") ++ freqByDuoCode("gru")) :_*
+          firstAs("end") +:
+          firstAs("variant_class") +:
+          collect_set($"dbgap_consent_code").as("consent_codes") +:
+          (freqByDuoCode("hmb") ++ freqByDuoCode("gru")) :_*
       )
       .withColumn("hmb_af", calculated_duo_af("hmb"))
       .withColumn("gru_af", calculated_duo_af("gru"))
       .withColumn("study_id", lit(studyId))
       .withColumn("release_id", lit(releaseId))
       .withColumn("consent_codes_by_study", map($"study_id", $"consent_codes"))
-    variants
   }
 
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    val tableVariants = tableName(destination.name, studyId, releaseId)
+    data
+      .repartition(col("chromosome"))
+      .write.mode(SaveMode.Overwrite)
+      .partitionBy("study_id", "release_id", "chromosome")
+      .format("parquet")
+      .option("path", s"${destination.rootPath}/${destination.name}/$tableVariants")
+      .saveAsTable(tableVariants)
+    data
+  }
 
   def freqByDuoCode(duo: String): Seq[Column] = {
     Seq(

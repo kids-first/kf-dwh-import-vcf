@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SaveMode
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.vcf.OccurrenceOutput
@@ -7,10 +8,12 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 
-
 class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   import spark.implicits._
+
+  implicit val conf: Configuration =
+    Configuration(List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile)))
 
   Feature("Run") {
     Scenario("Transform vcf into parquet files") {
