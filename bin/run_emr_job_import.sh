@@ -26,7 +26,6 @@ steps=$(cat <<EOF
       "${study_id}",
       "${release_id}",
       "${input_vcf}",
-      "s3a://kf-strides-variant-parquet-prd",
       "${job}",
       "${biospecimen_id_column}",
       "${is_pattern_override}"

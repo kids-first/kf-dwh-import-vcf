@@ -9,7 +9,7 @@ object ImportVcf extends App {
 
   println(s"Job arguments: ${args.mkString("[", ", ", "]")}")
 
-  val Array(studyId, releaseId, input, output, runType, biospecimenIdColumn, isPatternOverride) = args
+  val Array(studyId, releaseId, input, runType, biospecimenIdColumn, isPatternOverride) = args
 
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
@@ -22,9 +22,9 @@ object ImportVcf extends App {
 
   val isPatternOverriden: Boolean = Try(isPatternOverride.toBoolean).getOrElse(false)
 
-  run(studyId, releaseId, input, output, runType, biospecimenIdColumn, isPatternOverriden)
+  run(studyId, releaseId, input, runType, biospecimenIdColumn, isPatternOverriden)
 
-  def run(studyId: String, releaseId: String, input: String, output: String,
+  def run(studyId: String, releaseId: String, input: String,
           runType: String = "all", biospecimenIdColumn: String = "biospecimen_id", isPatternOverriden: Boolean = false)
          (implicit spark: SparkSession, conf: Configuration): Unit = {
     spark.sql("use variant")
@@ -32,11 +32,11 @@ object ImportVcf extends App {
     runType match {
       case "occurrences" => new Occurrences(studyId, releaseId, input, biospecimenIdColumn, isPatternOverriden).run()
       case "variants" => new Variants(studyId, releaseId).run()
-      case "consequences" => Consequences.run(studyId, releaseId, input, output)
+      case "consequences" => new Consequences(studyId, releaseId, input).run()
       case "all" =>
         new Occurrences(studyId, releaseId, input, biospecimenIdColumn, isPatternOverriden).run()
         new Variants(studyId, releaseId).run()
-        Consequences.run(studyId, releaseId, input, output)
+        new Consequences(studyId, releaseId, input).run()
 
     }
   }
