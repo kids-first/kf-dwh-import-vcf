@@ -31,7 +31,7 @@ object ClinicalUtils {
 
   }
 
-  private def loadClinicalTable(studyId: String, releaseId: String, tableName: String)(implicit spark: SparkSession): DataFrame = {
+  def loadClinicalTable(studyId: String, releaseId: String, tableName: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     spark
       .read
@@ -78,6 +78,7 @@ object ClinicalUtils {
           .otherwise(when(col("affected_status") === "affected", lit(true))
             .otherwise(lit(false))))
       .select("kf_id", "is_proband", "affected_status").alias("p")
+
     val all = b.join(p, b("participant_id") === p("kf_id")).select("b.*", "p.is_proband", "p.affected_status")
 
     broadcast(all)

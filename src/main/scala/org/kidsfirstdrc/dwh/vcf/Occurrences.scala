@@ -5,7 +5,8 @@ import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{ArrayType, IntegerType, MapType, StringType}
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, HarmonizedData}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}
+import org.kidsfirstdrc.dwh.utils.ClinicalUtils
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils.{getBiospecimens, getRelations}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
@@ -20,26 +21,67 @@ class Occurrences(studyId: String, releaseId: String, input: String, output: Str
       if (isPatternOverriden) loadPostCGP(input, studyId, releaseId)
       else unionCGPFiles(input, studyId, releaseId)
     }
-    Map(HarmonizedData.family_variants_vcf -> inputDF)
+
+    inputDF.show(false)
+
+    val biospecimens = ClinicalUtils.loadClinicalTable(studyId, releaseId, "biospecimens")
+
+    val participants = ClinicalUtils.loadClinicalTable(studyId, releaseId, "participants")
+
+    val family_relationships = ClinicalUtils.loadClinicalTable(studyId, releaseId, "family_relationships")
+
+    Map(
+      DataService.participants -> participants,
+      DataService.biospecimens -> biospecimens,
+      DataService.family_relationships -> family_relationships,
+      HarmonizedData.family_variants_vcf -> inputDF
+    )
+  }
+
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+    val participants = data(DataService.participants)
+      .withColumn("affected_status",
+        when(col("affected_status").cast(StringType) === "true", lit(true))
+          .otherwise(when(col("affected_status") === "affected", lit(true))
+            .otherwise(lit(false))))
+      .select("kf_id", "is_proband", "affected_status")
+
+    val biospecimens = data(DataService.biospecimens)
+      .select(col(biospecimenIdColumn).as("joined_sample_id"), $"biospecimen_id", $"participant_id", $"family_id",
+        coalesce($"dbgap_consent_code", lit("_NONE_")) as "dbgap_consent_code",
+        ($"consent_type" === "GRU") as "is_gru",
+        ($"consent_type" === "HMB") as "is_hmb"
+      )
+
+    val family_relationships = data(DataService.family_relationships).where($"participant1_to_participant2_relation" isin("Mother", "Father"))
+
+    val family_variants_vcf = data(HarmonizedData.family_variants_vcf)
+
+    val occurrences = selectOccurrences(studyId, releaseId, family_variants_vcf)
+
+    val joinedBiospecimen =
+      biospecimens
+        .join(participants, biospecimens("participant_id") === participants("kf_id"))
+        .select(biospecimens("*"), $"is_proband", $"affected_status")
+
+    val withClinical = joinOccurrencesWithClinical(occurrences, joinedBiospecimen)
+
+    val relations =
+      family_relationships
+        .groupBy("participant2")
+        .agg(map_from_entries(
+            collect_list(
+              struct($"participant1_to_participant2_relation" as "relation", $"participant1" as "participant_id")
+            )) as "relations")
+        .select($"participant2" as "participant_id", $"relations.Mother" as "mother_id", $"relations.Father" as "father_id")
+
+    joinOccurrencesWithInheritance(withClinical, relations)
   }
 
   override def run()(implicit spark: SparkSession): DataFrame = {
-    val inputDF: DataFrame = {
-      if (isPatternOverriden) loadPostCGP(input, studyId, releaseId)
-      else unionCGPFiles(input, studyId, releaseId)
-    }
-    val outputDf = build(studyId, releaseId, inputDF, biospecimenIdColumn)
-    write(outputDf, output, studyId, releaseId)
-    outputDf
-  }
-
-  def build(studyId: String, releaseId: String, inputDf: DataFrame, biospecimenIdColumn: String)(implicit spark: SparkSession): DataFrame = {
-
-    val occurrences = selectOccurrences(studyId, releaseId, inputDf)
-    val biospecimens = getBiospecimens(studyId, releaseId, biospecimenIdColumn)
-    val withClinical = joinOccurrencesWithClinical(occurrences, biospecimens)
-    val relations = getRelations(studyId, releaseId)
-    joinOccurrencesWithInheritance(withClinical, relations)
+    val outputDf = transform(extract())
+    load(outputDf)
   }
 
   def selectOccurrences(studyId: String, releaseId: String, inputDF: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -185,20 +227,17 @@ class Occurrences(studyId: String, releaseId: String, input: String, output: Str
       .drop(occurrences("biospecimen_id")).drop(biospecimens("joined_sample_id"))
   }
 
-
-  def write(df: DataFrame, output: String, studyId: String, releaseId: String)(implicit spark: SparkSession): Unit = {
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     val tableOccurence = tableName("occurrences", studyId, releaseId)
-    df
+    data
       .repartitionByRange(700, $"has_alt", $"dbgap_consent_code", $"chromosome", $"start")
       .write.mode("overwrite")
       .partitionBy("study_id", "has_alt", "dbgap_consent_code", "chromosome")
       .format("parquet")
       .option("path", s"$output/occurrences/$tableOccurence")
       .saveAsTable(tableOccurence)
+
+    data
   }
-
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = ???
-
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = ???
 }

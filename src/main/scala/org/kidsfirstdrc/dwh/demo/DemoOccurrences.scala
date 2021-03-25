@@ -14,7 +14,7 @@ object DemoOccurrences {
   ))
 
   def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
-    new Occurrences(studyId, releaseId, input, output).write(build(studyId, releaseId, input), output, studyId, releaseId)
+    new Occurrences(studyId, releaseId, input, output).load(build(studyId, releaseId, input))
   }
 
   def build(studyId: String, releaseId: String, input: String)(implicit spark: SparkSession): DataFrame = {
