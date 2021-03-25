@@ -1,29 +1,36 @@
 package org.kidsfirstdrc.dwh.demo
 
-import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
-import org.apache.spark.sql.SparkSession
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions.{input_file_name, regexp_extract}
-import org.kidsfirstdrc.dwh.conf.Catalog.HarmonizedData
+import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, HarmonizedData}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 import org.kidsfirstdrc.dwh.vcf.Consequences
 
-object DemoConsequences {
+class DemoConsequences(studyId: String, releaseId: String, input: String)
+                      (implicit conf: Configuration)
+  extends ETL(Clinical.consequences){
 
-  implicit val conf: Configuration = Configuration(List(
-    StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/public/demo")
-  ))
+  override def run()(implicit spark: SparkSession): DataFrame = {
+    val data = extract()
+    val consequences = transform(data)
+    load(consequences)
+  }
 
-  def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
-
-    val inputDF = vcf(input)
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    val df = vcf(input)
       .withColumn("file_name", regexp_extract(input_file_name(), ".*/(.*)", 1))
       .select(chromosome, start, end, reference, alternate, name, annotations)
+    Map(HarmonizedData.family_variants_vcf -> df)
+  }
 
-    val data = Map(HarmonizedData.family_variants_vcf -> inputDF)
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    new Consequences(studyId, releaseId, input).transform(data)
+  }
 
-    val consequences = new Consequences(studyId, releaseId, input).transform(data)
-
-    new Consequences(studyId, releaseId, input).load(consequences)
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    new Consequences(studyId, releaseId, input).load(data)
   }
 }

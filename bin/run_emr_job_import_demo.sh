@@ -20,7 +20,6 @@ steps=$(cat <<EOF
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
       "${release_id}",
       "${input}",
-      "s3a://kf-strides-variant-parquet-prd/public/demo",
       "${job}"
     ],
     "Type": "CUSTOM_JAR",

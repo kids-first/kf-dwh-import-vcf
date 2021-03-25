@@ -45,7 +45,7 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
         loadTestClinicalTable("family_relationships", output)
 
         When("Run the main application")
-        ImportVcf.run(studyId, releaseId, input, output)
+        ImportVcf.run(studyId, releaseId, input)
 
         Then("Table occurrences_sd_123456_re_abcdef should contain rows for the given study and release")
 
