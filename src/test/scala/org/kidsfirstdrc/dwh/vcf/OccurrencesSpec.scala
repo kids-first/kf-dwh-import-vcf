@@ -3,6 +3,7 @@ package org.kidsfirstdrc.dwh.vcf
 import bio.ferlab.datalake.core.config.Configuration
 import org.apache.spark.sql.functions.{explode, lit}
 import org.apache.spark.sql.{DataFrame, SaveMode}
+import org.kidsfirstdrc.dwh.conf.Catalog.{DataService, HarmonizedData}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.dataservice._
 import org.kidsfirstdrc.dwh.testutils.vcf.{OccurrenceOutput, PostCGPInput}
@@ -24,6 +25,11 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
     BiospecimenOutput(biospecimen_id = "BS_HIJKKL"  , participant_id = "PT_000001", family_id = "FA_000001", study_id = "SD_123456"),
     BiospecimenOutput(biospecimen_id = "BS_HIJKKL2" , participant_id = "PT_000002", family_id = "FA_000001", study_id = "SD_123456"),
     BiospecimenOutput(biospecimen_id = "BS_2CZNEQQ5", participant_id = "PT_000003", family_id = "FA_000001", study_id = "SD_123456"),
+
+    BiospecimenOutput(biospecimen_id = "BS_ABCD1234", participant_id = "PT_000001", family_id = "FA_000001", study_id = "SD_123456"),
+    BiospecimenOutput(biospecimen_id = "BS_EFGH4567", participant_id = "PT_000002", family_id = "FA_000001", study_id = "SD_123456"),
+    BiospecimenOutput(biospecimen_id = "BS_IJKL8901", participant_id = "PT_000003", family_id = "FA_000001", study_id = "SD_123456"),
+
     BiospecimenOutput(biospecimen_id = "BS_HIJKKL"  , participant_id = "PT_000001", family_id = "FA_000002", study_id = "SD_789"),
     BiospecimenOutput(biospecimen_id = "BS_HIJKKL2" , participant_id = "PT_000002", family_id = "FA_000002", study_id = "SD_789"),
     BiospecimenOutput(biospecimen_id = "BS_2CZNEQQ5", participant_id = "PT_000003", family_id = "FA_000002", study_id = "SD_789")
@@ -47,15 +53,8 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
     FamilyRelationshipOutput(kf_id = "FR_000002", participant2 = "PT_000002", participant1 = "PT_000001", participant1_to_participant2_relation = "Child" , study_id = "SD_123456")
   ).toDF
 
-  "build" should "return a dataframe with all expected columns" in {
+  "transform" should "return a dataframe with all expected columns" in {
     spark.sql("CREATE DATABASE IF NOT EXISTS variant")
-    val output: String = getClass.getClassLoader.getResource(".").getFile
-    loadTestData(output, biospecimensDf, "biospecimens", releaseId_lc)
-    loadTestData(output, genomic_filesDf, "genomic_files", releaseId_lc)
-    loadTestData(output, genomic_files_overrideDf, "genomic_files_override")
-    loadTestData(output, participantsDf, "participants", releaseId_lc)
-    loadTestData(output, family_relationshipsDf, "family_relationships", releaseId_lc)
-
     spark.sql("use variant")
 
     val postCGP = Seq(
@@ -64,14 +63,37 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
       .withColumn("file_name", lit("file_1"))
       .withColumn("genotype", explode($"genotypes"))
 
-    val outputDf = new Occurrences(studyId, releaseId, "", "" ).build(studyId, releaseId, postCGP, "biospecimen_id")
-    outputDf.show(false)
+    val inputData = Map(
+      DataService.participants -> participantsDf.where($"study_id" === studyId),
+      DataService.biospecimens -> biospecimensDf.where($"study_id" === studyId),
+      DataService.family_relationships -> family_relationshipsDf.where($"study_id" === studyId),
+      HarmonizedData.family_variants_vcf -> postCGP
+    )
+
+    val outputDf = new Occurrences(studyId, releaseId, "", "" ).transform(inputData)
 
     outputDf.as[OccurrenceOutput].collect() should contain theSameElementsAs Seq(
       OccurrenceOutput(participant_id = "PT_000002", biospecimen_id = "BS_HIJKKL2"),
       OccurrenceOutput(participant_id = "PT_000001", biospecimen_id = "BS_HIJKKL", `mother_id` = Some("PT_000002"), mother_calls = Some(List(0, 0)), mother_zygosity = Some("WT"))
     )
+  }
 
+  "run" should "return a dataframe with all expected columns" in {
+    spark.sql("CREATE DATABASE IF NOT EXISTS variant")
+    val output: String = getClass.getClassLoader.getResource(".").getFile
+    loadTestData(output, biospecimensDf, "biospecimens", releaseId_lc)
+    loadTestData(output, genomic_filesDf, "genomic_files", releaseId_lc)
+    loadTestData(output, genomic_files_overrideDf, "genomic_files_override")
+    loadTestData(output, participantsDf, "participants", releaseId_lc)
+    loadTestData(output, family_relationshipsDf, "family_relationships", releaseId_lc)
+
+    val input = getClass.getResource("/input_vcf/SD_123456").getFile
+
+    spark.sql("use variant")
+
+    val outputDf = new Occurrences(studyId, releaseId, input, output).run()
+
+    outputDf.as[OccurrenceOutput].count shouldBe 8
   }
 
   private def loadTestData(output: String, df: DataFrame, tableName: String, releaseId: String): Unit = {
