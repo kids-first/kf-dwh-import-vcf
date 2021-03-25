@@ -1,14 +1,13 @@
 package org.kidsfirstdrc.dwh.join
 
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.kidsfirstdrc.dwh.conf.Catalog.Clinical
 import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.{calculated_duo_af, locusColumNames}
 import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
-import org.kidsfirstdrc.dwh.vcf.Variants.TABLE_NAME
 
 object JoinVariants {
 
@@ -18,7 +17,7 @@ object JoinVariants {
 
     val variants: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
-        val nextDf = spark.table(SparkUtils.tableName(TABLE_NAME, studyId, releaseId, database))
+        val nextDf = spark.table(SparkUtils.tableName(Clinical.variants.name, studyId, releaseId, database))
           .withColumn("studies", array($"study_id"))
           .withColumn("hmb_ac_by_study", map($"study_id", $"hmb_ac"))
           .withColumn("hmb_an_by_study", map($"study_id", $"hmb_an"))
@@ -51,9 +50,9 @@ object JoinVariants {
       $"gru_ac" :+ $"gru_an" :+ $"gru_homozygotes" :+ $"gru_heterozygotes" :+
       $"study_id"
 
-    val merged = if (mergeWithExisting && spark.catalog.tableExists(TABLE_NAME)) {
+    val merged = if (mergeWithExisting && spark.catalog.tableExists(Clinical.variants.name)) {
       val existingColumns = commonColumns :+ explode($"studies").as("study_id")
-      val existingVariants = spark.table(TABLE_NAME)
+      val existingVariants = spark.table(Clinical.variants.name)
         .select(existingColumns: _*)
         .withColumn("hmb_ac", $"hmb_ac_by_study"($"study_id"))
         .withColumn("hmb_ac_by_study", map($"study_id", $"hmb_ac"))
@@ -89,7 +88,7 @@ object JoinVariants {
     val joinedWithClinvar = joinWithClinvar(joinedWithPop)
     val joinedWithDBSNP = joinWithDBSNP(joinedWithClinvar)
 
-    write(releaseId, output, TABLE_NAME, joinedWithDBSNP, Some(60), database)
+    write(releaseId, output, Clinical.variants.name, joinedWithDBSNP, Some(60), database)
 
   }
 

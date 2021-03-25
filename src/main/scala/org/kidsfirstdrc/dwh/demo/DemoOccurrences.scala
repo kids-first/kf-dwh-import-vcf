@@ -10,11 +10,11 @@ import org.kidsfirstdrc.dwh.vcf.Occurrences
 object DemoOccurrences {
 
   implicit val conf: Configuration = Configuration(List(
-    StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")
+    StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/public/demo")
   ))
 
-  def run(studyId: String, releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
-    new Occurrences(studyId, releaseId, input, output).load(build(studyId, releaseId, input))
+  def run(studyId: String, releaseId: String, input: String)(implicit spark: SparkSession): Unit = {
+    new Occurrences(studyId, releaseId, input, "biospecimen_id").load(build(studyId, releaseId, input))
   }
 
   def build(studyId: String, releaseId: String, input: String)(implicit spark: SparkSession): DataFrame = {
@@ -24,7 +24,7 @@ object DemoOccurrences {
       .withColumn("genotype", explode(col("genotypes")))
       .withColumn("file_name", regexp_extract(input_file_name(), ".*/(.*)", 1))
 
-    val occurrences = new Occurrences(studyId, releaseId, input, "").selectOccurrences(studyId, releaseId, inputDF)
+    val occurrences = new Occurrences(studyId, releaseId, input, "biospecimen_id").selectOccurrences(studyId, releaseId, inputDF)
       .withColumn("participant_id", col("biospecimen_id"))
       .withColumn("is_gru", lit(null).cast(BooleanType))
       .withColumn("is_hmb", lit(null).cast(BooleanType))
@@ -45,7 +45,7 @@ object DemoOccurrences {
       )
     )
 
-    new Occurrences(studyId, releaseId, input, input).joinOccurrencesWithInheritance(occurrences, relations)
+    new Occurrences(studyId, releaseId, input, "biospecimen_id").joinOccurrencesWithInheritance(occurrences, relations)
 
   }
 

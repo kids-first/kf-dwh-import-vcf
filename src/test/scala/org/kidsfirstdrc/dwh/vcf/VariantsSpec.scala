@@ -1,5 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
+import org.kidsfirstdrc.dwh.conf.Catalog.Clinical
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.vcf.{VariantInput, VariantOutput}
 import org.scalatest.GivenWhenThen
@@ -10,6 +12,9 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
 
   import spark.implicits._
 
+  implicit val conf: Configuration =
+    Configuration(List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile)))
+
   val studyId = "SD_123456"
   val releaseId = "RE_ABCDEF"
   "build" should "return a dataframe with all expected columns" in {
@@ -17,7 +22,7 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
       VariantInput()
     ).toDF()
 
-    val output = Variants.build(studyId, releaseId, df)
+    val output = new Variants(studyId, releaseId).transform(Map(Clinical.occurrences -> df))
 
     output.as[VariantOutput].collect() should contain theSameElementsAs Seq(
       VariantOutput()
@@ -31,7 +36,7 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
       VariantInput(is_hmb = false, is_gru = true, zygosity = "HET", has_alt = 1, dbgap_consent_code =  "SD_123456.c3")
     ).toDF()
 
-    val output = Variants.build(studyId, releaseId, df)
+    val output = new Variants(studyId, releaseId).transform(Map(Clinical.occurrences -> df))
 
     output.as[VariantOutput].collect() should contain theSameElementsAs Seq(
       VariantOutput(
