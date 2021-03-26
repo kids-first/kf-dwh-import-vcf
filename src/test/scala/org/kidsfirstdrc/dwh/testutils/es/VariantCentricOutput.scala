@@ -59,7 +59,6 @@ object VariantCentricOutput {
                          feature_type: String = "Transcript",
                          consequences: Seq[String] = Seq("missense_variant"), // index true
                          biotype: Option[String] = Some("protein_coding"), // index true
-                         variant_class: String = "SNV", // index true
                          strand: Int = 1, // index true
                          exon: Option[Exon] = Some(Exon(Some(7), Some(27))),
                          intron: Option[Intron] = None,
@@ -97,6 +96,7 @@ object VariantCentricOutput {
                     `reference`: String = "G", //index false
                     `alternate`: String = "A", //index false
                     `locus`: String = "2-165310406-G-A", //index false
+                    `variant_class`: String = "SNV", // index true
                     `studies`: List[Study] = List(), //index true
                     `participant_number`: Long = 22, //index true
                     `acls`: List[String] = List("SD_456.c1", "SD_123.c1", "SD_789.c99"), //index true
