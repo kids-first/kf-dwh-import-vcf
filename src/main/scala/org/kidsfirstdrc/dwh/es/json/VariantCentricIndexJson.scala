@@ -67,7 +67,7 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
       .withConsequences(consequences)
       .withGenes(genes)
       .withParticipants(occurrences)
-      .select("hash", "chromosome", "start", "reference", "alternate", "locus", "studies", "participant_number",
+      .select("hash", "chromosome", "start", "reference", "alternate", "locus", "variant_class", "studies", "participant_number",
         "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "genes", "hgvsg", "participant_ids")
   }
 
@@ -132,7 +132,7 @@ object VariantCentricIndexJson {
         consequences
           .withScores
           .select("chromosome", "start", "reference", "alternate", "symbol", "ensembl_gene_id", "consequences",
-            "vep_impact", "symbol", "strand", "biotype", "variant_class", "exon", "intron", "hgvsc", "hgvsp", "cds_position",
+            "vep_impact", "symbol", "strand", "biotype", "exon", "intron", "hgvsc", "hgvsp", "cds_position",
             "cdna_position", "protein_position", "amino_acids", "codons", "canonical", "aa_change", "coding_dna_change",
             "ensembl_transcript_id", "ensembl_regulatory_id", "feature_type", "predictions", "conservations")
 
