@@ -110,7 +110,9 @@ class ImportClinVarJob(runEnv: Environment)(implicit conf: Configuration)
       val fieldsToRemove: Seq[String] = Seq("chromosome", "start", "end", "reference", "alternate", "interpretation")
 
       val fieldsTokeep: Seq[String] = df.columns.filterNot(c => fieldsToRemove.contains(c))
-      df.withColumn("interpretations", array_union(col("clin_sig"), col("clin_sig_conflict")))
+      df
+        .withColumn("interpretations",
+          array_remove(array_union(col("clin_sig"), col("clin_sig_conflict")), ""))
         .withColumn("interpretation", explode(col("interpretations")))
         .drop("interpretations")
         .groupBy("chromosome", "start", "end", "reference", "alternate")

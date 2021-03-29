@@ -34,7 +34,7 @@ object VariantCentricOutput {
                      `clin_sig`: List[String] = List("Benign"),
                      `conditions`: List[String] = List("Congenital myasthenic syndrome 12", "not specified", "not provided"),
                      `inheritance`: List[String] = List("germline"),
-                     `interpretations`: List[String] = List("", "Benign"))
+                     `interpretations`: List[String] = List("Benign"))
 
   case class ScoreConservations(phylo_p17way_primate_rankscore: Double)
 
