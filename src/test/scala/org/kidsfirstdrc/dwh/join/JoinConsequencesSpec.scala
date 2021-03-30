@@ -4,7 +4,7 @@ import org.apache.spark.sql.SaveMode
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.ImportScores
 import org.kidsfirstdrc.dwh.testutils.join.JoinConsequenceOutput
-import org.kidsfirstdrc.dwh.testutils.vcf.ConsequenceOutput
+import org.kidsfirstdrc.dwh.testutils.vcf.{ConsequenceOutput, Exon, RefAlt}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -21,7 +21,9 @@ class JoinConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
       spark.sql("create database if not exists variant")
       spark.sql("use variant")
       Given("2 studies")
-      val (studyId1, studyId2) = ("SD_123", "SD_456")
+      val studyId1 = "SD_123"
+      val studyId2 = "SD_456"
+      val studyId3 = "SD_789"
 
       Given("2 tables, one  for each study")
       //Study 1
@@ -33,27 +35,18 @@ class JoinConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
         .saveAsTable("consequences_sd_123_re_abcdef")
 
       //Study 2
-      val csq2 = ConsequenceOutput(chromosome = "3", start = 3000, end = 3000, "C", "A", name = Some("mutation_2"), hgvsg = Some("chr3:g.3000C>A"), cds_position = None, amino_acids = None, study_id = studyId2)
       val csq3 = csq1.copy(study_id = studyId2)
 
-      Seq(csq2, csq3).toDF().write.mode(SaveMode.Overwrite)
+      Seq(csq3).toDF().write.mode(SaveMode.Overwrite)
         .option("path", s"$outputDir/consequences_sd_456_re_abcdef")
         .format("parquet")
         .saveAsTable("consequences_sd_456_re_abcdef")
 
       Given("1 existing table annotation that contains some data for at least one study")
-      val studyId3 = "SD_789"
-      val existingCsq1 = JoinConsequenceOutput(study_ids = Set(studyId3), release_id = "RE_PREVIOUS")
-      val existingCsq2 = JoinConsequenceOutput(chromosome = "4", start = 4000, end = 4000, "C", "A", name = Some("mutation_3"),
-        hgvsg = Some("chr4:g.4000C>A"), cds_position = None, amino_acids = None, coding_dna_change = None, aa_change = None,
-        SIFT_score = None, study_ids = Set(studyId3), release_id = "RE_PREVIOUS",
-        CADD_raw_rankscore = None, DANN_rankscore = None, FATHMM_converted_rankscore = None, FATHMM_pred = None,
-        LRT_converted_rankscore = None, LRT_pred = None, Polyphen2_HVAR_pred = None, Polyphen2_HVAR_rankscore = None,
-        REVEL_rankscore = None, SIFT_converted_rankscore = None, SIFT_pred = None, phyloP17way_primate_rankscore = None)
 
-      val removedOldCsq = JoinConsequenceOutput(alternate = "G", study_ids = Set(studyId1), release_id = "RE_PREVIOUS")
+      val existingCsq1 = JoinConsequenceOutput(study_ids = List(studyId3), release_id = "RE_PREVIOUS")
 
-      Seq(existingCsq1, existingCsq2, removedOldCsq).toDF().write.mode(SaveMode.Overwrite)
+      Seq(existingCsq1).toDF().write.mode(SaveMode.Overwrite)
         .option("path", s"$outputDir/consequences")
         .format("parquet")
         .saveAsTable("consequences")
@@ -74,18 +67,16 @@ class JoinConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
       val output = variantReleaseTable
         .as[JoinConsequenceOutput]
       val expectedOutput = Seq(
-        JoinConsequenceOutput(study_ids = Set(studyId1, studyId2, studyId3),
-          CADD_raw_rankscore = None, DANN_rankscore = None, FATHMM_converted_rankscore = None, FATHMM_pred = None,
-          LRT_converted_rankscore = None, LRT_pred = None, Polyphen2_HVAR_pred = None, Polyphen2_HVAR_rankscore = None,
-          REVEL_rankscore = None, SIFT_converted_rankscore = None, SIFT_pred = None, phyloP17way_primate_rankscore = None),
-        JoinConsequenceOutput(
-          chromosome = "3", start = 3000, end = 3000, "C", "A", name = Some("mutation_2"), hgvsg = Some("chr3:g.3000C>A"),
-          cds_position = None, amino_acids = None, coding_dna_change = None, aa_change = None, SIFT_score = None,
-          study_ids = Set(studyId2),
-          CADD_raw_rankscore = None, DANN_rankscore = None, FATHMM_converted_rankscore = None, FATHMM_pred = None,
-          LRT_converted_rankscore = None, LRT_pred = None, Polyphen2_HVAR_pred = None, Polyphen2_HVAR_rankscore = None,
-          REVEL_rankscore = None, SIFT_converted_rankscore = None, SIFT_pred = None, phyloP17way_primate_rankscore = None),
-        existingCsq2.copy(release_id = releaseId)
+        JoinConsequenceOutput(study_ids = List(studyId3), `release_id` = "RE_ABCDEF"),
+        JoinConsequenceOutput("2",165310406,165310406,"G","A","ENST00000283256.10",None,"Transcript",List("missense_variant"),
+          Some("rs1057520413"),"MODERATE","SCN2A","ENSG00000136531",1,"protein_coding","SNV",Some(Exon(Some(7),Some(27))),None,
+          "ENST00000283256.10:c.781G>A","ENSP00000283256.6:p.Val261Met",Some("chr2:g.166166916G>A"),Some(781),937,261,RefAlt("V","M"),
+          RefAlt("GTG","ATG"), true,List("SD_456", "SD_123"),Some("V261M"),"781G>A","RE_ABCDEF",None,None,None,None,None,None,None,None,
+          None,None,None,None,None,None,None,None,None,None,None,null,None,None,None,None,None,None,None,None,None,None,None,None,None,
+          None,None,None,None,None,None,None,None,None,None,None,None,None,null,None,None,null,None,None,null,None,None,None,None,None,
+          None,null,None,None,null,None,None,null,None,None,null,None,None,null,None,None,null,None,None,null,None,None,null,null,None,
+          None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,
+          null,None,None)
 
       )
 
@@ -93,5 +84,4 @@ class JoinConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
 
     }
   }
-
 }

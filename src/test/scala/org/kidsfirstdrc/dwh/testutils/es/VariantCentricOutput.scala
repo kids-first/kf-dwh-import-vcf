@@ -38,17 +38,20 @@ object VariantCentricOutput {
 
   case class ScoreConservations(phylo_p17way_primate_rankscore: Double)
 
-  case class ScorePredictions(sift_converted_rank_score: Double,
-                              sift_pred: String,
-                              polyphen2_hvar_score: Double,
-                              polyphen2_hvar_pred: String,
-                              FATHMM_converted_rankscore: String,
-                              fathmm_pred: String,
-                              cadd_score: String,
-                              dann_score: String,
-                              revel_rankscore: Double,
-                              lrt_converted_rankscore: Double,
-                              lrt_pred: String)
+  case class ScorePredictions(sift_converted_rankscore: Option[Double] = Some(0.91255),
+                              sift_score: Option[Double] = None,
+                              sift_pred: Option[String] = None,
+                              polyphen2_hvar_rankscore: Option[Double] = Some(0.97372),
+                              polyphen2_hvar_score: Option[Double] = None,
+                              polyphen2_hvar_pred: Option[String] = None,
+                              fathmm_converted_rankscore: Option[Double] = Some(0.98611),
+                              fathmm_pred: Option[String] = None,
+                              cadd_rankscore: Option[Double] = Some(0.76643),
+                              dann_rankscore: Option[Double] = Some(0.95813),
+                              dann_score: Option[Double] = Some(0.9988206585102238),
+                              revel_rankscore: Option[Double] = Some(0.98972),
+                              lrt_converted_rankscore: Option[Double] = Some(0.62929),
+                              lrt_pred: Option[String] = Some("D"))
 
   case class Consequence(vep_impact: String = "MODERATE", // index true
                          symbol: String, // index false
@@ -91,6 +94,7 @@ object VariantCentricOutput {
   //case class PARTICIPANT(`participant_id`: String = "PT_000003")
 
   case class Output(`hash`: String = "ba3d35feba14451058e6fc93eeba163c800a8e09",
+                    `genome_build`: String = "GRCh38",
                     `chromosome`: String = "2", //index true
                     `start`: Long = 165310406, //index true
                     `reference`: String = "G", //index false

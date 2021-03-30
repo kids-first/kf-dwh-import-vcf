@@ -41,7 +41,7 @@ object Catalog {
     val cancer_hotspots   = DataSource(alias, "/public/cancer_hotspots"  , "variant", "cancer_hotspots"  , PARQUET, OverWrite)
     val clinvar           = DataSource(alias, "/public/clinvar"          , "variant", "clinvar"          , PARQUET, OverWrite)
     val cosmic_gene_set   = DataSource(alias, "/public/cosmic_gene_set"  , "variant", "cosmic_gene_set"  , PARQUET, OverWrite)
-    val dbnsfp_variant    = DataSource(alias, "/public/dbnsfp/variant"   , "variant", "bdnsfp"           , PARQUET, OverWrite)
+    val dbnsfp_variant    = DataSource(alias, "/public/dbnsfp/variant"   , "variant", "dbnsfp"           , PARQUET, OverWrite)
     val dbnsfp_annovar    = DataSource(alias, "/public/annovar/dbnsfp"   , "variant", "dbnsfp_annovar"   , PARQUET, OverWrite)
     val dbnsfp_original   = DataSource(alias, "/public/dbnsfp/scores"    , "variant", "dbnsfp_original"  , PARQUET, OverWrite)
     val dbsnp             = DataSource(alias, "/public/dbsnp"            , "variant", "dbsnp"            , PARQUET, OverWrite)

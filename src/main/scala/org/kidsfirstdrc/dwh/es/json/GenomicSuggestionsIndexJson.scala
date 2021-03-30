@@ -5,9 +5,11 @@ import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, Es, Public}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
+
+import scala.util.{Success, Try}
 
 class GenomicSuggestionsIndexJson(releaseId: String)
                                  (override implicit val conf: Configuration) extends ETL(Es.genomic_suggestions) {
@@ -18,8 +20,19 @@ class GenomicSuggestionsIndexJson(releaseId: String)
   final val variantSymbolWeight = 2
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    import spark.implicits._
+    val occurrences: DataFrame = spark
+      .table(s"${DataService.studies.database}.${DataService.studies.name}")
+      .select("study_id")
+      .as[String].collect()
+      .map(study_id => Try(spark.table(s"${Clinical.occurrences.database}.${Clinical.occurrences.name}_${study_id.toLowerCase}")))
+      .collect { case Success(df) => df }
+      .reduce( (df1, df2) => df1.unionByName(df2))
+
+
     Map(
       Public.genes -> spark.table(s"${Public.genes.database}.${Public.genes.name}"),
+      Clinical.occurrences -> occurrences,
       Clinical.variants -> spark.read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId"),
       Clinical.consequences -> spark.read.parquet(s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId")
     )
@@ -32,7 +45,13 @@ class GenomicSuggestionsIndexJson(releaseId: String)
       .selectLocus(col("symbol"), col("aa_change"))
       .dropDuplicates()
 
-    getGenesSuggest(genes).unionByName(getVariantSuggest(variants, consequences))
+    val occurrences = data(Clinical.occurrences)
+        .where(col("is_gru") || col("is_hmb"))
+        .selectLocus().distinct()
+
+    val filteredVariants = variants.joinByLocus(occurrences, "inner")
+
+    getGenesSuggest(genes).unionByName(getVariantSuggest(filteredVariants, consequences))
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -73,7 +92,7 @@ class GenomicSuggestionsIndexJson(releaseId: String)
           lit(variantSymbolWeight) as "weight"),
         ))
       .withColumn("symbol", col("symbol")(0))
-      .select("type", "symbol", "locus", "suggestion_id", "hgvsg", "suggest")
+      .select("type", "symbol", "locus", "suggestion_id", "hgvsg", "suggest", "chromosome")
   }
 
   def getGenesSuggest(genes: DataFrame): DataFrame = {
@@ -82,6 +101,7 @@ class GenomicSuggestionsIndexJson(releaseId: String)
       .withColumn("suggestion_id", sha1(col("symbol"))) //this maps to `hash` column in gene_centric index
       .withColumn("hgvsg", lit(null).cast(StringType))
       .withColumn("locus", lit(null).cast(StringType))
+      .withColumn("chromosome", lit(null).cast(StringType))
       .withColumn("suggest", array(
         struct(
           array(col("symbol")) as "input",
@@ -90,6 +110,6 @@ class GenomicSuggestionsIndexJson(releaseId: String)
           array_remove(functions.transform(col("alias"), c => when(c.isNull, lit("")).otherwise(c)), "") as "input",
           lit(geneAliasesWeight) as "weight"
       )))
-      .select("type", "symbol", "locus", "suggestion_id", "hgvsg", "suggest")
+      .select("type", "symbol", "locus", "suggestion_id", "hgvsg", "suggest", "chromosome")
   }
 }
