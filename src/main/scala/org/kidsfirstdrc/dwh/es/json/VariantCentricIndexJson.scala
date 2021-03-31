@@ -28,11 +28,11 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
       .reduce( (df1, df2) => df1.unionByName(df2))
 
     Map(
-      Clinical.variants        -> spark.table(s"${Clinical.variants.database}.${Clinical.variants.name}"),
-      Clinical.consequences    -> spark.table(s"${Clinical.consequences.database}.${Clinical.consequences.name}"),
-      Clinical.occurrences     -> occurrences,
-      Public.clinvar           -> spark.table(s"${Public.clinvar.database}.${Public.clinvar.name}"),
-      Public.genes             -> spark.table(s"${Public.genes.database}.${Public.genes.name}")
+      Clinical.variants     -> spark.table(s"${Clinical.variants.database}.${Clinical.variants.name}"),
+      Clinical.consequences -> spark.table(s"${Clinical.consequences.database}.${Clinical.consequences.name}"),
+      Clinical.occurrences  -> occurrences,
+      Public.clinvar        -> spark.table(s"${Public.clinvar.database}.${Public.clinvar.name}"),
+      Public.genes          -> spark.table(s"${Public.genes.database}.${Public.genes.name}")
     )
   }
 
@@ -59,15 +59,16 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
       .withColumnRenamed("chromosome", "genes_chromosome")
 
     variants
+      .withParticipants(occurrences)
       .withColumn("locus", concat_ws("-", locus:_*))
       .withColumn("hash", sha1(col("locus")))
+      .withColumn("genome_build", lit("GRCh38"))
       .withStudies
       .withFrequencies
       .withClinVar(clinvar)
       .withConsequences(consequences)
       .withGenes(genes)
-      .withParticipants(occurrences)
-      .select("hash", "chromosome", "start", "reference", "alternate", "locus", "variant_class", "studies", "participant_number",
+      .select("genome_build", "hash", "chromosome", "start", "reference", "alternate", "locus", "variant_class", "studies", "participant_number",
         "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "genes", "hgvsg", "participant_ids")
   }
 
@@ -181,6 +182,7 @@ object VariantCentricIndexJson {
             frequenciesByStudiesFor("gru")
           ).as("frequencies"),
           col("participant_number")))
+        .filter(col("study.participant_number").isNotNull and col("study.participant_number") > 0)
         .groupBy(locus:_*)
         .agg(
           collect_set("study").as("studies"),
@@ -188,6 +190,7 @@ object VariantCentricIndexJson {
             sum(col("participant_number")).as("participant_number"):+
             flatten(collect_set("acls")).as("acls"):+
             flatten(collect_set("external_study_ids")).as("external_study_ids"):_*)
+
     }
 
     def withFrequencies: DataFrame = {
@@ -225,14 +228,17 @@ object VariantCentricIndexJson {
       df
         .withColumn("predictions",
             struct(
-              col("SIFT_converted_rankscore") as "sift_converted_rank_score",
+              col("SIFT_converted_rankscore") as "sift_converted_rankscore",
+              col("SIFT_score") as "sift_score",
               col("SIFT_pred") as "sift_pred",
-              col("Polyphen2_HVAR_rankscore") as "polyphen2_hvar_score",
+              col("Polyphen2_HVAR_rankscore") as "polyphen2_hvar_rankscore",
+              col("Polyphen2_HVAR_score") as "polyphen2_hvar_score",
               col("Polyphen2_HVAR_pred") as "polyphen2_hvar_pred",
-              col("FATHMM_converted_rankscore"),
+              col("FATHMM_converted_rankscore") as "fathmm_converted_rankscore",
               col("FATHMM_pred") as "fathmm_pred",
-              col("CADD_raw_rankscore") as "cadd_score",
-              col("DANN_rankscore") as "dann_score",
+              col("CADD_raw_rankscore") as "cadd_rankscore",
+              col("DANN_rankscore") as "dann_rankscore",
+              col("DANN_score") as "dann_score",
               col("REVEL_rankscore") as "revel_rankscore",
               col("LRT_converted_rankscore") as "lrt_converted_rankscore",
               col("LRT_pred") as "lrt_pred"
@@ -265,7 +271,7 @@ object VariantCentricIndexJson {
           .groupByLocus()
           .agg(collect_set(col("participant_id")) as "participant_ids")
 
-      df.joinByLocus(occurrencesWithParticipants, "left")
+      df.joinByLocus(occurrencesWithParticipants, "inner")
         .withColumn("participant_ids", array_remove(col("participant_ids"), ""))
     }
   }

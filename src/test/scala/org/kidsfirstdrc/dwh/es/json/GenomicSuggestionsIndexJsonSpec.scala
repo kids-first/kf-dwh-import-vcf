@@ -7,6 +7,7 @@ import org.kidsfirstdrc.dwh.testutils._
 import org.kidsfirstdrc.dwh.testutils.es.{SUGGEST, SuggesterIndexOutput}
 import org.kidsfirstdrc.dwh.testutils.external.GenesOutput
 import org.kidsfirstdrc.dwh.testutils.join.{JoinConsequenceOutput, JoinVariantOutput}
+import org.kidsfirstdrc.dwh.testutils.vcf.OccurrenceOutput
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -19,7 +20,13 @@ class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen wit
   val studyId3 = "SD_789"
   val realeaseId = "RE_ABCDEF"
 
+  val occurrencesDf: DataFrame = Seq(
+    OccurrenceOutput(chromosome = "3", `start` = 165310406, `end` = 165310406, is_gru = false, is_hmb = false),
+    OccurrenceOutput(chromosome = "2", `start` = 165310406, `end` = 165310406, is_gru = true, is_hmb = false)
+  ).toDF()
+
   val variant = JoinVariantOutput(
+    chromosome = "2",
     hmb_ac = 12, hmb_an = 27, hmb_af = 0.4444444444, hmb_homozygotes = 9, hmb_heterozygotes = 7,
     gru_ac = 2, gru_an = 7, gru_af = 0.2857142857, gru_homozygotes = 5, gru_heterozygotes = 1,
     hmb_ac_by_study = Map(studyId1 -> 5, studyId2 -> 5, studyId3 -> 2),
@@ -40,7 +47,8 @@ class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen wit
     clinvar_id = Some("RCV000436956"))
 
   val joinVariantDf: DataFrame = Seq(
-    variant
+    variant,                       //should be in the index
+    variant.copy(chromosome = "3") //should not be in the index
   ).toDF().withColumnRenamed("one_thousand_genomes", "1k_genomes")
 
   val joinConsequencesDf: DataFrame = Seq(
@@ -67,6 +75,7 @@ class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen wit
 
   val data = Map(
     Public.genes -> genesDf,
+    Clinical.occurrences -> occurrencesDf,
     Clinical.variants -> joinVariantDf,
     Clinical.consequences -> joinConsequencesDf
   )
@@ -82,6 +91,7 @@ class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen wit
       SuggesterIndexOutput(),
       SuggesterIndexOutput(
         `type` = "gene",
+        `chromosome` = null,
         `locus` = null,
         `suggestion_id` = "9b8016c31b93a7504a8314ce3d060792f67ca2ad",
         `hgvsg` = null,
