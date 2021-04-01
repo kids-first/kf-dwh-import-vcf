@@ -6,8 +6,8 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.testutils._
 import org.kidsfirstdrc.dwh.testutils.es.{SUGGEST, SuggesterIndexOutput}
 import org.kidsfirstdrc.dwh.testutils.external.GenesOutput
-import org.kidsfirstdrc.dwh.testutils.join.{JoinConsequenceOutput, JoinVariantOutput}
-import org.kidsfirstdrc.dwh.testutils.vcf.OccurrenceOutput
+import org.kidsfirstdrc.dwh.testutils.join.{Freq, JoinConsequenceOutput, JoinVariantOutput}
+import org.kidsfirstdrc.dwh.testutils.vcf.{OccurrenceOutput, VariantFrequency}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -25,26 +25,25 @@ class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen wit
     OccurrenceOutput(chromosome = "2", `start` = 165310406, `end` = 165310406, is_gru = true, is_hmb = false)
   ).toDF()
 
-  val variant = JoinVariantOutput(
-    chromosome = "2",
-    hmb_ac = 12, hmb_an = 27, hmb_af = 0.4444444444, hmb_homozygotes = 9, hmb_heterozygotes = 7,
-    gru_ac = 2, gru_an = 7, gru_af = 0.2857142857, gru_homozygotes = 5, gru_heterozygotes = 1,
-    hmb_ac_by_study = Map(studyId1 -> 5, studyId2 -> 5, studyId3 -> 2),
-    hmb_an_by_study = Map(studyId1 -> 10, studyId2 -> 10, studyId3 -> 7),
-    hmb_af_by_study = Map(studyId1 -> 0.5, studyId2 -> 0.5, studyId3 -> 0.2857142857),
-    hmb_homozygotes_by_study = Map(studyId1 -> 2, studyId2 -> 2, studyId3 -> 5),
-    hmb_heterozygotes_by_study = Map(studyId1 -> 3, studyId2 -> 3, studyId3 -> 1),
-    gru_ac_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 2),
-    gru_an_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 7),
-    gru_af_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 0.2857142857),
-    gru_homozygotes_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 5),
-    gru_heterozygotes_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 1),
-    studies = Set(studyId1, studyId2, studyId3),
-    consent_codes = Set("SD_789.c99", "SD_123.c1", "SD_456.c1"),
-    consent_codes_by_study = Map(studyId1 -> Set("SD_123.c1"), studyId2 -> Set("SD_456.c1"), studyId3 -> Set(s"$studyId3.c99")),
-    release_id = realeaseId,
-    clin_sig = Some("pathogenic"),
-    clinvar_id = Some("RCV000436956"))
+  val variant =
+    JoinVariantOutput(
+      frequencies = VariantFrequency(Freq(ac = 12, an = 27, af = 0.4444444444, homozygotes = 9, heterozygotes = 7), Freq(ac = 12, an = 27, af = 0.4444444444, homozygotes = 9, heterozygotes = 7)),
+      upper_bound_kf_ac_by_study = Map(studyId1 -> 5, studyId2 -> 5, studyId3 -> 2),
+      upper_bound_kf_an_by_study = Map(studyId1 -> 10, studyId2 -> 10, studyId3 -> 7),
+      upper_bound_kf_af_by_study = Map(studyId1 -> 0.5, studyId2 -> 0.5, studyId3 -> 0.2857142857),
+      upper_bound_kf_homozygotes_by_study = Map(studyId1 -> 2, studyId2 -> 2, studyId3 -> 5),
+      upper_bound_kf_heterozygotes_by_study = Map(studyId1 -> 3, studyId2 -> 3, studyId3 -> 1),
+      lower_bound_kf_ac_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 2),
+      lower_bound_kf_an_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 7),
+      lower_bound_kf_af_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 0.2857142857),
+      lower_bound_kf_homozygotes_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 5),
+      lower_bound_kf_heterozygotes_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 1),
+      studies = Set(studyId1, studyId2, studyId3),
+      consent_codes = Set("SD_789.c99", "SD_123.c1", "SD_456.c1"),
+      consent_codes_by_study = Map(studyId1 -> Set("SD_123.c1"), studyId2 -> Set("SD_456.c1"), studyId3 -> Set(s"$studyId3.c99")),
+      release_id = realeaseId,
+      clin_sig = Some("pathogenic"),
+      clinvar_id = Some("RCV000436956"))
 
   val joinVariantDf: DataFrame = Seq(
     variant,                       //should be in the index

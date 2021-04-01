@@ -6,7 +6,6 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}
-import org.kidsfirstdrc.dwh.utils.ClinicalUtils
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
@@ -22,11 +21,14 @@ class Occurrences(studyId: String, releaseId: String, input: String, biospecimen
 
     inputDF.show(false)
 
-    val biospecimens = ClinicalUtils.loadClinicalTable(studyId, releaseId, "biospecimens")
+    val biospecimens =
+      spark.read.parquet(s"${DataService.biospecimens.rootPath}/dataservice/biospecimens/biospecimens_${releaseId.toLowerCase}")
 
-    val participants = ClinicalUtils.loadClinicalTable(studyId, releaseId, "participants")
+    val participants =
+      spark.read.parquet(s"${DataService.participants.rootPath}/dataservice/participants/participants_${releaseId.toLowerCase}")
 
-    val family_relationships = ClinicalUtils.loadClinicalTable(studyId, releaseId, "family_relationships")
+    val family_relationships =
+      spark.read.parquet(s"${DataService.family_relationships.rootPath}/dataservice/family_relationships/family_relationships_${releaseId.toLowerCase}")
 
     Map(
       DataService.participants -> participants,

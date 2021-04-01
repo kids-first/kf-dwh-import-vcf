@@ -8,6 +8,7 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, Es, Public}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
+import org.kidsfirstdrc.dwh.utils.SparkUtils.tableName
 
 import scala.util.{Success, Try}
 
@@ -22,13 +23,12 @@ class GenomicSuggestionsIndexJson(releaseId: String)
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     import spark.implicits._
     val occurrences: DataFrame = spark
-      .table(s"${DataService.studies.database}.${DataService.studies.name}")
-      .select("study_id")
-      .as[String].collect()
-      .map(study_id => Try(spark.table(s"${Clinical.occurrences.database}.${Clinical.occurrences.name}_${study_id.toLowerCase}")))
+      .read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId")
+      .withColumn("study", explode(col("studies"))).select("study").distinct.as[String].collect()
+      .map(studyId =>
+        Try(spark.read.parquet(s"${Clinical.occurrences.rootPath}/occurrences/${tableName("occurrences", studyId, releaseId)}")))
       .collect { case Success(df) => df }
       .reduce( (df1, df2) => df1.unionByName(df2))
-
 
     Map(
       Public.genes -> spark.table(s"${Public.genes.database}.${Public.genes.name}"),

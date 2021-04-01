@@ -58,7 +58,7 @@ class JoinConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
         .saveAsTable("dbnsfp_original")
 
       When("Join Consequences")
-      JoinConsequences.join(Seq(studyId1, studyId2), releaseId, outputDir, mergeWithExisting = true)
+      JoinConsequences.join(Seq(studyId1, studyId2), releaseId, outputDir, mergeWithExisting = true, "variant")
 
       Then("A new table for the release is created")
       val variantReleaseTable = spark.table("variant.consequences_re_abcdef")

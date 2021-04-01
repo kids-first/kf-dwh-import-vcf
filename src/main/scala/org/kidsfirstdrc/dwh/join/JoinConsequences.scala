@@ -2,7 +2,6 @@ package org.kidsfirstdrc.dwh.join
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.utils.SparkUtils
 import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 
@@ -11,7 +10,7 @@ object JoinConsequences {
 
   val TABLE_NAME = "consequences"
 
-  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean, database: String = "variant")(implicit spark: SparkSession): Unit = {
+  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean, database: String)(implicit spark: SparkSession): Unit = {
 
     import spark.implicits._
 
@@ -24,7 +23,6 @@ object JoinConsequences {
           currentDF
             .union(nextDf)
         }
-
     }
 
     val commonColumns = Seq(
@@ -72,7 +70,7 @@ object JoinConsequences {
       mergeConsequences(releaseId, consequences.select(allColumns: _*))
     }
     val joinedWithScores = joinWithDBNSFP(merged)
-    write(releaseId, output, TABLE_NAME, joinedWithScores, Some(30), database)
+    JoinWrite.write(releaseId, output, TABLE_NAME, joinedWithScores, Some(30), database)
 
   }
 

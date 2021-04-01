@@ -1,1 +1,277 @@
-{"chromosome":"2","start":165310406,"reference":"G","alternate":"A","end":165310406,"studies":[{"study_id":"SD_456","consent_codes":["SD_456.c1"],"frequencies":{"hmb":{"ac":5,"an":10,"af":0.500000000000000000,"homozygotes":2,"heterozygotes":3},"gru":{"ac":0,"an":0,"af":0E-18,"homozygotes":0,"heterozygotes":0}}},{"study_id":"SD_123","consent_codes":["SD_123.c1"],"frequencies":{"hmb":{"ac":5,"an":10,"af":0.500000000000000000,"homozygotes":2,"heterozygotes":3},"gru":{"ac":0,"an":0,"af":0E-18,"homozygotes":0,"heterozygotes":0}}},{"study_id":"SD_789","consent_codes":["SD_789.c99"],"frequencies":{"hmb":{"ac":2,"an":7,"af":0.285714285700000000,"homozygotes":5,"heterozygotes":1},"gru":{"ac":2,"an":7,"af":0.285714285700000000,"homozygotes":5,"heterozygotes":1}}}],"frequencies":{"1k_genomes":{"an":20,"ac":10,"af":0.500000000000000000,"homozygotes":10,"heterozygotes":10},"topmed":{"an":20,"ac":10,"af":0.500000000000000000,"homozygotes":10,"heterozygotes":10},"gnomad_genomes_2_1":{"an":20,"ac":10,"af":0.500000000000000000,"homozygotes":10,"heterozygotes":10},"gnomad_exomes_2_1":{"an":20,"ac":10,"af":0.500000000000000000,"homozygotes":10,"heterozygotes":10},"gnomad_genomes_3_0":{"an":20,"ac":10,"af":0.500000000000000000,"homozygotes":10,"heterozygotes":10},"internal":{"hmb":{"ac":12,"an":27,"af":0.444444444400000000,"homozygotes":9,"heterozygotes":7},"gru":{"ac":2,"an":7,"af":0.285714285700000000,"homozygotes":5,"heterozygotes":1}}},"clinvar":{"name":"RCV000436956","clin_sig":"pathogenic"},"dbsnp_id":"rs1234567","release_id":"RE_ABCDEF","consequences":[{"name":"rs1057520413","biotype":"protein_coding","aa_change":"V261M","cds_position":781,"consequences":["missense_variant"],"impact":"MODERATE","amino_acids":{"reference":"V","variant":"M"},"hgvsp":"ENSP00000283256.6:p.Val261Met","feature_type":"Transcript","coding_dna_change":"781G>A","hgvsg":"chr2:g.166166916G>A","symbol":"SCN2A","omim_gene_id":"23234234","exon":{"rank":7,"total":27},"scores":{"predictions":{"sift_converted_rank_score":0.1,"sift_pred":"SIFT_pred","polyphen2_hvar_score":0.2,"polyphen2_hvar_pred":"HVAR_pred","FATHMM_converted_rankscore":"FATHMM_rankscore","fathmm_pred":"FATHMM_pred","cadd_score":"CADD_raw_rankscore","dann_score":"DANN_rankscore","revel_rankscore":0.3,"lrt_converted_rankscore":0.4,"lrt_pred":"LRT_pred"},"conservations":{"phylo_p17way_primate_rankscore":0.5}},"ensembl_gene_id":"ENSG00000136532","ensembl_transcript_id":"ENST00000283256.10","variant_class":"SNV","hgvsc":"ENST00000283256.10:c.781G>A","canonical":true,"protein_position":261,"strand":1,"entrez_gene_id":"12345","codons":{"reference":"GTG","variant":"ATG"},"cdna_position":937},{"name":"rs1057520413","biotype":"protein_coding","aa_change":"V261M","cds_position":781,"consequences":["missense_variant"],"impact":"MODERATE","amino_acids":{"reference":"V","variant":"M"},"hgvsp":"ENSP00000283256.6:p.Val261Met","feature_type":"Transcript","coding_dna_change":"781G>A","hgvsg":"chr2:g.166166916G>A","symbol":"SCN2A","omim_gene_id":"23234234","exon":{"rank":7,"total":27},"scores":{"predictions":{"sift_converted_rank_score":0.1,"sift_pred":"SIFT_pred","polyphen2_hvar_score":0.2,"polyphen2_hvar_pred":"HVAR_pred","FATHMM_converted_rankscore":"FATHMM_rankscore","fathmm_pred":"FATHMM_pred","cadd_score":"CADD_raw_rankscore","dann_score":"DANN_rankscore","revel_rankscore":0.3,"lrt_converted_rankscore":0.4,"lrt_pred":"LRT_pred"},"conservations":{"phylo_p17way_primate_rankscore":0.5}},"ensembl_gene_id":"ENSG00000136531","ensembl_transcript_id":"ENST00000283256.10","variant_class":"SNV","hgvsc":"ENST00000283256.10:c.781G>A","canonical":true,"protein_position":261,"strand":1,"entrez_gene_id":"12345","codons":{"reference":"GTG","variant":"ATG"},"cdna_position":937}]}
+{
+  "genome_build": "GRCh38",
+  "hash": "ba3d35feba14451058e6fc93eeba163c800a8e09",
+  "chromosome": "2",
+  "start": 165310406,
+  "reference": "G",
+  "alternate": "A",
+  "locus": "2-165310406-G-A",
+  "variant_class": "SNV",
+  "studies": [{
+    "study_id": "SD_456",
+    "acls": ["SD_456.c1"],
+    "external_study_ids": ["SD_456"],
+    "frequencies": {
+      "upper_bound_kf": {
+        "ac": 5,
+        "an": 10,
+        "af": 0.500000000000000000,
+        "homozygotes": 2,
+        "heterozygotes": 3
+      },
+      "lower_bound_kf": {
+        "ac": 0,
+        "an": 0,
+        "af": 0E-18,
+        "homozygotes": 0,
+        "heterozygotes": 0
+      }
+    },
+    "participant_number": 5
+  }, {
+    "study_id": "SD_123",
+    "acls": ["SD_123.c1"],
+    "external_study_ids": ["SD_123"],
+    "frequencies": {
+      "upper_bound_kf": {
+        "ac": 5,
+        "an": 10,
+        "af": 0.500000000000000000,
+        "homozygotes": 2,
+        "heterozygotes": 3
+      },
+      "lower_bound_kf": {
+        "ac": 0,
+        "an": 0,
+        "af": 0E-18,
+        "homozygotes": 0,
+        "heterozygotes": 0
+      }
+    },
+    "participant_number": 5
+  }, {
+    "study_id": "SD_789",
+    "acls": ["SD_789.c99"],
+    "external_study_ids": ["SD_789"],
+    "frequencies": {
+      "upper_bound_kf": {
+        "ac": 2,
+        "an": 7,
+        "af": 0.285714285700000000,
+        "homozygotes": 5,
+        "heterozygotes": 1
+      },
+      "lower_bound_kf": {
+        "ac": 2,
+        "an": 7,
+        "af": 0.285714285700000000,
+        "homozygotes": 5,
+        "heterozygotes": 1
+      }
+    },
+    "participant_number": 6
+  }],
+  "participant_number": 16,
+  "acls": ["SD_456.c1", "SD_123.c1", "SD_789.c99"],
+  "external_study_ids": ["SD_456", "SD_123", "SD_789"],
+  "frequencies": {
+    "one_thousand_genomes": {
+      "ac": 10,
+      "an": 20,
+      "af": 0.500000000000000000
+    },
+    "topmed": {
+      "ac": 10,
+      "an": 20,
+      "af": 0.500000000000000000,
+      "heterozygotes": 10,
+      "homozygotes": 10
+    },
+    "gnomad_genomes_2_1": {
+      "ac": 10,
+      "an": 20,
+      "af": 0.500000000000000000,
+      "homozygotes": 10
+    },
+    "gnomad_exomes_2_1": {
+      "ac": 10,
+      "an": 20,
+      "af": 0.500000000000000000,
+      "homozygotes": 10
+    },
+    "gnomad_genomes_3_0": {
+      "ac": 10,
+      "an": 20,
+      "af": 0.500000000000000000,
+      "homozygotes": 10
+    },
+    "internal": {
+      "upper_bound_kf": {
+        "ac": 12,
+        "an": 27,
+        "af": 0.444444444400000000,
+        "homozygotes": 9,
+        "heterozygotes": 7
+      },
+      "lower_bound_kf": {
+        "ac": 12,
+        "an": 27,
+        "af": 0.444444444400000000,
+        "homozygotes": 9,
+        "heterozygotes": 7
+      }
+    }
+  },
+  "clinvar": {
+    "clinvar_id": "257668",
+    "clin_sig": ["Benign"],
+    "conditions": ["Congenital myasthenic syndrome 12", "not specified", "not provided"],
+    "inheritance": ["germline"],
+    "interpretations": ["Benign"]
+  },
+  "rsnumber": "rs1234567",
+  "release_id": "RE_ABCDEF",
+  "consequences": [{
+    "biotype": "protein_coding",
+    "aa_change": "V108M",
+    "cds_position": 322,
+    "predictions": {
+      "sift_converted_rankscore": 0.91255,
+      "sift_score": 0.91255,
+      "sift_pred": "D",
+      "polyphen2_hvar_rankscore": 0.97372,
+      "polyphen2_hvar_score": 0.91255,
+      "polyphen2_hvar_pred": "D",
+      "fathmm_converted_rankscore": 0.98611,
+      "fathmm_pred": "D",
+      "cadd_rankscore": 0.76643,
+      "dann_rankscore": 0.95813,
+      "dann_score": 0.9988206585102238,
+      "revel_rankscore": 0.98972,
+      "lrt_converted_rankscore": 0.62929,
+      "lrt_pred": "D"
+    },
+    "impact_score": 3,
+    "consequences": ["missense_variant"],
+    "amino_acids": {
+      "reference": "V",
+      "variant": "M"
+    },
+    "hgvsp": "ENSP00000487466.1:p.Val108Met",
+    "feature_type": "Transcript",
+    "coding_dna_change": "322G>A",
+    "symbol": "SCN2A",
+    "exon": {
+      "rank": 4,
+      "total": 4
+    },
+    "ensembl_gene_id": "ENSG00000189337",
+    "ensembl_regulatory_id": "ENSR0000636134",
+    "conservations": {
+      "phylo_p17way_primate_rankscore": 0.7674
+    },
+    "ensembl_transcript_id": "ENST00000636203",
+    "hgvsc": "ENST00000486878.2:c.322G>A",
+    "canonical": false,
+    "intron": {
+      "rank": 2,
+      "total": 10
+    },
+    "protein_position": 108,
+    "strand": 1,
+    "vep_impact": "MODERATE",
+    "codons": {
+      "reference": "Gtg",
+      "variant": "Atg"
+    },
+    "cdna_position": 322
+  }, {
+    "biotype": "protein_coding",
+    "aa_change": "V108M",
+    "cds_position": 322,
+    "predictions": {
+      "sift_converted_rankscore": 0.91255,
+      "sift_score": 0.91255,
+      "sift_pred": "D",
+      "polyphen2_hvar_rankscore": 0.97372,
+      "polyphen2_hvar_score": 0.91255,
+      "polyphen2_hvar_pred": "D",
+      "fathmm_converted_rankscore": 0.98611,
+      "fathmm_pred": "D",
+      "cadd_rankscore": 0.76643,
+      "dann_rankscore": 0.95813,
+      "dann_score": 0.9988206585102238,
+      "revel_rankscore": 0.98972,
+      "lrt_converted_rankscore": 0.62929,
+      "lrt_pred": "D"
+    },
+    "impact_score": 3,
+    "consequences": ["missense_variant"],
+    "amino_acids": {
+      "reference": "V",
+      "variant": "M"
+    },
+    "hgvsp": "ENSP00000487466.1:p.Val108Met",
+    "feature_type": "Transcript",
+    "coding_dna_change": "322G>A",
+    "symbol": "SCN2A",
+    "exon": {
+      "rank": 4,
+      "total": 4
+    },
+    "ensembl_gene_id": "ENSG00000189337",
+    "ensembl_regulatory_id": "ENSR0000636135",
+    "conservations": {
+      "phylo_p17way_primate_rankscore": 0.7674
+    },
+    "ensembl_transcript_id": "ENST00000636564",
+    "hgvsc": "ENST00000486878.2:c.322G>A",
+    "canonical": false,
+    "intron": {
+      "rank": 2,
+      "total": 10
+    },
+    "protein_position": 108,
+    "strand": 1,
+    "vep_impact": "MODERATE",
+    "codons": {
+      "reference": "Gtg",
+      "variant": "Atg"
+    },
+    "cdna_position": 322
+  }],
+  "impact_score": 3,
+  "genes": [{
+    "symbol": "SCN2A",
+    "entrez_gene_id": 777,
+    "omim_gene_id": "601013",
+    "hgnc": "HGNC:1392",
+    "ensembl_gene_id": "ENSG00000189337",
+    "location": "1q25.3",
+    "name": "calcium voltage-gated channel subunit alpha1 E",
+    "alias": ["BII", "CACH6", "CACNL1A6", "Cav2.3", "EIEE69", "gm139"],
+    "orphanet": [{
+      "disorder_id": 17827,
+      "panel": "Immunodeficiency due to a classical component pathway complement deficiency",
+      "inheritance": ["Autosomal recessive"]
+    }],
+    "hpo": [{
+      "hpo_term_id": "HP:0001347",
+      "hpo_term_name": "Hyperreflexia",
+      "hpo_term_label": "Hyperreflexia (HP:0001347)"
+    }],
+    "omim": [{
+      "name": "Epileptic encephalopathy, early infantile, 69",
+      "omim_id": "618285",
+      "inheritance": ["AD"]
+    }],
+    "ddd": [{
+      "disease_name": "OCULOAURICULAR SYNDROME"
+    }],
+    "cosmic": [{
+      "tumour_types_germline": ["breast", "colon", "endometrial cancer under age 50"]
+    }]
+  }],
+  "hgvsg": "chr2:g.166166916G>A",
+  "participant_ids": ["PT_000002", "PT_000003"]
+}

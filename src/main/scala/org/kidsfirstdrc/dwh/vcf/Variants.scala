@@ -3,17 +3,25 @@ package org.kidsfirstdrc.dwh.vcf
 import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.Clinical
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Raw}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class Variants(studyId: String, releaseId: String)(implicit conf: Configuration)
+class Variants(studyId: String, releaseId: String, schema: String)(implicit conf: Configuration)
   extends ETL(Clinical.variants){
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+    val participantsPath = Raw.all_participants.location
+    val occurrencesPath = s"${Clinical.occurrences.rootPath}/occurrences/${tableName(Clinical.occurrences.name, studyId, releaseId)}"
+
+    println(s"participantsPath: ${participantsPath}")
+    println(s"occurrencesPath: ${occurrencesPath}")
     Map(
-      Clinical.occurrences -> spark.table(tableName(Clinical.occurrences.name, studyId, releaseId))
+      Raw.all_participants ->
+        spark.read.json(participantsPath),
+      Clinical.occurrences ->
+        spark.read.parquet(occurrencesPath)
     )
   }
 
@@ -25,7 +33,17 @@ class Variants(studyId: String, releaseId: String)(implicit conf: Configuration)
 
   override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    data(Clinical.occurrences)
+
+    val participants = data(Raw.all_participants).select($"id" as "participant_id")
+
+    val occurrences: DataFrame = schema match {
+      case "portal" => data(Clinical.occurrences).join(broadcast(participants), Seq("participant_id"), "inner")
+      case _ => data(Clinical.occurrences)
+    }
+
+    val participantTotalCount = occurrences.select("participant_id").distinct().repartition(200).count()
+
+    occurrences
       .select(
         $"chromosome",
         $"start",
@@ -35,7 +53,7 @@ class Variants(studyId: String, releaseId: String)(implicit conf: Configuration)
         $"name",
         $"zygosity",
         calculated_ac,
-        calculate_an,
+        calculate_an_lower_bound_kf,
         homozygotes,
         heterozygotes,
         $"is_gru",
@@ -47,14 +65,32 @@ class Variants(studyId: String, releaseId: String)(implicit conf: Configuration)
       .groupBy(locus: _*)
       .agg(
         firstAs("name"),
-        firstAs("hgvsg") +:
-          firstAs("end") +:
-          firstAs("variant_class") +:
-          collect_set($"dbgap_consent_code").as("consent_codes") +:
-          (freqByDuoCode("hmb") ++ freqByDuoCode("gru")) :_*
+        firstAs("hgvsg"),
+        firstAs("end"),
+        firstAs("variant_class"),
+        collect_set($"dbgap_consent_code").as("consent_codes"),
+        sum(col("ac")) as "ac",
+        sum(col("an_lower_bound_kf")) as "an_lower_bound_kf",
+        sum(col("homozygotes")) as "homozygotes",
+        sum(col("heterozygotes")) as "heterozygotes"
       )
-      .withColumn("hmb_af", calculated_duo_af("hmb"))
-      .withColumn("gru_af", calculated_duo_af("gru"))
+      .withColumn("an_upper_bound_kf", calculate_an_upper_bound_kf(participantTotalCount))
+      .withColumn("frequencies", struct(
+        struct(
+          col("ac"),
+          col("an_upper_bound_kf") as "an",
+          calculated_af_from_an(col("an_upper_bound_kf")) as "af",
+          col("homozygotes"),
+          col("heterozygotes")
+      ) as "upper_bound_kf",
+        struct(
+          col("ac"),
+          col("an_lower_bound_kf") as "an",
+          calculated_af_from_an(col("an_lower_bound_kf")) as "af",
+          col("homozygotes"),
+          col("heterozygotes")
+      ) as "lower_bound_kf"))
+      .drop("an", "ac", "af", "heterozygotes", "homozygotes", "an_upper_bound_kf", "an_lower_bound_kf")
       .withColumn("study_id", lit(studyId))
       .withColumn("release_id", lit(releaseId))
       .withColumn("consent_codes_by_study", map($"study_id", $"consent_codes"))
@@ -68,16 +104,7 @@ class Variants(studyId: String, releaseId: String)(implicit conf: Configuration)
       .partitionBy("study_id", "release_id", "chromosome")
       .format("parquet")
       .option("path", s"${destination.rootPath}/${destination.name}/$tableVariants")
-      .saveAsTable(tableVariants)
+      .saveAsTable(s"$schema.$tableVariants")
     data
-  }
-
-  def freqByDuoCode(duo: String): Seq[Column] = {
-    Seq(
-      sum(when(col(s"is_$duo"), col("ac")).otherwise(0)) as s"${duo}_ac",
-      sum(when(col(s"is_$duo"), col("an")).otherwise(0)) as s"${duo}_an",
-      sum(when(col(s"is_$duo"), col("homozygotes")).otherwise(0)) as s"${duo}_homozygotes",
-      sum(when(col(s"is_$duo"), col("heterozygotes")).otherwise(0)) as s"${duo}_heterozygotes"
-    )
   }
 }

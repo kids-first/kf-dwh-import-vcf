@@ -3,7 +3,6 @@ package org.kidsfirstdrc.dwh.join
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Clinical
-import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.{calculated_duo_af, locusColumNames}
@@ -11,7 +10,7 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 
 object JoinVariants {
 
-  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean = true, database: String = "variant")(implicit spark: SparkSession): Unit = {
+  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean, database: String)(implicit spark: SparkSession): Unit = {
 
     import spark.implicits._
 
@@ -19,17 +18,26 @@ object JoinVariants {
       (currentDF, studyId) =>
         val nextDf = spark.table(SparkUtils.tableName(Clinical.variants.name, studyId, releaseId, database))
           .withColumn("studies", array($"study_id"))
-          .withColumn("hmb_ac_by_study", map($"study_id", $"hmb_ac"))
-          .withColumn("hmb_an_by_study", map($"study_id", $"hmb_an"))
-          .withColumn("hmb_af_by_study", map($"study_id", $"hmb_af"))
-          .withColumn("hmb_homozygotes_by_study", map($"study_id", $"hmb_homozygotes"))
-          .withColumn("hmb_heterozygotes_by_study", map($"study_id", $"hmb_heterozygotes"))
-          .withColumn("gru_ac_by_study", map($"study_id", $"gru_ac"))
-          .withColumn("gru_an_by_study", map($"study_id", $"gru_an"))
-          .withColumn("gru_af_by_study", map($"study_id", $"gru_af"))
-          .withColumn("gru_homozygotes_by_study", map($"study_id", $"gru_homozygotes"))
-          .withColumn("gru_heterozygotes_by_study", map($"study_id", $"gru_heterozygotes"))
-        //.withColumn("freqs", struct($"an", $"ac", $"af", $"homozygotes", $"heterozygotes"))
+          .withColumn("upper_bound_kf_ac", $"frequencies.upper_bound_kf.ac")
+          .withColumn("upper_bound_kf_an", $"frequencies.upper_bound_kf.an")
+          .withColumn("upper_bound_kf_af", $"frequencies.upper_bound_kf.af")
+          .withColumn("upper_bound_kf_homozygotes", $"frequencies.upper_bound_kf.homozygotes")
+          .withColumn("upper_bound_kf_heterozygotes", $"frequencies.upper_bound_kf.heterozygotes")
+          .withColumn("lower_bound_kf_ac", $"frequencies.lower_bound_kf.ac")
+          .withColumn("lower_bound_kf_an", $"frequencies.lower_bound_kf.an")
+          .withColumn("lower_bound_kf_af", $"frequencies.lower_bound_kf.af")
+          .withColumn("lower_bound_kf_homozygotes", $"frequencies.lower_bound_kf.homozygotes")
+          .withColumn("lower_bound_kf_heterozygotes", $"frequencies.lower_bound_kf.heterozygotes")
+          .withColumn("upper_bound_kf_ac_by_study", map($"study_id", $"frequencies.upper_bound_kf.ac"))
+          .withColumn("upper_bound_kf_an_by_study", map($"study_id", $"frequencies.upper_bound_kf.an"))
+          .withColumn("upper_bound_kf_af_by_study", map($"study_id", $"frequencies.upper_bound_kf.af"))
+          .withColumn("upper_bound_kf_homozygotes_by_study", map($"study_id", $"frequencies.upper_bound_kf.homozygotes"))
+          .withColumn("upper_bound_kf_heterozygotes_by_study", map($"study_id", $"frequencies.upper_bound_kf.heterozygotes"))
+          .withColumn("lower_bound_kf_ac_by_study", map($"study_id", $"frequencies.lower_bound_kf.ac"))
+          .withColumn("lower_bound_kf_an_by_study", map($"study_id", $"frequencies.lower_bound_kf.an"))
+          .withColumn("lower_bound_kf_af_by_study", map($"study_id", $"frequencies.lower_bound_kf.af"))
+          .withColumn("lower_bound_kf_homozygotes_by_study", map($"study_id", $"frequencies.lower_bound_kf.homozygotes"))
+          .withColumn("lower_bound_kf_heterozygotes_by_study", map($"study_id", $"frequencies.lower_bound_kf.heterozygotes"))
         if (currentDF.isEmpty)
           nextDf
         else {
@@ -40,38 +48,68 @@ object JoinVariants {
     }
 
     val commonColumns = Seq($"chromosome", $"start", $"reference", $"alternate", $"end", $"name", $"hgvsg", $"variant_class",
-      $"release_id", $"hmb_ac_by_study", $"hmb_an_by_study", $"hmb_af_by_study", $"hmb_homozygotes_by_study",
-      $"hmb_heterozygotes_by_study", $"gru_ac_by_study", $"gru_an_by_study", $"gru_af_by_study", $"gru_homozygotes_by_study",
-      $"gru_heterozygotes_by_study", $"studies", $"consent_codes", $"consent_codes_by_study"
+      $"release_id",
+      $"lower_bound_kf_ac_by_study",
+      $"lower_bound_kf_an_by_study",
+      $"lower_bound_kf_af_by_study",
+      $"lower_bound_kf_homozygotes_by_study",
+      $"lower_bound_kf_heterozygotes_by_study",
+      $"upper_bound_kf_ac_by_study",
+      $"upper_bound_kf_an_by_study",
+      $"upper_bound_kf_af_by_study",
+      $"upper_bound_kf_homozygotes_by_study",
+      $"upper_bound_kf_heterozygotes_by_study",
+      $"lower_bound_kf_ac",
+      $"lower_bound_kf_an",
+      $"lower_bound_kf_af",
+      $"lower_bound_kf_homozygotes",
+      $"lower_bound_kf_heterozygotes",
+      $"upper_bound_kf_ac",
+      $"upper_bound_kf_an",
+      $"upper_bound_kf_af",
+      $"upper_bound_kf_homozygotes",
+      $"upper_bound_kf_heterozygotes",
+
+      $"studies", $"consent_codes", $"consent_codes_by_study"
     )
 
     val allColumns = commonColumns :+
-      $"hmb_ac" :+ $"hmb_an" :+ $"hmb_homozygotes" :+ $"hmb_heterozygotes" :+
-      $"gru_ac" :+ $"gru_an" :+ $"gru_homozygotes" :+ $"gru_heterozygotes" :+
       $"study_id"
 
-    val merged = if (mergeWithExisting && spark.catalog.tableExists(Clinical.variants.name)) {
+    val merged = if (mergeWithExisting && spark.catalog.tableExists(s"${database}.${Clinical.variants.name}")) {
       val existingColumns = commonColumns :+ explode($"studies").as("study_id")
-      val existingVariants = spark.table(Clinical.variants.name)
+      val existingVariants = spark.table(s"${database}.${Clinical.variants.name}")
+        .withColumn("upper_bound_kf_ac", $"frequencies.upper_bound_kf.ac")
+        .withColumn("upper_bound_kf_an", $"frequencies.upper_bound_kf.an")
+        .withColumn("upper_bound_kf_af", $"frequencies.upper_bound_kf.af")
+        .withColumn("upper_bound_kf_homozygotes", $"frequencies.upper_bound_kf.homozygotes")
+        .withColumn("upper_bound_kf_heterozygotes", $"frequencies.upper_bound_kf.heterozygotes")
+        .withColumn("lower_bound_kf_ac", $"frequencies.lower_bound_kf.ac")
+        .withColumn("lower_bound_kf_an", $"frequencies.lower_bound_kf.an")
+        .withColumn("lower_bound_kf_af", $"frequencies.lower_bound_kf.af")
+        .withColumn("lower_bound_kf_homozygotes", $"frequencies.lower_bound_kf.homozygotes")
+        .withColumn("lower_bound_kf_heterozygotes", $"frequencies.lower_bound_kf.heterozygotes")
         .select(existingColumns: _*)
-        .withColumn("hmb_ac", $"hmb_ac_by_study"($"study_id"))
-        .withColumn("hmb_ac_by_study", map($"study_id", $"hmb_ac"))
-        .withColumn("hmb_an", $"hmb_an_by_study"($"study_id"))
-        .withColumn("hmb_an_by_study", map($"study_id", $"hmb_an"))
-        .withColumn("hmb_af_by_study", map($"study_id", $"hmb_af_by_study"($"study_id")))
-        .withColumn("hmb_homozygotes", $"hmb_homozygotes_by_study"($"study_id"))
-        .withColumn("hmb_homozygotes_by_study", map($"study_id", $"hmb_homozygotes"))
-        .withColumn("hmb_heterozygotes", $"hmb_heterozygotes_by_study"($"study_id"))
-        .withColumn("hmb_heterozygotes_by_study", map($"study_id", $"hmb_heterozygotes"))
-        .withColumn("gru_ac", $"gru_ac_by_study"($"study_id"))
-        .withColumn("gru_ac_by_study", map($"study_id", $"gru_ac"))
-        .withColumn("gru_an", $"gru_an_by_study"($"study_id"))
-        .withColumn("gru_an_by_study", map($"study_id", $"gru_an"))
-        .withColumn("gru_af_by_study", map($"study_id", $"gru_af_by_study"($"study_id")))
-        .withColumn("gru_homozygotes", $"gru_homozygotes_by_study"($"study_id"))
-        .withColumn("gru_homozygotes_by_study", map($"study_id", $"gru_homozygotes"))
-        .withColumn("gru_heterozygotes", $"gru_heterozygotes_by_study"($"study_id"))
-        .withColumn("gru_heterozygotes_by_study", map($"study_id", $"gru_heterozygotes"))
+        .withColumn("lower_bound_kf_ac", $"lower_bound_kf_ac_by_study"($"study_id"))
+        .withColumn("lower_bound_kf_ac_by_study", map($"study_id", $"lower_bound_kf_ac"))
+        .withColumn("lower_bound_kf_an", $"lower_bound_kf_an_by_study"($"study_id"))
+        .withColumn("lower_bound_kf_an_by_study", map($"study_id", $"lower_bound_kf_an"))
+        .withColumn("lower_bound_kf_af_by_study", map($"study_id", $"lower_bound_kf_af_by_study"($"study_id")))
+        .withColumn("lower_bound_kf_homozygotes", $"lower_bound_kf_homozygotes_by_study"($"study_id"))
+        .withColumn("lower_bound_kf_homozygotes_by_study", map($"study_id", $"lower_bound_kf_homozygotes"))
+        .withColumn("lower_bound_kf_heterozygotes", $"lower_bound_kf_heterozygotes_by_study"($"study_id"))
+        .withColumn("lower_bound_kf_heterozygotes_by_study", map($"study_id", $"lower_bound_kf_heterozygotes"))
+
+        .withColumn("upper_bound_kf_ac", $"upper_bound_kf_ac_by_study"($"study_id"))
+        .withColumn("upper_bound_kf_ac_by_study", map($"study_id", $"upper_bound_kf_ac"))
+        .withColumn("upper_bound_kf_an", $"upper_bound_kf_an_by_study"($"study_id"))
+        .withColumn("upper_bound_kf_an_by_study", map($"study_id", $"upper_bound_kf_an"))
+        .withColumn("upper_bound_kf_af_by_study", map($"study_id", $"upper_bound_kf_af_by_study"($"study_id")))
+        .withColumn("upper_bound_kf_homozygotes", $"upper_bound_kf_homozygotes_by_study"($"study_id"))
+        .withColumn("upper_bound_kf_homozygotes_by_study", map($"study_id", $"upper_bound_kf_homozygotes"))
+        .withColumn("upper_bound_kf_heterozygotes", $"upper_bound_kf_heterozygotes_by_study"($"study_id"))
+        .withColumn("upper_bound_kf_heterozygotes_by_study", map($"study_id", $"upper_bound_kf_heterozygotes"))
+
         .withColumn("consent_codes", $"consent_codes_by_study"($"study_id"))
         .withColumn("consent_codes_by_study", map($"study_id", $"consent_codes"))
         .where(not($"study_id".isin(studyIds: _*)))
@@ -88,7 +126,7 @@ object JoinVariants {
     val joinedWithClinvar = joinWithClinvar(joinedWithPop)
     val joinedWithDBSNP = joinWithDBSNP(joinedWithClinvar)
 
-    write(releaseId, output, Clinical.variants.name, joinedWithDBSNP, Some(60), database)
+    JoinWrite.write(releaseId, output, Clinical.variants.name, joinedWithDBSNP, Some(60), database)
 
   }
 
@@ -105,31 +143,51 @@ object JoinVariants {
         firstAs("hgvsg"),
         firstAs("variant_class"),
 
-        sum("hmb_ac") as "hmb_ac",
-        map_from_entries(collect_list(struct($"study_id", $"hmb_ac"))) as "hmb_ac_by_study",
-        sum("hmb_an") as "hmb_an",
-        map_from_entries(collect_list(struct($"study_id", $"hmb_an"))) as "hmb_an_by_study",
-        map_from_entries(collect_list(struct($"study_id", calculated_duo_af("hmb")))) as "hmb_af_by_study",
-        sum("hmb_homozygotes") as "hmb_homozygotes",
-        map_from_entries(collect_list(struct($"study_id", $"hmb_homozygotes"))) as "hmb_homozygotes_by_study",
-        sum("hmb_heterozygotes") as "hmb_heterozygotes",
-        map_from_entries(collect_list(struct($"study_id", $"hmb_heterozygotes"))) as "hmb_heterozygotes_by_study",
-        sum("gru_ac") as "gru_ac",
-        map_from_entries(collect_list(struct($"study_id", $"gru_ac"))) as "gru_ac_by_study",
-        sum("gru_an") as "gru_an",
-        map_from_entries(collect_list(struct($"study_id", $"gru_an"))) as "gru_an_by_study",
-        map_from_entries(collect_list(struct($"study_id", calculated_duo_af("gru")))) as "gru_af_by_study",
-        sum("gru_homozygotes") as "gru_homozygotes",
-        map_from_entries(collect_list(struct($"study_id", $"gru_homozygotes"))) as "gru_homozygotes_by_study",
-        sum("gru_heterozygotes") as "gru_heterozygotes",
-        map_from_entries(collect_list(struct($"study_id", $"gru_heterozygotes"))) as "gru_heterozygotes_by_study",
+        sum("lower_bound_kf_ac") as "lower_bound_kf_ac",
+        map_from_entries(collect_list(struct($"study_id", $"lower_bound_kf_ac"))) as "lower_bound_kf_ac_by_study",
+        sum("lower_bound_kf_an") as "lower_bound_kf_an",
+        map_from_entries(collect_list(struct($"study_id", $"lower_bound_kf_an"))) as "lower_bound_kf_an_by_study",
+        map_from_entries(collect_list(struct($"study_id", calculated_duo_af("lower_bound_kf")))) as "lower_bound_kf_af_by_study",
+        sum("lower_bound_kf_homozygotes") as "lower_bound_kf_homozygotes",
+        map_from_entries(collect_list(struct($"study_id", $"lower_bound_kf_homozygotes"))) as "lower_bound_kf_homozygotes_by_study",
+        sum("lower_bound_kf_heterozygotes") as "lower_bound_kf_heterozygotes",
+        map_from_entries(collect_list(struct($"study_id", $"lower_bound_kf_heterozygotes"))) as "lower_bound_kf_heterozygotes_by_study",
+
+        sum("upper_bound_kf_ac") as "upper_bound_kf_ac",
+        map_from_entries(collect_list(struct($"study_id", $"upper_bound_kf_ac"))) as "upper_bound_kf_ac_by_study",
+        sum("upper_bound_kf_an") as "upper_bound_kf_an",
+        map_from_entries(collect_list(struct($"study_id", $"upper_bound_kf_an"))) as "upper_bound_kf_an_by_study",
+        map_from_entries(collect_list(struct($"study_id", calculated_duo_af("upper_bound_kf")))) as "upper_bound_kf_af_by_study",
+        sum("upper_bound_kf_homozygotes") as "upper_bound_kf_homozygotes",
+        map_from_entries(collect_list(struct($"study_id", $"upper_bound_kf_homozygotes"))) as "upper_bound_kf_homozygotes_by_study",
+        sum("upper_bound_kf_heterozygotes") as "upper_bound_kf_heterozygotes",
+        map_from_entries(collect_list(struct($"study_id", $"upper_bound_kf_heterozygotes"))) as "upper_bound_kf_heterozygotes_by_study",
+
+
         collect_list($"study_id") as "studies",
         array_distinct(flatten(collect_list($"consent_codes"))) as "consent_codes",
         map_from_entries(collect_list(struct($"study_id", $"consent_codes"))) as "consent_codes_by_study",
         lit(releaseId) as "release_id"
       )
-      .withColumn("hmb_af", calculated_duo_af("hmb"))
-      .withColumn("gru_af", calculated_duo_af("gru"))
+      .withColumn("upper_bound_kf_af", calculated_duo_af("upper_bound_kf"))
+      .withColumn("lower_bound_kf_af", calculated_duo_af("lower_bound_kf"))
+      .withColumn("frequencies", struct(
+        struct(
+          col("upper_bound_kf_an") as "an",
+          col("upper_bound_kf_ac") as "ac",
+          col("upper_bound_kf_af") as "af",
+          col("upper_bound_kf_homozygotes") as "homozygotes",
+          col("upper_bound_kf_heterozygotes") as "heterozygotes") as "upper_bound_kf",
+        struct(
+          col("lower_bound_kf_an") as "an",
+          col("lower_bound_kf_ac") as "ac",
+          col("lower_bound_kf_af") as "af",
+          col("lower_bound_kf_homozygotes") as "homozygotes",
+          col("lower_bound_kf_heterozygotes") as "heterozygotes") as "lower_bound_kf"
+      ))
+      .drop("lower_bound_kf_an", "lower_bound_kf_ac", "lower_bound_kf_af", "lower_bound_kf_homozygotes", "lower_bound_kf_heterozygotes")
+      .drop("upper_bound_kf_an", "upper_bound_kf_ac", "upper_bound_kf_af", "upper_bound_kf_homozygotes", "upper_bound_kf_heterozygotes")
+
     t
 
   }
@@ -137,15 +195,15 @@ object JoinVariants {
   def joinWithPopulations(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
     //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
     import spark.implicits._
-    val genomes = spark.table("1000_genomes").dropDuplicates(locusColumNames)
+    val genomes = spark.table("variant.1000_genomes").dropDuplicates(locusColumNames)
       .selectLocus($"ac", $"an", $"af")
-    val topmed = spark.table("topmed_bravo").dropDuplicates(locusColumNames)
+    val topmed = spark.table("variant.topmed_bravo").dropDuplicates(locusColumNames)
       .selectLocus($"ac", $"an", $"af", $"homozygotes", $"heterozygotes")
-    val gnomad_genomes_2_1 = spark.table("gnomad_genomes_2_1_1_liftover_grch38").dropDuplicates(locusColumNames)
+    val gnomad_genomes_2_1 = spark.table("variant.gnomad_genomes_2_1_1_liftover_grch38").dropDuplicates(locusColumNames)
       .selectLocus($"ac", $"an", $"af", $"hom")
-    val gnomad_exomes_2_1 = spark.table("gnomad_exomes_2_1_1_liftover_grch38").dropDuplicates(locusColumNames)
+    val gnomad_exomes_2_1 = spark.table("variant.gnomad_exomes_2_1_1_liftover_grch38").dropDuplicates(locusColumNames)
       .selectLocus($"ac", $"an", $"af", $"hom")
-    val gnomad_genomes_3_0 = spark.table("gnomad_genomes_3_0").dropDuplicates(locusColumNames)
+    val gnomad_genomes_3_0 = spark.table("variant.gnomad_genomes_3_0").dropDuplicates(locusColumNames)
       .selectLocus($"ac", $"an", $"af", $"hom")
 
     variants
@@ -158,7 +216,7 @@ object JoinVariants {
 
   def joinWithClinvar(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
     //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
-    val clinvar = spark.table("clinvar").dropDuplicates(locusColumNames)
+    val clinvar = spark.table("variant.clinvar").dropDuplicates(locusColumNames)
     variants
       .joinByLocus(clinvar, "left")
       .select(variants("*"), clinvar("name") as "clinvar_id", clinvar("clin_sig") as "clin_sig")
@@ -166,7 +224,7 @@ object JoinVariants {
 
   def joinWithDBSNP(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
     //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
-    val dbsnp = spark.table("dbsnp").dropDuplicates(locusColumNames)
+    val dbsnp = spark.table("variant.dbsnp").dropDuplicates(locusColumNames)
     variants
       .joinByLocus(dbsnp, "left")
       .select(variants("*"), dbsnp("name") as "dbsnp_id")

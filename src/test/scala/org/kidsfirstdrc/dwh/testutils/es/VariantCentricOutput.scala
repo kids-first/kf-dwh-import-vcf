@@ -11,7 +11,8 @@ object VariantCentricOutput {
                               af: BigDecimal = 0.5,
                               homozygotes: Long = 10)
 
-  case class StudyFrequency(hmb: Freq, gru: Freq)
+  case class StudyFrequency(upper_bound_kf: Freq,
+                            lower_bound_kf: Freq)
 
   case class Study(study_id: String,
                    acls: List[String],
@@ -19,9 +20,9 @@ object VariantCentricOutput {
                    frequencies: StudyFrequency,
                    participant_number: Long)
 
-  case class InternalFrequencies(combined: Freq = Freq(34, 14, 0.411764705882352900, 14, 8),
-                                 hmb: Freq = Freq(27, 12, 0.444444444400000000, 9, 7),
-                                 gru: Freq = Freq(7, 2, 0.285714285700000000, 5, 1))
+  case class InternalFrequencies(upper_bound_kf: Freq = Freq(27, 12, 0.4444444444, 9, 7),
+                                 lower_bound_kf: Freq = Freq(27, 12, 0.4444444444, 9, 7))
+
 
   case class Frequencies(one_thousand_genomes: OneThousandGenomesFreq = OneThousandGenomesFreq(),
                          topmed: Freq = Freq(),
@@ -29,6 +30,7 @@ object VariantCentricOutput {
                          gnomad_exomes_2_1: GnomadFreqOutput = GnomadFreqOutput(),
                          gnomad_genomes_3_0: GnomadFreqOutput = GnomadFreqOutput(),
                          internal: InternalFrequencies = InternalFrequencies())
+                         //internal: Freq = Freq(34, 14, 0.411764705882352900, 14, 8))
 
   case class CLINVAR(`clinvar_id`: String = "257668",
                      `clin_sig`: List[String] = List("Benign"),
@@ -39,13 +41,13 @@ object VariantCentricOutput {
   case class ScoreConservations(phylo_p17way_primate_rankscore: Double)
 
   case class ScorePredictions(sift_converted_rankscore: Option[Double] = Some(0.91255),
-                              sift_score: Option[Double] = None,
-                              sift_pred: Option[String] = None,
+                              sift_score: Option[Double] = Some(0.91255),
+                              sift_pred: Option[String] = Some("D"),
                               polyphen2_hvar_rankscore: Option[Double] = Some(0.97372),
-                              polyphen2_hvar_score: Option[Double] = None,
-                              polyphen2_hvar_pred: Option[String] = None,
+                              polyphen2_hvar_score: Option[Double] = Some(0.91255),
+                              polyphen2_hvar_pred: Option[String] = Some("D"),
                               fathmm_converted_rankscore: Option[Double] = Some(0.98611),
-                              fathmm_pred: Option[String] = None,
+                              fathmm_pred: Option[String] = Some("D"),
                               cadd_rankscore: Option[Double] = Some(0.76643),
                               dann_rankscore: Option[Double] = Some(0.95813),
                               dann_score: Option[Double] = Some(0.9988206585102238),
@@ -56,7 +58,7 @@ object VariantCentricOutput {
   case class Consequence(vep_impact: String = "MODERATE", // index true
                          symbol: String, // index false
                          ensembl_transcript_id: Option[String] = Some("ENST00000283256.10"), //index false
-                         ensembl_regulatory_id: Option[String] = None, //index false
+                         ensembl_regulatory_id: Option[String] = Some("ENSR0000636135"), //index false
                          hgvsc: Option[String] = Some("ENST00000283256.10:c.781G>A"),
                          hgvsp: Option[String] = Some("ENSP00000283256.6:p.Val261Met"),
                          feature_type: String = "Transcript",
@@ -64,7 +66,7 @@ object VariantCentricOutput {
                          biotype: Option[String] = Some("protein_coding"), // index true
                          strand: Int = 1, // index true
                          exon: Option[Exon] = Some(Exon(Some(7), Some(27))),
-                         intron: Option[Intron] = None,
+                         intron: Option[Intron] = Some(Intron(2, 10)),
                          cdna_position: Option[Int] = Some(937),
                          cds_position: Option[Int] = Some(781),
                          amino_acids: Option[RefAlt] = Some(RefAlt("V", "M")),
@@ -102,7 +104,7 @@ object VariantCentricOutput {
                     `locus`: String = "2-165310406-G-A", //index false
                     `variant_class`: String = "SNV", // index true
                     `studies`: List[Study] = List(), //index true
-                    `participant_number`: Long = 22, //index true
+                    `participant_number`: Long = 16, //index true
                     `acls`: List[String] = List("SD_456.c1", "SD_123.c1", "SD_789.c99"), //index true
                     `external_study_ids`: List[String] = List("SD_456", "SD_123", "SD_789"), //index true
                     `frequencies`: Frequencies = Frequencies(), //index true
@@ -110,6 +112,7 @@ object VariantCentricOutput {
                     `rsnumber`: String = "rs1234567", //index false
                     `release_id`: String = "RE_ABCDEF", //index false
                     `consequences`: List[Consequence] = List(),
+                    `impact_score`: Int = 3,
                     `hgvsg`: Option[String] = Some("chr2:g.166166916G>A"), //index false
                     `genes`: List[GENES] = List(GENES()),
                     `participant_ids`: List[String] = List("PT_000003"))

@@ -1,7 +1,9 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
-import org.apache.spark.sql.SaveMode
+import bio.ferlab.datalake.core.etl.DataSource
+import org.apache.spark.sql.{DataFrame, SaveMode}
+import org.kidsfirstdrc.dwh.conf.Catalog.DataService
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.vcf.OccurrenceOutput
 import org.scalatest.GivenWhenThen
@@ -30,19 +32,19 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
       withOutputFolder("output") { output =>
         spark.sql("create database if not exists variant")
         And("A table biospecimens_re_abcdef")
-        loadTestClinicalTable("biospecimens", output)
+        loadTestClinicalTable("biospecimens", s"${DataService.biospecimens.rootPath}/Dataservice")
 
         And("A table genomic_files_re_abcdef that contains only sample.CGP.filtered.deNovo.vep.vcf.gz")
-        loadTestClinicalTable("genomic_files", output)
+        loadTestClinicalTable("genomic_files", s"${DataService.genomic_files.rootPath}/Dataservice")
 
         And("A table genomic_files_override that contains a file to include")
-        loadTestTable("genomic_files_override", output)
+        loadTestTable("genomic_files_override", s"${DataService.genomic_files_override.rootPath}")
 
         And("A table participants_re_abcdef")
-        loadTestClinicalTable("participants", output)
+        loadTestClinicalTable("participants", s"${DataService.participants.rootPath}/Dataservice")
 
         And("A table family_relationships_re_abcdef")
-        loadTestClinicalTable("family_relationships", output)
+        loadTestClinicalTable("family_relationships", s"${DataService.family_relationships.rootPath}/Dataservice")
 
         When("Run the main application")
         ImportVcf.run(studyId, releaseId, input)
@@ -113,25 +115,26 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
   }
 
 
-  private def loadTestClinicalTable(tableName:String, output: String): Unit = {
+  private def loadTestClinicalTable(tableName: String, output: String): Unit = {
     spark.sql(s"drop table if exists variant.${tableName}_re_abcdef ")
     val genomicFilesDF = spark
       .read
-      .json(getClass.getResource(s"/tables/${tableName}_re_abcdef").getFile)
+      .json(this.getClass.getResource(s"/tables/${tableName}_re_abcdef").getFile)
     genomicFilesDF.write.mode(SaveMode.Overwrite)
-      .option("path", s"$output/${tableName}_re_abcdef")
-      .format("json")
+      .option("path", s"$output/$tableName/${tableName}_re_abcdef")
+      .format("parquet")
       .saveAsTable(s"variant.${tableName}_re_abcdef")
   }
 
-  private def loadTestTable(tableName:String, output: String): Unit = {
+  private def loadTestTable(tableName: String, output: String): Unit = {
     spark.sql(s"drop table if exists variant.${tableName}")
     val genomicFilesDF = spark
       .read
-      .json(getClass.getResource(s"/tables/${tableName}").getFile)
+      .json(this.getClass.getResource(s"/tables/${tableName}").getFile)
     genomicFilesDF.write.mode(SaveMode.Overwrite)
-      .option("path", s"$output/${tableName}")
-      .format("json")
+      .option("path", s"$output/$tableName/${tableName}")
+      .format("parquet")
       .saveAsTable(s"variant.${tableName}")
   }
+
 }

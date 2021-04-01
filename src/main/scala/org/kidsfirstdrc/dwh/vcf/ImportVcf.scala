@@ -9,33 +9,39 @@ object ImportVcf extends App {
 
   println(s"Job arguments: ${args.mkString("[", ", ", "]")}")
 
-  val Array(studyId, releaseId, input, runType, biospecimenIdColumn, isPatternOverride) = args
+  val Array(studyId, releaseId, input, runType, biospecimenIdColumn, isPatternOverride, schema) = args
 
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
     .enableHiveSupport()
     .appName(s"Import $runType for $studyId - $releaseId").getOrCreate()
 
+  val storage = schema match {
+    case "variant" => StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")
+    case "portal" => StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/portal")
+  }
+
   implicit val conf: Configuration = Configuration(List(
-    StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")
+    storage
   ))
 
   val isPatternOverriden: Boolean = Try(isPatternOverride.toBoolean).getOrElse(false)
 
-  run(studyId, releaseId, input, runType, biospecimenIdColumn, isPatternOverriden)
+  run(studyId, releaseId, input, runType, biospecimenIdColumn, isPatternOverriden, schema)
 
   def run(studyId: String, releaseId: String, input: String,
-          runType: String = "all", biospecimenIdColumn: String = "biospecimen_id", isPatternOverriden: Boolean = false)
+          runType: String = "all", biospecimenIdColumn: String = "biospecimen_id", isPatternOverriden: Boolean = false,
+          schema: String = "variant")
          (implicit spark: SparkSession, conf: Configuration): Unit = {
-    spark.sql("use variant")
+    spark.sql(s"USE $schema")
 
     runType match {
       case "occurrences" => new Occurrences(studyId, releaseId, input, biospecimenIdColumn, isPatternOverriden).run()
-      case "variants" => new Variants(studyId, releaseId).run()
+      case "variants" => new Variants(studyId, releaseId, schema).run()
       case "consequences" => new Consequences(studyId, releaseId, input).run()
       case "all" =>
         new Occurrences(studyId, releaseId, input, biospecimenIdColumn, isPatternOverriden).run()
-        new Variants(studyId, releaseId).run()
+        new Variants(studyId, releaseId, schema).run()
         new Consequences(studyId, releaseId, input).run()
 
     }
