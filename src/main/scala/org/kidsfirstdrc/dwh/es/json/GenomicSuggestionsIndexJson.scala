@@ -5,7 +5,7 @@ import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, Es, Public}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 import org.kidsfirstdrc.dwh.utils.SparkUtils.tableName

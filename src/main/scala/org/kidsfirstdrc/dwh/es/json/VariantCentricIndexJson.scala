@@ -5,7 +5,7 @@ import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{explode, _}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, Es, Public}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
 import org.kidsfirstdrc.dwh.es.json.VariantCentricIndexJson._
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
@@ -87,8 +87,7 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
 
   override def run()(implicit spark: SparkSession): DataFrame = {
     val inputDF = extract()
-    val outputDF = transform(inputDF).persist()
-    println(s"count: ${outputDF.count}")
+    val outputDF = transform(inputDF)
     load(outputDF)
     outputDF
   }
@@ -184,8 +183,6 @@ object VariantCentricIndexJson {
         .withColumn("participant_number",
           col("upper_bound_kf_homozygotes_by_study")(col("study_id")) +
             col("upper_bound_kf_heterozygotes_by_study")(col("study_id")))
-            //col("gru_homozygotes_by_study")(col("study_id")) +
-            //col("gru_heterozygotes_by_study")(col("study_id")))
         .withColumn("study", struct(
           col("study_id"),
           col("acls"),
@@ -208,9 +205,7 @@ object VariantCentricIndexJson {
     }
 
     def withFrequencies: DataFrame = {
-      df//.withColumn("internal", col("frequency"))
-        //.withCombinedFrequencies("combined", "hmb", "gru")
-        .withColumn("frequencies", struct(
+      df.withColumn("frequencies", struct(
           struct(
             col("1k_genomes.ac") as "ac",
             col("1k_genomes.an") as "an",
@@ -281,7 +276,6 @@ object VariantCentricIndexJson {
 
       val occurrencesWithParticipants =
         occurrences
-          //.where(col("is_gru") || col("is_hmb"))
           .groupByLocus()
           .agg(collect_set(col("participant_id")) as "participant_ids")
 
