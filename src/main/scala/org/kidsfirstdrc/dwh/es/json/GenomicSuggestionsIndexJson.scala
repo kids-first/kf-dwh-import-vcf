@@ -59,7 +59,7 @@ class GenomicSuggestionsIndexJson(releaseId: String)
       .write
       .mode(SaveMode.Overwrite)
       .format("json")
-      .json(s"${destination.location}")
+      .json(s"${destination.location}_$releaseId")
     data
   }
 
