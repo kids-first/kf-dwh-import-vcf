@@ -23,11 +23,11 @@ object ImportDemo extends App {
     spark.sql("use demo")
     runType match {
       case "occurrences" => new DemoOccurrences(studyId, releaseId, input).run()
-      case "variants" => new Variants(studyId, releaseId).run()
+      case "variants" => new Variants(studyId, releaseId, "demo").run()
       case "consequences" => new DemoConsequences(studyId, releaseId, input).run()
       case "all" =>
         new DemoOccurrences(studyId, releaseId, input).run()
-        new Variants(studyId, releaseId).run()
+        new Variants(studyId, releaseId, "demo").run()
         new DemoConsequences(studyId, releaseId, input).run()
 
     }

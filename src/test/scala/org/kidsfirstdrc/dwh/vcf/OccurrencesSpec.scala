@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions.{explode, lit}
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.kidsfirstdrc.dwh.conf.Catalog.{DataService, HarmonizedData}
@@ -81,12 +82,11 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
 
   "run" should "return a dataframe with all expected columns" in {
     spark.sql("CREATE DATABASE IF NOT EXISTS variant")
-    val output: String = getClass.getClassLoader.getResource(".").getFile
-    loadTestData(output, biospecimensDf, "biospecimens", releaseId_lc)
-    loadTestData(output, genomic_filesDf, "genomic_files", releaseId_lc)
-    loadTestData(output, genomic_files_overrideDf, "genomic_files_override")
-    loadTestData(output, participantsDf, "participants", releaseId_lc)
-    loadTestData(output, family_relationshipsDf, "family_relationships", releaseId_lc)
+    loadTestData(DataService.biospecimens, biospecimensDf, "biospecimens", releaseId_lc)
+    loadTestData(DataService.genomic_files, genomic_filesDf, "genomic_files", releaseId_lc)
+    loadTestData(DataService.genomic_files_override, genomic_files_overrideDf, "genomic_files_override")
+    loadTestData(DataService.participants, participantsDf, "participants", releaseId_lc)
+    loadTestData(DataService.family_relationships, family_relationshipsDf, "family_relationships", releaseId_lc)
 
     val input = getClass.getResource("/input_vcf/SD_123456").getFile
 
@@ -97,21 +97,21 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
     outputDf.as[OccurrenceOutput].count shouldBe 8
   }
 
-  private def loadTestData(output: String, df: DataFrame, tableName: String, releaseId: String): Unit = {
+  private def loadTestData(ds: DataSource, df: DataFrame, tableName: String, releaseId: String): Unit = {
     spark.sql(s"drop table if exists variant.${tableName}_$releaseId ")
     df.write
       .format("parquet")
       .mode(SaveMode.Overwrite)
-      .option("path", s"$output/${tableName}_$releaseId")
+      .option("path", s"${ds.rootPath}/dataservice/${tableName}/${tableName}_$releaseId")
       .saveAsTable(s"variant.${tableName}_$releaseId")
   }
 
-  private def loadTestData(output: String, df: DataFrame, tableName: String): Unit = {
+  private def loadTestData(ds: DataSource, df: DataFrame, tableName: String): Unit = {
     spark.sql(s"drop table if exists variant.${tableName} ")
     df.write
       .format("parquet")
       .mode(SaveMode.Overwrite)
-      .option("path", s"$output/$tableName")
+      .option("path", s"${ds.rootPath}/${tableName}/$tableName")
       .saveAsTable(s"variant.${tableName}")
   }
 }

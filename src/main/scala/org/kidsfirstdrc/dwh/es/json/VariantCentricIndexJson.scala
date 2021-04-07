@@ -20,16 +20,16 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     import spark.implicits._
     val occurrences: DataFrame = spark
-      .table(s"${DataService.studies.database}.${DataService.studies.name}")
-      .select("study_id")
-      .as[String].collect()
-      .map(study_id => Try(spark.table(s"${Clinical.occurrences.database}.${Clinical.occurrences.name}_${study_id.toLowerCase}")))
+      .read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId")
+      .withColumn("study", explode(col("studies"))).select("study").distinct.as[String].collect()
+      .map(studyId =>
+        Try(spark.read.parquet(s"${Clinical.occurrences.rootPath}/occurrences/${tableName("occurrences", studyId, releaseId)}")))
       .collect { case Success(df) => df }
       .reduce( (df1, df2) => df1.unionByName(df2))
 
     Map(
-      Clinical.variants     -> spark.table(s"${Clinical.variants.database}.${Clinical.variants.name}"),
-      Clinical.consequences -> spark.table(s"${Clinical.consequences.database}.${Clinical.consequences.name}"),
+      Clinical.variants     -> spark.read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId"),
+      Clinical.consequences -> spark.read.parquet(s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId"),
       Clinical.occurrences  -> occurrences,
       Public.clinvar        -> spark.table(s"${Public.clinvar.database}.${Public.clinvar.name}"),
       Public.genes          -> spark.table(s"${Public.genes.database}.${Public.genes.name}")
@@ -44,8 +44,7 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
     val consequences = data(Clinical.consequences)
       .withColumnRenamed("impact", "vep_impact")
 
-    val occurrences = data(Clinical.occurrences)
-      .selectLocus(col("participant_id"), col("is_hmb"), col("is_gru"))
+    val occurrences = data(Clinical.occurrences).selectLocus(col("participant_id"))
 
     val clinvar = data(Public.clinvar)
       .selectLocus(
@@ -68,8 +67,9 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
       .withClinVar(clinvar)
       .withConsequences(consequences)
       .withGenes(genes)
-      .select("genome_build", "hash", "chromosome", "start", "reference", "alternate", "locus", "variant_class", "studies", "participant_number",
-        "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id", "consequences", "genes", "hgvsg", "participant_ids")
+      .select("genome_build", "hash", "chromosome", "start", "reference", "alternate", "locus", "variant_class",
+        "studies", "participant_number", "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id",
+        "consequences", "impact_score", "genes", "hgvsg", "participant_ids")
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -107,11 +107,11 @@ object VariantCentricIndexJson {
 
   private def frequenciesForPrefix(prefix: String): Column = {
     struct(
-      col(s"${prefix}_ac") as "ac",
-      col(s"${prefix}_an") as "an",
-      col(s"${prefix}_af") as "af",
-      col(s"${prefix}_homozygotes") as "homozygotes",
-      col(s"${prefix}_heterozygotes") as "heterozygotes"
+      col(s"frequencies.${prefix}.ac") as "ac",
+      col(s"frequencies.${prefix}.an") as "an",
+      col(s"frequencies.${prefix}.af") as "af",
+      col(s"frequencies.${prefix}.homozygotes") as "homozygotes",
+      col(s"frequencies.${prefix}.heterozygotes") as "heterozygotes"
     ).as(prefix)
   }
 
@@ -123,6 +123,16 @@ object VariantCentricIndexJson {
       col(s"${prefix}_homozygotes_by_study")(col("study_id")) as "homozygotes",
       col(s"${prefix}_heterozygotes_by_study")(col("study_id")) as "heterozygotes"
     ).as(prefix)
+  }
+
+  private def frequenciesByStudies: Column = {
+    struct(
+      col(s"ac_by_study")(col("study_id")) as "ac",
+      col(s"an_by_study")(col("study_id")) as "an",
+      col(s"af_by_study")(col("study_id")) as "af",
+      col(s"homozygotes_by_study")(col("study_id")) as "homozygotes",
+      col(s"heterozygotes_by_study")(col("study_id")) as "heterozygotes"
+    ).as("frequencies")
   }
 
   implicit class DataFrameOperations(df: DataFrame) {
@@ -152,7 +162,8 @@ object VariantCentricIndexJson {
           .groupBy(locus:_*)
           .agg(
             collect_set(col("consequence")) as "consequences",
-              collect_set(col("symbol")) as "symbols"
+            collect_set(col("symbol")) as "symbols",
+            max(col("impact_score")) as "impact_score"
           )
 
       df.joinByLocus(consequencesDf, "left")
@@ -162,6 +173,8 @@ object VariantCentricIndexJson {
       array.map(fullConsentCode => fullConsentCode.split('.')(0)).distinct
     }
 
+    Some("x").fold(Seq.empty[String])(x => x.split(",").toSeq)
+
     def withStudies: DataFrame = {
       val inputColumns: Seq[Column] = df.columns.filterNot(_.equals("studies")).map(col)
       df
@@ -169,17 +182,18 @@ object VariantCentricIndexJson {
         .withColumn("acls", col("consent_codes_by_study")(col("study_id")))
         .withColumn("external_study_ids", external_study_ids(col("acls")))
         .withColumn("participant_number",
-          col("hmb_homozygotes_by_study")(col("study_id")) +
-            col("hmb_heterozygotes_by_study")(col("study_id")) +
-            col("gru_homozygotes_by_study")(col("study_id")) +
-            col("gru_heterozygotes_by_study")(col("study_id")))
+          col("upper_bound_kf_homozygotes_by_study")(col("study_id")) +
+            col("upper_bound_kf_heterozygotes_by_study")(col("study_id")))
+            //col("gru_homozygotes_by_study")(col("study_id")) +
+            //col("gru_heterozygotes_by_study")(col("study_id")))
         .withColumn("study", struct(
           col("study_id"),
           col("acls"),
           col("external_study_ids"),
+          //frequenciesByStudies as "frequencies",
           struct(
-            frequenciesByStudiesFor("hmb"),
-            frequenciesByStudiesFor("gru")
+            frequenciesByStudiesFor("upper_bound_kf"),
+            frequenciesByStudiesFor("lower_bound_kf")
           ).as("frequencies"),
           col("participant_number")))
         .filter(col("study.participant_number").isNotNull and col("study.participant_number") > 0)
@@ -194,7 +208,8 @@ object VariantCentricIndexJson {
     }
 
     def withFrequencies: DataFrame = {
-      df.withCombinedFrequencies("combined", "hmb", "gru")
+      df//.withColumn("internal", col("frequency"))
+        //.withCombinedFrequencies("combined", "hmb", "gru")
         .withColumn("frequencies", struct(
           struct(
             col("1k_genomes.ac") as "ac",
@@ -212,9 +227,8 @@ object VariantCentricIndexJson {
           frequenciesForGnomad("gnomad_exomes_2_1"),
           frequenciesForGnomad("gnomad_genomes_3_0"),
           struct(
-            frequenciesForPrefix("combined"),
-            frequenciesForPrefix("hmb"),
-            frequenciesForPrefix("gru")
+            frequenciesForPrefix("upper_bound_kf"),
+            frequenciesForPrefix("lower_bound_kf")
           ).as("internal")
         ))
     }
@@ -267,7 +281,7 @@ object VariantCentricIndexJson {
 
       val occurrencesWithParticipants =
         occurrences
-          .where(col("is_gru") || col("is_hmb"))
+          //.where(col("is_gru") || col("is_hmb"))
           .groupByLocus()
           .agg(collect_set(col("participant_id")) as "participant_ids")
 

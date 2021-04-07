@@ -131,6 +131,29 @@ object SparkUtils {
       notNullAf.cast(DecimalType(11, 10))
     }
 
+    val calculated_af: Column = {
+      val ac = col("ac")
+      val an = col("an")
+      val af = when(an === 0, 0)
+        .otherwise(ac / an)
+      //From documentation of changePrecision in DecimalType : returning null if it overflows.
+      //https://stackoverflow.com/questions/55688810/apache-spark-null-value-when-casting-incompatible-decimaltype-vs-classcastexcept
+      val notNullAf = when(af.isNull, 0).otherwise(af)
+      notNullAf.cast(DecimalType(11, 10))
+    }
+
+    val calculated_af_from_an: Column => Column = an => {
+      val ac = col("ac")
+      val af = when(an === 0, 0)
+        .otherwise(ac / an)
+      //From documentation of changePrecision in DecimalType : returning null if it overflows.
+      //https://stackoverflow.com/questions/55688810/apache-spark-null-value-when-casting-incompatible-decimaltype-vs-classcastexcept
+      val notNullAf = when(af.isNull, 0).otherwise(af)
+      notNullAf.cast(DecimalType(11, 10))
+    }
+
+
+
     val ac: Column = col("INFO_AC")(0) as "ac"
     val af: Column = col("INFO_AF")(0) as "af"
     val an: Column = col("INFO_AN") as "an"
@@ -153,8 +176,14 @@ object SparkUtils {
      * */
     val has_alt: Column = when(array_contains(col("genotype.calls"), 1), 1).otherwise(0) as "has_alt"
 
-    val calculated_ac: Column = when(col("zygosity") === "HET", 1).when(col("zygosity") === "HOM", 2).otherwise(0) as "ac"
-    val calculate_an: Column = when(col("has_alt") === 1, 2).otherwise(0) as "an"
+    val calculated_ac: Column = when(col("zygosity") === "HET", 1)
+      .when(col("zygosity") === "HOM", 2)
+      .otherwise(0) as "ac"
+
+    val calculate_an_upper_bound_kf: Long => Column = pc => lit(pc * 2) as "an_upper_bound_kf"
+    val calculate_an_lower_bound_kf: Column =
+      when(col("zygosity") === "HOM" or col("zygosity") === "HET" or col("zygosity") === "WT", 2)
+        .otherwise(0) as "an_lower_bound_kf"
 
     val homozygotes: Column = when(col("zygosity") === "HOM", 1).otherwise(0) as "homozygotes"
     val heterozygotes: Column = when(col("zygosity") === "HET", 1).otherwise(0) as "heterozygotes"

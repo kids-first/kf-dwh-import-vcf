@@ -7,7 +7,7 @@ import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, TopmedBravoOutput}
 import org.kidsfirstdrc.dwh.testutils.join.Freq
-import org.kidsfirstdrc.dwh.testutils.variant.Variant
+import org.kidsfirstdrc.dwh.testutils.update.Variant
 import org.kidsfirstdrc.dwh.updates.UpdateVariant
 import org.kidsfirstdrc.dwh.vcf.Variants
 import org.scalatest.GivenWhenThen

@@ -17,20 +17,22 @@ object Catalog {
   object Raw extends StoreFolder {
     override val alias: String  = kfStridesVariantBucket
 
-    val `1000genomes_vcf`         = DataSource(alias, "/raw/1000Genomes/ALL.*.sites.vcf.gz"    , "", "1000genomes_vcf"          ,    VCF, OverWrite)
-    val annovar_dbnsfp            = DataSource(alias, "/raw/annovar/dbNSFP/hg38_dbnsfp41a.txt" , "", "annovar_dbnsfp"           ,    CSV, OverWrite)
-    val cancerhotspots_csv        = DataSource(alias, "/raw/cancerhotspots/cancerhotspots.*.gz", "", "cancerhotspots_csv"       ,    CSV, OverWrite)
-    val clinvar_vcf               = DataSource(alias, "/raw/clinvar/clinvar.vcf.gz"            , "", "clinvar_vcf"              ,    VCF, OverWrite)
-    val cosmic_cancer_gene_census = DataSource(alias, "/raw/cosmic/cancer_gene_census.csv"     , "", "cosmic_cancer_gene_census",    CSV, OverWrite)
-    val dbsnp_vcf                 = DataSource(alias, "/raw/dbsnp/GCF_000001405.38.gz"         , "", "dbsnp_vcf"                ,    VCF, OverWrite)
-    val dbNSFP_csv                = DataSource(alias, "/raw/dbNSFP/*.gz"                       , "", "dbNSFP_csv"               ,    CSV, OverWrite)
-    val ddd_gene_census           = DataSource(alias, "/raw/ddd/DDG2P_17_5_2020.csv"           , "", "ddd_gene_census"          ,    CSV, OverWrite)
-    val hpo_genes_to_phenotype    = DataSource(alias, "/raw/hpo/genes_to_phenotype.txt"        , "", "hpo_genes_to_phenotype"   ,    CSV, OverWrite)
-    val omim_genemap2             = DataSource(alias, "/raw/omim/genemap2.txt"                 , "", "omim_genemap2"            ,    CSV, OverWrite)
-    val orphanet_gene_association = DataSource(alias, "/raw/orphanet/en_product6.xml"          , "", "en_product6"              ,    XML, OverWrite)
-    val orphanet_disease_history  = DataSource(alias, "/raw/orphanet/en_product9_ages.xml"     , "", "en_product9_ages"         ,    XML, OverWrite)
-    val refseq_homo_sapiens_gene  = DataSource(alias, "/raw/refseq/Homo_sapiens.gene_info.gz"  , "", "refseq_homo_sapiens_gene" ,    CSV, OverWrite)
-    val topmed_bravo_dbsnp        = DataSource(alias, "/raw/topmed/bravo-dbsnp-all.vcf.gz"     , "", "topmed_bravo_dbsnp"       ,    VCF, OverWrite)
+    val `1000genomes_vcf`         = DataSource(alias, "/raw/1000Genomes/ALL.*.sites.vcf.gz"      , "", "1000genomes_vcf"          ,    VCF , OverWrite)
+    val annovar_dbnsfp            = DataSource(alias, "/raw/annovar/dbNSFP/hg38_dbnsfp41a.txt"   , "", "annovar_dbnsfp"           ,    CSV , OverWrite)
+    val cancerhotspots_csv        = DataSource(alias, "/raw/cancerhotspots/cancerhotspots.*.gz"  , "", "cancerhotspots_csv"       ,    CSV , OverWrite)
+    val clinvar_vcf               = DataSource(alias, "/raw/clinvar/clinvar.vcf.gz"              , "", "clinvar_vcf"              ,    VCF , OverWrite)
+    val cosmic_cancer_gene_census = DataSource(alias, "/raw/cosmic/cancer_gene_census.csv"       , "", "cosmic_cancer_gene_census",    CSV , OverWrite)
+    val dbsnp_vcf                 = DataSource(alias, "/raw/dbsnp/GCF_000001405.38.gz"           , "", "dbsnp_vcf"                ,    VCF , OverWrite)
+    val dbNSFP_csv                = DataSource(alias, "/raw/dbNSFP/*.gz"                         , "", "dbNSFP_csv"               ,    CSV , OverWrite)
+    val ddd_gene_census           = DataSource(alias, "/raw/ddd/DDG2P_17_5_2020.csv"             , "", "ddd_gene_census"          ,    CSV , OverWrite)
+    val hpo_genes_to_phenotype    = DataSource(alias, "/raw/hpo/genes_to_phenotype.txt"          , "", "hpo_genes_to_phenotype"   ,    CSV , OverWrite)
+    val omim_genemap2             = DataSource(alias, "/raw/omim/genemap2.txt"                   , "", "omim_genemap2"            ,    CSV , OverWrite)
+    val orphanet_gene_association = DataSource(alias, "/raw/orphanet/en_product6.xml"            , "", "en_product6"              ,    XML , OverWrite)
+    val orphanet_disease_history  = DataSource(alias, "/raw/orphanet/en_product9_ages.xml"       , "", "en_product9_ages"         ,    XML , OverWrite)
+    val refseq_homo_sapiens_gene  = DataSource(alias, "/raw/refseq/Homo_sapiens.gene_info.gz"    , "", "refseq_homo_sapiens_gene" ,    CSV , OverWrite)
+    val topmed_bravo_dbsnp        = DataSource(alias, "/raw/topmed/bravo-dbsnp-all.vcf.gz"       , "", "topmed_bravo_dbsnp"       ,    VCF , OverWrite)
+    val all_participants          = DataSource(alias, "/raw/participants/all_participants_*.json", "", "all_participants"         ,    JSON, OverWrite)
+
   }
 
   object Public extends StoreFolder {

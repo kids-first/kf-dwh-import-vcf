@@ -1,14 +1,15 @@
 #!/bin/bash
 set -x
 study_id=$1
-release_id=$2
+release_id=${2:-"re_000010"}
 study_id_lc=$(echo "$study_id" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
-job=${3:-"all"}
+job=${3:-"variants"}
 is_pattern_override=${4:-"false"}
 input_vcf=${5:-"s3a://kf-study-us-east-1-prd-${study_id_lc}/harmonized-data/family-variants"}
-instance_count=${6:-"10"}
-instance_type=${7:-"r5.4xlarge"}
+instance_count=${6:-"7"}
+instance_type=${7:-"m5.4xlarge"}
 biospecimen_id_column=${8:-"biospecimen_id"}
+schema=${9:-"portal"}
 
 steps=$(cat <<EOF
 [
@@ -28,7 +29,8 @@ steps=$(cat <<EOF
       "${input_vcf}",
       "${job}",
       "${biospecimen_id_column}",
-      "${is_pattern_override}"
+      "${is_pattern_override}",
+      "${schema}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",
@@ -49,7 +51,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --release-label emr-6.2.0 \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --steps "${steps}" \
---name "Variant Import - ${job} - Study ${study_id} - Release ${release_id}" \
+--name "Import - ${job} - ${study_id} - ${release_id} - ${schema}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \

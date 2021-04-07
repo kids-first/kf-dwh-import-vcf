@@ -13,7 +13,7 @@ object PrepareIndex extends App {
     .appName(s"Export $jobType - $releaseId").getOrCreate()
 
   implicit val conf: Configuration = Configuration(List(
-    StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")
+    StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/portal")
   ))
 
   jobType match {

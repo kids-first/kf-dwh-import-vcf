@@ -8,7 +8,7 @@ import org.kidsfirstdrc.dwh.testutils.es.VariantCentricOutput
 import org.kidsfirstdrc.dwh.testutils.es.VariantCentricOutput._
 import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, GenesOutput}
 import org.kidsfirstdrc.dwh.testutils.join.{Freq, JoinConsequenceOutput, JoinVariantOutput}
-import org.kidsfirstdrc.dwh.testutils.vcf.{Exon, OccurrenceOutput, RefAlt}
+import org.kidsfirstdrc.dwh.testutils.vcf._
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -31,33 +31,35 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
 
   val joinVariantDf: DataFrame = Seq(
     JoinVariantOutput(
-      hmb_ac = 12, hmb_an = 27, hmb_af = 0.4444444444, hmb_homozygotes = 9, hmb_heterozygotes = 7,
-      gru_ac = 2, gru_an = 7, gru_af = 0.2857142857, gru_homozygotes = 5, gru_heterozygotes = 1,
-      hmb_ac_by_study = Map(studyId1 -> 5, studyId2 -> 5, studyId3 -> 2, studyId4 -> 0),
-      hmb_an_by_study = Map(studyId1 -> 10, studyId2 -> 10, studyId3 -> 7, studyId4 -> 0),
-      hmb_af_by_study = Map(studyId1 -> 0.5, studyId2 -> 0.5, studyId3 -> 0.2857142857, studyId4 -> 0),
-      hmb_homozygotes_by_study = Map(studyId1 -> 2, studyId2 -> 2, studyId3 -> 5, studyId4 -> 0),
-      hmb_heterozygotes_by_study = Map(studyId1 -> 3, studyId2 -> 3, studyId3 -> 1, studyId4 -> 0),
-      gru_ac_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 2, studyId4 -> 0),
-      gru_an_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 7, studyId4 -> 0),
-      gru_af_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 0.2857142857, studyId4 -> 0),
-      gru_homozygotes_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 5, studyId4 -> 0),
-      gru_heterozygotes_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 1, studyId4 -> 0),
-      studies = Set(studyId1, studyId2, studyId3, studyId4),
-      consent_codes = Set("SD_789.c99", "SD_123.c1", "SD_456.c1", "SD_999.c99"),
-      consent_codes_by_study = Map(studyId1 -> Set("SD_123.c1"), studyId2 -> Set("SD_456.c1"), studyId3 -> Set(s"$studyId3.c99"), studyId4 -> Set(s"$studyId4.c99")),
+      frequencies = VariantFrequency(Freq(ac = 12, an = 27, af = 0.4444444444, homozygotes = 9, heterozygotes = 7), Freq(ac = 12, an = 27, af = 0.4444444444, homozygotes = 9, heterozygotes = 7)),
+      upper_bound_kf_ac_by_study = Map(studyId1 -> 5, studyId2 -> 5, studyId3 -> 2),
+      upper_bound_kf_an_by_study = Map(studyId1 -> 10, studyId2 -> 10, studyId3 -> 7),
+      upper_bound_kf_af_by_study = Map(studyId1 -> 0.5, studyId2 -> 0.5, studyId3 -> 0.2857142857),
+      upper_bound_kf_homozygotes_by_study = Map(studyId1 -> 2, studyId2 -> 2, studyId3 -> 5),
+      upper_bound_kf_heterozygotes_by_study = Map(studyId1 -> 3, studyId2 -> 3, studyId3 -> 1),
+      lower_bound_kf_ac_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 2),
+      lower_bound_kf_an_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 7),
+      lower_bound_kf_af_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 0.2857142857),
+      lower_bound_kf_homozygotes_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 5),
+      lower_bound_kf_heterozygotes_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 1),
+      studies = Set(studyId1, studyId2, studyId3),
+      consent_codes = Set("SD_789.c99", "SD_123.c1", "SD_456.c1"),
+      consent_codes_by_study = Map(studyId1 -> Set("SD_123.c1"), studyId2 -> Set("SD_456.c1"), studyId3 -> Set(s"$studyId3.c99")),
       release_id = realeaseId,
       clin_sig = Some("pathogenic"),
       clinvar_id = Some("RCV000436956"))
+
   ).toDF().withColumnRenamed("one_thousand_genomes", "1k_genomes")
 
   val joinConsequencesDf: DataFrame = Seq(
-    JoinConsequenceOutput().copy(ensembl_gene_id = "ENSG00000189337", ensembl_transcript_id = "ENST00000636564"),
-    JoinConsequenceOutput().copy(ensembl_gene_id = "ENSG00000189337", ensembl_transcript_id = "ENST00000636203")
+    JoinConsequenceOutput().copy(ensembl_gene_id = "ENSG00000189337", ensembl_transcript_id = "ENST00000636564", `ensembl_regulatory_id` = Some("ENSR0000636135"), `intron` = Some(Intron(2, 10)),
+      `SIFT_score` = Some(0.91255), `SIFT_pred` = Some("D"), `Polyphen2_HVAR_pred` = Some("D"), `Polyphen2_HVAR_score` = Some(0.91255), `FATHMM_pred` = Some("D")),
+    JoinConsequenceOutput().copy(ensembl_gene_id = "ENSG00000189337", ensembl_transcript_id = "ENST00000636203", `ensembl_regulatory_id` = Some("ENSR0000636134"), `intron` = Some(Intron(2, 10)),
+      `SIFT_score` = Some(0.91255), `SIFT_pred` = Some("D"), `Polyphen2_HVAR_pred` = Some("D"), `Polyphen2_HVAR_score` = Some(0.91255), `FATHMM_pred` = Some("D"))
   ).toDF()
 
   val occurrencesDf: DataFrame = Seq(
-    OccurrenceOutput(`start` = 165310406, `end` = 165310406, is_gru = false, is_hmb = false, participant_id = "PT_000001"), //should not be in the result
+    //OccurrenceOutput(`start` = 165310406, `end` = 165310406, is_gru = false, is_hmb = false, participant_id = "PT_000001"), //should not be in the result
     OccurrenceOutput(`start` = 165310406, `end` = 165310406, is_gru = true , is_hmb = false, participant_id = "PT_000002"), //should be in the result
     OccurrenceOutput(`start` = 165310406, `end` = 165310406, is_gru = false, is_hmb = true , participant_id = "PT_000003")  //should be in the result
   ).toDF()
@@ -80,14 +82,14 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
 
   val expectedStudies = List(
     Study("SD_456", List("SD_456.c1"), List("SD_456"), StudyFrequency(Freq(10,5,0.5,2,3),Freq(0,0,0,0,0)),5),
-    Study("SD_789", List("SD_789.c99"), List("SD_789"), StudyFrequency(Freq(7,2,0.2857142857,5,1),Freq(7,2,0.2857142857,5,1)),12),
-    Study("SD_123", List("SD_123.c1"), List("SD_123"), StudyFrequency(Freq(10,5,0.5,2,3),Freq(0,0,0,0,0)),5)
+    Study("SD_123", List("SD_123.c1"), List("SD_123"), StudyFrequency(Freq(10,5,0.5,2,3),Freq(0,0,0,0,0)),5),
+    Study("SD_789", List("SD_789.c99"), List("SD_789"), StudyFrequency(Freq(7,2,0.2857142857,5,1),Freq(7,2,0.2857142857,5,1)),6)
   )
 
   val expectedConsequences: List[Consequence] = List(
-    Consequence("MODERATE", "SCN2A", Some("ENST00000636203"),None, Some("ENST00000486878.2:c.322G>A"),Some("ENSP00000487466.1:p.Val108Met"),"Transcript",List("missense_variant"),Some("protein_coding"),1,Some(Exon(Some(4), Some(4))),None,Some(322),Some(322),Some(RefAlt("V","M")),Some(RefAlt("Gtg","Atg")),Some(108),Some("V108M"),Some("322G>A"),3,false,
+    Consequence("MODERATE", "SCN2A", Some("ENST00000636203"),Some("ENSR0000636134"), Some("ENST00000486878.2:c.322G>A"),Some("ENSP00000487466.1:p.Val108Met"),"Transcript",List("missense_variant"),Some("protein_coding"),1,Some(Exon(Some(4), Some(4))),Some(Intron(2, 10)),Some(322),Some(322),Some(RefAlt("V","M")),Some(RefAlt("Gtg","Atg")),Some(108),Some("V108M"),Some("322G>A"),3,false,
       ScoreConservations(0.7674), ScorePredictions()),
-    Consequence("MODERATE", "SCN2A", Some("ENST00000636564"),None, Some("ENST00000486878.2:c.322G>A"),Some("ENSP00000487466.1:p.Val108Met"),"Transcript",List("missense_variant"),Some("protein_coding"),1,Some(Exon(Some(4), Some(4))),None,Some(322),Some(322),Some(RefAlt("V","M")),Some(RefAlt("Gtg","Atg")),Some(108),Some("V108M"),Some("322G>A"),3,false,
+    Consequence("MODERATE", "SCN2A", Some("ENST00000636564"),Some("ENSR0000636135"), Some("ENST00000486878.2:c.322G>A"),Some("ENSP00000487466.1:p.Val108Met"),"Transcript",List("missense_variant"),Some("protein_coding"),1,Some(Exon(Some(4), Some(4))),Some(Intron(2, 10)),Some(322),Some(322),Some(RefAlt("V","M")),Some(RefAlt("Gtg","Atg")),Some(108),Some("V108M"),Some("322G>A"),3,false,
       ScoreConservations(0.7674), ScorePredictions())
   )
 
@@ -112,5 +114,6 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
     variant.copy(consequences = List(), studies = List(), genes = List(), participant_ids = List()) shouldBe
       VariantCentricOutput.Output(studies = List(), consequences = List(), genes = List(), participant_ids = List())
 
+    result.write.mode("overwrite").json(this.getClass.getClassLoader.getResource(".").getFile + "variant_centric")
   }
 }

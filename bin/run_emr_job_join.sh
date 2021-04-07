@@ -1,10 +1,11 @@
 #!/bin/bash
-study_ids=$1
-release_id=$2
-job=${3:-"all"}
-mergeExisting=${4:-"true"}
-number_instance=${5:-"20"}
-instance_type=${6:-"r5.4xlarge"}
+study_ids=${1:-"SD_46SK55A3,SD_9PYZAHHE,SD_DYPMEHHF,SD_BHJXBDQK"}
+release_id=${2:-"RE_000010"}
+job=${3:-"variants"}
+mergeExisting=${4:-"false"}
+schema=${5:-"portal"}
+number_instance=${6:-"10"}
+instance_type=${7:-"r5.4xlarge"}
 
 #steps="[{\"Args\":[\"spark-submit\",\"--deploy-mode\",\"client\",\"--class\",\"org.kidsfirstdrc.dwh.join.Join\",\"s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar\",\"${study_ids}\",\"${release_id}\",\"s3a://kf-strides-variant-parquet-prd\",\"${job}\",\"${mergeExisting}\",\"variant\"],\"Type\":\"CUSTOM_JAR\",\"ActionOnFailure\":\"TERMINATE_CLUSTER\",\"Jar\":\"command-runner.jar\",\"Properties\":\"\",\"Name\":\"Spark application\"}]"
 steps=$(cat <<EOF
@@ -22,10 +23,9 @@ steps=$(cat <<EOF
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
       "${study_ids}",
       "${release_id}",
-      "s3a://kf-strides-variant-parquet-prd",
       "${job}",
       "${mergeExisting}",
-      "variant"
+      "${schema}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",
@@ -46,7 +46,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --release-label emr-6.2.0 \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --steps "${steps}" \
---name "Variant Join ${job} - Studies ${study_ids} - Release ${release_id}" \
+--name "Join ${job} - ${study_ids} - ${release_id} - ${schema}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \
