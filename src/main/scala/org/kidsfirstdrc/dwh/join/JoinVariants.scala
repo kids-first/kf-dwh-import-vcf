@@ -18,26 +18,10 @@ object JoinVariants {
       (currentDF, studyId) =>
         val nextDf = spark.table(SparkUtils.tableName(Clinical.variants.name, studyId, releaseId, database))
           .withColumn("studies", array($"study_id"))
-          .withColumn("upper_bound_kf_ac", $"frequencies.upper_bound_kf.ac")
-          .withColumn("upper_bound_kf_an", $"frequencies.upper_bound_kf.an")
-          .withColumn("upper_bound_kf_af", $"frequencies.upper_bound_kf.af")
-          .withColumn("upper_bound_kf_homozygotes", $"frequencies.upper_bound_kf.homozygotes")
-          .withColumn("upper_bound_kf_heterozygotes", $"frequencies.upper_bound_kf.heterozygotes")
-          .withColumn("lower_bound_kf_ac", $"frequencies.lower_bound_kf.ac")
-          .withColumn("lower_bound_kf_an", $"frequencies.lower_bound_kf.an")
-          .withColumn("lower_bound_kf_af", $"frequencies.lower_bound_kf.af")
-          .withColumn("lower_bound_kf_homozygotes", $"frequencies.lower_bound_kf.homozygotes")
-          .withColumn("lower_bound_kf_heterozygotes", $"frequencies.lower_bound_kf.heterozygotes")
-          .withColumn("upper_bound_kf_ac_by_study", map($"study_id", $"frequencies.upper_bound_kf.ac"))
-          .withColumn("upper_bound_kf_an_by_study", map($"study_id", $"frequencies.upper_bound_kf.an"))
-          .withColumn("upper_bound_kf_af_by_study", map($"study_id", $"frequencies.upper_bound_kf.af"))
-          .withColumn("upper_bound_kf_homozygotes_by_study", map($"study_id", $"frequencies.upper_bound_kf.homozygotes"))
-          .withColumn("upper_bound_kf_heterozygotes_by_study", map($"study_id", $"frequencies.upper_bound_kf.heterozygotes"))
-          .withColumn("lower_bound_kf_ac_by_study", map($"study_id", $"frequencies.lower_bound_kf.ac"))
-          .withColumn("lower_bound_kf_an_by_study", map($"study_id", $"frequencies.lower_bound_kf.an"))
-          .withColumn("lower_bound_kf_af_by_study", map($"study_id", $"frequencies.lower_bound_kf.af"))
-          .withColumn("lower_bound_kf_homozygotes_by_study", map($"study_id", $"frequencies.lower_bound_kf.homozygotes"))
-          .withColumn("lower_bound_kf_heterozygotes_by_study", map($"study_id", $"frequencies.lower_bound_kf.heterozygotes"))
+          .withRenamedFrequencies("upper_bound_kf")
+          .withRenamedFrequencies("lower_bound_kf")
+          .withColumnByStudy("upper_bound_kf")
+          .withColumnByStudy("lower_bound_kf")
         if (currentDF.isEmpty)
           nextDf
         else {
@@ -79,37 +63,11 @@ object JoinVariants {
     val merged = if (mergeWithExisting && spark.catalog.tableExists(s"${database}.${Clinical.variants.name}")) {
       val existingColumns = commonColumns :+ explode($"studies").as("study_id")
       val existingVariants = spark.table(s"${database}.${Clinical.variants.name}")
-        .withColumn("upper_bound_kf_ac", $"frequencies.upper_bound_kf.ac")
-        .withColumn("upper_bound_kf_an", $"frequencies.upper_bound_kf.an")
-        .withColumn("upper_bound_kf_af", $"frequencies.upper_bound_kf.af")
-        .withColumn("upper_bound_kf_homozygotes", $"frequencies.upper_bound_kf.homozygotes")
-        .withColumn("upper_bound_kf_heterozygotes", $"frequencies.upper_bound_kf.heterozygotes")
-        .withColumn("lower_bound_kf_ac", $"frequencies.lower_bound_kf.ac")
-        .withColumn("lower_bound_kf_an", $"frequencies.lower_bound_kf.an")
-        .withColumn("lower_bound_kf_af", $"frequencies.lower_bound_kf.af")
-        .withColumn("lower_bound_kf_homozygotes", $"frequencies.lower_bound_kf.homozygotes")
-        .withColumn("lower_bound_kf_heterozygotes", $"frequencies.lower_bound_kf.heterozygotes")
+        .withRenamedFrequencies("upper_bound_kf")
+        .withRenamedFrequencies("lower_bound_kf")
         .select(existingColumns: _*)
-        .withColumn("lower_bound_kf_ac", $"lower_bound_kf_ac_by_study"($"study_id"))
-        .withColumn("lower_bound_kf_ac_by_study", map($"study_id", $"lower_bound_kf_ac"))
-        .withColumn("lower_bound_kf_an", $"lower_bound_kf_an_by_study"($"study_id"))
-        .withColumn("lower_bound_kf_an_by_study", map($"study_id", $"lower_bound_kf_an"))
-        .withColumn("lower_bound_kf_af_by_study", map($"study_id", $"lower_bound_kf_af_by_study"($"study_id")))
-        .withColumn("lower_bound_kf_homozygotes", $"lower_bound_kf_homozygotes_by_study"($"study_id"))
-        .withColumn("lower_bound_kf_homozygotes_by_study", map($"study_id", $"lower_bound_kf_homozygotes"))
-        .withColumn("lower_bound_kf_heterozygotes", $"lower_bound_kf_heterozygotes_by_study"($"study_id"))
-        .withColumn("lower_bound_kf_heterozygotes_by_study", map($"study_id", $"lower_bound_kf_heterozygotes"))
-
-        .withColumn("upper_bound_kf_ac", $"upper_bound_kf_ac_by_study"($"study_id"))
-        .withColumn("upper_bound_kf_ac_by_study", map($"study_id", $"upper_bound_kf_ac"))
-        .withColumn("upper_bound_kf_an", $"upper_bound_kf_an_by_study"($"study_id"))
-        .withColumn("upper_bound_kf_an_by_study", map($"study_id", $"upper_bound_kf_an"))
-        .withColumn("upper_bound_kf_af_by_study", map($"study_id", $"upper_bound_kf_af_by_study"($"study_id")))
-        .withColumn("upper_bound_kf_homozygotes", $"upper_bound_kf_homozygotes_by_study"($"study_id"))
-        .withColumn("upper_bound_kf_homozygotes_by_study", map($"study_id", $"upper_bound_kf_homozygotes"))
-        .withColumn("upper_bound_kf_heterozygotes", $"upper_bound_kf_heterozygotes_by_study"($"study_id"))
-        .withColumn("upper_bound_kf_heterozygotes_by_study", map($"study_id", $"upper_bound_kf_heterozygotes"))
-
+        .withColumnByStudyAfterExplode("lower_bound_kf")
+        .withColumnByStudyAfterExplode("upper_bound_kf")
         .withColumn("consent_codes", $"consent_codes_by_study"($"study_id"))
         .withColumn("consent_codes_by_study", map($"study_id", $"consent_codes"))
         .where(not($"study_id".isin(studyIds: _*)))
@@ -228,6 +186,36 @@ object JoinVariants {
     variants
       .joinByLocus(dbsnp, "left")
       .select(variants("*"), dbsnp("name") as "dbsnp_id")
+  }
+
+  implicit class DataFrameOperations(df: DataFrame) {
+    def withRenamedFrequencies(prefix: String): DataFrame = {
+      df.withColumn(s"${prefix}_ac", col(s"frequencies.${prefix}.ac"))
+        .withColumn(s"${prefix}_an", col(s"frequencies.${prefix}.an"))
+        .withColumn(s"${prefix}_af", col(s"frequencies.${prefix}.af"))
+        .withColumn(s"${prefix}_homozygotes", col(s"frequencies.${prefix}.homozygotes"))
+        .withColumn(s"${prefix}_heterozygotes", col(s"frequencies.${prefix}.heterozygotes"))
+    }
+
+    def withColumnByStudy(prefix: String): DataFrame = {
+      df.withColumn(s"${prefix}_ac_by_study", map(col("study_id"), col(s"frequencies.${prefix}.ac")))
+        .withColumn(s"${prefix}_an_by_study", map(col("study_id"), col(s"frequencies.${prefix}.an")))
+        .withColumn(s"${prefix}_af_by_study", map(col("study_id"), col(s"frequencies.${prefix}.af")))
+        .withColumn(s"${prefix}_homozygotes_by_study", map(col("study_id"), col(s"frequencies.${prefix}.homozygotes")))
+        .withColumn(s"${prefix}_heterozygotes_by_study", map(col("study_id"), col(s"frequencies.${prefix}.heterozygotes")))
+    }
+
+    def withColumnByStudyAfterExplode(prefix: String) = {
+      df.withColumn(s"${prefix}_ac", col(s"${prefix}_ac_by_study")(col("study_id")))
+        .withColumn(s"${prefix}_ac_by_study", map(col("study_id"), col(s"${prefix}_ac")))
+        .withColumn(s"${prefix}_an", col(s"${prefix}_an_by_study")(col("study_id")))
+        .withColumn(s"${prefix}_an_by_study", map(col("study_id"), col(s"${prefix}_an")))
+        .withColumn(s"${prefix}_af_by_study", map(col("study_id"), col(s"${prefix}_af_by_study")(col("study_id"))))
+        .withColumn(s"${prefix}_homozygotes", col(s"${prefix}_homozygotes_by_study")(col("study_id")))
+        .withColumn(s"${prefix}_homozygotes_by_study", map(col("study_id"), col(s"${prefix}_homozygotes")))
+        .withColumn(s"${prefix}_heterozygotes", col(s"${prefix}_heterozygotes_by_study")(col("study_id")))
+        .withColumn(s"${prefix}_heterozygotes_by_study", map(col("study_id"), col(s"${prefix}_heterozygotes")))
+    }
   }
 
 }
