@@ -1,38 +1,64 @@
 package org.kidsfirstdrc.dwh.join
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.Clinical
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.{calculated_duo_af, locusColumNames}
 import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 
-object JoinVariants {
+class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: Boolean, database: String)(implicit conf: Configuration)
+  extends ETL(Clinical.variants){
 
-  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean, database: String)(implicit spark: SparkSession): Unit = {
 
-    import spark.implicits._
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
 
     val variants: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
         val nextDf = spark.table(SparkUtils.tableName(Clinical.variants.name, studyId, releaseId, database))
-          .withColumn("studies", array($"study_id"))
-          .withRenamedFrequencies("upper_bound_kf")
-          .withRenamedFrequencies("lower_bound_kf")
-          .withColumnByStudy("upper_bound_kf")
-          .withColumnByStudy("lower_bound_kf")
+          .withColumn("studies", array(col("study_id")))
         if (currentDF.isEmpty)
           nextDf
         else {
           currentDF
             .union(nextDf)
         }
-
     }
 
-    val commonColumns = Seq($"chromosome", $"start", $"reference", $"alternate", $"end", $"name", $"hgvsg", $"variant_class",
-      $"release_id",
+    Map(
+      Public.`1000_genomes` -> spark.table(s"variant.${Public.`1000_genomes`.name}"),
+      Public.topmed_bravo -> spark.table(s"variant.${Public.topmed_bravo.name}"),
+      Public.gnomad_genomes_2_1 -> spark.table(s"variant.${Public.gnomad_genomes_2_1.name}"),
+      Public.gnomad_exomes_2_1 -> spark.table(s"variant.${Public.gnomad_exomes_2_1.name}"),
+      Public.gnomad_genomes_3_0 -> spark.table(s"variant.${Public.gnomad_genomes_3_0.name}"),
+      Public.clinvar -> spark.table(s"variant.${Public.clinvar.name}"),
+      Public.dbsnp -> spark.table(s"variant.${Public.dbsnp.name}"),
+      Clinical.variants -> variants
+    )
+  }
+
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+
+    val variants = data(Clinical.variants)
+      .withRenamedFrequencies("upper_bound_kf")
+      .withRenamedFrequencies("lower_bound_kf")
+      .withColumnByStudy("upper_bound_kf")
+      .withColumnByStudy("lower_bound_kf")
+
+    //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
+    val genomes = data(Public.`1000_genomes`).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af")
+    val topmed = data(Public.topmed_bravo).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af", $"homozygotes", $"heterozygotes")
+    val gnomad_genomes_2_1 = data(Public.gnomad_genomes_2_1).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af", $"hom")
+    val gnomad_exomes_2_1 = data(Public.gnomad_exomes_2_1).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af", $"hom")
+    val gnomad_genomes_3_0 = data(Public.gnomad_genomes_3_0).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af", $"hom")
+    val clinvar = data(Public.clinvar).dropDuplicates(locusColumNames)
+    val dbsnp = data(Public.dbsnp).dropDuplicates(locusColumNames)
+
+    val commonColumns = Seq($"chromosome", $"start", $"reference", $"alternate", $"end", $"name", $"hgvsg", $"variant_class", $"release_id",
       $"lower_bound_kf_ac_by_study",
       $"lower_bound_kf_an_by_study",
       $"lower_bound_kf_af_by_study",
@@ -60,34 +86,40 @@ object JoinVariants {
     val allColumns = commonColumns :+
       $"study_id"
 
-    val merged = if (mergeWithExisting && spark.catalog.tableExists(s"${database}.${Clinical.variants.name}")) {
-      val existingColumns = commonColumns :+ explode($"studies").as("study_id")
-      val existingVariants = spark.table(s"${database}.${Clinical.variants.name}")
-        .withRenamedFrequencies("upper_bound_kf")
-        .withRenamedFrequencies("lower_bound_kf")
-        .select(existingColumns: _*)
-        .withColumnByStudyAfterExplode("lower_bound_kf")
-        .withColumnByStudyAfterExplode("upper_bound_kf")
-        .withColumn("consent_codes", $"consent_codes_by_study"($"study_id"))
-        .withColumn("consent_codes_by_study", map($"study_id", $"consent_codes"))
-        .where(not($"study_id".isin(studyIds: _*)))
+    val merged =
+      if (mergeWithExisting && spark.catalog.tableExists(s"${database}.${Clinical.variants.name}")) {
+        val existingColumns = commonColumns :+ explode($"studies").as("study_id")
+        val existingVariants = spark.table(s"${database}.${Clinical.variants.name}")
+          .withRenamedFrequencies("upper_bound_kf")
+          .withRenamedFrequencies("lower_bound_kf")
+          .select(existingColumns: _*)
+          .withColumnByStudyAfterExplode("lower_bound_kf")
+          .withColumnByStudyAfterExplode("upper_bound_kf")
+          .withColumn("consent_codes", $"consent_codes_by_study"($"study_id"))
+          .withColumn("consent_codes_by_study", map($"study_id", $"consent_codes"))
+          .where(not($"study_id".isin(studyIds: _*)))
 
-      mergeVariants(
-        releaseId, existingVariants
-          .select(allColumns: _*)
-          .union(variants.select(allColumns: _*))
-      )
-    } else {
-      mergeVariants(releaseId, variants.select(allColumns: _*))
-    }
-    val joinedWithPop = joinWithPopulations(merged)
-    val joinedWithClinvar = joinWithClinvar(joinedWithPop)
-    val joinedWithDBSNP = joinWithDBSNP(joinedWithClinvar)
+        mergeVariants(
+          releaseId, existingVariants
+            .select(allColumns: _*)
+            .union(variants.select(allColumns: _*)))
+      } else {
+        mergeVariants(releaseId, variants.select(allColumns: _*))
+      }
 
-    JoinWrite.write(releaseId, output, Clinical.variants.name, joinedWithDBSNP, Some(60), database)
-
+    merged
+      .joinAndMerge(genomes, "1k_genomes", "left")
+      .joinAndMerge(topmed, "topmed", "left")
+      .joinAndMerge(gnomad_genomes_2_1, "gnomad_genomes_2_1", "left")
+      .joinAndMerge(gnomad_exomes_2_1, "gnomad_exomes_2_1", "left")
+      .joinAndMerge(gnomad_genomes_3_0, "gnomad_genomes_3_0", "left")
+      .joinWithClinvar(clinvar)
+      .joinWithDBSNP(dbsnp)
   }
 
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    JoinWrite.write(releaseId, Clinical.variants.rootPath, Clinical.variants.name, data, Some(60), database)
+  }
 
   private def mergeVariants(releaseId: String, variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
 
@@ -150,44 +182,6 @@ object JoinVariants {
 
   }
 
-  def joinWithPopulations(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
-    import spark.implicits._
-    val genomes = spark.table("variant.1000_genomes").dropDuplicates(locusColumNames)
-      .selectLocus($"ac", $"an", $"af")
-    val topmed = spark.table("variant.topmed_bravo").dropDuplicates(locusColumNames)
-      .selectLocus($"ac", $"an", $"af", $"homozygotes", $"heterozygotes")
-    val gnomad_genomes_2_1 = spark.table("variant.gnomad_genomes_2_1_1_liftover_grch38").dropDuplicates(locusColumNames)
-      .selectLocus($"ac", $"an", $"af", $"hom")
-    val gnomad_exomes_2_1 = spark.table("variant.gnomad_exomes_2_1_1_liftover_grch38").dropDuplicates(locusColumNames)
-      .selectLocus($"ac", $"an", $"af", $"hom")
-    val gnomad_genomes_3_0 = spark.table("variant.gnomad_genomes_3_0").dropDuplicates(locusColumNames)
-      .selectLocus($"ac", $"an", $"af", $"hom")
-
-    variants
-      .joinAndMerge(genomes, "1k_genomes", "left")
-      .joinAndMerge(topmed, "topmed", "left")
-      .joinAndMerge(gnomad_genomes_2_1, "gnomad_genomes_2_1", "left")
-      .joinAndMerge(gnomad_exomes_2_1, "gnomad_exomes_2_1", "left")
-      .joinAndMerge(gnomad_genomes_3_0, "gnomad_genomes_3_0", "left")
-  }
-
-  def joinWithClinvar(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
-    val clinvar = spark.table("variant.clinvar").dropDuplicates(locusColumNames)
-    variants
-      .joinByLocus(clinvar, "left")
-      .select(variants("*"), clinvar("name") as "clinvar_id", clinvar("clin_sig") as "clin_sig")
-  }
-
-  def joinWithDBSNP(variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
-    val dbsnp = spark.table("variant.dbsnp").dropDuplicates(locusColumNames)
-    variants
-      .joinByLocus(dbsnp, "left")
-      .select(variants("*"), dbsnp("name") as "dbsnp_id")
-  }
-
   implicit class DataFrameOperations(df: DataFrame) {
     def withRenamedFrequencies(prefix: String): DataFrame = {
       df.withColumn(s"${prefix}_ac", col(s"frequencies.${prefix}.ac"))
@@ -216,6 +210,17 @@ object JoinVariants {
         .withColumn(s"${prefix}_heterozygotes", col(s"${prefix}_heterozygotes_by_study")(col("study_id")))
         .withColumn(s"${prefix}_heterozygotes_by_study", map(col("study_id"), col(s"${prefix}_heterozygotes")))
     }
-  }
 
+    def joinWithClinvar(clinvar: DataFrame)(implicit spark: SparkSession): DataFrame = {
+      df
+        .joinByLocus(clinvar, "left")
+        .select(df("*"), clinvar("name") as "clinvar_id", clinvar("clin_sig") as "clin_sig")
+    }
+
+    def joinWithDBSNP(dbsnp: DataFrame)(implicit spark: SparkSession): DataFrame = {
+      df
+        .joinByLocus(dbsnp, "left")
+        .select(df("*"), dbsnp("name") as "dbsnp_id")
+    }
+  }
 }

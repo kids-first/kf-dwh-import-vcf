@@ -1,9 +1,10 @@
 package org.kidsfirstdrc.dwh.join
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SaveMode
 import org.kidsfirstdrc.dwh.testutils.Model._
-import org.kidsfirstdrc.dwh.testutils.join.{Freq, JoinVariantOutput}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.join.{Freq, JoinVariantOutput}
 import org.kidsfirstdrc.dwh.testutils.vcf.{VariantFrequency, VariantOutput}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
@@ -18,6 +19,11 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
   "build" should "return a dataframe with all expected columns" in {
     withOutputFolder("output") { outputDir =>
+
+      implicit val conf: Configuration = Configuration(List(
+        StorageConf("kf-strides-variant", outputDir)
+      ))
+
       spark.sql("create database if not exists variant")
       spark.sql("use variant")
       Given("2 studies")
@@ -140,7 +146,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         .saveAsTable("dbsnp")
 
       When("Join variants")
-      JoinVariants.join(Seq(studyId1, studyId2), releaseId, outputDir, mergeWithExisting = true, "variant")
+      new JoinVariants(Seq(studyId1, studyId2), releaseId, mergeWithExisting = true, "variant").run()
 
       Then("A new table for the release is created")
       val variantReleaseTable = spark.table("variant.variants_re_abcdef")
