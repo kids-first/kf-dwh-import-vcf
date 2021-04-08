@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.join
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SparkSession
 
 object Join extends App {
@@ -14,6 +15,10 @@ object Join extends App {
     case "portal" => "s3a://kf-strides-variant-parquet-prd/portal"
   }
 
+  implicit val conf: Configuration = Configuration(List(
+    StorageConf("kf-strides-variant", output)
+  ))
+
   run(studyId, releaseId, output, runType, mergeExisting.toBoolean, schema)
 
   def run(studyId: String, releaseId: String, output: String, runType: String, mergeExisting: Boolean, schema: String)(implicit spark: SparkSession): Unit = {
@@ -23,10 +28,10 @@ object Join extends App {
     spark.sql(s"USE $schema")
 
     runType match {
-      case "variants" => JoinVariants.join(studyIds, releaseIdLc, output, mergeExisting, schema)
+      case "variants" => new JoinVariants(studyIds, releaseIdLc, mergeExisting, schema).run()
       case "consequences" => JoinConsequences.join(studyIds, releaseIdLc, output, mergeExisting, schema)
       case "all" =>
-        JoinVariants.join(studyIds, releaseIdLc, output, mergeExisting, schema)
+        new JoinVariants(studyIds, releaseIdLc, mergeExisting, schema).run()
         JoinConsequences.join(studyIds, releaseIdLc, output, mergeExisting, schema)
 
     }
