@@ -19,9 +19,9 @@ object Join extends App {
     StorageConf("kf-strides-variant", output)
   ))
 
-  run(studyId, releaseId, output, runType, mergeExisting.toBoolean, schema)
+  run(studyId, releaseId, runType, mergeExisting.toBoolean, schema)
 
-  def run(studyId: String, releaseId: String, output: String, runType: String, mergeExisting: Boolean, schema: String)(implicit spark: SparkSession): Unit = {
+  def run(studyId: String, releaseId: String, runType: String, mergeExisting: Boolean, schema: String)(implicit spark: SparkSession): Unit = {
     val studyIds = studyId.split(",")
     val releaseIdLc = releaseId.toLowerCase()
 
@@ -29,10 +29,10 @@ object Join extends App {
 
     runType match {
       case "variants" => new JoinVariants(studyIds, releaseIdLc, mergeExisting, schema).run()
-      case "consequences" => JoinConsequences.join(studyIds, releaseIdLc, output, mergeExisting, schema)
+      case "consequences" => new JoinConsequences(studyIds, releaseIdLc, mergeExisting, schema).run()
       case "all" =>
         new JoinVariants(studyIds, releaseIdLc, mergeExisting, schema).run()
-        JoinConsequences.join(studyIds, releaseIdLc, output, mergeExisting, schema)
+        new JoinConsequences(studyIds, releaseIdLc, mergeExisting, schema).run()
 
     }
   }

@@ -5,14 +5,16 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.join.JoinConsequences
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
+import JoinConsequences._
 
 object Consequences {
   def run(releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
     val inputDF = vcf(input)
     val consequences: DataFrame = build(inputDF)
+    val dbnsfp_original: DataFrame = spark.table("variant.dbnsfp_original")
 
-    val joinConsequences = JoinConsequences.joinWithDBNSFP(consequences)
+    val joinConsequences = consequences.joinWithDbnsfp(dbnsfp_original)
     val tableConsequences = s"consequences_${releaseId.toLowerCase}"
     joinConsequences
       .repartition($"chromosome")
