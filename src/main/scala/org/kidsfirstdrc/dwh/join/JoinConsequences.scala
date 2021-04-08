@@ -1,22 +1,22 @@
 package org.kidsfirstdrc.dwh.join
 
+import bio.ferlab.datalake.core.config.Configuration
+import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.utils.SparkUtils
 import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
+import JoinConsequences._
 
 
-object JoinConsequences {
+class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisting: Boolean, database: String)(implicit conf: Configuration)
+  extends ETL(Clinical.consequences){
 
-  val TABLE_NAME = "consequences"
-
-  def join(studyIds: Seq[String], releaseId: String, output: String, mergeWithExisting: Boolean, database: String)(implicit spark: SparkSession): Unit = {
-
-    import spark.implicits._
-
+  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     val consequences: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
-        val nextDf = spark.table(SparkUtils.tableName(TABLE_NAME, studyId, releaseId, database))
+        val nextDf = spark.table(SparkUtils.tableName(Clinical.consequences.name, studyId, releaseId, database))
         if (currentDF.isEmpty)
           nextDf
         else {
@@ -25,55 +25,48 @@ object JoinConsequences {
         }
     }
 
-    val commonColumns = Seq(
-      $"chromosome",
-      $"start",
-      $"end",
-      $"reference",
-      $"alternate",
-      $"consequences",
-      $"ensembl_transcript_id",
-      $"ensembl_regulatory_id",
-      $"feature_type",
-      $"name",
-      $"impact",
-      $"symbol",
-      $"ensembl_gene_id",
-      $"strand",
-      $"biotype",
-      $"variant_class",
-      $"exon",
-      $"intron",
-      $"hgvsc",
-      $"hgvsp",
-      $"hgvsg",
-      $"cds_position",
-      $"cdna_position",
-      $"protein_position",
-      $"amino_acids",
-      $"codons",
-      $"canonical"
+    Map(
+      Clinical.consequences -> consequences,
+      Public.dbnsfp_original -> spark.table("variant.dbnsfp_original")
     )
+  }
+
+  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+
+    val consequences = data(Clinical.consequences)
+    val dbnsfp_original = data(Public.dbnsfp_original)
+
+    val commonColumns = Seq(
+      $"chromosome", $"start", $"end", $"reference", $"alternate", $"consequences", $"ensembl_transcript_id", $"ensembl_regulatory_id",
+      $"feature_type", $"name", $"impact", $"symbol", $"ensembl_gene_id", $"strand", $"biotype", $"variant_class", $"exon", $"intron",
+      $"hgvsc", $"hgvsp", $"hgvsg", $"cds_position", $"cdna_position", $"protein_position", $"amino_acids", $"codons", $"canonical"
+    )
+
     val allColumns = commonColumns :+ col("study_id")
-    val merged = if (mergeWithExisting && spark.catalog.tableExists(TABLE_NAME)) {
 
-      val existingConsequences = spark.table(TABLE_NAME)
+    val merged =
+      if (mergeWithExisting && spark.catalog.tableExists(s"${Clinical.consequences.name}")) {
+        val existingConsequences = spark.table(s"${Clinical.consequences.name}")
 
-      val existingColumns = commonColumns :+ $"study_ids"
-      mergeConsequences(releaseId, existingConsequences.select(existingColumns: _*)
-        .withColumn("study_id", explode($"study_ids"))
-        .drop("study_ids")
-        .where(not($"study_id".isin(studyIds: _*)))
-        .union(consequences.select(allColumns: _*))
-      )
-    } else {
-      mergeConsequences(releaseId, consequences.select(allColumns: _*))
-    }
-    val joinedWithScores = joinWithDBNSFP(merged)
-    JoinWrite.write(releaseId, output, TABLE_NAME, joinedWithScores, Some(30), database)
+        val existingColumns = commonColumns :+ $"study_ids"
+        mergeConsequences(releaseId, existingConsequences.select(existingColumns: _*)
+          .withColumn("study_id", explode($"study_ids"))
+          .drop("study_ids")
+          .where(not($"study_id".isin(studyIds: _*)))
+          .union(consequences.select(allColumns: _*))
+        )
+      } else {
+        mergeConsequences(releaseId, consequences.select(allColumns: _*))
+      }
+
+    merged.joinWithDbnsfp(dbnsfp_original)
 
   }
 
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    JoinWrite.write(releaseId, Clinical.consequences.rootPath, Clinical.consequences.name, data, Some(30), database)
+  }
 
   private def mergeConsequences(releaseId: String, consequences: DataFrame)(implicit spark: SparkSession): DataFrame = {
 
@@ -115,34 +108,17 @@ object JoinConsequences {
       .withColumn("coding_dna_change", when($"cds_position".isNotNull, concat($"cds_position", $"reference", lit(">"), $"alternate")).otherwise(lit(null)))
       .withColumn("release_id", lit(releaseId))
 
-
   }
+}
 
-
-  def joinWithDBNSFP(c: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    val s = spark.table("variant.dbnsfp_original")
-      .drop(
-        "aaref",
-        "symbol",
-        "ensembl_gene_id",
-        "ensembl_protein_id",
-        "VEP_canonical",
-        "cds_strand")
-
-    c.join(s,
-      c("chromosome") === s("chromosome") &&
-        c("start") === s("start") &&
-        c("reference") === s("reference") &&
-        c("alternate") === s("alternate") &&
-        c("ensembl_transcript_id") === s("ensembl_transcript_id"),
-      "left")
-      .drop(s("chromosome"))
-      .drop(s("start"))
-      .drop(s("reference"))
-      .drop(s("alternate"))
-      .drop(s("ensembl_transcript_id"))
-
-
+object JoinConsequences {
+  implicit class DataFrameOperations(df: DataFrame) {
+    def joinWithDbnsfp(dbnsfp_original: DataFrame) = {
+      df
+        .join(
+          dbnsfp_original.drop("aaref", "symbol", "ensembl_gene_id", "ensembl_protein_id", "VEP_canonical", "cds_strand"),
+          Seq("chromosome", "start", "reference", "alternate", "ensembl_transcript_id"),
+          "left")
+    }
   }
-
 }

@@ -1,5 +1,6 @@
 package org.kidsfirstdrc.dwh.join
 
+import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SaveMode
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.ImportScores
@@ -18,6 +19,11 @@ class JoinConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
 
   "build" should "return a dataframe with all expected columns" in {
     withOutputFolder("output") { outputDir =>
+
+      implicit val conf: Configuration = Configuration(List(
+        StorageConf("kf-strides-variant", outputDir)
+      ))
+
       spark.sql("create database if not exists variant")
       spark.sql("use variant")
       Given("2 studies")
@@ -58,7 +64,7 @@ class JoinConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
         .saveAsTable("dbnsfp_original")
 
       When("Join Consequences")
-      JoinConsequences.join(Seq(studyId1, studyId2), releaseId, outputDir, mergeWithExisting = true, "variant")
+      new JoinConsequences(Seq(studyId1, studyId2), releaseId, mergeWithExisting = true, "variant").run()
 
       Then("A new table for the release is created")
       val variantReleaseTable = spark.table("variant.consequences_re_abcdef")
