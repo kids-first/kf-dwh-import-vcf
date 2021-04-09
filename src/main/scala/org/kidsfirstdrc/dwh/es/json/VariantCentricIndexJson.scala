@@ -80,14 +80,14 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
       .option("maxRecordsPerFile", 200000)
       .partitionBy("chromosome")
       .mode(SaveMode.Overwrite)
-      .format("json")
-      .json(s"${destination.rootPath}/es_index/${destination.name}_$releaseId")
+      .parquet(s"${destination.rootPath}/es_index/${destination.name}_${releaseId}")
     data
   }
 
   override def run()(implicit spark: SparkSession): DataFrame = {
     val inputDF = extract()
-    val outputDF = transform(inputDF)
+    val outputDF = transform(inputDF).persist()
+    println(s"count: ${outputDF.count}")
     load(outputDF)
     outputDF
   }
