@@ -1,5 +1,5 @@
 #!/bin/bash
-job_type=${1:-"genomic_suggestions"}
+job_type=${1:-"variant_centric"}
 release_id=${2:-"re_000010"}
 number_instance=${3:-"15"}
 instance_type=${4:-"r5.4xlarge"}
@@ -15,7 +15,7 @@ steps=$(cat <<EOF
       "--deploy-mode",
       "client",
       "--class",
-      "org.kidsfirstdrc.dwh.es.json.PrepareIndex",
+      "org.kidsfirstdrc.dwh.es.index.PrepareIndex",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
       "${job_type}",
       "${release_id}"
