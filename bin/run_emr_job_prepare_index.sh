@@ -1,5 +1,5 @@
 #!/bin/bash
-job_type=${1:-"variant_centric"}
+job_type=${1:-"genomic_suggestions"}
 release_id=${2:-"re_000010"}
 number_instance=${3:-"15"}
 instance_type=${4:-"r5.4xlarge"}
@@ -39,7 +39,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --release-label emr-6.2.0 \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --steps "${steps}" \
---name "Prepare ${job_type} to Json - ${release_id}" \
+--name "Prepare ${job_type} - ${release_id}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \

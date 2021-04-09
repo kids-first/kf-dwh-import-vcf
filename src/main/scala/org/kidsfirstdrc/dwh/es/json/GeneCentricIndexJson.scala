@@ -23,8 +23,7 @@ class GeneCentricIndexJson()(override implicit val conf: Configuration) extends 
     data
       .write
       .mode(SaveMode.Overwrite)
-      .format("json")
-      .json(s"${destination.location}")
+      .parquet(s"${destination.location}")
     data
   }
 

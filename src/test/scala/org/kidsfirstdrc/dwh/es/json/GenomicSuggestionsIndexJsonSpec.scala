@@ -43,11 +43,12 @@ class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen wit
       consent_codes_by_study = Map(studyId1 -> Set("SD_123.c1"), studyId2 -> Set("SD_456.c1"), studyId3 -> Set(s"$studyId3.c99")),
       release_id = realeaseId,
       clin_sig = Some("pathogenic"),
-      clinvar_id = Some("RCV000436956"))
+      clinvar_id = Some("RCV000436956"),
+      name = "rs1313905795")
 
   val joinVariantDf: DataFrame = Seq(
     variant,                       //should be in the index
-    variant.copy(chromosome = "3") //should not be in the index
+    //variant.copy(chromosome = "3") //should not be in the index
   ).toDF().withColumnRenamed("one_thousand_genomes", "1k_genomes")
 
   val joinConsequencesDf: DataFrame = Seq(
@@ -95,9 +96,10 @@ class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen wit
         `suggestion_id` = "9b8016c31b93a7504a8314ce3d060792f67ca2ad",
         `hgvsg` = null,
         `symbol` = "OR4F5",
+        `rsnumber` = null,
         `suggest` = List(
           SUGGEST(List("OR4F5"), 5),
-          SUGGEST(List("BII", "CACH6", "CACNL1A6", "Cav2.3"), 3)))
+          SUGGEST(List("BII", "CACH6", "CACNL1A6", "Cav2.3", "ENSG00000198216"), 3)))
     )
   }
 
@@ -112,7 +114,9 @@ class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen wit
 
     val expectedResult = SuggesterIndexOutput(
       `hgvsg` = "",
-      `suggest` = List(SUGGEST(List("SCN2A", "SCN2A.2", "2-165310406-G-A")), SUGGEST(List("SCN2A", "SCN2A.2"), 2)))
+      `suggest` = List(
+        SUGGEST(List("SCN2A", "SCN2A.2", "2-165310406-G-A", "rs1313905795", "RCV000436956"), 4),
+        SUGGEST(List("SCN2A", "SCN2A.2", "ENSG00000136531", "ENST00000486878"), 2)))
 
     result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
       expectedResult
