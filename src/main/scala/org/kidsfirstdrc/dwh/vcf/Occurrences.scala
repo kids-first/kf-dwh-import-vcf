@@ -101,7 +101,16 @@ class Occurrences(studyId: String, releaseId: String, input: String, biospecimen
   def selectOccurrences(studyId: String, releaseId: String, inputDF: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
-    val occurrences = inputDF
+    val inputWithAnnotation =
+      inputDF
+        .withColumn("annotation", explode(annotations))
+        .groupBy(inputDF.columns.head, inputDF.columns.tail:_*)
+        .agg(
+          max("annotation.HGVSg") as "hgvsg",
+          max("annotation.VARIANT_CLASS") as "variant_class"
+        )
+
+    val occurrences = inputWithAnnotation
       .select(
         chromosome,
         start,
@@ -109,7 +118,8 @@ class Occurrences(studyId: String, releaseId: String, input: String, biospecimen
         reference,
         alternate,
         name,
-        firstAnn,
+        $"hgvsg",
+        $"variant_class",
         $"genotype.sampleId" as "biospecimen_id",
         $"genotype.alleleDepths" as "ad",
         $"genotype.depth" as "dp",
@@ -153,8 +163,6 @@ class Occurrences(studyId: String, releaseId: String, input: String, biospecimen
       )
       .withColumn("is_lo_conf_denovo", array_contains(split($"lo_conf_denovo", ","), $"biospecimen_id"))
       .withColumn("is_hi_conf_denovo", array_contains(split($"hi_conf_denovo", ","), $"biospecimen_id"))
-      .withColumn("hgvsg", hgvsg)
-      .withColumn("variant_class", variant_class)
       .drop("annotation", "lo_conf_denovo", "hi_conf_denovo")
     occurrences
   }

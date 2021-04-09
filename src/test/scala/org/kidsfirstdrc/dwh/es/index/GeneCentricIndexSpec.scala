@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.es.json
+package org.kidsfirstdrc.dwh.es.index
 
 import bio.ferlab.datalake.core.config.Configuration
 import org.apache.spark.sql.DataFrame
@@ -11,7 +11,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 
-class GeneCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class GeneCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
 
   val genesDf: DataFrame = Seq(
@@ -26,7 +26,7 @@ class GeneCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithS
 
   "Gene_centric index job" should "transform data to the right format" in {
 
-    val result = new GeneCentricIndexJson().transform(data)
+    val result = new GeneCentricIndex().transform(data)
     result.columns should contain allElementsOf Seq("hash")
     result.as[GeneCentricOutput].collect() should contain allElementsOf Seq(GeneCentricOutput())
   }
