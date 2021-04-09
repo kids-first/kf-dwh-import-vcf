@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.es.json
+package org.kidsfirstdrc.dwh.es.index
 
 import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.{DataSource, ETL}
@@ -6,7 +6,7 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{explode, _}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
-import org.kidsfirstdrc.dwh.es.json.VariantCentricIndexJson._
+import org.kidsfirstdrc.dwh.es.index.VariantCentricIndex._
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
@@ -14,7 +14,7 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 import scala.collection.mutable
 import scala.util.{Success, Try}
 
-class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
+class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
   extends ETL(Es.variant_centric)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
@@ -93,7 +93,7 @@ class VariantCentricIndexJson(releaseId: String)(implicit conf: Configuration)
   }
 }
 
-object VariantCentricIndexJson {
+object VariantCentricIndex {
 
   private def frequenciesForGnomad(colName: String): Column = {
     struct(

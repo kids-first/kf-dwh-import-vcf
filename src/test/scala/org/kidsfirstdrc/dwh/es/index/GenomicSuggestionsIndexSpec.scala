@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.es.json
+package org.kidsfirstdrc.dwh.es.index
 
 import bio.ferlab.datalake.core.config.Configuration
 import org.apache.spark.sql.DataFrame
@@ -13,7 +13,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 
-class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class GenomicSuggestionsIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
   val studyId1 = "SD_123"
   val studyId2 = "SD_456"
@@ -73,6 +73,12 @@ class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen wit
     )
   ).toDF()
 
+  val genesWithNullsDf: DataFrame = Seq(
+    GenesOutput(
+      `alias` = List("BII", "CACH6", "CACNL1A6", "Cav2.3", "", null), `ensembl_gene_id` = null
+    )
+  ).toDF()
+
   val data = Map(
     Public.genes -> genesDf,
     Clinical.occurrences -> occurrencesDf,
@@ -84,7 +90,7 @@ class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen wit
 
   "suggester index job" should "transform data to the right format" in {
 
-    val result = new GenomicSuggestionsIndexJson("re_000010").transform(data)
+    val result = new GenomicSuggestionsIndex("re_000010").transform(data)
     result.show(false)
 
     result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
@@ -105,18 +111,36 @@ class GenomicSuggestionsIndexJsonSpec extends AnyFlatSpec with GivenWhenThen wit
 
   "suggester from variants" should "remove null and empty values" in {
 
-    val result = new GenomicSuggestionsIndexJson("").getVariantSuggest(joinVariantWithNullDf, joinConsequencesWithEmptyAndNullDf)
+    val result = new GenomicSuggestionsIndex("").getVariantSuggest(joinVariantWithNullDf, joinConsequencesWithEmptyAndNullDf)
     result.show(false)
-
-    result.repartition(1)
-      .write.mode("overwrite")
-      .json(getClass.getClassLoader.getResource(".").getFile + "test_result")
 
     val expectedResult = SuggesterIndexOutput(
       `hgvsg` = "",
       `suggest` = List(
         SUGGEST(List("SCN2A", "SCN2A.2", "2-165310406-G-A", "rs1313905795", "RCV000436956"), 4),
         SUGGEST(List("SCN2A", "SCN2A.2", "ENSG00000136531", "ENST00000486878"), 2)))
+
+    result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
+      expectedResult
+    )
+  }
+
+  "suggester from genes" should "remove null and empty values" in {
+
+    val result = new GenomicSuggestionsIndex("").getGenesSuggest(genesWithNullsDf)
+    result.show(false)
+
+    val expectedResult = SuggesterIndexOutput(
+      `type` = "gene",
+      `chromosome` = null,
+      `locus` = null,
+      `suggestion_id` = "9b8016c31b93a7504a8314ce3d060792f67ca2ad",
+      `hgvsg` = null,
+      `symbol` = "OR4F5",
+      `rsnumber` = null,
+      `suggest` = List(
+        SUGGEST(List("OR4F5"), 5),
+        SUGGEST(List("BII", "CACH6", "CACNL1A6", "Cav2.3"), 3)))
 
     result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
       expectedResult

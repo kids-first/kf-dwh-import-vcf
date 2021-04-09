@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.es.json
+package org.kidsfirstdrc.dwh.es.index
 
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.DataFrame
@@ -14,7 +14,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 
-class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class VariantCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
   val studyId1 = "SD_123"
   val studyId2 = "SD_456"
@@ -99,7 +99,7 @@ class VariantCentricIndexJsonSpec extends AnyFlatSpec with GivenWhenThen with Wi
 
   "VariantDbJson" should "transform data to the right format" in {
 
-    val result = new VariantCentricIndexJson(realeaseId).transform(data)
+    val result = new VariantCentricIndex(realeaseId).transform(data)
 
     val parsedResult = result.as[VariantCentricOutput.Output].collect()
     val variant = parsedResult.head

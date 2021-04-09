@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.es.json
+package org.kidsfirstdrc.dwh.es.index
 
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SparkSession
@@ -17,9 +17,9 @@ object PrepareIndex extends App {
   ))
 
   jobType match {
-    case "gene_centric" => new GeneCentricIndexJson().run()
-    case "genomic_suggestions" => new GenomicSuggestionsIndexJson(releaseId).run()
-    case "variant_centric" => new VariantCentricIndexJson(releaseId).run()
+    case "gene_centric" => new GeneCentricIndex().run()
+    case "genomic_suggestions" => new GenomicSuggestionsIndex(releaseId).run()
+    case "variant_centric" => new VariantCentricIndex(releaseId).run()
   }
 
 }

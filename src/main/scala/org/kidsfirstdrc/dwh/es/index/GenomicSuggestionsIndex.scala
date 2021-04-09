@@ -1,4 +1,4 @@
-package org.kidsfirstdrc.dwh.es.json
+package org.kidsfirstdrc.dwh.es.index
 
 import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.{DataSource, ETL}
@@ -9,8 +9,8 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 
-class GenomicSuggestionsIndexJson(releaseId: String)
-                                 (override implicit val conf: Configuration) extends ETL(Es.genomic_suggestions) {
+class GenomicSuggestionsIndex(releaseId: String)
+                             (override implicit val conf: Configuration) extends ETL(Es.genomic_suggestions) {
 
   final val geneSymbolWeight = 5
   final val geneAliasesWeight = 3
@@ -96,6 +96,8 @@ class GenomicSuggestionsIndexJson(releaseId: String)
 
   def getGenesSuggest(genes: DataFrame): DataFrame = {
     genes
+      .withColumn("ensembl_gene_id", when(col("ensembl_gene_id").isNull, lit("")).otherwise(trim(col("ensembl_gene_id"))))
+      .withColumn("symbol", when(col("symbol").isNull, lit("")).otherwise(trim(col("symbol"))))
       .withColumn("type", lit("gene"))
       .withColumn("suggestion_id", sha1(col("symbol"))) //this maps to `hash` column in gene_centric index
       .withColumn("hgvsg", lit(null).cast(StringType))
