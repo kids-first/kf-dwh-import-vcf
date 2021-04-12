@@ -19,7 +19,6 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
     val variants: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
         val nextDf = spark.table(SparkUtils.tableName(Clinical.variants.name, studyId, releaseId, database))
-          .withColumn("studies", array(col("study_id")))
         if (currentDF.isEmpty)
           nextDf
         else {
@@ -40,10 +39,20 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
     )
   }
 
+  def getUpperBoundAlleleNumber(variants: DataFrame)(implicit spark: SparkSession): Long = {
+    import spark.implicits._
+    variants
+      .select("upper_bound_kf_an", "study_id")
+      .groupBy("study_id")
+      .agg(first("upper_bound_kf_an") as "upper_bound_kf_an")
+      .select("upper_bound_kf_an").as[Long].collect().sum
+  }
+
   override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val variants = data(Clinical.variants)
+      .withColumn("studies", array(col("study_id")))
       .withRenamedFrequencies("upper_bound_kf")
       .withRenamedFrequencies("lower_bound_kf")
       .withColumnByStudy("upper_bound_kf")
@@ -124,6 +133,7 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
   private def mergeVariants(releaseId: String, variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
 
     import spark.implicits._
+    val upper_bound_kf_an = getUpperBoundAlleleNumber(variants)
 
     val t = variants
       .groupBy($"chromosome", $"start", $"reference", $"alternate")
@@ -159,6 +169,7 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
         map_from_entries(collect_list(struct($"study_id", $"consent_codes"))) as "consent_codes_by_study",
         lit(releaseId) as "release_id"
       )
+      .withColumn("upper_bound_kf_an", lit(upper_bound_kf_an))
       .withColumn("upper_bound_kf_af", calculated_duo_af("upper_bound_kf"))
       .withColumn("lower_bound_kf_af", calculated_duo_af("lower_bound_kf"))
       .withColumn("frequencies", struct(

@@ -2,6 +2,7 @@ package org.kidsfirstdrc.dwh.join
 
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SaveMode
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.testutils.Model._
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.join.{Freq, JoinVariantOutput}
@@ -178,7 +179,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           consent_codes_by_study = Map(studyId1 -> Set("SD_123.c1"), studyId2 -> Set("SD_456.c1"), studyId3 -> Set(s"$studyId3.c99"))),
         JoinVariantOutput(
           chromosome = "3", start = 3000, end = 3000, reference = "T", alternate = "G",
-          frequencies = VariantFrequency(Freq(2,2,1,1,0),Freq(2,2,1,1,0)),
+          frequencies = VariantFrequency(Freq(11,2,0.18181818181818182,1,0),Freq(2,2,1.0,1,0)),
           upper_bound_kf_ac_by_study = Map(studyId1 -> 2),
           upper_bound_kf_an_by_study = Map(studyId1 -> 2),
           upper_bound_kf_af_by_study = Map(studyId1 -> 1),
@@ -199,7 +200,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           gnomad_genomes_3_0 = None),
         JoinVariantOutput(
           chromosome = "3", start = 3000, end = 3000, "C", "A", name = "mutation_2", hgvsg = "chr3:g.2000T>G",
-          frequencies = VariantFrequency(Freq(2,2,1,1,0),Freq(2,2,1,1,0)),
+          frequencies = VariantFrequency(Freq(11,2,0.18181818181818182,1,0),Freq(2,2,1.0,1,0)),
           upper_bound_kf_ac_by_study = Map(studyId2 -> 2),
           upper_bound_kf_an_by_study = Map(studyId2 -> 2),
           upper_bound_kf_af_by_study = Map(studyId2 -> 1.0000000000),
@@ -220,9 +221,99 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         existingVariant2.copy(release_id = releaseId,
           one_thousand_genomes = None,
           gnomad_exomes_2_1 = None,
-          gnomad_genomes_3_0 = None)
+          gnomad_genomes_3_0 = None,
+          frequencies = VariantFrequency(Freq(11,2,0.18181818181818182,1,1),Freq(3,2,0.6666666666666666,1,1)))
       )
       output.collect() should contain theSameElementsAs expectedOutput
+
+    }
+  }
+
+
+  "join variant" should "combine frequencies" in {
+    withOutputFolder("output") { outputDir =>
+      implicit val conf: Configuration = Configuration(List(
+        StorageConf("kf-strides-variant", getClass.getResource(".").getFile)
+      ))
+
+      val studyId3 = "SD_333"
+
+      spark.sql("create database if not exists variant")
+      spark.sql("drop table if exists variant.variants")
+      spark.sql("use variant")
+
+      val existingVariant1 =
+        Seq(
+          JoinVariantOutput(
+            "2", 165310407, 165310407, "G", "A",
+            frequencies = VariantFrequency(Freq(ac = 4, an = 10, af = 0.4, homozygotes = 6, heterozygotes = 2), Freq(ac = 4, an = 10, af = 0.4, homozygotes = 6, heterozygotes = 2)),
+            upper_bound_kf_ac_by_study = Map(studyId3 -> 4),
+            upper_bound_kf_an_by_study = Map(studyId3 -> 10),
+            upper_bound_kf_af_by_study = Map(studyId3 -> 0.4),
+            upper_bound_kf_homozygotes_by_study = Map(studyId3 -> 6),
+            upper_bound_kf_heterozygotes_by_study = Map(studyId3 -> 2),
+            lower_bound_kf_ac_by_study = Map(studyId3 -> 4),
+            lower_bound_kf_an_by_study = Map(studyId3 -> 10),
+            lower_bound_kf_af_by_study = Map(studyId3 -> 0.4),
+            lower_bound_kf_homozygotes_by_study = Map(studyId3 -> 6),
+            lower_bound_kf_heterozygotes_by_study = Map(studyId3 -> 2),
+            studies = Set(studyId3), release_id = "RE_PREVIOUS",
+            consent_codes = Set(s"$studyId3.c99"),
+            consent_codes_by_study = Map(studyId3 -> Set(s"$studyId3.c99")))
+        ).toDF.write
+          .mode(SaveMode.Overwrite)
+          .format("parquet")
+          .option("path", outputDir + "variants")
+          .saveAsTable("variant.variants")
+
+      val variants = Seq(
+        VariantOutput("2", 165310407, 165310407, "G", "A", "chr4:g.73979437G>A", None,
+          frequencies = VariantFrequency(Freq(6, 3, 0.5, 1, 1), Freq(4, 3, 0.75, 1, 1)),
+          consent_codes = Set("SD_111.c1"),
+          study_id = "SD_111",
+          consent_codes_by_study = Map("SD_111" -> Set("SD_111.c1"))),
+        VariantOutput("2", 165310407, 165310407, "G", "C", "chr4:g.73979437G>C", None,
+          frequencies = VariantFrequency(Freq(6, 3, 0.5, 1, 1), Freq(4, 3, 0.75, 1, 1)),
+          consent_codes = Set("SD_222.c1"),
+          study_id = "SD_222",
+          consent_codes_by_study = Map("SD_222" -> Set("SD_222.c1")))
+      ).toDF()
+
+      val data = Map(
+        Public.`1000_genomes` -> Seq(FrequencyEntry()).toDF(),
+        Public.topmed_bravo -> Seq(FrequencyEntry()).toDF(),
+        Public.gnomad_genomes_2_1 -> Seq(GnomadFrequencyEntry()).toDF(),
+        Public.gnomad_exomes_2_1 -> Seq(GnomadFrequencyEntry()).toDF(),
+        Public.gnomad_genomes_3_0 -> Seq(GnomadFrequencyEntry()).toDF(),
+        Public.clinvar -> Seq(ClinvarEntry()).toDF(),
+        Public.dbsnp -> Seq(DBSNPEntry()).toDF(),
+        Clinical.variants -> variants
+      )
+
+      val result = new JoinVariants(Seq("SD_222", "SD_111"), "RE_000000", true, "variant")
+        .transform(data)
+
+      result.select("frequencies.upper_bound_kf", "upper_bound_kf_ac_by_study", "upper_bound_kf_an_by_study", "upper_bound_kf_af_by_study").show(false)
+
+      result.select("frequencies.upper_bound_kf.*").as[Freq].collect() should contain theSameElementsAs Seq(
+        Freq(22, 7, 0.3181818181818182, 7, 3),
+        Freq(22, 3, 0.13636363636363635, 1, 1)
+      )
+
+      result.select("upper_bound_kf_ac_by_study").as[Map[String, Long]].collect() should contain theSameElementsAs Seq(
+        Map("SD_333" -> 4, "SD_111" -> 3),
+        Map("SD_222" -> 3)
+      )
+
+      result.select("upper_bound_kf_an_by_study").as[Map[String, Long]].collect() should contain theSameElementsAs Seq(
+        Map("SD_333" -> 10, "SD_111" -> 6),
+        Map("SD_222" -> 6)
+      )
+
+      result.select("upper_bound_kf_af_by_study").as[Map[String, Long]].collect() should contain theSameElementsAs Seq(
+        Map("SD_333" -> 0.4, "SD_111" -> 0.5),
+        Map("SD_222" -> 0.5)
+      )
 
     }
   }
