@@ -59,9 +59,9 @@ class VariantCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSp
   ).toDF()
 
   val occurrencesDf: DataFrame = Seq(
-    //OccurrenceOutput(`start` = 165310406, `end` = 165310406, is_gru = false, is_hmb = false, participant_id = "PT_000001"), //should not be in the result
-    OccurrenceOutput(`start` = 165310406, `end` = 165310406, is_gru = true , is_hmb = false, participant_id = "PT_000002"), //should be in the result
-    OccurrenceOutput(`start` = 165310406, `end` = 165310406, is_gru = false, is_hmb = true , participant_id = "PT_000003")  //should be in the result
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 0, participant_id = "PT_000001"), //should not be in the result
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000002"), //should be in the result
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000003")  //should be in the result
   ).toDF()
 
   val clinvarDf: DataFrame = Seq(
