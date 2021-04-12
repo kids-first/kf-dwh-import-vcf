@@ -4,6 +4,7 @@ import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{explode, _}
+import org.apache.spark.sql.types.DoubleType
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
 import org.kidsfirstdrc.dwh.es.index.VariantCentricIndex._
@@ -80,7 +81,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
       .option("maxRecordsPerFile", 200000)
       .partitionBy("chromosome")
       .mode(SaveMode.Overwrite)
-      .parquet(s"${destination.rootPath}/es_index/${destination.name}_${releaseId}")
+      .parquet(s"${destination.rootPath}/es_index/${destination.name}_${releaseId}_parquet")
     data
   }
 
@@ -99,7 +100,7 @@ object VariantCentricIndex {
     struct(
       col(s"$colName.ac") as "ac",
       col(s"$colName.an") as "an",
-      col(s"$colName.af") as "af",
+      col(s"$colName.af").cast(DoubleType) as "af",
       col(s"$colName.hom") as "homozygotes"
     ).as(colName)
   }
@@ -108,7 +109,7 @@ object VariantCentricIndex {
     struct(
       col(s"frequencies.${prefix}.ac") as "ac",
       col(s"frequencies.${prefix}.an") as "an",
-      col(s"frequencies.${prefix}.af") as "af",
+      col(s"frequencies.${prefix}.af").cast(DoubleType) as "af",
       col(s"frequencies.${prefix}.homozygotes") as "homozygotes",
       col(s"frequencies.${prefix}.heterozygotes") as "heterozygotes"
     ).as(prefix)
@@ -118,7 +119,7 @@ object VariantCentricIndex {
     struct(
       col(s"${prefix}_ac_by_study")(col("study_id")) as "ac",
       col(s"${prefix}_an_by_study")(col("study_id")) as "an",
-      col(s"${prefix}_af_by_study")(col("study_id")) as "af",
+      col(s"${prefix}_af_by_study")(col("study_id")).cast(DoubleType) as "af",
       col(s"${prefix}_homozygotes_by_study")(col("study_id")) as "homozygotes",
       col(s"${prefix}_heterozygotes_by_study")(col("study_id")) as "heterozygotes"
     ).as(prefix)
@@ -128,7 +129,7 @@ object VariantCentricIndex {
     struct(
       col(s"ac_by_study")(col("study_id")) as "ac",
       col(s"an_by_study")(col("study_id")) as "an",
-      col(s"af_by_study")(col("study_id")) as "af",
+      col(s"af_by_study")(col("study_id")).cast(DoubleType) as "af",
       col(s"homozygotes_by_study")(col("study_id")) as "homozygotes",
       col(s"heterozygotes_by_study")(col("study_id")) as "heterozygotes"
     ).as("frequencies")
@@ -209,12 +210,12 @@ object VariantCentricIndex {
           struct(
             col("1k_genomes.ac") as "ac",
             col("1k_genomes.an") as "an",
-            col("1k_genomes.af") as "af"
+            col("1k_genomes.af").cast(DoubleType) as "af"
           ).as("one_thousand_genomes"),
           struct(
             col("topmed.ac") as "ac",
             col("topmed.an") as "an",
-            col("topmed.af") as "af",
+            col("topmed.af").cast(DoubleType) as "af",
             col("topmed.heterozygotes") as "heterozygotes",
             col("topmed.homozygotes") as "homozygotes"
           ).as("topmed"),

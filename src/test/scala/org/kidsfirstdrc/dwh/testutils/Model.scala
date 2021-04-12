@@ -17,7 +17,7 @@ object Model {
                                   alternate: String = "A",
                                   ac: Long = 10,
                                   an: Long = 20,
-                                  af: BigDecimal = 0.5,
+                                  af: Double = 0.5,
                                   hom: Long = 10)
 
   case class FrequencyEntry(chromosome: String = "2",
@@ -27,7 +27,7 @@ object Model {
                             alternate: String = "A",
                             ac: Long = 10,
                             an: Long = 20,
-                            af: BigDecimal = 0.5,
+                            af: Double = 0.5,
                             homozygotes: Long = 10,
                             heterozygotes: Long = 10)
 

@@ -21,12 +21,12 @@ case class JoinVariantOutput(chromosome: String = "2",
                              dbsnp_id: Option[String] = Some("rs1234567"),
                              upper_bound_kf_ac_by_study: Map[String, Long],
                              upper_bound_kf_an_by_study: Map[String, Long],
-                             upper_bound_kf_af_by_study: Map[String, BigDecimal],
+                             upper_bound_kf_af_by_study: Map[String, Double],
                              upper_bound_kf_homozygotes_by_study: Map[String, Long],
                              upper_bound_kf_heterozygotes_by_study: Map[String, Long],
                              lower_bound_kf_ac_by_study: Map[String, Long],
                              lower_bound_kf_an_by_study: Map[String, Long],
-                             lower_bound_kf_af_by_study: Map[String, BigDecimal],
+                             lower_bound_kf_af_by_study: Map[String, Double],
                              lower_bound_kf_homozygotes_by_study: Map[String, Long],
                              lower_bound_kf_heterozygotes_by_study: Map[String, Long],
                              studies: Set[String],
@@ -36,15 +36,15 @@ case class JoinVariantOutput(chromosome: String = "2",
 
 case class OneThousandGenomesFreq(an: Long = 20,
                                   ac: Long = 10,
-                                  af: BigDecimal = 0.5)
+                                  af: Double = 0.5)
 
 case class GnomadFreq(ac: Long = 10,
                       an: Long = 20,
-                      af: BigDecimal = 0.5,
+                      af: Double = 0.5,
                       hom: Long = 10)
 
 case class Freq(an: Long = 20,
                 ac: Long = 10,
-                af: BigDecimal = 0.5,
+                af: Double = 0.5,
                 homozygotes: Long = 10,
                 heterozygotes: Long = 10)

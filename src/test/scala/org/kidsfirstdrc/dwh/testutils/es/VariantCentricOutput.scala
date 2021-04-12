@@ -8,7 +8,7 @@ object VariantCentricOutput {
 
   case class GnomadFreqOutput(ac: Long = 10,
                               an: Long = 20,
-                              af: BigDecimal = 0.5,
+                              af: Double = 0.5,
                               homozygotes: Long = 10)
 
   case class StudyFrequency(upper_bound_kf: Freq,

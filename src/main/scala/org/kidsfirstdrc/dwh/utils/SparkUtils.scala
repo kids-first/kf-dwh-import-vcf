@@ -4,7 +4,7 @@ import io.projectglow.Glow
 import org.apache.hadoop.fs.Path
 import org.apache.spark.sql.expressions.{Window, WindowSpec}
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ArrayType, DecimalType}
+import org.apache.spark.sql.types.{ArrayType, DecimalType, DoubleType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getGenomicFiles
 
@@ -125,10 +125,7 @@ object SparkUtils {
       val an = col(s"${duo}_an")
       val af = when(an === 0, 0)
         .otherwise(ac / an)
-      //From documentation of changePrecision in DecimalType : returning null if it overflows.
-      //https://stackoverflow.com/questions/55688810/apache-spark-null-value-when-casting-incompatible-decimaltype-vs-classcastexcept
-      val notNullAf = when(af.isNull, 0).otherwise(af)
-      notNullAf.cast(DecimalType(11, 10))
+      when(af.isNull, 0).otherwise(af).cast(DoubleType)
     }
 
     val calculated_af: Column = {
@@ -136,33 +133,27 @@ object SparkUtils {
       val an = col("an")
       val af = when(an === 0, 0)
         .otherwise(ac / an)
-      //From documentation of changePrecision in DecimalType : returning null if it overflows.
-      //https://stackoverflow.com/questions/55688810/apache-spark-null-value-when-casting-incompatible-decimaltype-vs-classcastexcept
-      val notNullAf = when(af.isNull, 0).otherwise(af)
-      notNullAf.cast(DecimalType(11, 10))
+      when(af.isNull, 0).otherwise(af).cast(DoubleType)
     }
 
     val calculated_af_from_an: Column => Column = an => {
       val ac = col("ac")
       val af = when(an === 0, 0)
         .otherwise(ac / an)
-      //From documentation of changePrecision in DecimalType : returning null if it overflows.
-      //https://stackoverflow.com/questions/55688810/apache-spark-null-value-when-casting-incompatible-decimaltype-vs-classcastexcept
-      val notNullAf = when(af.isNull, 0).otherwise(af)
-      notNullAf.cast(DecimalType(11, 10))
+      when(af.isNull, 0).otherwise(af).cast(DoubleType)
     }
 
 
 
     val ac: Column = col("INFO_AC")(0) as "ac"
-    val af: Column = col("INFO_AF")(0) as "af"
+    val af: Column = (col("INFO_AF")(0) as "af").cast(DoubleType)
     val an: Column = col("INFO_AN") as "an"
 
-    val afr_af: Column = col("INFO_AFR_AF")(0) as "afr_af"
-    val eur_af: Column = col("INFO_EUR_AF")(0) as "eur_af"
-    val sas_af: Column = col("INFO_SAS_AF")(0) as "sas_af"
-    val amr_af: Column = col("INFO_AMR_AF")(0) as "amr_af"
-    val eas_af: Column = col("INFO_EAS_AF")(0) as "eas_af"
+    val afr_af: Column = (col("INFO_AFR_AF")(0) as "afr_af").cast(DoubleType)
+    val eur_af: Column = (col("INFO_EUR_AF")(0) as "eur_af").cast(DoubleType)
+    val sas_af: Column = (col("INFO_SAS_AF")(0) as "sas_af").cast(DoubleType)
+    val amr_af: Column = (col("INFO_AMR_AF")(0) as "amr_af").cast(DoubleType)
+    val eas_af: Column = (col("INFO_EAS_AF")(0) as "eas_af").cast(DoubleType)
 
     val dp: Column = col("INFO_DP") as "dp"
 
