@@ -27,7 +27,7 @@ steps=$(cat <<EOF
       "--exclude-packages",
       "org.apache.httpcomponents:httpcore,org.apache.httpcomponents:httpclient",
       "--deploy-mode", "client",
-      "--class", "org.kidsfirstdrc.dwh.variantDb.stats.Stats",
+      "--class", "org.kidsfirstdrc.dwh.es.stats.Stats",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
       "${es_nodes}"
     ],

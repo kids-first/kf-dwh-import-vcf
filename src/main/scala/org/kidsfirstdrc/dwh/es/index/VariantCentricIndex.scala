@@ -81,7 +81,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
       .option("maxRecordsPerFile", 200000)
       .partitionBy("chromosome")
       .mode(SaveMode.Overwrite)
-      .parquet(s"${destination.rootPath}/es_index/${destination.name}_${releaseId}_parquet")
+      .parquet(s"${destination.rootPath}/es_index/${destination.name}_${releaseId}")
     data
   }
 
