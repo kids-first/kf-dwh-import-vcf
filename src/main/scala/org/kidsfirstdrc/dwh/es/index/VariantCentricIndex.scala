@@ -25,7 +25,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
       .withColumn("study", explode(col("studies"))).select("study").distinct.as[String].collect()
       .map(studyId =>
         Try(spark.read.parquet(s"${Clinical.occurrences.rootPath}/occurrences/${tableName("occurrences", studyId, releaseId)}")))
-      .collect { case Success(df) => df }
+      .collect { case Success(df) => df.where(col("has_alt") === 1) }
       .reduce( (df1, df2) => df1.unionByName(df2))
 
     Map(

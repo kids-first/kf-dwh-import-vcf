@@ -41,7 +41,7 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
       case _ => data(Clinical.occurrences)
     }
 
-    val participantTotalCount = occurrences.select("participant_id").distinct().repartition(200).count()
+    val participantTotalCount = occurrences.select("participant_id").distinct().count()
 
     occurrences
       .select(
