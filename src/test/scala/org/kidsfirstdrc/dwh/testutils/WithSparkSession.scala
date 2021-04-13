@@ -13,7 +13,7 @@ trait WithSparkSession {
     //.config("spark.ui.enabled", value = false)
     //.config("spark.sql.warehouse.dir", s"$tmp/wharehouse")
     //.config("spark.driver.extraJavaOptions", s"-Dderby.system.home=$tmp/derby")
-    //.enableHiveSupport()
+    .enableHiveSupport()
     .master("local")
     .getOrCreate()
 

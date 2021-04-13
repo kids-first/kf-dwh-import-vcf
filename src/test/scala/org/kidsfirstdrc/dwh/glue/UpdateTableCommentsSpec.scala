@@ -10,6 +10,17 @@ class UpdateTableCommentsSpec extends AnyFlatSpec with GivenWhenThen with WithSp
 
   val database = "variant"
   val table = "orphanet_gene_set"
+  spark.sql(s"CREATE DATABASE IF NOT EXISTS ${database}")
+  spark.sql(s"DROP TABLE IF EXISTS ${database}.${table}")
+  spark.sql(
+    s"""CREATE TABLE IF NOT EXISTS ${database}.${table}
+       |(
+       |orpha_code BIGINT COMMENT 'test',
+       |expert_link STRING,
+       |name STRING,
+       |gene_synonym_list ARRAY<STRING>
+       |)
+       |""".stripMargin)
 
   "clearComments" should "remove all comments" in {
     UpdateTableComments.clearComments(database, table)

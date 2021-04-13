@@ -11,3 +11,4 @@ derby.log
 .DS_Store
 *.log
 null
+spark-warehouse
