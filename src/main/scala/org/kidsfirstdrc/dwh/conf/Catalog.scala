@@ -85,9 +85,9 @@ object Catalog {
 
     override val alias: String = kfStridesVariantBucket
     val relativePath = s"/es_index"
-    val variant_centric     = DataSource(alias, s"$relativePath/variant_centric_re_*", "", "variant_centric"    , JSON, OverWrite)
-    val gene_centric        = DataSource(alias, s"$relativePath/gene_centric"        , "", "gene_centric"       , JSON, OverWrite)
-    val genomic_suggestions = DataSource(alias, s"$relativePath/genomic_suggestions" , "", "genomic_suggestions", JSON, OverWrite)
+    val variant_centric     = DataSource(alias, s"$relativePath/variant_centric"     , "portal", "variant_centric"    , PARQUET, OverWrite)
+    val gene_centric        = DataSource(alias, s"$relativePath/gene_centric"        , "portal", "gene_centric"       , PARQUET, OverWrite)
+    val genomic_suggestions = DataSource(alias, s"$relativePath/genomic_suggestions" , "portal", "genomic_suggestions", PARQUET, OverWrite)
   }
 
   def sources: Set[DataSource] = Raw.sources ++ Public.sources ++ Clinical.sources ++ Es.sources

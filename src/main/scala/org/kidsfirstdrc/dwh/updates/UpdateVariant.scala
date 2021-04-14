@@ -61,7 +61,7 @@ class UpdateVariant(source: DataSource, runEnv: Environment)(implicit conf: Conf
       write(releaseId_datetime, getClass.getClassLoader.getResource("tables").getFile, destination.name, data, Some(60), destination.database)
     else
       write(releaseId_datetime, destination.rootPath, destination.name, data, Some(60), destination.database)
-    if (runEnv == Environment.PROD) publishTable(releaseId_datetime, destination.name)
+    if (runEnv == Environment.PROD || runEnv == Environment.LOCAL) publishTable(releaseId_datetime, destination.name)
     data
   }
 }

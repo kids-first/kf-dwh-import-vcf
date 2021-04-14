@@ -41,7 +41,9 @@ class GenomicSuggestionsIndex(releaseId: String)
     data
       .write
       .mode(SaveMode.Overwrite)
-      .parquet(s"${destination.location}_$releaseId")
+      .option("format", "parquet")
+      .option("path", s"${destination.location}_$releaseId")
+      .saveAsTable(s"${destination.database}.${destination.name}_${releaseId}")
     data
   }
 
