@@ -4,7 +4,7 @@ import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{explode, _}
-import org.apache.spark.sql.types.DoubleType
+import org.apache.spark.sql.types.{DoubleType, LongType}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
 import org.kidsfirstdrc.dwh.es.index.VariantCentricIndex._
@@ -25,7 +25,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
       .withColumn("study", explode(col("studies"))).select("study").distinct.as[String].collect()
       .map(studyId =>
         Try(spark.read.parquet(s"${Clinical.occurrences.rootPath}/occurrences/${tableName("occurrences", studyId, releaseId)}")))
-      .collect { case Success(df) => df.where(col("has_alt") === 1) }
+      .collect { case Success(df) => df }
       .reduce( (df1, df2) => df1.unionByName(df2))
 
     Map(
@@ -45,7 +45,9 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
     val consequences = data(Clinical.consequences)
       .withColumnRenamed("impact", "vep_impact")
 
-    val occurrences = data(Clinical.occurrences).selectLocus(col("participant_id"))
+    val occurrences = data(Clinical.occurrences)
+      .where(col("has_alt") === 1)
+      .selectLocus(col("participant_id"), col("study_id"))
 
     val clinvar = data(Public.clinvar)
       .selectLocus(
@@ -64,13 +66,15 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
       .withColumn("hash", sha1(col("locus")))
       .withColumn("genome_build", lit("GRCh38"))
       .withStudies
+      .withColumn("participant_total_number", (col("frequencies.upper_bound_kf.an") / 2).cast(LongType))
+      .withColumn("participant_frequency", (col("participant_number") / col("participant_total_number")).cast(DoubleType))
       .withFrequencies
       .withClinVar(clinvar)
       .withConsequences(consequences)
       .withGenes(genes)
       .select("genome_build", "hash", "chromosome", "start", "reference", "alternate", "locus", "variant_class",
-        "studies", "participant_number", "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id",
-        "consequences", "impact_score", "genes", "hgvsg", "participant_ids")
+        "studies", "participant_number", "participant_number_visible", "acls", "external_study_ids", "frequencies", "clinvar", "rsnumber", "release_id",
+        "consequences", "impact_score", "genes", "hgvsg", "participant_total_number", "participant_frequency")
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -178,29 +182,36 @@ object VariantCentricIndex {
     Some("x").fold(Seq.empty[String])(x => x.split(",").toSeq)
 
     def withStudies: DataFrame = {
+      val minimumParticipantsPerStudy = 10
       val inputColumns: Seq[Column] = df.columns.filterNot(_.equals("studies")).map(col)
+
       df
         .select(inputColumns :+ explode(col("studies")).as("study_id"):_*)
         .withColumn("acls", col("consent_codes_by_study")(col("study_id")))
         .withColumn("external_study_ids", external_study_ids(col("acls")))
+        .withColumn("ids", col("participant_ids_by_study")(col("study_id")))
         .withColumn("participant_number",
-          col("upper_bound_kf_homozygotes_by_study")(col("study_id")) +
-            col("upper_bound_kf_heterozygotes_by_study")(col("study_id")))
+          when(col("ids").isNull, lit(0))
+            .otherwise(size(col("ids"))))
+        .withColumn("participant_number_visible",
+          when(size(col("ids")) >= minimumParticipantsPerStudy, size(col("ids"))).otherwise(lit(0)))
+        .withColumn("participant_ids",
+          when(size(col("ids")) >= minimumParticipantsPerStudy, col("ids")).otherwise(lit(null)))
         .withColumn("study", struct(
           col("study_id"),
           col("acls"),
           col("external_study_ids"),
-          //frequenciesByStudies as "frequencies",
           struct(
             frequenciesByStudiesFor("upper_bound_kf"),
             frequenciesByStudiesFor("lower_bound_kf")
           ).as("frequencies"),
-          col("participant_number")))
-        .filter(col("study.participant_number").isNotNull and col("study.participant_number") > 0)
+          col("participant_number"),
+          col("participant_ids")))
         .groupBy(locus:_*)
         .agg(
           collect_set("study").as("studies"),
           (inputColumns.toSet -- locus.toSet).map(c => first(c).as(c.toString)).toList :+
+            sum(col("participant_number_visible")).as("participant_number_visible") :+
             sum(col("participant_number")).as("participant_number"):+
             flatten(collect_set("acls")).as("acls"):+
             flatten(collect_set("external_study_ids")).as("external_study_ids"):_*)
@@ -279,11 +290,15 @@ object VariantCentricIndex {
 
       val occurrencesWithParticipants =
         occurrences
-          .groupByLocus()
-          .agg(collect_set(col("participant_id")) as "participant_ids")
+          .groupBy(col("chromosome"), col("start"), col("reference"), col("alternate"), col("study_id"))
+          .agg(
+            collect_list(col("participant_id")) as "participant_ids"
+          ).groupByLocus()
+          .agg(
+            map_from_entries(collect_list(struct(col("study_id"), col("participant_ids")))) as "participant_ids_by_study"
+          )
 
       df.joinByLocus(occurrencesWithParticipants, "inner")
-        .withColumn("participant_ids", array_remove(col("participant_ids"), ""))
     }
   }
 }
