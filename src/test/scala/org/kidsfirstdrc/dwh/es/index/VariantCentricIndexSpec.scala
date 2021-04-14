@@ -31,7 +31,7 @@ class VariantCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSp
 
   val joinVariantDf: DataFrame = Seq(
     JoinVariantOutput(
-      frequencies = VariantFrequency(Freq(ac = 12, an = 27, af = 0.4444444444, homozygotes = 9, heterozygotes = 7), Freq(ac = 12, an = 27, af = 0.4444444444, homozygotes = 9, heterozygotes = 7)),
+      frequencies = VariantFrequency(Freq(ac = 12, an = 30, af = 0.4, homozygotes = 9, heterozygotes = 7), Freq(ac = 12, an = 27, af = 0.4444444444, homozygotes = 9, heterozygotes = 7)),
       upper_bound_kf_ac_by_study = Map(studyId1 -> 5, studyId2 -> 5, studyId3 -> 2),
       upper_bound_kf_an_by_study = Map(studyId1 -> 10, studyId2 -> 10, studyId3 -> 7),
       upper_bound_kf_af_by_study = Map(studyId1 -> 0.5, studyId2 -> 0.5, studyId3 -> 0.2857142857),
@@ -59,9 +59,19 @@ class VariantCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSp
   ).toDF()
 
   val occurrencesDf: DataFrame = Seq(
-    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 0, participant_id = "PT_000001"), //should not be in the result
-    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000002"), //should be in the result
-    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000003")  //should be in the result
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 0, participant_id = "PT_000001"), //removed because `has_alt` = 0
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000002",`study_id` = "SD_123"),
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000003",`study_id` = "SD_123"),
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000004",`study_id` = "SD_123"),
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000005",`study_id` = "SD_123"),
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000006",`study_id` = "SD_123"),
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000007",`study_id` = "SD_123"),
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000008",`study_id` = "SD_123"),
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000009",`study_id` = "SD_123"),
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000010",`study_id` = "SD_123"),
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000011",`study_id` = "SD_123"),
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000012",`study_id` = "SD_123"),
+    OccurrenceOutput(`start` = 165310406, `end` = 165310406, `has_alt` = 1, participant_id = "PT_000033",`study_id` = "SD_456") //removed because <10 participants
   ).toDF()
 
   val clinvarDf: DataFrame = Seq(
@@ -81,9 +91,10 @@ class VariantCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSp
   )
 
   val expectedStudies = List(
-    Study("SD_456", List("SD_456.c1"), List("SD_456"), StudyFrequency(Freq(10,5,0.5,2,3),Freq(0,0,0,0,0)),5),
-    Study("SD_123", List("SD_123.c1"), List("SD_123"), StudyFrequency(Freq(10,5,0.5,2,3),Freq(0,0,0,0,0)),5),
-    Study("SD_789", List("SD_789.c99"), List("SD_789"), StudyFrequency(Freq(7,2,0.2857142857,5,1),Freq(7,2,0.2857142857,5,1)),6)
+    Study("SD_456", List("SD_456.c1"), List("SD_456"), StudyFrequency(Freq(10,5,0.5,2,3),Freq(0,0,0,0,0)), 1, null),
+    Study("SD_123", List("SD_123.c1"), List("SD_123"), StudyFrequency(Freq(10,5,0.5,2,3),Freq(0,0,0,0,0)), 11,
+      List("PT_000002", "PT_000003", "PT_000004", "PT_000005", "PT_000006", "PT_000007", "PT_000008", "PT_000009", "PT_000010", "PT_000011", "PT_000012")),
+    Study("SD_789", List("SD_789.c99"), List("SD_789"), StudyFrequency(Freq(7,2,0.2857142857,5,1),Freq(7,2,0.2857142857,5,1)), 0, null)
   )
 
   val expectedConsequences: List[Consequence] = List(
@@ -95,8 +106,6 @@ class VariantCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSp
 
   val expectedGenes = List(GENES())
 
-  val expectedParticipants: List[String] = List("PT_000003", "PT_000002")
-
   "VariantDbJson" should "transform data to the right format" in {
 
     val result = new VariantCentricIndex(realeaseId).transform(data)
@@ -107,12 +116,11 @@ class VariantCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSp
     //1. make sure we have only 1 row in the result
     parsedResult.length shouldBe 1
     //2. data validation of that row
-    variant.participant_ids should contain allElementsOf expectedParticipants
     variant.consequences should contain allElementsOf expectedConsequences
     variant.studies should contain allElementsOf expectedStudies
     variant.genes should contain allElementsOf expectedGenes
-    variant.copy(consequences = List(), studies = List(), genes = List(), participant_ids = List()) shouldBe
-      VariantCentricOutput.Output(studies = List(), consequences = List(), genes = List(), participant_ids = List())
+    variant.copy(consequences = List(), studies = List(), genes = List()) shouldBe
+      VariantCentricOutput.Output(studies = List(), consequences = List(), genes = List())
 
     result.write.mode("overwrite").json(this.getClass.getClassLoader.getResource(".").getFile + "variant_centric")
   }
