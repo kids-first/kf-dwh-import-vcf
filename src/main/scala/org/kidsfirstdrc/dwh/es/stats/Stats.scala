@@ -3,7 +3,7 @@ package org.kidsfirstdrc.dwh.es.stats
 import org.apache.http.HttpHeaders
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.StringEntity
-import org.apache.http.impl.client.DefaultHttpClient
+import org.apache.http.impl.client.{DefaultHttpClient, HttpClientBuilder}
 import org.apache.spark.sql.SparkSession
 import org.json4s.DefaultFormats
 import org.json4s.jackson.Serialization.write
@@ -25,7 +25,7 @@ object Stats extends App {
   val occurrencesDF = StatsUtils.getUnionOfOccurrences(DATABASE, occurrencesTables)
   val stats = StatsUtils.getStats(occurrencesDF)
 
-  val client = new DefaultHttpClient()
+  val client = new HttpClientBuilder().build()
 
   val post = new HttpPost(s"${es_host}/variant_stats/doc/1")
 
