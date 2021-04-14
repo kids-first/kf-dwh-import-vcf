@@ -1,0 +1,89 @@
+[{
+  "col_name": "start",
+  "comment": "The reference position, with the first base having position 1. Is the number that represents the location  of the allele on the chromosome."
+},
+  {
+    "col_name": "reference",
+    "comment": "Reference base(s): on the forward strand. Each base must be one of A, C, G, T or N (meaning aNy of those). Multiple bases are permitted. The value in the position field refers to the position of the first base in the String."
+  },
+  {
+    "col_name": "alternate",
+    "comment": "Alternate base(s): on the forward strand. Similar to REF, but for alternate non-reference alleles. Comma separated list of alternate non-reference alleles. Options are A, C, G, T, N or *."
+  },
+  {
+    "col_name": "name",
+    "comment": "dbSNP identifier given as an rs number. If there is no identifier available, then the value NULL should be used"
+  },
+  {
+    "col_name": "end",
+    "comment": "Is the end position on chromosome. This is the position of the last base in the REF allele"
+  },
+  {
+    "col_name": "hgvsg",
+    "comment": "The HGVS genomic sequence name"
+  },
+  {
+    "col_name": "variant_class",
+    "comment": "Sequence Ontology variant class (for farther information, refer to the link: https://useast.ensembl.org/info/genome/variation/prediction/classification.html#classes)"
+  },
+  {
+    "col_name": "by_study",
+    "comment": "Gives the values of the an, ac, af, homozygous and heterozygous alt count by study. Indirectly, this also gives access to studies in which there is at least one participant whose gene carries the mutation"
+  },
+  {
+    "col_name": "ac",
+    "comment": "Allele count in genotype across the cohort of participants (!!!! you have to check if it is for all the vcf - Will this data be calculated dynamically for each seve-set?). It refers to the number of called alleles"
+  },
+  {
+    "col_name": "an",
+    "comment": "Allele number of alleles in called genotypes for all participants"
+  },
+  {
+    "col_name": "homozygotes",
+    "comment": "Homozygous alt count"
+  },
+  {
+    "col_name": "heterozygotes",
+    "comment": "Heterozygous alt count"
+  },
+  {
+    "col_name": "af",
+    "comment": "Allele frequency"
+  },
+  {
+    "col_name": "release_id",
+    "comment": "Latest release identifier"
+  },
+  {
+    "col_name": "1k_genomes",
+    "comment": "Provide a table with the following values of the 1000 genomes cohort: ac, af, an, afr_af (african af), eur_af (european af), sas_af (south asian af), amr_af (american af), eas_af (east asian af), dp (mean depth of coverage)"
+  },
+  {
+    "col_name": "topmed",
+    "comment": "Provide a table with the following values of the topmed cohort: ac, af, an, count of homozygous and heterozygous alt count, average genotype quality of all individuals, quality filter, filter status (FAIL or PASS) "
+  },
+  {
+    "col_name": "gnomad_genomes_2_1",
+    "comment": "Gives data set of the gnomAD v2 cohort (15,708 whole genomes mapped to the GRCh37/hg19). "
+  },
+  {
+    "col_name": "gnomad_exomes_2_1",
+    "comment": "Gives data set of the gnomAD v2 cohort (125,748 exomes mapped to the GRCh37/hg19)"
+  },
+  {
+    "col_name": "gnomad_genomes_3_0",
+    "comment": "Gives data set of the gnomAD v3 cohort (71,702 whole genomes and no exomes, all mapped to the GRCh38 reference sequence). Note that most of the genomes v2 are included in v3"
+  },
+  {
+    "col_name": "clinvar_id",
+    "comment": "ClinVar (DB of relashionships among sequence variation and human phenotype) variation ID"
+  },
+  {
+    "col_name": "clin_sig",
+    "comment": "ClinVar clinical significance of the dbSNP variant (for farther information, refer to the link: https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/)"
+  },
+  {
+    "col_name": "chromosome",
+    "comment": "Chromosome number"
+  }
+]

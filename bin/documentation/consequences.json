@@ -1,0 +1,201 @@
+[{
+  "col_name": "start",
+  "comment": "The reference position, with the first base having position 1. This is the number that represents the location  of the allele on the chromosome."
+},
+  {
+    "col_name": "end",
+    "comment": "It is the end position on chromosome. This is the position of the last base in the REF allele"
+  },
+  {
+    "col_name": "reference",
+    "comment": "Reference base(s): on the forward strand. Each base must be one of A, C, G, T or N (meaning aNy of those). The value in the position field refers to the position of the first base in the String."
+  },
+  {
+    "col_name": "alternate",
+    "comment": "Alternate base(s): on the forward strand. Similar to REF, but for alternate non-reference alleles.Options are A, C, G, T, N or *. The '*' is used to indicate that the allele is missing due to an upstream deletion."
+  },
+  {
+    "col_name": "consequence",
+    "comment": "Consequence type of this variant (for farther information, refer to the link: https://useast.ensembl.org/info/genome/variation/prediction/predicted_data.html#consequences)"
+  },
+  {
+    "col_name": "ensembl_transcript_id",
+    "comment": "Refers to the Ensemble Transcript ID"
+  },
+  {
+    "col_name": "ensembl_regulatory_id",
+    "comment": "Ensembl ID of affected regions that are predicted to regulate gene expression"
+  },
+  {
+    "col_name": "feature_type",
+    "comment": "Type of feature. Currently one of transcript, RegulatoryFeature, MotifFeature"
+  },
+  {
+    "col_name": "name",
+    "comment": "dbSNP identifier given as an rs number. If there is no identifier available, then the value NULL should be used"
+  },
+  {
+    "col_name": "impact",
+    "comment": "The impact modifier for the consequence type"
+  },
+  {
+    "col_name": "symbol",
+    "comment": "The gene symbol"
+  },
+  {
+    "col_name": "ensemble_gene_id",
+    "comment": "Ensembl stable ID of affected gene"
+  },
+  {
+    "col_name": "strand",
+    "comment": "The DNA strand (1 or -1) on which the transcript feature lies"
+  },
+  {
+    "col_name": "biotype",
+    "comment": "Biotype of transcript or regulatory feature (for farther information, refer to the link: https://m.ensembl.org/info/genome/genebuild/biotypes.html)"
+  },
+  {
+    "col_name": "variant_class",
+    "comment": "Sequence Ontology variant class (for farther information, refer to the link: https://useast.ensembl.org/info/genome/variation/prediction/classification.html#classes)"
+  },
+  {
+    "col_name": "exon",
+    "comment": "The exon number (out of total number)"
+  },
+  {
+    "col_name": "intron",
+    "comment": "The intron number (out of total number)"
+  },
+  {
+    "col_name": "hgvsc",
+    "comment": "The HGVS coding sequence name"
+  },
+  {
+    "col_name": "hgvsp",
+    "comment": "The HGVS protein sequence name"
+  },
+  {
+    "col_name": "hgvsg",
+    "comment": "The HGVS genomic sequence name"
+  },
+  {
+    "col_name": "cds_position",
+    "comment": "Position in CDS - relative position of base pair in coding sequence"
+  },
+  {
+    "col_name": "cdna_position",
+    "comment": "Position in cDNA - relative position of base pair in cDNA sequence"
+  },
+  {
+    "col_name": "protein_position",
+    "comment": "Position in protein - relative position of amino acid in protein"
+  },
+  {
+    "col_name": "amino_acids",
+    "comment": "Reference and variant amino acids"
+  },
+  {
+    "col_name": "codons",
+    "comment": "Reference and variant codon sequence"
+  },
+  {
+    "col_name": "study_ids",
+    "comment": "IDs of studies"
+  },
+  {
+    "col_name": "aa_change",
+    "comment": "amino acid change - only given if the variant affects the protein-coding sequence"
+  },
+  {
+    "col_name": "coding_dna_change",
+    "comment": "Relative position of base in coding sequence and the genomic variantion"
+  },
+  {
+    "col_name": "release_id",
+    "comment": "Latest release identifier"
+  },
+  {
+    "col_name": "sift_score",
+    "comment": "Functional prediction - The SIFT score (SIFTori). Scores range from 0 to 1. The smaller the score the more likely the genomic variation has damaging effect"
+  },
+  {
+    "col_name": "sift_pred",
+    "comment": "Functional prediction - The SIFT prediction. If SIFTori is smaller than 0.05 (rankscore>0.39575) the corresponding nsSNV is predicted as (Damaging); otherwise it is predicted as Tolerated. Multiple predictions separated by "
+  },
+  {
+    "col_name": "sift_converted_rank_score",
+    "comment": "Functional prediction - SIFTori scores were first converted to SIFTnew=1-SIFTori, then ranked among all SIFTnew scores in dbNSFP. The rankscore is the ratio of the rank the SIFTnew score over the total number of SIFTnew scores in dbNSFP."
+  },
+  {
+    "col_name": "polyphen2_hdiv_score",
+    "comment": "Functional prediction - Polyphen2 score based on HumDiv. The score ranges from 0 to 1. Multiple entries separated by, corresponding to Uniprot_acc"
+  },
+  {
+    "col_name": "polyphen2_hdiv_pred",
+    "comment": "Functional prediction - Polyphen2 prediction based on HumDiv, 'D' ('probably damaging'), 'P' ('possibly damaging') and 'B' ('benign'). Multiple entries are separated by, corresponding to Uniprot_acc"
+  },
+  {
+    "col_name": "polyphen2_hdiv_rank_score",
+    "comment": "Functional prediction - Functional prediction - Polyphen2 HDIV scores were first ranked among all HDIV scores in dbNSFP. The rankscore is the ratio of the rank the score over the total number of the scores in dbNSFP."
+  },
+  {
+    "col_name": "polyphen2_hvar_score",
+    "comment": "Functional prediction - Polyphen2 score based on HumVar. The score ranges from 0 to 1. Multiple entries separated by, corresponding to Uniprot_acc"
+  },
+  {
+    "col_name": "polyphen2_hvar_pred",
+    "comment": "Functional prediction - Polyphen2 prediction based on HumVar, 'D' ('probably damaging'), 'P' ('possibly damaging') and 'B' ('benign')"
+  },
+  {
+    "col_name": "polyphen2_hvar_rank_score",
+    "comment": "Functional prediction - Polyphen2 HVAR scores were first ranked among all HVAR scores in dbNSFP. The rankscore is the ratio of the rank the score over the total number of the scores in dbNSFP. The scores range from 0.01493 to 0.97581"
+  },
+  {
+    "col_name": "fathmm_score",
+    "comment": "Functional prediction - FATHMM default score (weighted for human inherited-disease mutations with Disease Ontology) (FATHMMori). Scores range from -16.13 to 10.64. The smaller the score the more likely the SNP has damaging effect"
+  },
+  {
+    "col_name": "fathmm_pred",
+    "comment": "Functional prediction - If a FATHMMori score is <=-1.5 (or rankscore >=0.81332) the corresponding nsSNV is predicted as DAMAGING; otherwise it is predicted as TOLERATED"
+  },
+  {
+    "col_name": "fathmm_converted_rank_score",
+    "comment": "Functional prediction - FATHMMori scores were first converted to FATHMMnew=1-(FATHMMori+16.13)/26.77, then ranked among all FATHMMnew scores in dbNSFP. The scores range from 0 to 1."
+  },
+  {
+    "col_name": "cadd_score",
+    "comment": "Functional prediction - CADD raw score for functional prediction of a SNP. The larger the score the more likely the SNP has damaging effect. Scores range from -6.458163 to 18.301497 in dbNSFP"
+  },
+  {
+    "col_name": "cadd_rankscore",
+    "comment": "Functional prediction - CADD raw scores were ranked among all CADD raw scores in dbNSFP. The rankscore is the ratio of the rank of the score over the total number of CADD raw scores in dbNSF"
+  },
+  {
+    "col_name": "cadd_phred",
+    "comment": "Functional prediction - CADD phred-like score. This is phred-like rank score based on whole genome CADD raw scores. The larger the score the more likely the SNP has damaging effect"
+  },
+  {
+    "col_name": "dann_score",
+    "comment": "Functional prediction - DANN is a score retrained based on the training data of CADD using deep neural network. Scores range from 0 to 1. A larger number indicate a higher probability to be damaging"
+  },
+  {
+    "col_name": "dann_rank_score",
+    "comment": "Functional prediction - DANN scores were ranked among all DANN scores in dbNSFP. The rankscore is the ratio of the rank of the score over the total number of DANN scores in dbNSFP"
+  },
+  {
+    "col_name": "phylo_p100way_vertebrate",
+    "comment": "Conservation scores - phyloP (phylogenetic p-values) conservation score based on the multiple alignments of 100 vertebrate genomes (including human). The larger the score, the more conserved the site. Scores range from -20.0 to 10.003 in dbNSFP"
+  },
+  {
+    "col_name": "phylo_p100way_vertebrate_rankscore",
+    "comment": "Conservation scores - phyloP100way_vertebrate scores were ranked among all phyloP100way_vertebrate scores in dbNSFP. The rankscore is the ratio of the rank of the score over the total number of phyloP100way_vertebrate scores in dbNSFP"
+  },
+  {
+    "col_name": "phylop30way_mammalian",
+    "comment": "Conservation scores - phyloP (phylogenetic p-values) conservation score based on the multiple alignments of 30 mammalian genomes (including human). The larger the score, the more conserved the site. Scores range from -20 to 1.312 in dbNSFP"
+  },
+  {
+    "col_name": "phylo_p30way_mamalian_rankscore",
+    "comment": "Conservation scores - phyloP30way_mammalian scores were ranked among all phyloP30way_mammalian scores in dbNSFP. The rankscore is the ratio of the rank of the score over the total number of phyloP30way_mammalian scores in dbNSFP"
+  }
+]

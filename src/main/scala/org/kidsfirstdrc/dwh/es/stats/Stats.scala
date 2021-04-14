@@ -25,7 +25,7 @@ object Stats extends App {
   val occurrencesDF = StatsUtils.getUnionOfOccurrences(DATABASE, occurrencesTables)
   val stats = StatsUtils.getStats(occurrencesDF)
 
-  val client = new HttpClientBuilder().build()
+  val client = new DefaultHttpClient()
 
   val post = new HttpPost(s"${es_host}/variant_stats/doc/1")
 

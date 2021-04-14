@@ -1,0 +1,89 @@
+[{
+  "col_name": "start",
+  "comment": "The reference position, with the first base having position 1. Is the number that represents the location  of the allele on the chromosome"
+},
+  {
+    "col_name": "end",
+    "comment": "It is the end position on chromosome. This is the position of the last base in the REF allele"
+  },
+  {
+    "col_name": "reference",
+    "comment": "Reference base(s): on the forward strand. Each base must be one of A, C, G, T or N (meaning aNy of those). Multiple bases are permitted. The value in the position field refers to the position of the first base in the String"
+  },
+  {
+    "col_name": "alternate",
+    "comment": "Alternate base(s): on the forward strand. Similar to REF, but for alternate non-reference alleles. Comma separated list of alternate non-reference alleles. Options are A, C, G, T, N or *."
+  },
+  {
+    "col_name": "name",
+    "comment": "dbSNP identifier given as an rs number. If there is no identifier available, then the value NULL should be used"
+  },
+  {
+    "col_name": "ad",
+    "comment": "Allele depth. This is the number of reads that support each of the reported alleles. All reads at the position (including reads that did not pass the variant caller's filters are included in this number"
+  },
+  {
+    "col_name": "dp",
+    "comment": "Read depth at the position"
+  },
+  {
+    "col_name": "gp",
+    "comment": "The phred-scaled genotype posterior probabilities"
+  },
+  {
+    "col_name": "calls",
+    "comment": ""
+  },
+  {
+    "col_name": "has_alt",
+    "comment": "Values are: true or false"
+  },
+  {
+    "col_name": "is_multi_alellic",
+    "comment": "Values are: true or false"
+  },
+  {
+    "col_name": "old_multi_allelic",
+    "comment": ""
+  },
+  {
+    "col_name": "release_id",
+    "comment": "Latest release identifier"
+  },
+  {
+    "col_name": "hgvsg",
+    "comment": "The HGVS genomic sequence name"
+  },
+  {
+    "col_name": "variant_class",
+    "comment": "Sequence Ontology variant class (for farther information, refer to the link: https://useast.ensembl.org/info/genome/variation/prediction/classification.html#classes)"
+  },
+  {
+    "col_name": "biospecimen_id",
+    "comment": "The KF identifier of the participant's sample"
+  },
+  {
+    "col_name": "participant_id",
+    "comment": "Participant's KF identifier"
+  },
+  {
+    "col_name": "family_id",
+    "comment": "The family KF identifier to which the participant belongs"
+  },
+  {
+    "col_name": "bucket",
+    "comment": ""
+  },
+  {
+    "col_name": "study_id",
+    "comment": "The study KF identifier to which the participant belongs (note that the participant cannot be part of more than one study)"
+  },
+  {
+    "col_name": "dbgap_consent_code",
+    "comment": "Database of Genotypes and Phenotypes consent code"
+  },
+  {
+    "col_name": "chromosome",
+    "comment": "Chromosome number"
+  }
+]
