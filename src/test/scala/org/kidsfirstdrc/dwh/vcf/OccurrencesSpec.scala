@@ -2,12 +2,13 @@ package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import bio.ferlab.datalake.core.etl.DataSource
-import org.apache.spark.sql.functions.{explode, lit}
+import org.apache.spark.sql.functions.{array_sort, col, explode, lit}
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.kidsfirstdrc.dwh.conf.Catalog.{DataService, HarmonizedData}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.dataservice._
 import org.kidsfirstdrc.dwh.testutils.vcf.{OccurrenceOutput, PostCGPInput}
+import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.annotations
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -15,6 +16,7 @@ import org.scalatest.matchers.should.Matchers
 class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   import spark.implicits._
+  spark.sparkContext.setCheckpointDir(getClass.getClassLoader.getResource(".").getFile)
 
   val studyId = "SD_123456"
   val releaseId = "RE_ABCDEF"
@@ -63,6 +65,10 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
       PostCGPInput()
     ).toDF()
       .withColumn("file_name", lit("file_1"))
+      .withColumn("annotation", annotations)
+      .withColumn("hgvsg", array_sort(col("annotation.HGVSg"))(0))
+      .withColumn("variant_class", array_sort(col("annotation.VARIANT_CLASS"))(0))
+      .drop("annotation", "INFO_ANN")
       .withColumn("genotype", explode($"genotypes"))
 
     val inputData = Map(
@@ -72,7 +78,8 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
       HarmonizedData.family_variants_vcf -> postCGP
     )
 
-    val outputDf = new Occurrences(studyId, releaseId, "", "biospecimen_id").transform(inputData)
+    val outputDf = new Occurrences(studyId, releaseId, "", "biospecimen_id",
+      ".CGP.filtered.deNovo.vep.vcf.gz", ".postCGP.filtered.deNovo.vep.vcf.gz").transform(inputData)
 
     outputDf.as[OccurrenceOutput].collect() should contain theSameElementsAs Seq(
       OccurrenceOutput(participant_id = "PT_000002", biospecimen_id = "BS_HIJKKL2"),
@@ -92,7 +99,10 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
 
     spark.sql("use variant")
 
-    val outputDf = new Occurrences(studyId, releaseId, input, "biospecimen_id").run()
+    val outputDf = new Occurrences(studyId, releaseId, input, "biospecimen_id",
+      ".CGP.filtered.deNovo.vep.vcf.gz", ".postCGP.filtered.deNovo.vep.vcf.gz").run()
+
+    outputDf.select("participant_id").show(false)
 
     outputDf.as[OccurrenceOutput].count shouldBe 8
   }

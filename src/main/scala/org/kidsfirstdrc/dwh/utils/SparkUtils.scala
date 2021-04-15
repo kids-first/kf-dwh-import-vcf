@@ -45,19 +45,7 @@ object SparkUtils {
     statuses != null && statuses.nonEmpty
   }
 
-
-  def cgpExist(input: String)(implicit spark: SparkSession): Boolean = fileExist(cgpFilesPath(input))
-
-  def cgpFilesPath(input: String): String =
-    s"$input/*.CGP.filtered.deNovo.vep.vcf.gz"
-
-  def postCGPExist(input: String)(implicit spark: SparkSession): Boolean = fileExist(postCGPFilesPath(input))
-
-  def postCGPFilesPath(input: String): String =
-    s"$input/*.postCGP.filtered.deNovo.vep.vcf.gz"
-
-  def allFilesPath(input: String): String =
-    s"$input/*.filtered.deNovo.vep.vcf.gz"
+  def allFilesPath(input: String): String = s"$input/*.filtered.deNovo.vep.vcf.gz"
 
   /**
    * Return vcf entries found in visibles input files by joining table genomic_files
@@ -69,13 +57,15 @@ object SparkUtils {
    * @return vcf entries enriched with additional columns file_name
    */
   def visibleVcf(path: String, studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
-    val genomicFiles = broadcast(getGenomicFiles(studyId, releaseId).select("file_name"))
+    val genomicFiles = getGenomicFiles(studyId, releaseId).select("file_name")
     val inputDF = vcf(path)
       .withColumn("file_name", filename)
     inputDF
       .join(genomicFiles, inputDF("file_name") === genomicFiles("file_name"), "inner")
       .drop(genomicFiles("file_name"))
   }
+
+  def vcf(files: List[String])(implicit spark: SparkSession): DataFrame = vcf(files.mkString(","))
 
   def vcf(input: String)(implicit spark: SparkSession): DataFrame = {
     val inputs = input.split(",")
@@ -117,9 +107,9 @@ object SparkUtils {
     val reference: Column = col("referenceAllele") as "reference"
     val start: Column = (col("start") + 1) as "start"
     val end: Column = (col("end") + 1) as "end"
-
     val alternate: Column = col("alternateAlleles")(0) as "alternate"
     val name: Column = col("names")(0) as "name"
+
     val calculated_duo_af: String => Column = duo => {
       val ac = col(s"${duo}_ac")
       val an = col(s"${duo}_an")

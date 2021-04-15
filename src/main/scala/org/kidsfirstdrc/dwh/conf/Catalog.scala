@@ -7,6 +7,7 @@ import bio.ferlab.datalake.core.loader.LoadTypes.OverWrite
 object Catalog {
 
   val kfStridesVariantBucket = "kf-strides-variant"
+
   val kfStudyBucket = "kf-study"
 
   object HarmonizedData extends StoreFolder {

@@ -6,29 +6,22 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}
+import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getGenomicFiles
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class Occurrences(studyId: String, releaseId: String, input: String, biospecimenIdColumn: String, isPatternOverriden: Boolean = false)
+class Occurrences(studyId: String, releaseId: String, input: String, biospecimenIdColumn: String,
+                  cgp_pattern: String,
+                  post_cgp_pattern: String)
                  (implicit conf: Configuration)
   extends ETL(Clinical.occurrences){
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
-    val inputDF: DataFrame = {
-      if (isPatternOverriden) loadPostCGP(input, studyId, releaseId)
-      else unionCGPFiles(input, studyId, releaseId)
-    }
+    val inputDF: DataFrame = unionCGPFiles(input, studyId, releaseId, cgp_pattern, post_cgp_pattern)
 
-    inputDF.show(false)
-
-    val biospecimens =
-      spark.read.parquet(s"${DataService.biospecimens.rootPath}/dataservice/biospecimens/biospecimens_${releaseId.toLowerCase}")
-
-    val participants =
-      spark.read.parquet(s"${DataService.participants.rootPath}/dataservice/participants/participants_${releaseId.toLowerCase}")
-
-    val family_relationships =
-      spark.read.parquet(s"${DataService.family_relationships.rootPath}/dataservice/family_relationships/family_relationships_${releaseId.toLowerCase}")
+    val biospecimens = spark.table(s"${DataService.biospecimens.database}.${DataService.biospecimens.name}_${releaseId.toLowerCase}")
+    val participants = spark.table(s"${DataService.participants.database}.${DataService.participants.name}_${releaseId.toLowerCase}")
+    val family_relationships = spark.table(s"${DataService.family_relationships.database}.${DataService.family_relationships.name}_${releaseId.toLowerCase}")
 
     Map(
       DataService.participants -> participants,
@@ -54,7 +47,7 @@ class Occurrences(studyId: String, releaseId: String, input: String, biospecimen
         ($"consent_type" === "HMB") as "is_hmb"
       )
 
-    val family_relationships = data(DataService.family_relationships).where($"participant1_to_participant2_relation" isin("Mother", "Father"))
+    val family_relationships = data(DataService.family_relationships).where($"participant1_to_participant2_relation".isin("Mother", "Father"))
 
     val family_variants_vcf = data(HarmonizedData.family_variants_vcf)
 
@@ -65,7 +58,11 @@ class Occurrences(studyId: String, releaseId: String, input: String, biospecimen
         .join(participants, biospecimens("participant_id") === participants("kf_id"))
         .select(biospecimens("*"), $"is_proband", $"affected_status")
 
-    val withClinical = joinOccurrencesWithClinical(occurrences, joinedBiospecimen)
+    //val withClinical =
+    //  occurrences
+    //    .join(joinedBiospecimen, occurrences("biospecimen_id") === joinedBiospecimen("joined_sample_id"))
+    //    .drop(occurrences("biospecimen_id"))
+    //    .drop(joinedBiospecimen("joined_sample_id"))
 
     val relations =
       family_relationships
@@ -76,7 +73,17 @@ class Occurrences(studyId: String, releaseId: String, input: String, biospecimen
             )) as "relations")
         .select($"participant2" as "participant_id", $"relations.Mother" as "mother_id", $"relations.Father" as "father_id")
 
-    joinOccurrencesWithInheritance(withClinical, relations)
+    val joinedRelation = joinedBiospecimen.join(relations, Seq("participant_id"), "left")
+
+    occurrences
+      .join(broadcast(joinedRelation), Seq("biospecimen_id"))
+      .withColumn("family_calls", when($"family_id".isNotNull, familyCalls).otherwise(lit(null).cast(MapType(StringType, ArrayType(IntegerType)))))
+      .withColumn("mother_calls", when($"family_id".isNotNull, $"family_calls"($"mother_id")).otherwise(lit(null).cast(ArrayType(IntegerType))))
+      .withColumn("father_calls", when($"family_id".isNotNull, $"family_calls"($"father_id")).otherwise(lit(null).cast(ArrayType(IntegerType))))
+      .drop("family_calls")
+      .withColumn("zygosity", zygosity($"calls"))
+      .withColumn("mother_zygosity", zygosity($"mother_calls"))
+      .withColumn("father_zygosity", zygosity($"father_calls"))
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -103,12 +110,6 @@ class Occurrences(studyId: String, releaseId: String, input: String, biospecimen
 
     val inputWithAnnotation =
       inputDF
-        .withColumn("annotation", explode(annotations))
-        .groupBy(inputDF.columns.head, inputDF.columns.tail:_*)
-        .agg(
-          max("annotation.HGVSg") as "hgvsg",
-          max("annotation.VARIANT_CLASS") as "variant_class"
-        )
 
     val occurrences = inputWithAnnotation
       .select(
@@ -178,56 +179,82 @@ class Occurrences(studyId: String, releaseId: String, input: String, biospecimen
    * @param spark
    * @return a dataframe that unions cgp and postcgp vcf
    */
-  private def unionCGPFiles(input: String, studyId: String, releaseId: String)(implicit spark: SparkSession) = {
-    (postCGPExist(input), cgpExist(input)) match {
-      case (false, true) => loadCGP(input, studyId, releaseId)
-      case (true, false) => loadPostCGP(postCGPFilesPath(input), studyId, releaseId)
-      case (true, true) =>
-        val postCGP = loadPostCGP(postCGPFilesPath(input), studyId, releaseId)
-        val cgp = loadCGP(input, studyId, releaseId)
+  private def unionCGPFiles(input: String, studyId: String, releaseId: String, cgp_pattern: String, post_cgp_pattern: String)(implicit spark: SparkSession): DataFrame = {
+    val postCGPFiles = getVisibleFiles(input, studyId, releaseId, post_cgp_pattern)
+    val CGPFiles = getVisibleFiles(input, studyId, releaseId, cgp_pattern)
+    val vcfDf = (postCGPFiles, CGPFiles) match {
+      case (Nil, Nil) => throw new IllegalStateException("No VCF files found!")
+      case (Nil, genomicFiles) if genomicFiles.nonEmpty => asCGP(vcf(genomicFiles))
+      case (genomicFiles, Nil) if genomicFiles.nonEmpty => asPostCGP(vcf(genomicFiles))
+      case (postCGPFiles, cgpFiles) =>
+        val postCGP = asPostCGP(vcf(postCGPFiles))
+        val cgp = asCGP(vcf(cgpFiles))
         union(postCGP, cgp)
-      case (false, false) => throw new IllegalStateException("No VCF files found!")
+
     }
 
+    vcfDf.withColumn("file_name", filename)
   }
 
-  private def loadPostCGP(input: String, studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
+  def getVisibleFiles(input: String, studyId: String, releaseId: String, contains: String)(implicit spark: SparkSession): List[String] = {
     import spark.implicits._
-    visibleVcf(input, studyId, releaseId)
+      getGenomicFiles(studyId, releaseId)
+        .select("file_name")
+        .distinct
+        .as[String]
+        .collect()
+        .filter(_.contains(contains))
+        .map(f => {
+          if (input.endsWith("/")) s"${input}${f}"
+          else s"$input/$f"})
+        .toList
+  }
+
+  private def asPostCGP(inputDf: DataFrame)(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+    inputDf
+      .withColumn("annotation", annotations)
+      .withColumn("hgvsg", array_sort(col("annotation.HGVSg"))(0))
+      .withColumn("variant_class", array_sort(col("annotation.VARIANT_CLASS"))(0))
+      .drop("annotation", "INFO_ANN")
       .withColumn("genotype", explode($"genotypes"))
   }
 
-  private def loadCGP(input: String, studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
+  private def asCGP(inputDf: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    visibleVcf(cgpFilesPath(input), studyId, releaseId)
-      .withColumn("INFO_DS", lit(null).cast("boolean"))
-      .withColumn("INFO_HaplotypeScore", lit(null).cast("double"))
-      .withColumn("genotype", explode($"genotypes"))
-      .drop("genotypes")
-      .withColumn("INFO_ReadPosRankSum", $"INFO_ReadPosRankSum"(0))
-      .withColumn("INFO_ClippingRankSum", $"INFO_ClippingRankSum"(0))
-      .withColumn("INFO_RAW_MQ", $"INFO_RAW_MQ"(0))
-      .withColumn("INFO_BaseQRankSum", $"INFO_BaseQRankSum"(0))
-      .withColumn("INFO_MQRankSum", $"INFO_MQRankSum"(0))
-      .withColumn("INFO_ExcessHet", $"INFO_ExcessHet"(0))
-      .withColumn("genotype", struct(
-        $"genotype.sampleId",
-        $"genotype.conditionalQuality",
-        $"genotype.filters",
-        $"genotype.SB",
-        $"genotype.alleleDepths",
-        $"genotype.PP",
-        $"genotype.PID"(0) as "PID",
-        $"genotype.phased",
-        $"genotype.calls",
-        $"genotype.MIN_DP"(0) as "MIN_DP",
-        $"genotype.JL",
-        $"genotype.PGT"(0) as "PGT",
-        $"genotype.phredLikelihoods",
-        $"genotype.depth",
-        $"genotype.RGQ",
-        $"genotype.JP"
-      ))
+      inputDf
+        .withColumn("annotation", annotations)
+        .withColumn("hgvsg", array_sort(col("annotation.HGVSg"))(0))
+        .withColumn("variant_class", array_sort(col("annotation.VARIANT_CLASS"))(0))
+        .drop("annotation", "INFO_ANN")
+        .withColumn("INFO_DS", lit(null).cast("boolean"))
+        .withColumn("INFO_HaplotypeScore", lit(null).cast("double"))
+        .withColumn("genotype", explode($"genotypes"))
+        .drop("genotypes")
+        .withColumn("INFO_ReadPosRankSum", $"INFO_ReadPosRankSum"(0))
+        .withColumn("INFO_ClippingRankSum", $"INFO_ClippingRankSum"(0))
+        .withColumn("INFO_RAW_MQ", $"INFO_RAW_MQ"(0))
+        .withColumn("INFO_BaseQRankSum", $"INFO_BaseQRankSum"(0))
+        .withColumn("INFO_MQRankSum", $"INFO_MQRankSum"(0))
+        .withColumn("INFO_ExcessHet", $"INFO_ExcessHet"(0))
+        .withColumn("genotype", struct(
+          $"genotype.sampleId",
+          $"genotype.conditionalQuality",
+          $"genotype.filters",
+          $"genotype.SB",
+          $"genotype.alleleDepths",
+          $"genotype.PP",
+          $"genotype.PID"(0) as "PID",
+          $"genotype.phased",
+          $"genotype.calls",
+          $"genotype.MIN_DP"(0) as "MIN_DP",
+          $"genotype.JL",
+          $"genotype.PGT"(0) as "PGT",
+          $"genotype.phredLikelihoods",
+          $"genotype.depth",
+          $"genotype.RGQ",
+          $"genotype.JP"
+        ))
   }
 
   def joinOccurrencesWithInheritance(occurrences: DataFrame, relations: DataFrame)(implicit spark: SparkSession): DataFrame = {
