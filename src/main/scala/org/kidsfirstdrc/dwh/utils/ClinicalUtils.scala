@@ -36,7 +36,7 @@ object ClinicalUtils {
     spark
       .read
       //.parquet(s"s3a://kf-strides-variant-parquet-prd/dataservice/$tableName/${tableName}_${releaseId.toLowerCase}")
-      .table(s"${tableName}_${releaseId.toLowerCase}")
+      .table(s"variant.${tableName}_${releaseId.toLowerCase}")
       .where($"study_id" === studyId)
   }
 
@@ -95,12 +95,10 @@ object ClinicalUtils {
 
   def getGenomicFiles(studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    broadcast(
       loadClinicalTable(studyId, releaseId, "genomic_files")
         .select($"file_name")
         .unionByName(loadManifestFile(studyId))
         .dropDuplicates("file_name")
-    )
   }
 
   val filterAcl: String => UserDefinedFunction = studyId => udf { (acl: Seq[String]) =>

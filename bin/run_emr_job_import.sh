@@ -1,15 +1,19 @@
 #!/bin/bash
 set -x
 study_id=$1
-release_id=${2:-"re_000010"}
+release_id=${2:-"re_000011"}
 study_id_lc=$(echo "$study_id" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
-job=${3:-"variants"}
-is_pattern_override=${4:-"false"}
-input_vcf=${5:-"s3a://kf-study-us-east-1-prd-${study_id_lc}/harmonized-data/family-variants"}
-instance_count=${6:-"7"}
-instance_type=${7:-"m5.4xlarge"}
+job=${3:-"occurrences"}
+schema=${4:-"portal"}
+cgp_pattern=${5:-".CGP.filtered.deNovo.vep.vcf.gz"}
+post_cgp_pattern=${6:-".postCGP.filtered.deNovo.vep.vcf.gz"}
+input_vcf=${7:-"s3a://kf-study-us-east-1-prd-${study_id_lc}/harmonized/family-variants/"}
+#input_vcf=${9:-"s3a://kf-study-us-east-1-prd-${study_id_lc}/harmonized-data/simple-variants/"}
+#post_cgp_pattern=${7:-"CGP.filtered.vep.vcf.gz"}
 biospecimen_id_column=${8:-"biospecimen_id"}
-schema=${9:-"portal"}
+instance_count=${9:-"15"}
+instance_type=${10:-"m5.4xlarge"}
+
 
 steps=$(cat <<EOF
 [
@@ -29,7 +33,8 @@ steps=$(cat <<EOF
       "${input_vcf}",
       "${job}",
       "${biospecimen_id_column}",
-      "${is_pattern_override}",
+      "${cgp_pattern}",
+      "${post_cgp_pattern}",
       "${schema}"
     ],
     "Type": "CUSTOM_JAR",

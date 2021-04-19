@@ -15,8 +15,6 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
     val participantsPath = Raw.all_participants.location
     val occurrencesPath = s"${Clinical.occurrences.rootPath}/occurrences/${tableName(Clinical.occurrences.name, studyId, releaseId)}"
 
-    println(s"participantsPath: ${participantsPath}")
-    println(s"occurrencesPath: ${occurrencesPath}")
     Map(
       Raw.all_participants ->
         spark.read.json(participantsPath),
@@ -65,9 +63,9 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
       .groupBy(locus: _*)
       .agg(
         firstAs("name"),
-        firstAs("hgvsg"),
+        max("hgvsg") as "hgvsg",
         firstAs("end"),
-        firstAs("variant_class"),
+        max("variant_class") as "variant_class",
         collect_set($"dbgap_consent_code").as("consent_codes"),
         sum(col("ac")) as "ac",
         sum(col("an_lower_bound_kf")) as "an_lower_bound_kf",

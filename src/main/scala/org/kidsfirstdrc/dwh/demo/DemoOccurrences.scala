@@ -31,7 +31,8 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)
   override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
-    val occurenceJob = new Occurrences(studyId, releaseId, input, "biospecimen_id")
+    val occurenceJob = new Occurrences(studyId, releaseId, input, "biospecimen_id",
+      ".CGP.filtered.deNovo.vep.vcf.gz", ".postCGP.filtered.deNovo.vep.vcf.gz")
 
     val inputDF = data(HarmonizedData.family_variants_vcf)
 
@@ -63,6 +64,7 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    new Occurrences(studyId, releaseId, input, "biospecimen_id").load(data)
+    new Occurrences(studyId, releaseId, input, "biospecimen_id",
+      ".CGP.filtered.deNovo.vep.vcf.gz", ".postCGP.filtered.deNovo.vep.vcf.gz").load(data)
   }
 }

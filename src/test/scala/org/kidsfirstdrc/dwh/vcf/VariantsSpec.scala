@@ -26,9 +26,9 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
       Configuration(List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile + "portal")))
 
     val occurrencesDf = Seq(
-      OccurrenceOutput(`participant_id` = "PT_001", `zygosity` = "HET"),
-      OccurrenceOutput(`participant_id` = "PT_002", `zygosity` = null),
-      OccurrenceOutput(`participant_id` = "PT_003", `zygosity` = "HOM")
+      OccurrenceOutput(`participant_id` = "PT_001", `zygosity` = "HET", `hgvsg` = null),
+      OccurrenceOutput(`participant_id` = "PT_002", `zygosity` = null , `hgvsg` = "chr4:g.73979437G>T"),
+      OccurrenceOutput(`participant_id` = "PT_003", `zygosity` = "HOM", `hgvsg` = "chr4:g.73979437G>T")
     ).toDF()
 
     val participantsDf = Seq(
