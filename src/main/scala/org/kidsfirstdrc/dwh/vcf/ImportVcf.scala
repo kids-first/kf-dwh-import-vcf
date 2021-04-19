@@ -9,7 +9,7 @@ object ImportVcf extends App {
 
   println(s"Job arguments: ${args.mkString("[", ", ", "]")}")
 
-  val Array(studyId, releaseId, input, runType, biospecimenIdColumn, cgp_pattern, post_cgp_pattern, schema) = args
+  val Array(studyId, releaseId, folder, runType, biospecimenIdColumn, cgp_pattern, post_cgp_pattern, schema) = args
 
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
@@ -28,7 +28,7 @@ object ImportVcf extends App {
     storage
   ))
 
-  run(studyId, releaseId, input, runType, biospecimenIdColumn, cgp_pattern, post_cgp_pattern, schema)
+  run(studyId, releaseId, s"s3a://kf-study-us-east-1-prd-${studyId.replace("_", "-").toLowerCase}/$folder", runType, biospecimenIdColumn, cgp_pattern, post_cgp_pattern, schema)
 
   def run(studyId: String, releaseId: String, input: String,
           runType: String = "all", biospecimenIdColumn: String = "biospecimen_id",

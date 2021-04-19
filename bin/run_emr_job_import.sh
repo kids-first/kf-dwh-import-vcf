@@ -2,13 +2,13 @@
 set -x
 study_id=$1
 release_id=${2:-"re_000011"}
-study_id_lc=$(echo "$study_id" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
 job=${3:-"occurrences"}
-schema=${4:-"portal"}
-cgp_pattern=${5:-".CGP.filtered.deNovo.vep.vcf.gz"}
-post_cgp_pattern=${6:-".postCGP.filtered.deNovo.vep.vcf.gz"}
-input_vcf=${7:-"s3a://kf-study-us-east-1-prd-${study_id_lc}/harmonized/family-variants/"}
-#input_vcf=${9:-"s3a://kf-study-us-east-1-prd-${study_id_lc}/harmonized-data/simple-variants/"}
+schema=${4:-"variant"}
+cgp_pattern=${5:-".postCGP.filtered.deNovo.vep.vcf.gz"}
+post_cgp_pattern=${6:-".CGP.filtered.deNovo.vep.vcf.gz"}
+#folder=${7:-"harmonized/family-variants/"}
+folder=${7:-"harmonized-data/family-variants/"}
+#folder=${7:-"harmonized-data/simple-variants/"}
 #post_cgp_pattern=${7:-"CGP.filtered.vep.vcf.gz"}
 biospecimen_id_column=${8:-"biospecimen_id"}
 instance_count=${9:-"15"}
@@ -30,7 +30,7 @@ steps=$(cat <<EOF
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
       "${study_id}",
       "${release_id}",
-      "${input_vcf}",
+      "${folder}",
       "${job}",
       "${biospecimen_id_column}",
       "${cgp_pattern}",
@@ -47,7 +47,7 @@ steps=$(cat <<EOF
 EOF
 )
 
-instance_groups="[{\"InstanceCount\":${instance_count},\"InstanceGroupType\":\"CORE\",\"InstanceType\":\"${instance_type}\",\"Name\":\"Core - 2\"},{\"InstanceCount\":1,\"EbsConfiguration\":{\"EbsBlockDeviceConfigs\":[{\"VolumeSpecification\":{\"SizeInGB\":32,\"VolumeType\":\"gp2\"},\"VolumesPerInstance\":2}]},\"InstanceGroupType\":\"MASTER\",\"InstanceType\":\"m5.xlarge\",\"Name\":\"Master - 1\"}]"
+instance_groups="[{\"InstanceCount\":${instance_count},\"InstanceGroupType\":\"CORE\",\"InstanceType\":\"${instance_type}\",\"Name\":\"Core - 2\"},{\"InstanceCount\":1,\"EbsConfiguration\":{\"EbsBlockDeviceConfigs\":[{\"VolumeSpecification\":{\"SizeInGB\":32,\"VolumeType\":\"gp2\"},\"VolumesPerInstance\":2}]},\"InstanceGroupType\":\"MASTER\",\"InstanceType\":\"m5.2xlarge\",\"Name\":\"Master - 1\"}]"
 
 aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --ec2-attributes '{"KeyName":"flintrock","InstanceProfile":"kf-variant-emr-ec2-prd-profile","SubnetId":"subnet-031b7ef17a032fc3b","EmrManagedSlaveSecurityGroup":"sg-0d04e7c3ff5f36538","EmrManagedMasterSecurityGroup":"sg-0abad24e2a3e5e279"}' \
