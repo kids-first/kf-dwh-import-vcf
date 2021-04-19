@@ -9,20 +9,24 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, HarmonizedData}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class Consequences(studyId: String, releaseId: String, input: String)
+class Consequences(studyId: String, releaseId: String, input: String, cgp_pattern: String, post_cgp_pattern: String)
                   (implicit conf: Configuration)
   extends ETL(Clinical.consequences){
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
-    val inputDF = visibleVcf(allFilesPath(input), studyId, releaseId)
+    val inputDF = vcf(
+      (getVisibleFiles(input, studyId, releaseId, cgp_pattern) ++
+      getVisibleFiles(input, studyId, releaseId, post_cgp_pattern)).distinct
+    )
+      .withColumn("file_name", filename)
       .select(chromosome, start, end, reference, alternate, name, annotations)
+
     Map(
       HarmonizedData.family_variants_vcf -> inputDF
     )
   }
 
   override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    import spark.implicits._
     data(HarmonizedData.family_variants_vcf)
       .groupBy(locus: _*)
       .agg(
@@ -30,9 +34,9 @@ class Consequences(studyId: String, releaseId: String, input: String)
         first("name") as "name",
         first("end") as "end"
       )
-      .withColumn("annotation", explode($"annotations"))
+      .withColumn("annotation", explode(col("annotations")))
       .drop("annotations")
-      .select($"*",
+      .select(col("*"),
         consequences,
         impact,
         symbol,

@@ -6,7 +6,6 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}
-import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getGenomicFiles
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
@@ -58,12 +57,6 @@ class Occurrences(studyId: String, releaseId: String, input: String, biospecimen
         .join(participants, biospecimens("participant_id") === participants("kf_id"))
         .select(biospecimens("*"), $"is_proband", $"affected_status")
 
-    //val withClinical =
-    //  occurrences
-    //    .join(joinedBiospecimen, occurrences("biospecimen_id") === joinedBiospecimen("joined_sample_id"))
-    //    .drop(occurrences("biospecimen_id"))
-    //    .drop(joinedBiospecimen("joined_sample_id"))
-
     val relations =
       family_relationships
         .groupBy("participant2")
@@ -107,7 +100,6 @@ class Occurrences(studyId: String, releaseId: String, input: String, biospecimen
 
   def selectOccurrences(studyId: String, releaseId: String, inputDF: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-
     val inputWithAnnotation =
       inputDF
 
@@ -196,28 +188,13 @@ class Occurrences(studyId: String, releaseId: String, input: String, biospecimen
     vcfDf.withColumn("file_name", filename)
   }
 
-  def getVisibleFiles(input: String, studyId: String, releaseId: String, contains: String)(implicit spark: SparkSession): List[String] = {
-    import spark.implicits._
-      getGenomicFiles(studyId, releaseId)
-        .select("file_name")
-        .distinct
-        .as[String]
-        .collect()
-        .filter(_.contains(contains))
-        .map(f => {
-          if (input.endsWith("/")) s"${input}${f}"
-          else s"$input/$f"})
-        .toList
-  }
-
   private def asPostCGP(inputDf: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    import spark.implicits._
     inputDf
       .withColumn("annotation", annotations)
       .withColumn("hgvsg", array_sort(col("annotation.HGVSg"))(0))
       .withColumn("variant_class", array_sort(col("annotation.VARIANT_CLASS"))(0))
       .drop("annotation", "INFO_ANN")
-      .withColumn("genotype", explode($"genotypes"))
+      .withColumn("genotype", explode(col("genotypes")))
   }
 
   private def asCGP(inputDf: DataFrame)(implicit spark: SparkSession): DataFrame = {

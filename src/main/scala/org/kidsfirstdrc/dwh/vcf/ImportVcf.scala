@@ -3,8 +3,6 @@ package org.kidsfirstdrc.dwh.vcf
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SparkSession
 
-import scala.util.Try
-
 object ImportVcf extends App {
 
   println(s"Job arguments: ${args.mkString("[", ", ", "]")}")
@@ -41,11 +39,11 @@ object ImportVcf extends App {
     runType match {
       case "occurrences" => new Occurrences(studyId, releaseId, input, biospecimenIdColumn, cgp_pattern, post_cgp_pattern).run()
       case "variants" => new Variants(studyId, releaseId, schema).run()
-      case "consequences" => new Consequences(studyId, releaseId, input).run()
+      case "consequences" => new Consequences(studyId, releaseId, input, cgp_pattern, post_cgp_pattern).run()
       case "all" =>
         new Occurrences(studyId, releaseId, input, biospecimenIdColumn, cgp_pattern, post_cgp_pattern).run()
         new Variants(studyId, releaseId, schema).run()
-        new Consequences(studyId, releaseId, input).run()
+        new Consequences(studyId, releaseId, input, cgp_pattern, post_cgp_pattern).run()
 
     }
   }
