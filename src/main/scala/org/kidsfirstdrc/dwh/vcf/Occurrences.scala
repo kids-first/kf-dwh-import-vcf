@@ -44,7 +44,7 @@ class Occurrences(studyId: String, releaseId: String, input: String, biospecimen
         coalesce($"dbgap_consent_code", lit("_NONE_")) as "dbgap_consent_code",
         ($"consent_type" === "GRU") as "is_gru",
         ($"consent_type" === "HMB") as "is_hmb"
-      )
+      ).drop("joined_sample_id")
 
     val family_relationships = data(DataService.family_relationships).where($"participant1_to_participant2_relation".isin("Mother", "Father"))
 

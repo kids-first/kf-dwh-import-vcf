@@ -26,7 +26,8 @@ case class HPO(`hpo_term_id`: String = "HP:0001347",
 
 case class OMIM(`name`: String = "Epileptic encephalopathy, early infantile, 69",
                 `omim_id`: String = "618285",
-                `inheritance`: List[String] = List("AD"))
+                `inheritance`: List[String] = List("Autosomal dominant"),
+                `inheritance_code`: List[String] = List("AD"))
 
 case class DDD(`disease_name`: String = "OCULOAURICULAR SYNDROME")
 

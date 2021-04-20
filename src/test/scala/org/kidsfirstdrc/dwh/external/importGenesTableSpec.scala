@@ -23,7 +23,7 @@ class importGenesTableSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
   "run" should "creates genes table" in {
 
     val inputData = Map(
-      Public.omim_gene_set     -> Seq(OmimOutput(omim_gene_id = 601013)).toDF(),
+      Public.omim_gene_set     -> Seq(OmimOutput(omim_gene_id = 601013), OmimOutput(omim_gene_id = 601013, phenotype = PHENOTYPE(null, null, null, null))).toDF(),
       Public.orphanet_gene_set -> Seq(OrphanetOutput(gene_symbol = "OR4F5")).toDF(),
       Public.hpo_gene_set      -> Seq(HpoGeneSetOutput()).toDF(),
       Public.human_genes       -> Seq(HumanGenesOutput(), HumanGenesOutput(`symbol` = "OR4F4")).toDF(),
@@ -34,7 +34,7 @@ class importGenesTableSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
     val resultDF = new ImportGenesTable(Environment.LOCAL).transform(inputData)
 
     val expectedOrphanet = List(ORPHANET(17601, "Multiple epiphyseal dysplasia, Al-Gazali type", List("Autosomal recessive")))
-    val expectedOmim = List(OMIM("Shprintzen-Goldberg syndrome", "182212", List("AD")))
+    val expectedOmim = List(OMIM("Shprintzen-Goldberg syndrome", "182212", List("Autosomal dominant"), List("AD")))
 
     resultDF.show(false)
 
