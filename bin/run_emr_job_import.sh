@@ -2,14 +2,14 @@
 set -x
 study_id=$1
 release_id=${2:-"re_000011"}
-job=${3:-"occurrences"}
-schema=${4:-"variant"}
-cgp_pattern=${5:-".postCGP.filtered.deNovo.vep.vcf.gz"}
-post_cgp_pattern=${6:-".CGP.filtered.deNovo.vep.vcf.gz"}
+job=${3:-"consequences"}
+schema=${4:-"portal"}
+cgp_pattern=${5:-".CGP.filtered.deNovo.vep.vcf.gz"}
+#post_cgp_pattern=${6:-".postCGP.filtered.deNovo.vep.vcf.gz"}
 #folder=${7:-"harmonized/family-variants/"}
-folder=${7:-"harmonized-data/family-variants/"}
-#folder=${7:-"harmonized-data/simple-variants/"}
-#post_cgp_pattern=${7:-"CGP.filtered.vep.vcf.gz"}
+#folder=${7:-"harmonized-data/family-variants/"}
+folder=${7:-"harmonized-data/simple-variants/"}
+post_cgp_pattern=${7:-".CGP.filtered.vep.vcf.gz"}
 biospecimen_id_column=${8:-"biospecimen_id"}
 instance_count=${9:-"15"}
 instance_type=${10:-"m5.4xlarge"}

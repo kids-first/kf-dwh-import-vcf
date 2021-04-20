@@ -1,6 +1,6 @@
 #!/bin/bash
 study_ids=${1:-"SD_46SK55A3,SD_9PYZAHHE,SD_DYPMEHHF,SD_BHJXBDQK"}
-release_id=${2:-"RE_000010"}
+release_id=${2:-"RE_000011"}
 job=${3:-"variants"}
 mergeExisting=${4:-"false"}
 schema=${5:-"portal"}

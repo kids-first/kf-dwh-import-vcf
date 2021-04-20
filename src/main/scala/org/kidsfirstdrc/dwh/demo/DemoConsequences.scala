@@ -27,10 +27,10 @@ class DemoConsequences(studyId: String, releaseId: String, input: String)
   }
 
   override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    new Consequences(studyId, releaseId, input).transform(data)
+    new Consequences(studyId, releaseId, input, "", "").transform(data)
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    new Consequences(studyId, releaseId, input).load(data)
+    new Consequences(studyId, releaseId, input, "", "").load(data)
   }
 }

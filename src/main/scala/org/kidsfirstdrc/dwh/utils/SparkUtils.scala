@@ -45,6 +45,21 @@ object SparkUtils {
     statuses != null && statuses.nonEmpty
   }
 
+  def getVisibleFiles(input: String, studyId: String, releaseId: String, contains: String)(implicit spark: SparkSession): List[String] = {
+    import spark.implicits._
+    getGenomicFiles(studyId, releaseId)
+      .select("file_name")
+      .distinct
+      .as[String]
+      .collect()
+      .filter(_.contains(contains))
+      .map(f => {
+        if (input.endsWith("/")) s"${input}${f}"
+        else s"$input/$f"})
+      .toList
+  }
+
+  @Deprecated
   def allFilesPath(input: String): String = s"$input/*.filtered.deNovo.vep.vcf.gz"
 
   /**
@@ -56,6 +71,7 @@ object SparkUtils {
    * @param spark     session
    * @return vcf entries enriched with additional columns file_name
    */
+  @Deprecated
   def visibleVcf(path: String, studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
     val genomicFiles = getGenomicFiles(studyId, releaseId).select("file_name")
     val inputDF = vcf(path)
