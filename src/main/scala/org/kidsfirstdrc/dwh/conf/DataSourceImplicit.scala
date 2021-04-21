@@ -9,9 +9,5 @@ object DataSourceImplicit {
     def documentationPath(implicit conf: Configuration): String = {
       s"${ds.rootPath}/jobs/documentation/${ds.name}.json"
     }
-
-    def path(implicit env: Configuration): String = {
-      ds.location
-    }
   }
 }

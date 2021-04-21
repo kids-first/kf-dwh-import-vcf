@@ -6,11 +6,9 @@ import io.projectglow.functions.lift_over_coordinates
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Environment.Environment
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportCancerHotspots(runEnv: Environment)
-                          (implicit conf: Configuration) extends StandardETL(Public.cancer_hotspots)(runEnv, conf) with App {
+class ImportCancerHotspots()(implicit conf: Configuration) extends StandardETL(Public.cancer_hotspots)(conf) with App {
   val chain = "/home/hadoop/b37ToHg38.over.chain"
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {

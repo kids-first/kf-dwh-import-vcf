@@ -2,7 +2,6 @@ package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
-import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.{CosmicCancerGeneCensusInput, CosmicCancerGeneCensusOutput}
 import org.scalatest.GivenWhenThen
@@ -23,7 +22,7 @@ class ImportCancerGeneCensusSpec extends AnyFlatSpec with GivenWhenThen with Wit
 
     val inputData = Map(Raw.cosmic_cancer_gene_census -> Seq(CosmicCancerGeneCensusInput()).toDF())
 
-    val resultDF = new ImportCancerGeneCensus(Environment.LOCAL).transform(inputData)
+    val resultDF = new ImportCancerGeneCensus().transform(inputData)
 
     val expectedResult = CosmicCancerGeneCensusOutput()
     resultDF.as[CosmicCancerGeneCensusOutput].collect().head shouldBe expectedResult

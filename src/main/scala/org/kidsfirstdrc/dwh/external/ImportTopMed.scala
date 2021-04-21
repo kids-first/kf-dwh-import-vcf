@@ -5,13 +5,13 @@ import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Environment.Environment
+
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class ImportTopMed(runEnv: Environment)(implicit conf: Configuration)
-  extends StandardETL(Public.topmed_bravo)(runEnv, conf) {
+class ImportTopMed()(implicit conf: Configuration)
+  extends StandardETL(Public.topmed_bravo)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(Raw.topmed_bravo_dbsnp -> vcf(Raw.topmed_bravo_dbsnp.location)(spark))

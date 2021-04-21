@@ -4,8 +4,6 @@ import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
-import org.kidsfirstdrc.dwh.conf.Environment
-import org.kidsfirstdrc.dwh.conf.Environment.{Environment, LOCAL}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.publish.Publish.publishTable
@@ -15,8 +13,8 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locusColumNames
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class UpdateVariant(source: DataSource, runEnv: Environment)(implicit conf: Configuration)
-  extends StandardETL(Clinical.variants)(runEnv, conf) {
+class UpdateVariant(source: DataSource)(implicit conf: Configuration)
+  extends StandardETL(Clinical.variants)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(
@@ -57,11 +55,8 @@ class UpdateVariant(source: DataSource, runEnv: Environment)(implicit conf: Conf
     val localTimeNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
     val releaseId_datetime = s"${lastReleaseId}_$localTimeNow"
 
-    if (runEnv == LOCAL)
-      write(releaseId_datetime, getClass.getClassLoader.getResource("tables").getFile, destination.name, data, Some(60), destination.database)
-    else
-      write(releaseId_datetime, destination.rootPath, destination.name, data, Some(60), destination.database)
-    if (runEnv == Environment.PROD || runEnv == Environment.LOCAL) publishTable(releaseId_datetime, destination.name)
+    write(releaseId_datetime, destination.rootPath, destination.name, data, Some(60), destination.database)
+    publishTable(releaseId_datetime, destination.name)
     data
   }
 }

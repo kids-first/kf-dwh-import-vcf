@@ -5,12 +5,11 @@ import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions.{col, explode, split}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Environment._
 import org.kidsfirstdrc.dwh.external.omim.OmimPhenotype.parse_pheno
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportOmimGeneSet(runEnv: Environment)(implicit conf: Configuration)
-  extends StandardETL(Public.omim_gene_set)(runEnv, conf) {
+class ImportOmimGeneSet()(implicit conf: Configuration)
+  extends StandardETL(Public.omim_gene_set)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     val df = spark.read.format("csv")

@@ -5,12 +5,12 @@ import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
-import org.kidsfirstdrc.dwh.conf.Environment.Environment
+
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils.removeEmptyObjectsIn
 
-class ImportGenesTable(runEnv: Environment)(implicit conf: Configuration)
-  extends StandardETL(Public.genes)(runEnv, conf) {
+class ImportGenesTable()(implicit conf: Configuration)
+  extends StandardETL(Public.genes)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(

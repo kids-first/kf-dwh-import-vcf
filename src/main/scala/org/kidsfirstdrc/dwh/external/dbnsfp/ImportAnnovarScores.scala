@@ -5,11 +5,11 @@ import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Environment.Environment
+
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportAnnovarScores(runEnv: Environment)(implicit conf: Configuration)
-  extends StandardETL(Public.dbnsfp_annovar)(runEnv, conf) {
+class ImportAnnovarScores()(implicit conf: Configuration)
+  extends StandardETL(Public.dbnsfp_annovar)(conf) {
 
     val source: DataSource = Raw.annovar_dbnsfp
 

@@ -5,11 +5,11 @@ import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog._
-import org.kidsfirstdrc.dwh.conf.Environment.Environment
+
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportDDDGeneCensus(runEnv: Environment)(implicit conf: Configuration)
-  extends StandardETL(Public.ddd_gene_set)(runEnv, conf) {
+class ImportDDDGeneCensus()(implicit conf: Configuration)
+  extends StandardETL(Public.ddd_gene_set)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(Raw.ddd_gene_census -> spark.read.option("header", "true").csv(Raw.ddd_gene_census.location))

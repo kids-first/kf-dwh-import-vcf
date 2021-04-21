@@ -1,6 +1,5 @@
 #!/bin/bash
 job_type=${1:-"clinvar"}
-run_env=${2:-"PROD"}
 update_dependencies=${3:-"false"}
 instance_count=${4:-"4"}
 instance_type=${5:-"m5.xlarge"}
@@ -26,7 +25,6 @@ steps=$(cat <<EOF
       "--class", "org.kidsfirstdrc.dwh.external.ImportExternal",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
       "${job_type}",
-      "${run_env}",
       "${update_dependencies}"
     ],
     "Type": "CUSTOM_JAR",

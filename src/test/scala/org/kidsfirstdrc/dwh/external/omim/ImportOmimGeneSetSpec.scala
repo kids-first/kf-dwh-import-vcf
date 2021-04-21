@@ -2,7 +2,6 @@ package org.kidsfirstdrc.dwh.external.omim
 
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
-import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.{OmimInput, OmimOutput}
 import org.scalatest.GivenWhenThen
@@ -22,7 +21,7 @@ class ImportOmimGeneSetSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
 
   "ImportOmimGeneSet" should "read data into expected format" in {
 
-    val outputDf = new ImportOmimGeneSet(Environment.LOCAL).extract()
+    val outputDf = new ImportOmimGeneSet().extract()
 
     outputDf(Raw.omim_genemap2).as[OmimInput]
 
@@ -31,7 +30,7 @@ class ImportOmimGeneSetSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
   "ImportOmimGeneSet" should "transform data into expected format" in {
 
     val inputDf = Map(Raw.omim_genemap2 -> Seq(OmimInput()).toDF())
-    val outputDf = new ImportOmimGeneSet(Environment.LOCAL).transform(inputDf)
+    val outputDf = new ImportOmimGeneSet().transform(inputDf)
 
     outputDf.as[OmimOutput].collect() should contain theSameElementsAs Seq(OmimOutput())
 

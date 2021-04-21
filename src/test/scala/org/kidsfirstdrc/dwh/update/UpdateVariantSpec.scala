@@ -2,14 +2,12 @@ package org.kidsfirstdrc.dwh.update
 
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
-import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, TopmedBravoOutput}
 import org.kidsfirstdrc.dwh.testutils.join.Freq
 import org.kidsfirstdrc.dwh.testutils.update.Variant
 import org.kidsfirstdrc.dwh.updates.UpdateVariant
-import org.kidsfirstdrc.dwh.vcf.Variants
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -39,7 +37,7 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
     val clinvarDF = Seq(clinvar).toDF()
     val data = Map(Clinical.variants -> variantDF, Public.clinvar -> clinvarDF)
 
-    val job = new UpdateVariant(Public.clinvar, Environment.LOCAL)
+    val job = new UpdateVariant(Public.clinvar)
     val resultDF = job.transform(data)
 
     val expectedResult = variant.copy(clinvar_id = Some(clinvar.name), clin_sig = clinvar.clin_sig)
@@ -60,7 +58,7 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
     val topmedDF = Seq(topmed).toDF()
     val data = Map(Clinical.variants -> variantDF, Public.topmed_bravo -> topmedDF)
 
-    val job = new UpdateVariant(Public.topmed_bravo, Environment.LOCAL)
+    val job = new UpdateVariant(Public.topmed_bravo)
     val resultDF = job.transform(data)
 
     val expectedResult = variant.copy(topmed = Some(Freq(10, 5, 0.5, 5, 0)))
@@ -83,9 +81,9 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
 
     Given("existing data")
 
-    val job = new UpdateVariant(Public.clinvar, Environment.LOCAL)
+    val job = new UpdateVariant(Public.clinvar)
 
-    new ImportClinVarJob(Environment.LOCAL).load(clinvarDF)
+    new ImportClinVarJob().load(clinvarDF)
     job.load(variantDF)
 
 

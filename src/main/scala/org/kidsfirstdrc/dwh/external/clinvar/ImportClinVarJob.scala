@@ -7,15 +7,15 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw.clinvar_vcf
-import org.kidsfirstdrc.dwh.conf.Environment.Environment
+
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 import scala.collection.mutable
 
-class ImportClinVarJob(runEnv: Environment)(implicit conf: Configuration)
-  extends StandardETL(Public.clinvar)(runEnv, conf) {
+class ImportClinVarJob()(implicit conf: Configuration)
+  extends StandardETL(Public.clinvar)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(clinvar_vcf -> vcf(clinvar_vcf.location))
