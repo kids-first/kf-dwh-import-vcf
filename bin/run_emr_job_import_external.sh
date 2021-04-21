@@ -1,6 +1,6 @@
 #!/bin/bash
 job_type=${1:-"clinvar"}
-run_env=${2:-"DEV"}
+run_env=${2:-"PROD"}
 update_dependencies=${3:-"false"}
 instance_count=${4:-"4"}
 instance_type=${5:-"m5.xlarge"}

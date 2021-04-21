@@ -26,7 +26,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
       .map(studyId =>
         Try(spark.read.parquet(s"${Clinical.occurrences.rootPath}/occurrences/${tableName("occurrences", studyId, releaseId)}")))
       .collect { case Success(df) => df }
-      .reduce( (df1, df2) => df1.unionByName(df2))
+      .reduce( (df1, df2) => df1.drop("joined_sample_id").unionByName(df2.drop("joined_sample_id")))
 
     Map(
       Clinical.variants     -> spark.read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId"),

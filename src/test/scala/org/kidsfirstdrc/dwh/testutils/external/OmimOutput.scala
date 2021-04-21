@@ -17,9 +17,10 @@ case class OmimOutput(chromosome: String = "chr1",
                       entrez_gene_id: Int = 6497,
                       ensembl_gene_id: String = "ENSG00000157933",
                       documentation: String = "formerly mapped to 1q22-q24",
-                      phenotype: PHENOTYPE = PHENOTYPE() )
+                      phenotype: PHENOTYPE = PHENOTYPE())
 
 
 case class PHENOTYPE(name: String = "Shprintzen-Goldberg syndrome",
                      omim_id: String = "182212",
-                     inheritance: List[String] = List("AD"))
+                     inheritance: List[String] = List("Autosomal dominant"),
+                     inheritance_code: List[String] = List("AD"))

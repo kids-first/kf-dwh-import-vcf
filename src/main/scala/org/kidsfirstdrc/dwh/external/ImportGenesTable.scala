@@ -39,10 +39,13 @@ class ImportGenesTable(runEnv: Environment)(implicit conf: Configuration)
       .select($"gene_symbol" as "symbol", $"disorder_id", $"name" as "panel", $"type_of_inheritance" as "inheritance")
 
     val omim = data(Public.omim_gene_set)
-      .select($"omim_gene_id",
+      .where($"phenotype.name".isNotNull)
+      .select(
+        $"omim_gene_id",
         $"phenotype.name" as "name",
         $"phenotype.omim_id" as "omim_id",
-        $"phenotype.inheritance" as "inheritance")
+        $"phenotype.inheritance" as "inheritance",
+        $"phenotype.inheritance_code" as "inheritance_code")
 
     val hpo = data(Public.hpo_gene_set)
       .select($"entrez_gene_id", $"hpo_term_id", $"hpo_term_name")

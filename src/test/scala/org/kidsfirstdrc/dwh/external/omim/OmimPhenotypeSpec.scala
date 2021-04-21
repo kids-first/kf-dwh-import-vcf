@@ -14,6 +14,7 @@ class OmimPhenotypeSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
   "parse_pheno" should "return phenotypes parsed as a structure" in {
     val df = Seq(
       "[Bone mineral density QTL 3], 606928 (2)",
+      " {Epilepsy, idiopathic generalized, 10}, 613060 (2), Autosomal dominant",
       "Myasthenic syndrome, congenital, 8, with pre- and postsynaptic defects, 615120 (3), Autosomal recessive, X-linked",
       null,
       "unmatch"
@@ -23,8 +24,9 @@ class OmimPhenotypeSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
     frame.where($"p".isNull).count() shouldBe 2
 
     frame.where($"p".isNotNull).select("p.*").as[OmimPhenotype].collect() should contain theSameElementsAs Seq(
-      OmimPhenotype("[Bone mineral density QTL 3]", "606928", None),
-      OmimPhenotype("Myasthenic syndrome, congenital, 8, with pre- and postsynaptic defects", "615120", Some(Array("AR", "XL")))
+      OmimPhenotype("[Bone mineral density QTL 3]", "606928", None, None),
+      OmimPhenotype("Epilepsy, idiopathic generalized, 10", "613060", Some(Array("Autosomal dominant")), Some(Array("AD"))),
+      OmimPhenotype("Myasthenic syndrome, congenital, 8, with pre- and postsynaptic defects", "615120", Some(Array("Autosomal recessive", "X-linked")), Some(Array("AR", "XL")))
     )
 
   }

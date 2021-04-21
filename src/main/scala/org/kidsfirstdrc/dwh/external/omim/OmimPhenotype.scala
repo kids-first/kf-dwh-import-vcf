@@ -2,13 +2,18 @@ package org.kidsfirstdrc.dwh.external.omim
 
 import org.apache.spark.sql.functions.udf
 
-case class OmimPhenotype(name: String, omim_id: String, inheritance: Option[Seq[String]])
+case class OmimPhenotype(name: String, omim_id: String, inheritance: Option[Seq[String]], inheritance_code: Option[Seq[String]])
 
 object OmimPhenotype {
 
   val pheno_regexp = "(.*),\\s(\\d*)\\s\\([1234]\\)(?:,\\s(.*))?".r
 
   def mapInheritance(inheritance: String): Option[Seq[String]] = {
+    if (inheritance == null) None
+    else Some(inheritance.split(", ").map(_.trim).distinct)
+  }
+
+  def mapInheritanceCode(inheritance: String): Option[Seq[String]] = {
     if (inheritance == null) None
     else {
       val s = inheritance.split(", ") flatMap {
@@ -39,7 +44,11 @@ object OmimPhenotype {
 
   val parse_pheno = udf { raw: String =>
     raw match {
-      case pheno_regexp(name, omim_id, inheritance) => Some(OmimPhenotype(name, omim_id, mapInheritance(inheritance)))
+      case pheno_regexp(name, omim_id, inheritance) => Some(OmimPhenotype(
+        name.replace("{", "").replace("}", "").trim,
+        omim_id.trim,
+        mapInheritance(inheritance),
+        mapInheritanceCode(inheritance)))
       case _ => None
     }
   }
