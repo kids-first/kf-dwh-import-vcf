@@ -6,11 +6,11 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DoubleType, IntegerType, LongType}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
-import org.kidsfirstdrc.dwh.conf.Environment.Environment
+
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportScores(runEnv: Environment)(implicit conf: Configuration)
-  extends StandardETL(Public.dbnsfp_original)(runEnv, conf) {
+class ImportScores()(implicit conf: Configuration)
+  extends StandardETL(Public.dbnsfp_original)(conf) {
 
   def split_semicolon(colName: String, outputColName: String): Column = split(col(colName), ";") as outputColName
 

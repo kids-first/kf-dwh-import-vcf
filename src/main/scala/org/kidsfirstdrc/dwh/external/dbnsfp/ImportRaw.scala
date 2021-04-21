@@ -4,11 +4,11 @@ import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Environment.Environment
+
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportRaw(runEnv: Environment)(implicit conf: Configuration)
-  extends StandardETL(Public.dbnsfp_variant)(runEnv, conf) {
+class ImportRaw()(implicit conf: Configuration)
+  extends StandardETL(Public.dbnsfp_variant)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     val dbnsfpDF =

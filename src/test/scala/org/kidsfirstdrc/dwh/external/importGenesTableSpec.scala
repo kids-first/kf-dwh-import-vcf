@@ -4,7 +4,6 @@ import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.functions
 import org.apache.spark.sql.functions.col
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
-import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external._
 import org.scalatest.GivenWhenThen
@@ -31,7 +30,7 @@ class importGenesTableSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
       Public.cosmic_gene_set   -> Seq(CosmicCancerGeneCensusOutput(`symbol` = "OR4F5")).toDF
     )
 
-    val resultDF = new ImportGenesTable(Environment.LOCAL).transform(inputData)
+    val resultDF = new ImportGenesTable().transform(inputData)
 
     val expectedOrphanet = List(ORPHANET(17601, "Multiple epiphyseal dysplasia, Al-Gazali type", List("Autosomal recessive")))
     val expectedOmim = List(OMIM("Shprintzen-Goldberg syndrome", "182212", List("Autosomal dominant"), List("AD")))

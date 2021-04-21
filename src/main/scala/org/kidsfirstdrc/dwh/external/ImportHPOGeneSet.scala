@@ -5,11 +5,11 @@ import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions.broadcast
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Environment.Environment
+
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportHPOGeneSet(runEnv: Environment)(implicit conf: Configuration)
-  extends StandardETL(Public.hpo_gene_set)(runEnv, conf) {
+class ImportHPOGeneSet()(implicit conf: Configuration)
+  extends StandardETL(Public.hpo_gene_set)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     val inputDF: DataFrame = spark.read

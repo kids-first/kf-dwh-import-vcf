@@ -5,13 +5,12 @@ import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog._
-import org.kidsfirstdrc.dwh.conf.Environment.Environment
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class Import1k(runEnv: Environment)(implicit conf: Configuration)
-  extends StandardETL(Public.`1000_genomes`)(runEnv, conf) {
+class Import1k()(implicit conf: Configuration)
+  extends StandardETL(Public.`1000_genomes`)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(Raw.`1000genomes_vcf` -> vcf(Raw.`1000genomes_vcf`.location))

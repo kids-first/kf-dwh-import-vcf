@@ -6,11 +6,11 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{split, udf}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-import org.kidsfirstdrc.dwh.conf.Environment.Environment
+
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportHumanGenes(runEnv: Environment)(implicit conf: Configuration)
-  extends StandardETL(Public.human_genes)(runEnv, conf) {
+class ImportHumanGenes()(implicit conf: Configuration)
+  extends StandardETL(Public.human_genes)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     val df = spark.read.format("csv")

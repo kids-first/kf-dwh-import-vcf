@@ -2,7 +2,6 @@ package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw.clinvar_vcf
-import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.{ClinvarInput, ClinvarOutput}
@@ -25,7 +24,7 @@ class ImportClinVarSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
     withOutputFolder("output") { _ =>
       val inputData = Map(clinvar_vcf -> Seq(ClinvarInput()).toDF())
 
-      val resultDF = new ImportClinVarJob(Environment.LOCAL).transform(inputData)
+      val resultDF = new ImportClinVarJob().transform(inputData)
 
       val expectedResult = ClinvarOutput()
 

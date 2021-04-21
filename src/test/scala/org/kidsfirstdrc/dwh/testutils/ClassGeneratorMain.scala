@@ -9,8 +9,6 @@ import org.kidsfirstdrc.dwh.testutils.ClassGeneratorImplicits._
 import org.kidsfirstdrc.dwh.testutils.external.{CosmicCancerGeneCensusInput, DddGeneCensusInput, OmimInput}
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
-import org.kidsfirstdrc.dwh.conf.Environment
-import Environment.LOCAL
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.external.{ImportCancerGeneCensus, ImportDDDGeneCensus}
 
@@ -106,7 +104,7 @@ object ClassGeneratorMain extends App with WithSparkSession {
   //spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.path(Environment.LOCAL))
     //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusInput", root)
 
-  new ImportCancerGeneCensus(Environment.LOCAL).transform(Map(Raw.cosmic_cancer_gene_census -> Seq(CosmicCancerGeneCensusInput()).toDF()))
+  new ImportCancerGeneCensus().transform(Map(Raw.cosmic_cancer_gene_census -> Seq(CosmicCancerGeneCensusInput()).toDF()))
     .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusOutput", root)
 
   // test class

@@ -3,12 +3,9 @@ package org.kidsfirstdrc.dwh.updates
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
-import org.kidsfirstdrc.dwh.conf.Environment
-
-import scala.util.Try
 
 object Update extends App {
-  val Array(source, destination, runEnv) = args
+  val Array(source, destination) = args
 
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
@@ -18,15 +15,13 @@ object Update extends App {
   implicit val conf: Configuration = Configuration(List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")))
 
 
-  run(source, destination, runEnv)
+  run(source, destination)
 
-  def run(source: String, destination: String, runEnv: String)(implicit spark: SparkSession): Unit = {
-
-    val env = Try(Environment.withName(runEnv)).getOrElse(Environment.DEV)
+  def run(source: String, destination: String)(implicit spark: SparkSession): Unit = {
 
     (source, destination) match {
-        case ("clinvar", "variants")      => new UpdateVariant(Public.clinvar, env).run()
-        case ("topmed_bravo", "variants") => new UpdateVariant(Public.topmed_bravo, env).run()
+        case ("clinvar", "variants")      => new UpdateVariant(Public.clinvar).run()
+        case ("topmed_bravo", "variants") => new UpdateVariant(Public.topmed_bravo).run()
         case _ => throw new IllegalArgumentException(s"No job found for : ($source, $destination)")
     }
   }

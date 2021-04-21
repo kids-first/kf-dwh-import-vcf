@@ -5,13 +5,13 @@ import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
-import org.kidsfirstdrc.dwh.conf.Environment.Environment
+
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 import scala.xml.{Elem, Node, XML}
 
-class ImportOrphanetGeneSet(runEnv: Environment)(implicit conf: Configuration)
-  extends StandardETL(Public.orphanet_gene_set)(runEnv, conf) {
+class ImportOrphanetGeneSet()(implicit conf: Configuration)
+  extends StandardETL(Public.orphanet_gene_set)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     import spark.implicits._

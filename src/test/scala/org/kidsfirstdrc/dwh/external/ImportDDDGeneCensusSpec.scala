@@ -2,7 +2,6 @@ package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
-import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.{DddGeneCensusInput, DddGeneCensusOutput}
 import org.scalatest.GivenWhenThen
@@ -23,7 +22,7 @@ class ImportDDDGeneCensusSpec extends AnyFlatSpec with GivenWhenThen with WithSp
 
     val inputData = Map(Raw.ddd_gene_census -> Seq(DddGeneCensusInput()).toDF())
 
-    val resultDF = new ImportDDDGeneCensus(Environment.LOCAL).transform(inputData)
+    val resultDF = new ImportDDDGeneCensus().transform(inputData)
 
     val expectedResult = DddGeneCensusOutput()
     resultDF.as[DddGeneCensusOutput].collect().head shouldBe expectedResult

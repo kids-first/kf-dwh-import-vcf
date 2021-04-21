@@ -1,7 +1,6 @@
 #!/bin/bash
 source=${1:-"clinvar"}
 destination=${2:-"variants"}
-runEnv=${3:-"DEV"}
 number_instance=${4:-"10"}
 instance_type=${5:-"r5.4xlarge"}
 
@@ -19,8 +18,7 @@ steps=$(cat <<EOF
       "org.kidsfirstdrc.dwh.updates.Update",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
       "${source}",
-      "${destination}",
-      "${runEnv}"
+      "${destination}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",

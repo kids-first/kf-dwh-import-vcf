@@ -1,18 +1,13 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
 import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
-import org.kidsfirstdrc.dwh.conf.Catalog.Public
-import org.kidsfirstdrc.dwh.conf.Environment
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
-import org.kidsfirstdrc.dwh.testutils.external.ImportScores._
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 
 class ImportScoresSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
-
-  import spark.implicits._
 
   implicit val conf: Configuration =
     Configuration(
