@@ -29,8 +29,10 @@ object ImportExternal extends App {
     case "clinvar"         =>
       new ImportClinVarJob().run()
       Try {
-        if (updateDependencies.toBoolean)
-          new UpdateVariant(Public.clinvar).run()
+        if (updateDependencies.toBoolean) {
+          new UpdateVariant(Public.clinvar, "variant").run()
+          new UpdateVariant(Public.clinvar, "portal").run()
+        }
       }
     case "cosmic_gene_set" => new ImportCancerGeneCensus().run()
     case "ddd_gene_set"    => new ImportDDDGeneCensus().run()
@@ -45,8 +47,10 @@ object ImportExternal extends App {
     case "topmed_bravo"    =>
       new ImportTopMed().run()
       Try {
-        if (updateDependencies.toBoolean)
-          new UpdateVariant(Public.topmed_bravo).run()
+        if (updateDependencies.toBoolean) {
+          new UpdateVariant(Public.topmed_bravo, "variant").run()
+          new UpdateVariant(Public.topmed_bravo, "portal").run()
+        }
       }
   }
 

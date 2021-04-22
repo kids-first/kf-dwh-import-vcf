@@ -13,12 +13,12 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locusColumNames
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class UpdateVariant(source: DataSource)(implicit conf: Configuration)
+class UpdateVariant(source: DataSource, schema: String)(implicit conf: Configuration)
   extends StandardETL(Clinical.variants)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
     Map(
-      destination -> spark.table(s"${destination.database}.${destination.name}"),
+      destination -> spark.table(s"$schema.${destination.name}"),
       //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
       source -> spark.table(s"variant.${source.name}").dropDuplicates(locusColumNames),
     )
@@ -55,7 +55,7 @@ class UpdateVariant(source: DataSource)(implicit conf: Configuration)
     val localTimeNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
     val releaseId_datetime = s"${lastReleaseId}_$localTimeNow"
 
-    write(releaseId_datetime, destination.rootPath, destination.name, data, Some(60), destination.database)
+    write(releaseId_datetime, destination.rootPath, destination.name, data, Some(60), schema)
     publishTable(releaseId_datetime, destination.name)
     data
   }
