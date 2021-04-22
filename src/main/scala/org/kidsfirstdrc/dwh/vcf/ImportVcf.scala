@@ -37,11 +37,13 @@ object ImportVcf extends App {
     spark.sql(s"USE $schema")
 
     runType match {
-      case "occurrences" => new Occurrences(studyId, releaseId, input, biospecimenIdColumn, cgp_pattern, post_cgp_pattern).run()
+      case "occurrences_family" => new OccurrencesFamily(studyId, releaseId, input, biospecimenIdColumn, cgp_pattern, post_cgp_pattern).run()
+      case "occurrences" => new Occurrences(studyId, releaseId).run()
       case "variants" => new Variants(studyId, releaseId, schema).run()
       case "consequences" => new Consequences(studyId, releaseId, input, cgp_pattern, post_cgp_pattern).run()
       case "all" =>
-        new Occurrences(studyId, releaseId, input, biospecimenIdColumn, cgp_pattern, post_cgp_pattern).run()
+        new OccurrencesFamily(studyId, releaseId, input, biospecimenIdColumn, cgp_pattern, post_cgp_pattern).run()
+        new Occurrences(studyId, releaseId).run()
         new Variants(studyId, releaseId, schema).run()
         new Consequences(studyId, releaseId, input, cgp_pattern, post_cgp_pattern).run()
 
