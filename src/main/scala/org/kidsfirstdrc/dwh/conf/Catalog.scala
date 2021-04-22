@@ -77,9 +77,10 @@ object Catalog {
 
     override val alias: String  = kfStridesVariantBucket
 
-    val consequences = DataSource(alias, "/consequences/consequences_re_*"   , "variant", "consequences", PARQUET, OverWrite)
-    val occurrences  = DataSource(alias, "/occurrences/occurrences_sd_*_re_*", "variant", "occurrences" , PARQUET, OverWrite)
-    val variants     = DataSource(alias, "/variants/variants_re_*"           , "variant", "variants"    , PARQUET, OverWrite)
+    val consequences        = DataSource(alias, "/consequences/consequences_re_*"          , "variant", "consequences"      , PARQUET, OverWrite)
+    val occurrences         = DataSource(alias, "/occurrences/occurrences_sd_*_re_*"       , "variant", "occurrences"       , PARQUET, OverWrite)
+    val occurrences_family  = DataSource(alias, "/occurrences/occurrences_family_sd_*_re_*", "variant", "occurrences_family", PARQUET, OverWrite)
+    val variants            = DataSource(alias, "/variants/variants_re_*"                  , "variant", "variants"          , PARQUET, OverWrite)
   }
 
   object Es extends StoreFolder {

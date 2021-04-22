@@ -13,7 +13,7 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class OccurrencesFamilySpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   import spark.implicits._
   spark.sparkContext.setCheckpointDir(getClass.getClassLoader.getResource(".").getFile)
@@ -78,7 +78,7 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
       HarmonizedData.family_variants_vcf -> postCGP
     )
 
-    val outputDf = new Occurrences(studyId, releaseId, "", "biospecimen_id",
+    val outputDf = new OccurrencesFamily(studyId, releaseId, "", "biospecimen_id",
       ".CGP.filtered.deNovo.vep.vcf.gz", ".postCGP.filtered.deNovo.vep.vcf.gz").transform(inputData)
 
     outputDf.as[OccurrenceOutput].collect() should contain theSameElementsAs Seq(
@@ -99,7 +99,7 @@ class OccurrencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessi
 
     spark.sql("use variant")
 
-    val outputDf = new Occurrences(studyId, releaseId, input, "biospecimen_id",
+    val outputDf = new OccurrencesFamily(studyId, releaseId, input, "biospecimen_id",
       ".CGP.filtered.deNovo.vep.vcf.gz", ".postCGP.filtered.deNovo.vep.vcf.gz").run()
 
     outputDf.select("participant_id").show(false)
