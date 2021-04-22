@@ -20,8 +20,14 @@ object Update extends App {
   def run(source: String, destination: String)(implicit spark: SparkSession): Unit = {
 
     (source, destination) match {
-        case ("clinvar", "variants")      => new UpdateVariant(Public.clinvar).run()
-        case ("topmed_bravo", "variants") => new UpdateVariant(Public.topmed_bravo).run()
+        case ("clinvar", "variants") =>
+          new UpdateVariant(Public.clinvar, "variant").run()
+          new UpdateVariant(Public.clinvar, "portal").run()
+
+        case ("topmed_bravo", "variants") =>
+          new UpdateVariant(Public.topmed_bravo, "variant").run()
+          new UpdateVariant(Public.topmed_bravo, "portal").run()
+
         case _ => throw new IllegalArgumentException(s"No job found for : ($source, $destination)")
     }
   }
