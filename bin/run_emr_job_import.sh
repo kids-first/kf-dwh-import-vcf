@@ -3,7 +3,7 @@ set -x
 study_id=$1
 release_id=${2:-"re_000011"}
 job=${3:-"occurrences_family"}
-schema=${4:-"portal"}
+schema=${4:-"variant"}
 cgp_pattern=${5:-".CGP.filtered.deNovo.vep.vcf.gz"}
 post_cgp_pattern=${6:-".postCGP.filtered.deNovo.vep.vcf.gz"}
 folder=${7:-"harmonized/family-variants/"}
