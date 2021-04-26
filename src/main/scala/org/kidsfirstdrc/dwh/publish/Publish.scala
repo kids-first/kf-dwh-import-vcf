@@ -40,6 +40,7 @@ object Publish extends App {
     allStudies
       .foreach { study =>
         val studyLc = study.toLowerCase
+        spark.sql(s"create or replace VIEW variant.occurrences_family_${studyLc} AS SELECT * FROM variant.occurrences_${studyLc}_${releaseId.toLowerCase}")
         spark.sql(s"create or replace VIEW variant.occurrences_${studyLc} AS SELECT * FROM variant.occurrences_${studyLc}_${releaseId.toLowerCase}")
       }
   }
