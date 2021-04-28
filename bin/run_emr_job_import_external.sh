@@ -1,8 +1,8 @@
 #!/bin/bash
 job_type=${1:-"clinvar"}
-update_dependencies=${3:-"false"}
-instance_count=${4:-"4"}
-instance_type=${5:-"m5.xlarge"}
+bucket=${4:-"s3a://kf-strides-variant-parquet-prd"}
+instance_count=${5:-"4"}
+instance_type=${6:-"m5.xlarge"}
 
 aws s3 cp bootstrap-actions s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions --recursive
 aws s3 cp documentation s3://kf-strides-variant-parquet-prd/jobs/documentation --recursive
@@ -25,7 +25,7 @@ steps=$(cat <<EOF
       "--class", "org.kidsfirstdrc.dwh.external.ImportExternal",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
       "${job_type}",
-      "${update_dependencies}"
+      "${bucket}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",
@@ -46,7 +46,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --bootstrap-actions Path="s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions/${bootstrapAction}.sh" \
 --steps "${steps}" \
---name "Import ${job_type} with dep ${update_dependencies}" \
+--name "Import ${job_type}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \
