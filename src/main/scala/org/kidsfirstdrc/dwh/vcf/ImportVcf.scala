@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.core.config.{Configuration, ConfigurationLoader, StorageConf}
 import org.apache.spark.sql.SparkSession
 
 object ImportVcf extends App {
@@ -14,8 +14,6 @@ object ImportVcf extends App {
     .config("spark.sql.broadcastTimeout", "3600")
     .enableHiveSupport()
     .appName(s"Import $runType for $studyId - $releaseId").getOrCreate()
-
-  spark.sparkContext.setCheckpointDir("s3a://kf-strides-variant-parquet-prd/checkpoint")
 
   val storage = schema match {
     case "variant" => StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")
