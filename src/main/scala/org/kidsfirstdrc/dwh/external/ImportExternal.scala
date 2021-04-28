@@ -18,6 +18,8 @@ object ImportExternal extends App {
 
   implicit val conf: Configuration = Configuration(List(StorageConf("kf-strides-variant", bucket)))
 
+  //implicit val conf: Configuration = ConfigurationLoader.loadFromResources(config)
+
   jobType.toLowerCase match {
     case "1000genomes"     => new Import1k().run()
     case "annovar_scores"  => new ImportAnnovarScores().run()

@@ -1,8 +1,9 @@
 #!/bin/bash
 job_type=${1:-"clinvar"}
-bucket=${4:-"s3a://kf-strides-variant-parquet-prd"}
-instance_count=${5:-"4"}
-instance_type=${6:-"m5.xlarge"}
+# config=${2:-"config/production.conf"}
+bucket=${3:-"s3a://kf-strides-variant-parquet-prd"}
+instance_count=${4:-"4"}
+instance_type=${5:-"m5.xlarge"}
 
 aws s3 cp bootstrap-actions s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions --recursive
 aws s3 cp documentation s3://kf-strides-variant-parquet-prd/jobs/documentation --recursive
