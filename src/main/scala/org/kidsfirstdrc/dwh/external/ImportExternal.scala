@@ -4,6 +4,7 @@ import bio.ferlab.datalake.core.config.{Configuration, ConfigurationLoader}
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.external.dbnsfp.{ImportAnnovarScores, ImportRaw, ImportScores}
+import org.kidsfirstdrc.dwh.external.ensembl.ImportEnsemblMapping
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetGeneSet
 
@@ -31,6 +32,7 @@ object ImportExternal extends App {
     case "dbnsfp_original" => new ImportScores().run()
     case "dbsnp"           => new ImportDBSNP().run()
     case "genes"           => new ImportGenesTable().run()
+    case "ensembl_mapping" => new ImportEnsemblMapping().run()
     case "hpo_gene_set"    => new ImportHPOGeneSet().run()
     case "human_genes"     => new ImportHumanGenes().run()
     case "omim_gene_set"   => new ImportOmimGeneSet().run()

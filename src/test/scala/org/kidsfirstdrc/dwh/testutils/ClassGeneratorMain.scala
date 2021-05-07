@@ -20,6 +20,13 @@ object ClassGeneratorMain extends App with WithSparkSession {
 
   implicit val conf: Configuration = Configuration(List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")))
 
+  //val path = getClass.getResource("/ensembl/canonical.csv").getFile
+  //val path = getClass.getResource("/ensembl/refseq.csv").getFile
+  //val path = getClass.getResource("/ensembl/ena.csv").getFile
+  //val path = getClass.getResource("/ensembl/entrez.csv").getFile
+  //val path = getClass.getResource("/ensembl/uniprot.csv").getFile
+  //val df = spark.read.format("csv").option("header", "true").load(path)
+  //df.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external", "EnsemblUniprotInput", root)
 
   /** PREVENTS re-writting these classes by mistake
    *
@@ -104,8 +111,8 @@ object ClassGeneratorMain extends App with WithSparkSession {
   //spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.path(Environment.LOCAL))
     //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusInput", root)
 
-  new ImportCancerGeneCensus().transform(Map(Raw.cosmic_cancer_gene_census -> Seq(CosmicCancerGeneCensusInput()).toDF()))
-    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusOutput", root)
+  //new ImportCancerGeneCensus().transform(Map(Raw.cosmic_cancer_gene_census -> Seq(CosmicCancerGeneCensusInput()).toDF()))
+  //  .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusOutput", root)
 
   // test class
   //case class TestNestedClass(a: String = "a", b: Long = 2, c: List[String] = List("c"), d: NestedClass = NestedClass())
