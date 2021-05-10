@@ -8,7 +8,8 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{DataService, HarmonizedData}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.dataservice._
 import org.kidsfirstdrc.dwh.testutils.vcf.{OccurrenceOutput, PostCGPInput}
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.annotations
+import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.{annotations, csq}
+import org.kidsfirstdrc.dwh.utils.SparkUtils.vcf
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -60,16 +61,21 @@ class OccurrencesFamilySpec extends AnyFlatSpec with GivenWhenThen with WithSpar
   "transform" should "return a dataframe with all expected columns" in {
     spark.sql("CREATE DATABASE IF NOT EXISTS variant")
     spark.sql("use variant")
+    val path = getClass.getClassLoader.getResource(".").getFile + "decoy_rm.vcf.gz"
 
-    val postCGP = Seq(
-      PostCGPInput()
-    ).toDF()
+    //vcf(path).select("INFO_CSQ").printSchema()
+    //Seq(PostCGPInput()).toDF().select("INFO_ANN").printSchema()
+    val postCGP =
+      //Seq(PostCGPInput()).toDF()
+      vcf(path)
       .withColumn("file_name", lit("file_1"))
-      .withColumn("annotation", annotations)
-      .withColumn("hgvsg", array_sort(col("annotation.HGVSg"))(0))
+      .withColumn("annotation", csq)
+      .withColumn("hgvsg", lit(""))//array_sort(col("annotation.HGVSg"))(0))
       .withColumn("variant_class", array_sort(col("annotation.VARIANT_CLASS"))(0))
       .drop("annotation", "INFO_ANN")
       .withColumn("genotype", explode($"genotypes"))
+
+    //postCGP.show(false)
 
     val inputData = Map(
       DataService.participants -> participantsDf.where($"study_id" === studyId),
