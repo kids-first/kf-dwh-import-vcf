@@ -5,6 +5,7 @@ import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.kidsfirstdrc.dwh.conf.Catalog.DataService
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.external.EnsemblMappingOutput
 import org.kidsfirstdrc.dwh.testutils.vcf.OccurrenceOutput
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
@@ -28,9 +29,19 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
       And("An input folder that contain VCF")
       val input = getClass.getResource("/input_vcf/SD_123456").getFile
 
+      val inputEnsemblData = Seq(EnsemblMappingOutput()).toDF
+
       And("An empty output folder")
       withOutputFolder("output") { output =>
         spark.sql("create database if not exists variant")
+
+        And("A table ensembl_mapping")
+        inputEnsemblData
+          .write.mode(SaveMode.Overwrite)
+          .option("path", s"$output/ensembl_mapping")
+          .format("parquet")
+          .saveAsTable(s"variant.ensembl_mapping")
+
         And("A table biospecimens_re_abcdef")
         loadTestClinicalTable("biospecimens", s"${DataService.biospecimens.rootPath}/Dataservice")
 

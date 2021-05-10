@@ -3,7 +3,7 @@ package org.kidsfirstdrc.dwh.external.ensembl
 import bio.ferlab.datalake.core.config.Configuration
 import bio.ferlab.datalake.core.etl.DataSource
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{Column, DataFrame, SparkSession}
+import org.apache.spark.sql.{Column, DataFrame, SparkSession, functions}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
 import org.kidsfirstdrc.dwh.jobs.StandardETL
@@ -45,13 +45,15 @@ class ImportEnsemblMapping()(implicit conf: Configuration)
     joinedDf
       .groupBy("ensembl_gene_id", "ensembl_transcript_id")
       .agg(
-        collect_list(col("tag")).as("tags"),
+        collect_set(col("tag")).as("tags"),
         externalIDs(List("refseq", "entrez", "uniprot")) :+
           first("species").as("species") :+
           first("tax_id").as("tax_id") :+
           collect_set("primary_accession").as("primary_accessions") :+
           collect_set("secondary_accession").as("secondary_accessions"):_*
       )
+      .withColumn("refseq_mrna_id", filter(col("refseq"), c => c("id").like("NM_%"))(0)("id"))
+      .withColumn("refseq_protein_id", filter(col("refseq"), c => c("id").like("NP_%"))(0)("id"))
       .withColumn("is_canonical", when(array_contains(col("tags"), "Ensembl Canonical"), lit(true)).otherwise(lit(false)))
       .withColumn("is_mane_select", when(array_contains(col("tags"), "MANE Select v0.93"), lit(true)).otherwise(lit(false)))
       .withColumn("is_mane_plus", when(array_contains(col("tags"), "MANE Plus Clinical v0.93"), lit(true)).otherwise(lit(false)))

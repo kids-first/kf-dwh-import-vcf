@@ -27,6 +27,10 @@ case class ConsequenceOutput(chromosome: String = "2",
                              codons: Option[RefAlt] = Some(RefAlt("GTG", "ATG")),
                              protein_position: Option[Int] = Some(261),
                              canonical: Boolean = true,
+                             mane_plus: Option[Boolean] = None,
+                             mane_select: Option[Boolean] = None,
+                             refseq_mrna_id: Option[String] = None,
+                             refseq_protein_id: Option[String] = None,
                              study_id: String = "SD_123456",
                              release_id: String = "RE_ABCDEF")
 

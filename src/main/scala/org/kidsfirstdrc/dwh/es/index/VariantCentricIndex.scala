@@ -150,8 +150,9 @@ object VariantCentricIndex {
           .withScores
           .select("chromosome", "start", "reference", "alternate", "symbol", "ensembl_gene_id", "consequences",
             "vep_impact", "symbol", "strand", "biotype", "exon", "intron", "hgvsc", "hgvsp", "cds_position",
-            "cdna_position", "protein_position", "amino_acids", "codons", "canonical", "aa_change", "coding_dna_change",
-            "ensembl_transcript_id", "ensembl_regulatory_id", "feature_type", "predictions", "conservations")
+            "cdna_position", "protein_position", "amino_acids", "codons", "canonical", "mane_plus", "mane_select", "aa_change",
+            "refseq_mrna_id", "refseq_protein_id", "coding_dna_change", "ensembl_transcript_id", "ensembl_regulatory_id",
+            "feature_type", "predictions", "conservations")
 
       val consequenceOutputColumns: Set[String] =
         consequenceWithScores.columns.toSet ++ Set("impact_score") -- Set("chromosome", "start", "reference", "alternate")
