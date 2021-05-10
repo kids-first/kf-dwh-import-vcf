@@ -53,7 +53,8 @@ class VariantCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSp
 
   val joinConsequencesDf: DataFrame = Seq(
     JoinConsequenceOutput().copy(ensembl_gene_id = "ENSG00000189337", ensembl_transcript_id = "ENST00000636564", `ensembl_regulatory_id` = Some("ENSR0000636135"), `intron` = Some(Intron(2, 10)),
-      `SIFT_score` = Some(0.91255), `SIFT_pred` = Some("D"), `Polyphen2_HVAR_pred` = Some("D"), `Polyphen2_HVAR_score` = Some(0.91255), `FATHMM_pred` = Some("D")),
+      `SIFT_score` = Some(0.91255), `SIFT_pred` = Some("D"), `Polyphen2_HVAR_pred` = Some("D"), `Polyphen2_HVAR_score` = Some(0.91255), `FATHMM_pred` = Some("D"),
+      `mane_plus` = Some(true), `refseq_mrna_id` = Some("MN_XXX")),
     JoinConsequenceOutput().copy(ensembl_gene_id = "ENSG00000189337", ensembl_transcript_id = "ENST00000636203", `ensembl_regulatory_id` = Some("ENSR0000636134"), `intron` = Some(Intron(2, 10)),
       `SIFT_score` = Some(0.91255), `SIFT_pred` = Some("D"), `Polyphen2_HVAR_pred` = Some("D"), `Polyphen2_HVAR_score` = Some(0.91255), `FATHMM_pred` = Some("D"))
   ).toDF()
@@ -98,9 +99,15 @@ class VariantCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSp
   )
 
   val expectedConsequences: List[Consequence] = List(
-    Consequence("MODERATE", "SCN2A", Some("ENST00000636203"),Some("ENSR0000636134"), Some("ENST00000486878.2:c.322G>A"),Some("ENSP00000487466.1:p.Val108Met"),"Transcript",List("missense_variant"),Some("protein_coding"),1,Some(Exon(Some(4), Some(4))),Some(Intron(2, 10)),Some(322),Some(322),Some(RefAlt("V","M")),Some(RefAlt("Gtg","Atg")),Some(108),Some("V108M"),Some("322G>A"),3,false,
+    Consequence("MODERATE", "SCN2A", Some("ENST00000636203"),Some("ENSR0000636134"), Some("ENST00000486878.2:c.322G>A"),
+      Some("ENSP00000487466.1:p.Val108Met"),"Transcript",List("missense_variant"),Some("protein_coding"),1,Some(Exon(Some(4), Some(4))),
+      Some(Intron(2, 10)),Some(322),Some(322),Some(RefAlt("V","M")),Some(RefAlt("Gtg","Atg")),Some(108),Some("V108M"),Some("322G>A"),3,false,
+      None, None, None, None,
       ScoreConservations(0.7674), ScorePredictions()),
-    Consequence("MODERATE", "SCN2A", Some("ENST00000636564"),Some("ENSR0000636135"), Some("ENST00000486878.2:c.322G>A"),Some("ENSP00000487466.1:p.Val108Met"),"Transcript",List("missense_variant"),Some("protein_coding"),1,Some(Exon(Some(4), Some(4))),Some(Intron(2, 10)),Some(322),Some(322),Some(RefAlt("V","M")),Some(RefAlt("Gtg","Atg")),Some(108),Some("V108M"),Some("322G>A"),3,false,
+    Consequence("MODERATE", "SCN2A", Some("ENST00000636564"),Some("ENSR0000636135"), Some("ENST00000486878.2:c.322G>A"),
+      Some("ENSP00000487466.1:p.Val108Met"),"Transcript",List("missense_variant"),Some("protein_coding"),1,Some(Exon(Some(4), Some(4))),
+      Some(Intron(2, 10)),Some(322),Some(322),Some(RefAlt("V","M")),Some(RefAlt("Gtg","Atg")),Some(108),Some("V108M"),Some("322G>A"),3,false,
+      Some(true), None, Some("MN_XXX"), None,
       ScoreConservations(0.7674), ScorePredictions())
   )
 

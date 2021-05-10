@@ -76,6 +76,10 @@ object VariantCentricOutput {
                          coding_dna_change: Option[String] = Some("781G>A"),
                          impact_score: Int = 3,
                          canonical: Boolean = true,
+                         mane_plus: Option[Boolean] = None,
+                         mane_select: Option[Boolean] = None,
+                         refseq_mrna_id: Option[String] = None,
+                         refseq_protein_id: Option[String] = None,
                          conservations: ScoreConservations,
                          predictions: ScorePredictions)
 

@@ -5,7 +5,7 @@ import bio.ferlab.datalake.core.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, HarmonizedData}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, HarmonizedData, Public}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
@@ -22,12 +22,22 @@ class Consequences(studyId: String, releaseId: String, input: String, cgp_patter
       .select(chromosome, start, end, reference, alternate, name, annotations)
 
     Map(
-      HarmonizedData.family_variants_vcf -> inputDF
+      HarmonizedData.family_variants_vcf -> inputDF,
+      Public.ensembl_mapping -> spark.table(s"${Public.ensembl_mapping.database}.${Public.ensembl_mapping.name}")
     )
   }
 
   override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    data(HarmonizedData.family_variants_vcf)
+    val ensembl_mappingDf = data(Public.ensembl_mapping)
+      .select(
+        col("ensembl_transcript_id"),
+        col("is_canonical"),
+        col("is_mane_plus") as "mane_plus",
+        col("is_mane_select") as "mane_select",
+        col("refseq_mrna_id"),
+        col("refseq_protein_id"))
+
+    val consequencesDf = data(HarmonizedData.family_variants_vcf)
       .groupBy(locus: _*)
       .agg(
         first("annotations") as "annotations",
@@ -62,6 +72,11 @@ class Consequences(studyId: String, releaseId: String, input: String, cgp_patter
         lit(releaseId) as "release_id"
       )
       .drop("annotation")
+
+    consequencesDf
+      .join(ensembl_mappingDf, Seq("ensembl_transcript_id"), "left")
+      .withColumn("canonical", when(col("is_canonical").isNull, col("canonical")).otherwise(col("is_canonical")))
+      .drop("is_canonical")
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
