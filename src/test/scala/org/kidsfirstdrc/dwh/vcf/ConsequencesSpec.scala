@@ -9,7 +9,6 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-
 class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   import spark.implicits._
@@ -70,6 +69,7 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
     output.as[ConsequenceOutput].collect() should contain theSameElementsAs Seq(
       ConsequenceOutput(ensembl_transcript_id = Some("ENST00000332831"), ensembl_regulatory_id = None, feature_type = "Transcript",
+        original_canonical = false,
         mane_plus = Some(true), mane_select = Some(true), refseq_mrna_id = Some("NM_001005277"), refseq_protein_id = Some("NP_001005277")),
       ConsequenceOutput(ensembl_transcript_id = None, ensembl_regulatory_id = Some("ENSR0000636135"), feature_type = "RegulatoryFeature")
     )

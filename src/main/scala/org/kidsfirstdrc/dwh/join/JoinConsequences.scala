@@ -40,8 +40,8 @@ class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisti
     val commonColumns = Seq(
       $"chromosome", $"start", $"end", $"reference", $"alternate", $"consequences", $"ensembl_transcript_id", $"ensembl_regulatory_id",
       $"feature_type", $"name", $"impact", $"symbol", $"ensembl_gene_id", $"strand", $"biotype", $"variant_class", $"exon", $"intron",
-      $"hgvsc", $"hgvsp", $"hgvsg", $"cds_position", $"cdna_position", $"protein_position", $"amino_acids", $"codons", $"canonical",
-      $"mane_plus", $"mane_select", $"refseq_mrna_id", $"refseq_protein_id"
+      $"hgvsc", $"hgvsp", $"hgvsg", $"cds_position", $"cdna_position", $"protein_position", $"amino_acids", $"codons", $"original_canonical",
+      $"canonical", $"mane_plus", $"mane_select", $"refseq_mrna_id", $"refseq_protein_id"
     )
 
     val allColumns = commonColumns :+ col("study_id")
@@ -102,6 +102,7 @@ class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisti
         firstAs("protein_position"),
         firstAs("amino_acids"),
         firstAs("codons"),
+        firstAs("original_canonical"),
         firstAs("canonical"),
         firstAs("mane_plus"),
         firstAs("mane_select"),
