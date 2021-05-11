@@ -67,7 +67,7 @@ class Consequences(studyId: String, releaseId: String, input: String, cgp_patter
         protein_position,
         amino_acids,
         codons,
-        canonical,
+        original_canonical,
         lit(studyId) as "study_id",
         lit(releaseId) as "release_id"
       )
@@ -75,7 +75,7 @@ class Consequences(studyId: String, releaseId: String, input: String, cgp_patter
 
     consequencesDf
       .join(ensembl_mappingDf, Seq("ensembl_transcript_id"), "left")
-      .withColumn("canonical", when(col("is_canonical").isNull, col("canonical")).otherwise(col("is_canonical")))
+      .withColumn("canonical", when(col("is_canonical").isNull, col("original_canonical")).otherwise(col("is_canonical")))
       .drop("is_canonical")
   }
 
