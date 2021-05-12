@@ -232,4 +232,6 @@ object SparkUtils {
 
   val removeEmptyObjectsIn: String => Column = column => when(to_json(col(column)) === lit("[{}]"), array()).otherwise(col(column))
 
+  def getColumnOrElse(colName: String, default: Any = ""): Column = when(col(colName).isNull, lit(default)).otherwise(trim(col(colName)))
+
 }
