@@ -73,7 +73,7 @@ class GenomicSuggestionsIndex(releaseId: String)
     variants
       .withColumn("clinvar_id", getColumnOrElse("clinvar_id"))
       .withColumn("hgvsg", getColumnOrElse("hgvsg"))
-      .withColumn("rsnumber", getColumnOrElse("rsnumber"))
+      .withColumn("rsnumber", getColumnOrElse("name"))
       .joinByLocus(groupedByLocusConsequences, "left")
       .withColumn("type", lit("variant"))
       .withColumn("locus", concat_ws("-", locus:_*))
