@@ -62,7 +62,7 @@ class GenomicSuggestionsIndexSpec extends AnyFlatSpec with GivenWhenThen with Wi
 
   val joinConsequencesWithEmptyAndNullDf: DataFrame = Seq(
     JoinConsequenceOutput().copy(symbol = "SCN2A.2", aa_change = None),
-    JoinConsequenceOutput().copy(symbol = "SCN2A", aa_change = null),
+    JoinConsequenceOutput().copy(symbol = "SCN2A", aa_change = null, `refseq_mrna_id` = Some("NM_XXX"), `refseq_protein_id` =  Some("NP_YYY")),
     JoinConsequenceOutput().copy(symbol = "", aa_change = None),
     JoinConsequenceOutput().copy(symbol = null, aa_change = null)
   ).toDF()
@@ -118,7 +118,7 @@ class GenomicSuggestionsIndexSpec extends AnyFlatSpec with GivenWhenThen with Wi
       `hgvsg` = "",
       `suggest` = List(
         SUGGEST(List("SCN2A", "SCN2A.2", "2-165310406-G-A", "rs1313905795", "RCV000436956"), 4),
-        SUGGEST(List("SCN2A", "SCN2A.2", "ENSG00000136531", "ENST00000486878"), 2)))
+        SUGGEST(List("SCN2A", "SCN2A.2", "ENSG00000136531", "ENST00000486878", "NM_XXX", "NP_YYY"), 2)))
 
     result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
       expectedResult
