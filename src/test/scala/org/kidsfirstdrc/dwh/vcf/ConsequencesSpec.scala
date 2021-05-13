@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.conf.Catalog.{HarmonizedData, Public}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.EnsemblMappingOutput

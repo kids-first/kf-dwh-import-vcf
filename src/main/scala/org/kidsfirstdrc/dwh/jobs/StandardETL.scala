@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.jobs
 
-import bio.ferlab.datalake.core.config.Configuration
-import bio.ferlab.datalake.core.etl.{DataSource, ETL}
+import bio.ferlab.datalake.spark3.config.Configuration
+import bio.ferlab.datalake.spark3.etl.{DataSource, ETL}
 import org.apache.spark.sql.functions.{col, lit, regexp_extract, trim}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.DataSourceImplicit._

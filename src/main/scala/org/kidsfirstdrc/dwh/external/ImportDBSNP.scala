@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
-import bio.ferlab.datalake.core.config.Configuration
-import bio.ferlab.datalake.core.etl.DataSource
+import bio.ferlab.datalake.spark3.config.Configuration
+import bio.ferlab.datalake.spark3.etl.DataSource
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}

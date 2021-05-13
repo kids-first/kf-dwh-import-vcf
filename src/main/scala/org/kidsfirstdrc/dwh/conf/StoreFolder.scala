@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.conf
 
-import bio.ferlab.datalake.core.etl.DataSource
+import bio.ferlab.datalake.spark3.etl.DataSource
 
 trait StoreFolder {
 

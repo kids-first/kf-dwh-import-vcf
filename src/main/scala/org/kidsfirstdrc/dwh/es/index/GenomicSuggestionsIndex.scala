@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.es.index
 
-import bio.ferlab.datalake.core.config.Configuration
-import bio.ferlab.datalake.core.etl.{DataSource, ETL}
+import bio.ferlab.datalake.spark3.config.Configuration
+import bio.ferlab.datalake.spark3.etl.{DataSource, ETL}
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType

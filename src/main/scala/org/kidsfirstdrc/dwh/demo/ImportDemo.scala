@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.demo
 
-import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.vcf.Variants
 

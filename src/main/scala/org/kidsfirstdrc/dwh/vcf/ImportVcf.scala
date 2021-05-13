@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.core.config.{Configuration, ConfigurationLoader, StorageConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, ConfigurationLoader, StorageConf}
 import org.apache.spark.sql.SparkSession
 
 object ImportVcf extends App {
