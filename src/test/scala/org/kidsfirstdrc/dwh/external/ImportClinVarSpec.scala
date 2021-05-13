@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.external
 
-import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw.clinvar_vcf
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession

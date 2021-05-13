@@ -1,8 +1,8 @@
 package org.kidsfirstdrc.dwh.conf
 
-import bio.ferlab.datalake.core.etl.DataSource
-import bio.ferlab.datalake.core.loader.Formats._
-import bio.ferlab.datalake.core.loader.LoadTypes.OverWrite
+import bio.ferlab.datalake.spark3.etl.DataSource
+import bio.ferlab.datalake.spark3.loader.Formats._
+import bio.ferlab.datalake.spark3.loader.LoadTypes.OverWrite
 
 object Catalog {
 

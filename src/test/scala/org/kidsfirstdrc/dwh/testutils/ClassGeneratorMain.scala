@@ -5,11 +5,11 @@ import org.apache.spark.sql.functions._
 import org.kidsfirstdrc.dwh.external.ImportHPOGeneSet
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetGeneSet
-import bio.ferlab.datalake.core.ClassGenerator._
+import bio.ferlab.datalake.spark3.ClassGenerator._
 import org.kidsfirstdrc.dwh.testutils.external.{CosmicCancerGeneCensusInput, DddGeneCensusInput, OmimInput}
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
-import bio.ferlab.datalake.core.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.external.{ImportCancerGeneCensus, ImportDDDGeneCensus}
 
 object ClassGeneratorMain extends App with WithSparkSession {

@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.external
 
-import bio.ferlab.datalake.core.config.{Configuration, ConfigurationLoader}
+import bio.ferlab.datalake.spark3.config.{Configuration, ConfigurationLoader}
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.external.dbnsfp.{ImportAnnovarScores, ImportRaw, ImportScores}

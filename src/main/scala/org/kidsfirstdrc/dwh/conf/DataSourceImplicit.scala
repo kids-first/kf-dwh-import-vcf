@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.conf
 
-import bio.ferlab.datalake.core.config.Configuration
-import bio.ferlab.datalake.core.etl.DataSource
+import bio.ferlab.datalake.spark3.config.Configuration
+import bio.ferlab.datalake.spark3.etl.DataSource
 
 object DataSourceImplicit {
 
