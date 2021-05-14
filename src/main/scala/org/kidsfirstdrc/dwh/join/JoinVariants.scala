@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.join
 
-import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.{DataSource, ETL}
+import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
@@ -11,10 +11,9 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.{calculated_duo_af, locusCo
 import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 
 class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: Boolean, database: String)(implicit conf: Configuration)
-  extends ETL(Clinical.variants){
+  extends ETL(){
 
-
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
 
     val variants: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
@@ -48,7 +47,7 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
       .select("upper_bound_kf_an").as[Long].collect().sum
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val variants = data(Clinical.variants)

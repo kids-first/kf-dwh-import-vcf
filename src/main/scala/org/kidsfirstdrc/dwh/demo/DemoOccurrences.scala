@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.demo
 
-import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.{DataSource, ETL}
+import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -11,9 +11,9 @@ import org.kidsfirstdrc.dwh.vcf.OccurrencesFamily
 
 class DemoOccurrences(studyId: String, releaseId: String, input: String)
                      (implicit conf: Configuration)
-  extends ETL(Clinical.occurrences){
+  extends ETL(){
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
     val inputDF = vcf(input)
       .withColumn("genotype", explode(col("genotypes")))
       .withColumn("file_name", regexp_extract(input_file_name(), ".*/(.*)", 1))
@@ -28,7 +28,7 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)
     )
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val occurenceJob = new OccurrencesFamily(studyId, releaseId, input, "biospecimen_id",

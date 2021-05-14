@@ -1,16 +1,16 @@
 package org.kidsfirstdrc.dwh.jobs
 
-import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.{DataSource, ETL}
+import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions.{col, lit, regexp_extract, trim}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.DataSourceImplicit._
+import org.kidsfirstdrc.dwh.conf.SourceConfImplicit._
 import org.kidsfirstdrc.dwh.glue.UpdateTableComments
 
 import scala.util.Try
 
-abstract class StandardETL(override val destination: DataSource)
-                          (implicit conf: Configuration) extends ETL(destination) {
+abstract class StandardETL(val destination: SourceConf)
+                          (implicit conf: Configuration) extends ETL() {
 
   val view_db = "variant_live"
 

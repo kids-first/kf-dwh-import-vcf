@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.{DataSource, ETL}
+import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Raw}
@@ -9,9 +9,11 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 class Variants(studyId: String, releaseId: String, schema: String)(implicit conf: Configuration)
-  extends ETL(Clinical.variants){
+  extends ETL(){
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  val destination = Clinical.variants
+
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
     val participantsPath = Raw.all_participants.location
     val occurrencesPath = s"${Clinical.occurrences.rootPath}/occurrences/${tableName(Clinical.occurrences.name, studyId, releaseId)}"
 
@@ -29,7 +31,7 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
     load(variants)
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val participants = data(Raw.all_participants).select($"id" as "participant_id")

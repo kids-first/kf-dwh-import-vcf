@@ -1,19 +1,19 @@
 package org.kidsfirstdrc.dwh.join
 
-import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.{DataSource, ETL}
+import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
+import org.kidsfirstdrc.dwh.join.JoinConsequences._
 import org.kidsfirstdrc.dwh.utils.SparkUtils
 import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
-import JoinConsequences._
 
 
 class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisting: Boolean, database: String)(implicit conf: Configuration)
-  extends ETL(Clinical.consequences){
+  extends ETL(){
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
     val consequences: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
         val nextDf = spark.table(SparkUtils.tableName(Clinical.consequences.name, studyId, releaseId, database))
@@ -31,7 +31,7 @@ class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisti
     )
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val consequences = data(Clinical.consequences)

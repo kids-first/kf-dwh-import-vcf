@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.DataSource
+import bio.ferlab.datalake.spark3.config.SourceConf
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
@@ -13,11 +13,11 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 class ImportDBSNP()(implicit conf: Configuration)
   extends StandardETL(Public.dbsnp)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
     Map(Raw.dbsnp_vcf -> vcf(Raw.dbsnp_vcf.location))
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     data(Raw.dbsnp_vcf)
       .where($"contigName" like "NC_%")

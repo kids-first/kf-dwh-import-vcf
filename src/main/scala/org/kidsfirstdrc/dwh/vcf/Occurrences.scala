@@ -1,16 +1,18 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.{DataSource, ETL}
+import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Clinical
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 
 class Occurrences(studyId: String, releaseId: String)
                  (implicit conf: Configuration)
-  extends ETL(Clinical.occurrences){
+  extends ETL(){
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  val destination = Clinical.occurrences
+
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
     val occurrences_family =
       spark.read.parquet(s"${Clinical.occurrences_family.rootPath}/occurrences_family/occurrences_family_${studyId.toLowerCase}_${releaseId.toLowerCase}")
     Map(
@@ -18,7 +20,7 @@ class Occurrences(studyId: String, releaseId: String)
     )
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(Clinical.occurrences_family)
   }
 

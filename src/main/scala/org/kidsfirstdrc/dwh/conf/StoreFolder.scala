@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.conf
 
-import bio.ferlab.datalake.spark3.etl.DataSource
+import bio.ferlab.datalake.spark3.config.SourceConf
 
 trait StoreFolder {
 
@@ -16,5 +16,5 @@ trait StoreFolder {
           acc :+ f.get(this)
       }.toSet
 
-  def sources: Set[DataSource] = getClassFields.filter(_.isInstanceOf[DataSource]).map(_.asInstanceOf[DataSource])
+  def sources: Set[SourceConf] = getClassFields.filter(_.isInstanceOf[SourceConf]).map(_.asInstanceOf[SourceConf])
 }

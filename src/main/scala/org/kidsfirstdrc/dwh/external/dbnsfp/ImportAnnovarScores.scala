@@ -1,19 +1,18 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
-import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.DataSource
+import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.config.SourceConf
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 class ImportAnnovarScores()(implicit conf: Configuration)
   extends StandardETL(Public.dbnsfp_annovar)(conf) {
 
-    val source: DataSource = Raw.annovar_dbnsfp
+    val source: SourceConf = Raw.annovar_dbnsfp
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
     val annovar_dbnsfp = spark.read
       .option("sep", "\t")
       .option("header", "true")
@@ -23,7 +22,7 @@ class ImportAnnovarScores()(implicit conf: Configuration)
     Map(source -> annovar_dbnsfp)
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     data(source)
       .select(

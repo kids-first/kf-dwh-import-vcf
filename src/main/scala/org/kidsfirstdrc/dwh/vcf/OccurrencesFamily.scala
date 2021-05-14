@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.{DataSource, ETL}
+import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -12,9 +12,11 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 class OccurrencesFamily(studyId: String, releaseId: String, input: String, biospecimenIdColumn: String,
                         cgp_pattern: String,
                         post_cgp_pattern: String)(implicit conf: Configuration)
-  extends ETL(Clinical.occurrences_family){
+  extends ETL(){
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  val destination = Clinical.occurrences_family
+
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
     val inputDF: DataFrame = unionCGPFiles(input, studyId, releaseId, cgp_pattern, post_cgp_pattern)
 
     val biospecimens = spark.table(s"${DataService.biospecimens.database}.${DataService.biospecimens.name}_${releaseId.toLowerCase}")
@@ -29,7 +31,7 @@ class OccurrencesFamily(studyId: String, releaseId: String, input: String, biosp
     )
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     val participants = data(DataService.participants)
       .withColumn("affected_status",
