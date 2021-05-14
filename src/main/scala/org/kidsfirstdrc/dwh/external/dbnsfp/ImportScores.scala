@@ -1,12 +1,10 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
-import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.DataSource
+import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DoubleType, IntegerType, LongType}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
-
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 class ImportScores()(implicit conf: Configuration)
@@ -24,13 +22,13 @@ class ImportScores()(implicit conf: Configuration)
 
   def pred(colName: String): Column = when(element_at_postion(colName) === ".", null).otherwise(element_at_postion(colName)) as colName
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
     Map(
       Public.dbnsfp_variant -> spark.table(s"${Public.dbnsfp_variant.database}.${Public.dbnsfp_variant.name}")
     )
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(Public.dbnsfp_variant).select(
       col("chromosome"),
       col("start").cast(LongType),

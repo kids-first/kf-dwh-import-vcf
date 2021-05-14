@@ -1,11 +1,11 @@
 package org.kidsfirstdrc.dwh.glue
 
 import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
-import bio.ferlab.datalake.spark3.etl.DataSource
+import bio.ferlab.datalake.spark3.config.SourceConf
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.Public.{clinvar, orphanet_gene_set}
-import org.kidsfirstdrc.dwh.conf.DataSourceImplicit._
+import org.kidsfirstdrc.dwh.conf.SourceConfImplicit._
 
 import scala.util.{Failure, Success, Try}
 
@@ -26,7 +26,7 @@ object UpdateTableComments extends App {
       Catalog.sources.filter(ds => names.contains(ds.name)).foreach(t => run(t))
   }
 
-  def run(table: DataSource)(implicit spark: SparkSession): Unit = {
+  def run(table: SourceConf)(implicit spark: SparkSession): Unit = {
     run(table.database, table.name, table.documentationPath)
   }
 

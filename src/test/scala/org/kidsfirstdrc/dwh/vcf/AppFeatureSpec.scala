@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
-import bio.ferlab.datalake.spark3.etl.DataSource
+import bio.ferlab.datalake.spark3.config.SourceConf
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.kidsfirstdrc.dwh.conf.Catalog.DataService
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession

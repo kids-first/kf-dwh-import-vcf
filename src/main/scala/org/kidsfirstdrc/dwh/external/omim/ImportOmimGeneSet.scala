@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external.omim
 
 import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.DataSource
+import bio.ferlab.datalake.spark3.config.SourceConf
 import org.apache.spark.sql.functions.{array, col, explode, lit, split}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
@@ -11,7 +11,7 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 class ImportOmimGeneSet()(implicit conf: Configuration)
   extends StandardETL(Public.omim_gene_set)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
     val df = spark.read.format("csv")
       .option("inferSchema", "true")
       .option("comment", "#")
@@ -22,7 +22,7 @@ class ImportOmimGeneSet()(implicit conf: Configuration)
     Map(Raw.omim_genemap2 -> df)
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val intermediateDf =
       data(Raw.omim_genemap2)
         .select(

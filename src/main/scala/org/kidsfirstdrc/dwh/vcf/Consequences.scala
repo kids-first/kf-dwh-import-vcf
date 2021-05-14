@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.{DataSource, ETL}
+import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
@@ -11,9 +11,11 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 class Consequences(studyId: String, releaseId: String, input: String, cgp_pattern: String, post_cgp_pattern: String)
                   (implicit conf: Configuration)
-  extends ETL(Clinical.consequences){
+  extends ETL(){
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  val destination = Clinical.consequences
+
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
     val inputDF = vcf(
       (getVisibleFiles(input, studyId, releaseId, cgp_pattern) ++
       getVisibleFiles(input, studyId, releaseId, post_cgp_pattern)).distinct
@@ -27,7 +29,7 @@ class Consequences(studyId: String, releaseId: String, input: String, cgp_patter
     )
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val ensembl_mappingDf = data(Public.ensembl_mapping)
       .select(
         col("ensembl_transcript_id"),

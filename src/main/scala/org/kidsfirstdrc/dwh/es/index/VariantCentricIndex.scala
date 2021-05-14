@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.es.index
 
-import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.{DataSource, ETL}
+import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{explode, _}
 import org.apache.spark.sql.types.{DoubleType, LongType}
@@ -16,9 +16,11 @@ import scala.collection.mutable
 import scala.util.{Success, Try}
 
 class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
-  extends ETL(Es.variant_centric)(conf) {
+  extends ETL()(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  val destination = Es.variant_centric
+
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
     import spark.implicits._
     val occurrences: DataFrame = spark
       .read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId")
@@ -37,7 +39,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
     )
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val variants = data(Clinical.variants)
       .drop("end")
       .withColumnRenamed("dbsnp_id", "rsnumber")

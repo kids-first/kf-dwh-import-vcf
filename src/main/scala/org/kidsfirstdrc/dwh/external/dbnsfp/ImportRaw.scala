@@ -1,16 +1,15 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
-import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.DataSource
+import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.config.SourceConf
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 class ImportRaw()(implicit conf: Configuration)
   extends StandardETL(Public.dbnsfp_variant)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
     val dbnsfpDF =
       spark.read
         .option("sep", "\t")
@@ -20,7 +19,7 @@ class ImportRaw()(implicit conf: Configuration)
     Map(Raw.dbNSFP_csv -> dbnsfpDF)
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(Raw.dbNSFP_csv)
       .withColumnRenamed("#chr", "chr")
       .withColumnRenamed("position_1-based", "start")

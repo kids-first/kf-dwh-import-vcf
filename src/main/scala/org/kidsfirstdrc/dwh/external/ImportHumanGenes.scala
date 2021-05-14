@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.etl.DataSource
+import bio.ferlab.datalake.spark3.config.SourceConf
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{split, udf}
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -12,7 +12,7 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 class ImportHumanGenes()(implicit conf: Configuration)
   extends StandardETL(Public.human_genes)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[DataSource, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
     val df = spark.read.format("csv")
       .option("inferSchema", "true")
       .option("header", "true")
@@ -22,7 +22,7 @@ class ImportHumanGenes()(implicit conf: Configuration)
     Map(Raw.refseq_homo_sapiens_gene -> df)
   }
 
-  override def transform(data: Map[DataSource, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     data(Raw.refseq_homo_sapiens_gene)
       .select(

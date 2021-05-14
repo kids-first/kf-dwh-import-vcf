@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
-import bio.ferlab.datalake.spark3.etl.DataSource
+import bio.ferlab.datalake.spark3.config.SourceConf
 import org.apache.spark.sql.functions.{array_sort, col, explode, lit}
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.kidsfirstdrc.dwh.conf.Catalog.{DataService, HarmonizedData}
@@ -107,7 +107,7 @@ class OccurrencesFamilySpec extends AnyFlatSpec with GivenWhenThen with WithSpar
     outputDf.as[OccurrenceOutput].count shouldBe 8
   }
 
-  private def loadTestData(ds: DataSource, df: DataFrame, tableName: String, releaseId: String): Unit = {
+  private def loadTestData(ds: SourceConf, df: DataFrame, tableName: String, releaseId: String): Unit = {
     spark.sql(s"drop table if exists variant.${tableName}_$releaseId ")
     df.write
       .format("parquet")
@@ -116,7 +116,7 @@ class OccurrencesFamilySpec extends AnyFlatSpec with GivenWhenThen with WithSpar
       .saveAsTable(s"variant.${tableName}_$releaseId")
   }
 
-  private def loadTestData(ds: DataSource, df: DataFrame, tableName: String): Unit = {
+  private def loadTestData(ds: SourceConf, df: DataFrame, tableName: String): Unit = {
     spark.sql(s"drop table if exists variant.${tableName} ")
     df.write
       .format("parquet")
