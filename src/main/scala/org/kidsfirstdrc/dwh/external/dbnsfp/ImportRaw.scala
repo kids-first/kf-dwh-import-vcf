@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
-import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
-import bio.ferlab.datalake.spark3.config.SourceConf
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
+import bio.ferlab.datalake.spark3.config.DatasetConf
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
@@ -9,7 +9,7 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 class ImportRaw()(implicit conf: Configuration)
   extends StandardETL(Public.dbnsfp_variant)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     val dbnsfpDF =
       spark.read
         .option("sep", "\t")
@@ -19,7 +19,7 @@ class ImportRaw()(implicit conf: Configuration)
     Map(Raw.dbNSFP_csv -> dbnsfpDF)
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(Raw.dbNSFP_csv)
       .withColumnRenamed("#chr", "chr")
       .withColumnRenamed("position_1-based", "start")
@@ -32,7 +32,7 @@ class ImportRaw()(implicit conf: Configuration)
       .partitionBy("chromosome")
       .format("parquet")
       .option("path", destination.location)
-      .saveAsTable(s"${destination.database}.${destination.name}")
+      .saveAsTable(s"${destination.table.get.fullName}")
     data
   }
 }

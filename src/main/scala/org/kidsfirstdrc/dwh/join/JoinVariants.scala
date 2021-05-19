@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.join
 
-import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -13,11 +13,11 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: Boolean, database: String)(implicit conf: Configuration)
   extends ETL(){
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
 
     val variants: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
-        val nextDf = spark.table(SparkUtils.tableName(Clinical.variants.name, studyId, releaseId, database))
+        val nextDf = spark.table(SparkUtils.tableName(Clinical.variants.datasetid, studyId, releaseId, database))
         if (currentDF.isEmpty)
           nextDf
         else {
@@ -27,13 +27,13 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
     }
 
     Map(
-      Public.`1000_genomes` -> spark.table(s"variant.${Public.`1000_genomes`.name}"),
-      Public.topmed_bravo -> spark.table(s"variant.${Public.topmed_bravo.name}"),
-      Public.gnomad_genomes_2_1 -> spark.table(s"variant.${Public.gnomad_genomes_2_1.name}"),
-      Public.gnomad_exomes_2_1 -> spark.table(s"variant.${Public.gnomad_exomes_2_1.name}"),
-      Public.gnomad_genomes_3_0 -> spark.table(s"variant.${Public.gnomad_genomes_3_0.name}"),
-      Public.clinvar -> spark.table(s"variant.${Public.clinvar.name}"),
-      Public.dbsnp -> spark.table(s"variant.${Public.dbsnp.name}"),
+      Public.`1000_genomes` -> spark.table(s"variant.${Public.`1000_genomes`.datasetid}"),
+      Public.topmed_bravo -> spark.table(s"variant.${Public.topmed_bravo.datasetid}"),
+      Public.gnomad_genomes_2_1 -> spark.table(s"variant.${Public.gnomad_genomes_2_1.datasetid}"),
+      Public.gnomad_exomes_2_1 -> spark.table(s"variant.${Public.gnomad_exomes_2_1.datasetid}"),
+      Public.gnomad_genomes_3_0 -> spark.table(s"variant.${Public.gnomad_genomes_3_0.datasetid}"),
+      Public.clinvar -> spark.table(s"variant.${Public.clinvar.datasetid}"),
+      Public.dbsnp -> spark.table(s"variant.${Public.dbsnp.datasetid}"),
       Clinical.variants -> variants
     )
   }
@@ -47,7 +47,7 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
       .select("upper_bound_kf_an").as[Long].collect().sum
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val variants = data(Clinical.variants)
@@ -95,9 +95,9 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
       $"study_id"
 
     val merged =
-      if (mergeWithExisting && spark.catalog.tableExists(s"${database}.${Clinical.variants.name}")) {
+      if (mergeWithExisting && spark.catalog.tableExists(s"${database}.${Clinical.variants.datasetid}")) {
         val existingColumns = commonColumns :+ explode($"studies").as("study_id")
-        val existingVariants = spark.table(s"${database}.${Clinical.variants.name}")
+        val existingVariants = spark.table(s"${database}.${Clinical.variants.datasetid}")
           .withRenamedFrequencies("upper_bound_kf")
           .withRenamedFrequencies("lower_bound_kf")
           .select(existingColumns: _*)
@@ -126,7 +126,7 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    JoinWrite.write(releaseId, Clinical.variants.rootPath, Clinical.variants.name, data, Some(60), database)
+    JoinWrite.write(releaseId, Clinical.variants.rootPath, Clinical.variants.datasetid, data, Some(60), database)
   }
 
   private def mergeVariants(releaseId: String, variants: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -233,4 +233,6 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
         .select(df("*"), dbsnp("name") as "dbsnp_id")
     }
   }
+
+  override val destination: DatasetConf = Clinical.variants
 }

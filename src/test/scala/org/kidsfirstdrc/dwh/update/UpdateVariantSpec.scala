@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.update
 
 import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
+import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
@@ -21,7 +22,8 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
     Configuration(
       List(StorageConf(
         "kf-strides-variant",
-        getClass.getClassLoader.getResource(".").getFile)))
+        getClass.getClassLoader.getResource(".").getFile)),
+      sources = Catalog.Clinical.sources.toList)
 
   Try(spark.sql("DROP TABLE IF EXISTS variant.variants"))
   Try(spark.sql("DROP VIEW IF EXISTS variant.variants"))
@@ -71,8 +73,6 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
 
   "load method" should "overwrite data" in {
 
-    val database = "variant"
-
     val variant = Variant()
     val clinvar = ClinvarOutput()
 
@@ -105,7 +105,7 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
     resultDF.as[Variant].collect().head shouldBe expectedResult
 
     ////checks the hive table was published and up to date
-    val variantsHiveTable = spark.table(s"$database.${Clinical.variants.name}")
+    val variantsHiveTable = spark.table(s"${Clinical.variants.table.get.fullName}")
     variantsHiveTable.as[Variant].collect().head shouldBe expectedResult
   }
 

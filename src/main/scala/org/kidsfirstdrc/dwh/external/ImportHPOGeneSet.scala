@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.config.SourceConf
+import bio.ferlab.datalake.spark3.config.DatasetConf
 import org.apache.spark.sql.functions.broadcast
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
@@ -11,7 +11,7 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 class ImportHPOGeneSet()(implicit conf: Configuration)
   extends StandardETL(Public.hpo_gene_set)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     val inputDF: DataFrame = spark.read
       .format("csv")
       .option("inferSchema", "true")
@@ -30,7 +30,7 @@ class ImportHPOGeneSet()(implicit conf: Configuration)
     )
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val human_genes = data(Public.human_genes)
     val inputDF =
       data(Raw.hpo_genes_to_phenotype)

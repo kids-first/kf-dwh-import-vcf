@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external.orphanet
 
 import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.config.SourceConf
+import bio.ferlab.datalake.spark3.config.DatasetConf
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
@@ -13,7 +13,7 @@ import scala.xml.{Elem, Node, XML}
 class ImportOrphanetGeneSet()(implicit conf: Configuration)
   extends StandardETL(Public.orphanet_gene_set)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     import spark.implicits._
 
     def loadXML: String => Elem = str => XML.loadString(spark.read.text(str).collect().map(_.getString(0)).mkString("\n"))
@@ -25,7 +25,7 @@ class ImportOrphanetGeneSet()(implicit conf: Configuration)
 
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(orphanet_gene_association)
       .join(
         data(orphanet_disease_history).select("orpha_code", "average_age_of_onset", "average_age_of_death","type_of_inheritance"),

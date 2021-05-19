@@ -1,7 +1,8 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.{Configuration, ConfigurationLoader, StorageConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SparkSession
+import org.kidsfirstdrc.dwh.conf.Catalog
 
 object ImportVcf extends App {
 
@@ -20,9 +21,10 @@ object ImportVcf extends App {
     case "portal" => StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/portal")
   }
 
-  implicit val conf: Configuration = Configuration(List(
-    storage
-  ))
+  implicit val conf: Configuration = Configuration(
+    List(storage),
+    sources = Catalog.sources.toList
+  )
 
   run(studyId, releaseId, s"s3a://kf-study-us-east-1-prd-${studyId.replace("_", "-").toLowerCase}/$folder", runType, biospecimenIdColumn, cgp_pattern, post_cgp_pattern, schema)
 

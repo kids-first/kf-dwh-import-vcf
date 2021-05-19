@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.config.SourceConf
+import bio.ferlab.datalake.spark3.config.DatasetConf
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
@@ -12,18 +12,18 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.removeEmptyObjectsIn
 class ImportGenesTable()(implicit conf: Configuration)
   extends StandardETL(Public.genes)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     Map(
-      Public.omim_gene_set     -> spark.table(s"${Public.omim_gene_set.database}.${Public.omim_gene_set.name}"),
-      Public.orphanet_gene_set -> spark.table(s"${Public.orphanet_gene_set.database}.${Public.orphanet_gene_set.name}"),
-      Public.hpo_gene_set      -> spark.table(s"${Public.hpo_gene_set.database}.${Public.hpo_gene_set.name}"),
-      Public.human_genes       -> spark.table(s"${Public.human_genes.database}.${Public.human_genes.name}"),
-      Public.ddd_gene_set      -> spark.table(s"${Public.ddd_gene_set.database}.${Public.ddd_gene_set.name}"),
-      Public.cosmic_gene_set   -> spark.table(s"${Public.cosmic_gene_set.database}.${Public.cosmic_gene_set.name}")
+      Public.omim_gene_set     -> spark.table(s"${Public.omim_gene_set.table.get.fullName}"),
+      Public.orphanet_gene_set -> spark.table(s"${Public.orphanet_gene_set.table.get.fullName}"),
+      Public.hpo_gene_set      -> spark.table(s"${Public.hpo_gene_set.table.get.fullName}"),
+      Public.human_genes       -> spark.table(s"${Public.human_genes.table.get.fullName}"),
+      Public.ddd_gene_set      -> spark.table(s"${Public.ddd_gene_set.table.get.fullName}"),
+      Public.cosmic_gene_set   -> spark.table(s"${Public.cosmic_gene_set.table.get.fullName}")
     )
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val humanGenes = data(Public.human_genes)

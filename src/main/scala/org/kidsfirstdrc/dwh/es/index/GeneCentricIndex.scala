@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.es.index
 
-import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions.{col, sha1}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
@@ -10,13 +10,13 @@ class GeneCentricIndex()(override implicit val conf: Configuration) extends ETL(
 
   val destination = Es.gene_centric
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     Map(
-      Public.genes -> spark.table(s"${Public.genes.database}.${Public.genes.name}")
+      Public.genes -> spark.table(s"${Public.genes.table.get.fullName}")
     )
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(Public.genes)
       .withColumn("hash", sha1(col("symbol")))
   }

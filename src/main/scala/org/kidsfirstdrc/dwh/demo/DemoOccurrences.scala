@@ -1,10 +1,11 @@
 package org.kidsfirstdrc.dwh.demo
 
-import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.vcf.OccurrencesFamily
@@ -13,7 +14,7 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)
                      (implicit conf: Configuration)
   extends ETL(){
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     val inputDF = vcf(input)
       .withColumn("genotype", explode(col("genotypes")))
       .withColumn("file_name", regexp_extract(input_file_name(), ".*/(.*)", 1))
@@ -28,7 +29,7 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)
     )
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val occurenceJob = new OccurrencesFamily(studyId, releaseId, input, "biospecimen_id",
@@ -67,4 +68,6 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)
     new OccurrencesFamily(studyId, releaseId, input, "biospecimen_id",
       ".CGP.filtered.deNovo.vep.vcf.gz", ".postCGP.filtered.deNovo.vep.vcf.gz").load(data)
   }
+
+  override val destination: DatasetConf = Catalog.Clinical.occurrences
 }

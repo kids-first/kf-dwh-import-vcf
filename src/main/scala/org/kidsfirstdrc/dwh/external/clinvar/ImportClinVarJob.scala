@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external.clinvar
 
-import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
-import bio.ferlab.datalake.spark3.config.SourceConf
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
+import bio.ferlab.datalake.spark3.config.DatasetConf
 import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
@@ -16,11 +16,11 @@ import scala.collection.mutable
 class ImportClinVarJob()(implicit conf: Configuration)
   extends StandardETL(Public.clinvar)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     Map(clinvar_vcf -> vcf(clinvar_vcf.location))
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
 
     val df = data(clinvar_vcf)
     spark.udf.register("inheritance", inheritance_udf)

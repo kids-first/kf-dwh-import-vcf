@@ -61,7 +61,7 @@ class ImportOrphanetProductSpec extends AnyFlatSpec with GivenWhenThen with With
     val job = new ImportOrphanetGeneSet()
 
     job.run()
-    val resultDF = spark.table(s"${job.destination.database}.${job.destination.name}")
+    val resultDF = spark.table(s"${job.destination.table.get.fullName}")
 
     resultDF.show(false)
     resultDF.where($"orpha_code" === 166024).as[OrphanetOutput].collect().head shouldBe OrphanetOutput()

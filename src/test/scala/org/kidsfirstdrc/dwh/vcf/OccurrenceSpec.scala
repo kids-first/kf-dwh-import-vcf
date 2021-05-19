@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
-import bio.ferlab.datalake.spark3.config.SourceConf
+import bio.ferlab.datalake.spark3.config.DatasetConf
 import org.apache.spark.sql.functions.{array_sort, col, explode, lit}
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}

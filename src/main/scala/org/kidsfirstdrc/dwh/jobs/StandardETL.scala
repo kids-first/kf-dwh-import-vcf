@@ -1,15 +1,14 @@
 package org.kidsfirstdrc.dwh.jobs
 
-import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions.{col, lit, regexp_extract, trim}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.SourceConfImplicit._
 import org.kidsfirstdrc.dwh.glue.UpdateTableComments
 
 import scala.util.Try
 
-abstract class StandardETL(val destination: SourceConf)
+abstract class StandardETL(val destination: DatasetConf)
                           (implicit conf: Configuration) extends ETL() {
 
   val view_db = "variant_live"
@@ -20,19 +19,19 @@ abstract class StandardETL(val destination: SourceConf)
       .mode(SaveMode.Overwrite)
       .format("parquet")
       .option("path", destination.location)
-      .saveAsTable(s"${destination.database}.${destination.name}")
+      .saveAsTable(s"${destination.table.get.fullName}")
     data
   }
 
   override def publish()(implicit spark: SparkSession): Unit = {
-    UpdateTableComments.run(destination.database, destination.name, destination.documentationPath)
-    Try { spark.sql(s"drop table if exists $view_db.${destination.name}") }
-    spark.sql(s"create or replace view $view_db.${destination.name} as select * from ${destination.database}.${destination.name}")
+    UpdateTableComments.run(destination)
+    Try { spark.sql(s"drop table if exists $view_db.${destination.table.get.name}") }
+    spark.sql(s"create or replace view $view_db.${destination.table.get.name} as select * from ${destination.table.get.fullName}")
   }
 
   private def regexp_extractFromCreateStatement[T](regex: String, defaultValue: T)(implicit spark: SparkSession): T = {
     Try {
-      spark.sql(s"show create table ${destination.database}.${destination.name}")
+      spark.sql(s"show create table ${destination.table.get.fullName}")
         .withColumn("extracted_value", regexp_extract(col("createtab_stmt"), regex, 1))
         .where(trim(col("extracted_value")) =!= lit(""))
         .select("extracted_value")

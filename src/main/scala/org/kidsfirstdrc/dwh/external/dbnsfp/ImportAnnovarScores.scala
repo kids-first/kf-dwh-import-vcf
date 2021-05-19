@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
-import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
-import bio.ferlab.datalake.spark3.config.SourceConf
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
+import bio.ferlab.datalake.spark3.config.DatasetConf
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
@@ -10,9 +10,9 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 class ImportAnnovarScores()(implicit conf: Configuration)
   extends StandardETL(Public.dbnsfp_annovar)(conf) {
 
-    val source: SourceConf = Raw.annovar_dbnsfp
+    val source: DatasetConf = Raw.annovar_dbnsfp
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     val annovar_dbnsfp = spark.read
       .option("sep", "\t")
       .option("header", "true")
@@ -22,7 +22,7 @@ class ImportAnnovarScores()(implicit conf: Configuration)
     Map(source -> annovar_dbnsfp)
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     data(source)
       .select(
@@ -92,7 +92,7 @@ class ImportAnnovarScores()(implicit conf: Configuration)
       .partitionBy("chromosome")
       .format(destination.format.sparkFormat)
       .option("path", destination.location)
-      .saveAsTable(s"${destination.database}.${destination.name}")
+      .saveAsTable(s"${destination.table.get.fullName}")
       data
   }
 }

@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.updates
 
 import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.config.SourceConf
+import bio.ferlab.datalake.spark3.config.DatasetConf
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
@@ -13,18 +13,18 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locusColumNames
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class UpdateVariant(source: SourceConf, schema: String)(implicit conf: Configuration)
+class UpdateVariant(source: DatasetConf, schema: String)(implicit conf: Configuration)
   extends StandardETL(Clinical.variants)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     Map(
-      destination -> spark.table(s"$schema.${destination.name}"),
+      destination -> spark.table(s"$schema.${destination.datasetid}"),
       //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
-      source -> spark.table(s"variant.${source.name}").dropDuplicates(locusColumNames),
+      source -> spark.table(s"variant.${source.datasetid}").dropDuplicates(locusColumNames),
     )
   }
 
-  private def updateClinvar(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  private def updateClinvar(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val variant = data(destination).drop("clinvar_id", "clin_sig")
     val clinvar = data(Public.clinvar)
     variant
@@ -32,7 +32,7 @@ class UpdateVariant(source: SourceConf, schema: String)(implicit conf: Configura
       .select(variant("*"), clinvar("name") as "clinvar_id", clinvar("clin_sig") as "clin_sig")
   }
 
-  private def updateTopmed(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  private def updateTopmed(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     val variant = data(destination)
     val topmed = data(Public.topmed_bravo)
@@ -42,7 +42,7 @@ class UpdateVariant(source: SourceConf, schema: String)(implicit conf: Configura
       .joinAndMerge(topmed, "topmed")
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     source match {
       case Public.clinvar => updateClinvar(data)
       case Public.topmed_bravo => updateTopmed(data)
@@ -55,8 +55,8 @@ class UpdateVariant(source: SourceConf, schema: String)(implicit conf: Configura
     val localTimeNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
     val releaseId_datetime = s"${lastReleaseId}_$localTimeNow"
 
-    write(releaseId_datetime, destination.rootPath, destination.name, data, Some(60), schema)
-    publishTable(releaseId_datetime, destination.name)
+    write(releaseId_datetime, destination.rootPath, destination.datasetid, data, Some(60), schema)
+    publishTable(releaseId_datetime, destination.datasetid)
     data
   }
 }

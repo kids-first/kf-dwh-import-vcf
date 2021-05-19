@@ -13,7 +13,7 @@ resolvers += "Sonatype OSS Releases" at "https://s01.oss.sonatype.org/content/re
 /* Runtime */
 libraryDependencies += "org.apache.spark" %% "spark-sql" % spark_version % Provided
 libraryDependencies += "io.projectglow" %% "glow" % "0.5.0" % Provided
-libraryDependencies += "bio.ferlab" %% "datalake-spark3" % "0.0.37"
+libraryDependencies += "bio.ferlab" %% "datalake-spark3" % "0.0.39"
 
 /* Test */
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"
@@ -32,8 +32,7 @@ assemblyMergeStrategy in assembly := {
   case "overview.html" => MergeStrategy.last
   case "git.properties" => MergeStrategy.discard
   case "mime.types" => MergeStrategy.first
-  case PathList("scala", "annotation", "nowarn.class" | "nowarn$.class") =>
-    MergeStrategy.first
+  case PathList("scala", "annotation", "nowarn.class" | "nowarn$.class") => MergeStrategy.first
   case x =>
     val oldStrategy = (assemblyMergeStrategy in assembly).value
     oldStrategy(x)
