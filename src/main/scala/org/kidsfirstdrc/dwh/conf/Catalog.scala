@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.conf
 
-import bio.ferlab.datalake.spark3.config.SourceConf
+import bio.ferlab.datalake.spark3.config.{DatasetConf, TableConf}
 import bio.ferlab.datalake.spark3.loader.Format._
 import bio.ferlab.datalake.spark3.loader.LoadType.OverWrite
 
@@ -12,32 +12,32 @@ object Catalog {
 
   object HarmonizedData extends StoreFolder {
     override val alias: String = kfStudyBucket
-    val family_variants_vcf = SourceConf(alias, "", "", "", VCF, OverWrite)
+    val family_variants_vcf = DatasetConf("family_variants_vcf", alias, "", VCF, OverWrite)
   }
 
   object Raw extends StoreFolder {
     override val alias: String  = kfStridesVariantBucket
 
-    val `1000genomes_vcf`         = SourceConf(alias, "/raw/1000Genomes/ALL.*.sites.vcf.gz"        , "", "1000genomes_vcf"          ,    VCF , OverWrite)
-    val annovar_dbnsfp            = SourceConf(alias, "/raw/annovar/dbNSFP/hg38_dbnsfp41a.txt"     , "", "annovar_dbnsfp"           ,    CSV , OverWrite)
-    val cancerhotspots_csv        = SourceConf(alias, "/raw/cancerhotspots/cancerhotspots.*.gz"    , "", "cancerhotspots_csv"       ,    CSV , OverWrite)
-    val clinvar_vcf               = SourceConf(alias, "/raw/clinvar/clinvar.vcf.gz"                , "", "clinvar_vcf"              ,    VCF , OverWrite)
-    val cosmic_cancer_gene_census = SourceConf(alias, "/raw/cosmic/cancer_gene_census.csv"         , "", "cosmic_cancer_gene_census",    CSV , OverWrite)
-    val dbsnp_vcf                 = SourceConf(alias, "/raw/dbsnp/GCF_000001405.38.gz"             , "", "dbsnp_vcf"                ,    VCF , OverWrite)
-    val dbNSFP_csv                = SourceConf(alias, "/raw/dbNSFP/*.gz"                           , "", "dbNSFP_csv"               ,    CSV , OverWrite)
-    val ddd_gene_census           = SourceConf(alias, "/raw/ddd/DDG2P_17_5_2020.csv"               , "", "ddd_gene_census"          ,    CSV , OverWrite)
-    val ensembl_canonical         = SourceConf(alias, "/raw/ensembl/*.GRCh38.104.canonical.tsv.gz" , "", "ensembl_canonical"        ,    CSV , OverWrite)
-    val ensembl_entrez            = SourceConf(alias, "/raw/ensembl/*.GRCh38.104.entrez.tsv.gz"    , "", "ensembl_entrez"           ,    CSV , OverWrite)
-    val ensembl_ena               = SourceConf(alias, "/raw/ensembl/*.GRCh38.104.ena.tsv.gz"       , "", "ensembl_ena"              ,    CSV , OverWrite)
-    val ensembl_refseq            = SourceConf(alias, "/raw/ensembl/*.GRCh38.104.refseq.tsv.gz"    , "", "ensembl_refseq"           ,    CSV , OverWrite)
-    val ensembl_uniprot           = SourceConf(alias, "/raw/ensembl/*.GRCh38.104.uniprot.tsv.gz"   , "", "ensembl_uniprot"          ,    CSV , OverWrite)
-    val hpo_genes_to_phenotype    = SourceConf(alias, "/raw/hpo/genes_to_phenotype.txt"            , "", "hpo_genes_to_phenotype"   ,    CSV , OverWrite)
-    val omim_genemap2             = SourceConf(alias, "/raw/omim/genemap2.txt"                     , "", "omim_genemap2"            ,    CSV , OverWrite)
-    val orphanet_gene_association = SourceConf(alias, "/raw/orphanet/en_product6.xml"              , "", "en_product6"              ,    XML , OverWrite)
-    val orphanet_disease_history  = SourceConf(alias, "/raw/orphanet/en_product9_ages.xml"         , "", "en_product9_ages"         ,    XML , OverWrite)
-    val refseq_homo_sapiens_gene  = SourceConf(alias, "/raw/refseq/Homo_sapiens.gene_info.gz"      , "", "refseq_homo_sapiens_gene" ,    CSV , OverWrite)
-    val topmed_bravo_dbsnp        = SourceConf(alias, "/raw/topmed/bravo-dbsnp-all.vcf.gz"         , "", "topmed_bravo_dbsnp"       ,    VCF , OverWrite)
-    val all_participants          = SourceConf(alias, "/raw/participants/all_participants_*.json"  , "", "all_participants"         ,    JSON, OverWrite)
+    val `1000genomes_vcf`         = DatasetConf("1000genomes_vcf"          , alias, "/raw/1000Genomes/ALL.*.sites.vcf.gz"       ,    VCF , OverWrite)
+    val annovar_dbnsfp            = DatasetConf("annovar_dbnsfp"           , alias, "/raw/annovar/dbNSFP/hg38_dbnsfp41a.txt"    ,    CSV , OverWrite)
+    val cancerhotspots_csv        = DatasetConf("cancerhotspots_csv"       , alias, "/raw/cancerhotspots/cancerhotspots.*.gz"   ,    CSV , OverWrite)
+    val clinvar_vcf               = DatasetConf("clinvar_vcf"              , alias, "/raw/clinvar/clinvar.vcf.gz"               ,    VCF , OverWrite)
+    val cosmic_cancer_gene_census = DatasetConf("cosmic_cancer_gene_census", alias, "/raw/cosmic/cancer_gene_census.csv"        ,    CSV , OverWrite)
+    val dbsnp_vcf                 = DatasetConf("dbsnp_vcf"                , alias, "/raw/dbsnp/GCF_000001405.38.gz"            ,    VCF , OverWrite)
+    val dbNSFP_csv                = DatasetConf("dbNSFP_csv"               , alias, "/raw/dbNSFP/*.gz"                          ,    CSV , OverWrite)
+    val ddd_gene_census           = DatasetConf("ddd_gene_census"          , alias, "/raw/ddd/DDG2P_17_5_2020.csv"              ,    CSV , OverWrite)
+    val ensembl_canonical         = DatasetConf("ensembl_canonical"        , alias, "/raw/ensembl/*.GRCh38.104.canonical.tsv.gz",    CSV , OverWrite)
+    val ensembl_entrez            = DatasetConf("ensembl_entrez"           , alias, "/raw/ensembl/*.GRCh38.104.entrez.tsv.gz"   ,    CSV , OverWrite)
+    val ensembl_ena               = DatasetConf("ensembl_ena"              , alias, "/raw/ensembl/*.GRCh38.104.ena.tsv.gz"      ,    CSV , OverWrite)
+    val ensembl_refseq            = DatasetConf("ensembl_refseq"           , alias, "/raw/ensembl/*.GRCh38.104.refseq.tsv.gz"   ,    CSV , OverWrite)
+    val ensembl_uniprot           = DatasetConf("ensembl_uniprot"          , alias, "/raw/ensembl/*.GRCh38.104.uniprot.tsv.gz"  ,    CSV , OverWrite)
+    val hpo_genes_to_phenotype    = DatasetConf("hpo_genes_to_phenotype"   , alias, "/raw/hpo/genes_to_phenotype.txt"           ,    CSV , OverWrite)
+    val omim_genemap2             = DatasetConf("omim_genemap2"            , alias, "/raw/omim/genemap2.txt"                    ,    CSV , OverWrite)
+    val orphanet_gene_association = DatasetConf("en_product6"              , alias, "/raw/orphanet/en_product6.xml"             ,    XML , OverWrite)
+    val orphanet_disease_history  = DatasetConf("en_product9_ages"         , alias, "/raw/orphanet/en_product9_ages.xml"        ,    XML , OverWrite)
+    val refseq_homo_sapiens_gene  = DatasetConf("refseq_homo_sapiens_gene" , alias, "/raw/refseq/Homo_sapiens.gene_info.gz"     ,    CSV , OverWrite)
+    val topmed_bravo_dbsnp        = DatasetConf("topmed_bravo_dbsnp"       , alias, "/raw/topmed/bravo-dbsnp-all.vcf.gz"        ,    VCF , OverWrite)
+    val all_participants          = DatasetConf("all_participants"         , alias, "/raw/participants/all_participants_*.json" ,    JSON, OverWrite)
 
   }
 
@@ -45,37 +45,37 @@ object Catalog {
 
     override val alias: String  = kfStridesVariantBucket
 
-    val `1000_genomes`     = SourceConf(alias, "/public/1000_genomes"      , "variant", "1000_genomes"      , PARQUET, OverWrite)
-    val cancer_hotspots    = SourceConf(alias, "/public/cancer_hotspots"   , "variant", "cancer_hotspots"   , PARQUET, OverWrite)
-    val clinvar            = SourceConf(alias, "/public/clinvar"           , "variant", "clinvar"           , PARQUET, OverWrite)
-    val cosmic_gene_set    = SourceConf(alias, "/public/cosmic_gene_set"   , "variant", "cosmic_gene_set"   , PARQUET, OverWrite)
-    val dbnsfp_variant     = SourceConf(alias, "/public/dbnsfp/variant"    , "variant", "dbnsfp"            , PARQUET, OverWrite)
-    val dbnsfp_annovar     = SourceConf(alias, "/public/annovar/dbnsfp"    , "variant", "dbnsfp_annovar"    , PARQUET, OverWrite)
-    val dbnsfp_original    = SourceConf(alias, "/public/dbnsfp/scores"     , "variant", "dbnsfp_original"   , PARQUET, OverWrite)
-    val dbsnp              = SourceConf(alias, "/public/dbsnp"             , "variant", "dbsnp"             , PARQUET, OverWrite)
-    val ddd_gene_set       = SourceConf(alias, "/public/ddd_gene_set"      , "variant", "ddd_gene_set"      , PARQUET, OverWrite)
-    val ensembl_mapping    = SourceConf(alias, "/public/ensembl_mapping"   , "variant", "ensembl_mapping"   , PARQUET, OverWrite)
-    val genes              = SourceConf(alias, "/public/genes"             , "variant", "genes"             , PARQUET, OverWrite)
-    val gnomad_genomes_2_1 = SourceConf(alias, "/public/gnomad_genomes_2_1_1_liftover_grch38", "variant", "gnomad_genomes_2_1_1_liftover_grch38", PARQUET, OverWrite)
-    val gnomad_exomes_2_1  = SourceConf(alias, "/public/gnomad_exomes_2_1_1_liftover_grch38" , "variant", "gnomad_exomes_2_1_1_liftover_grch38" , PARQUET, OverWrite)
-    val gnomad_genomes_3_0 = SourceConf(alias, "/public/gnomad_genomes_3_0", "variant", "gnomad_genomes_3_0", PARQUET, OverWrite)
-    val human_genes        = SourceConf(alias, "/public/human_genes"       , "variant", "human_genes"       , PARQUET, OverWrite)
-    val hpo_gene_set       = SourceConf(alias, "/public/hpo_gene_set"      , "variant", "hpo_gene_set"      , PARQUET, OverWrite)
-    val omim_gene_set      = SourceConf(alias, "/public/omim_gene_set"     , "variant", "omim_gene_set"     , PARQUET, OverWrite)
-    val orphanet_gene_set  = SourceConf(alias, "/public/orphanet_gene_set" , "variant", "orphanet_gene_set" , PARQUET, OverWrite)
-    val topmed_bravo       = SourceConf(alias, "/public/topmed_bravo"      , "variant", "topmed_bravo"      , PARQUET, OverWrite)
+    val `1000_genomes`     = DatasetConf("1000_genomes"        ,alias, "/public/1000_genomes"      , PARQUET, OverWrite, TableConf("variant", "1000_genomes"))
+    val cancer_hotspots    = DatasetConf("cancer_hotspots"     ,alias, "/public/cancer_hotspots"   , PARQUET, OverWrite, TableConf("variant", "cancer_hotspots"))
+    val clinvar            = DatasetConf("clinvar"             ,alias, "/public/clinvar"           , PARQUET, OverWrite, TableConf("variant", "clinvar"))
+    val cosmic_gene_set    = DatasetConf("cosmic_gene_set"     ,alias, "/public/cosmic_gene_set"   , PARQUET, OverWrite, TableConf("variant", "cosmic_gene_set"))
+    val dbnsfp_variant     = DatasetConf("dbnsfp"              ,alias, "/public/dbnsfp/variant"    , PARQUET, OverWrite, TableConf("variant", "dbnsfp"))
+    val dbnsfp_annovar     = DatasetConf("dbnsfp_annovar"      ,alias, "/public/annovar/dbnsfp"    , PARQUET, OverWrite, TableConf("variant", "dbnsfp_annovar"))
+    val dbnsfp_original    = DatasetConf("dbnsfp_original"     ,alias, "/public/dbnsfp/scores"     , PARQUET, OverWrite, TableConf("variant", "dbnsfp_original"))
+    val dbsnp              = DatasetConf("dbsnp"               ,alias, "/public/dbsnp"             , PARQUET, OverWrite, TableConf("variant", "dbsnp"))
+    val ddd_gene_set       = DatasetConf("ddd_gene_set"        ,alias, "/public/ddd_gene_set"      , PARQUET, OverWrite, TableConf("variant", "ddd_gene_set"))
+    val ensembl_mapping    = DatasetConf("ensembl_mapping"     ,alias, "/public/ensembl_mapping"   , PARQUET, OverWrite, TableConf("variant", "ensembl_mapping"))
+    val genes              = DatasetConf("genes"               ,alias, "/public/genes"             , PARQUET, OverWrite, TableConf("variant", "genes"))
+    val gnomad_genomes_2_1 = DatasetConf("gnomad_genomes_2_1_1_liftover_grch38",alias, "/public/gnomad_genomes_2_1_1_liftover_grch38", PARQUET, OverWrite, TableConf("variant", "gnomad_genomes_2_1_1_liftover_grch38"))
+    val gnomad_exomes_2_1  = DatasetConf("gnomad_exomes_2_1_1_liftover_grch38" ,alias, "/public/gnomad_exomes_2_1_1_liftover_grch38" , PARQUET, OverWrite, TableConf("variant", "gnomad_exomes_2_1_1_liftover_grch38"))
+    val gnomad_genomes_3_0 = DatasetConf("gnomad_genomes_3_0"  ,alias, "/public/gnomad_genomes_3_0", PARQUET, OverWrite, TableConf("variant", "gnomad_genomes_3_0"))
+    val human_genes        = DatasetConf("human_genes"         ,alias, "/public/human_genes"       , PARQUET, OverWrite, TableConf("variant", "human_genes"))
+    val hpo_gene_set       = DatasetConf("hpo_gene_set"        ,alias, "/public/hpo_gene_set"      , PARQUET, OverWrite, TableConf("variant", "hpo_gene_set"))
+    val omim_gene_set      = DatasetConf("omim_gene_set"       ,alias, "/public/omim_gene_set"     , PARQUET, OverWrite, TableConf("variant", "omim_gene_set"))
+    val orphanet_gene_set  = DatasetConf("orphanet_gene_set"   ,alias, "/public/orphanet_gene_set" , PARQUET, OverWrite, TableConf("variant", "orphanet_gene_set"))
+    val topmed_bravo       = DatasetConf("topmed_bravo"        ,alias, "/public/topmed_bravo"      , PARQUET, OverWrite, TableConf("variant", "topmed_bravo"))
   }
 
   object DataService extends StoreFolder {
 
     override val alias: String  = kfStridesVariantBucket
 
-    val studies                = SourceConf(alias, "/dataservice/studies/studies_re_*"                          , "variant", "studies"               , PARQUET, OverWrite)
-    val biospecimens           = SourceConf(alias, "/dataservice/biospecimens/biospecimens_re_*"                , "variant", "biospecimens"          , PARQUET, OverWrite)
-    val family_relationships   = SourceConf(alias, "/dataservice/family_relationships/family_relationships_re_*", "variant", "family_relationships"  , PARQUET, OverWrite)
-    val participants           = SourceConf(alias, "/dataservice/participants/participants_re_*"                , "variant", "participants"          , PARQUET, OverWrite)
-    val genomic_files          = SourceConf(alias, "/dataservice/genomic_files/genomic_files_re_*"              , "variant", "genomic_files"         , PARQUET, OverWrite)
-    val genomic_files_override = SourceConf(alias, "/genomic_files_override"                                    , "variant", "genomic_files_override", CSV    , OverWrite)
+    val studies                = DatasetConf("studies"               , alias, "/dataservice/studies/studies_re_*"                          ,  PARQUET, OverWrite, TableConf("variant", "studies"))
+    val biospecimens           = DatasetConf("biospecimens"          , alias, "/dataservice/biospecimens/biospecimens_re_*"                ,  PARQUET, OverWrite, TableConf("variant", "biospecimens"))
+    val family_relationships   = DatasetConf("family_relationships"  , alias, "/dataservice/family_relationships/family_relationships_re_*",  PARQUET, OverWrite, TableConf("variant", "family_relationships"))
+    val participants           = DatasetConf("participants"          , alias, "/dataservice/participants/participants_re_*"                ,  PARQUET, OverWrite, TableConf("variant", "participants"))
+    val genomic_files          = DatasetConf("genomic_files"         , alias, "/dataservice/genomic_files/genomic_files_re_*"              ,  PARQUET, OverWrite, TableConf("variant", "genomic_files"))
+    val genomic_files_override = DatasetConf("genomic_files_override", alias, "/genomic_files_override"                                    ,  CSV    , OverWrite, TableConf("variant", "genomic_files_override"))
 
   }
 
@@ -83,21 +83,21 @@ object Catalog {
 
     override val alias: String  = kfStridesVariantBucket
 
-    val consequences        = SourceConf(alias, "/consequences/consequences_re_*"          , "variant", "consequences"      , PARQUET, OverWrite)
-    val occurrences         = SourceConf(alias, "/occurrences/occurrences_sd_*_re_*"       , "variant", "occurrences"       , PARQUET, OverWrite)
-    val occurrences_family  = SourceConf(alias, "/occurrences/occurrences_family_sd_*_re_*", "variant", "occurrences_family", PARQUET, OverWrite)
-    val variants            = SourceConf(alias, "/variants/variants_re_*"                  , "variant", "variants"          , PARQUET, OverWrite)
+    val consequences        = DatasetConf("consequences"      , alias, "/consequences/consequences_re_*"          , PARQUET, OverWrite, TableConf("variant", "consequences"))
+    val occurrences         = DatasetConf("occurrences"       , alias, "/occurrences/occurrences_sd_*_re_*"       , PARQUET, OverWrite, TableConf("variant", "occurrences"))
+    val occurrences_family  = DatasetConf("occurrences_family", alias, "/occurrences/occurrences_family_sd_*_re_*", PARQUET, OverWrite, TableConf("variant", "occurrences_family"))
+    val variants            = DatasetConf("variants"          , alias, "/variants/variants_re_*"                  , PARQUET, OverWrite, TableConf("variant", "variants"))
   }
 
   object Es extends StoreFolder {
 
     override val alias: String = kfStridesVariantBucket
     val relativePath = s"/es_index"
-    val variant_centric     = SourceConf(alias, s"$relativePath/variant_centric"     , "portal", "variant_centric"    , PARQUET, OverWrite)
-    val gene_centric        = SourceConf(alias, s"$relativePath/gene_centric"        , "portal", "gene_centric"       , PARQUET, OverWrite)
-    val genomic_suggestions = SourceConf(alias, s"$relativePath/genomic_suggestions" , "portal", "genomic_suggestions", PARQUET, OverWrite)
+    val variant_centric     = DatasetConf("variant_centric"    , alias, s"$relativePath/variant_centric"    , PARQUET, OverWrite, TableConf("portal", "variant_centric"))
+    val gene_centric        = DatasetConf("gene_centric"       , alias, s"$relativePath/gene_centric"       , PARQUET, OverWrite, TableConf("portal", "gene_centric"))
+    val genomic_suggestions = DatasetConf("genomic_suggestions", alias, s"$relativePath/genomic_suggestions", PARQUET, OverWrite, TableConf("portal", "genomic_suggestions"))
   }
 
-  def sources: Set[SourceConf] = Raw.sources ++ Public.sources ++ Clinical.sources ++ Es.sources
+  def sources: Set[DatasetConf] = Raw.sources ++ Public.sources ++ Clinical.sources ++ Es.sources
 
 }

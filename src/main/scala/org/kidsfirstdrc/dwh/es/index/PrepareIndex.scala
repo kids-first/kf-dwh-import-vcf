@@ -2,6 +2,7 @@ package org.kidsfirstdrc.dwh.es.index
 
 import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SparkSession
+import org.kidsfirstdrc.dwh.conf.Catalog
 
 object PrepareIndex extends App {
 
@@ -12,9 +13,10 @@ object PrepareIndex extends App {
     .enableHiveSupport()
     .appName(s"Export $jobType - $releaseId").getOrCreate()
 
-  implicit val conf: Configuration = Configuration(List(
-    StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/portal")
-  ))
+  implicit val conf: Configuration = Configuration(
+    List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/portal")),
+    sources = Catalog.sources.toList
+  )
 
   jobType match {
     case "gene_centric" => new GeneCentricIndex().run()

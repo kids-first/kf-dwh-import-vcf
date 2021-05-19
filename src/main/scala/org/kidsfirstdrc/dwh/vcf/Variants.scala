@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
@@ -13,9 +13,9 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
 
   val destination = Clinical.variants
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     val participantsPath = Raw.all_participants.location
-    val occurrencesPath = s"${Clinical.occurrences.rootPath}/occurrences/${tableName(Clinical.occurrences.name, studyId, releaseId)}"
+    val occurrencesPath = s"${Clinical.occurrences.rootPath}/occurrences/${tableName(Clinical.occurrences.datasetid, studyId, releaseId)}"
 
     Map(
       Raw.all_participants ->
@@ -31,7 +31,7 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
     load(variants)
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val participants = data(Raw.all_participants).select($"id" as "participant_id")
@@ -97,13 +97,13 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    val tableVariants = tableName(destination.name, studyId, releaseId)
+    val tableVariants = tableName(destination.datasetid, studyId, releaseId)
     data
       .repartition(col("chromosome"))
       .write.mode(SaveMode.Overwrite)
       .partitionBy("study_id", "release_id", "chromosome")
       .format("parquet")
-      .option("path", s"${destination.rootPath}/${destination.name}/$tableVariants")
+      .option("path", s"${destination.rootPath}/${destination.datasetid}/$tableVariants")
       .saveAsTable(s"$schema.$tableVariants")
     data
   }

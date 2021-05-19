@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.config.SourceConf
+import bio.ferlab.datalake.spark3.config.DatasetConf
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog._
@@ -12,11 +12,11 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 class Import1k()(implicit conf: Configuration)
   extends StandardETL(Public.`1000_genomes`)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     Map(Raw.`1000genomes_vcf` -> vcf(Raw.`1000genomes_vcf`.location))
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(Raw.`1000genomes_vcf`)
       .select(chromosome,
         start,
@@ -44,7 +44,7 @@ class Import1k()(implicit conf: Configuration)
       .mode(SaveMode.Overwrite)
       .format("parquet")
       .option("path", destination.location)
-      .saveAsTable(s"${destination.database}.${destination.name}")
+      .saveAsTable(s"${destination.table.get.fullName}")
     data
   }
 }

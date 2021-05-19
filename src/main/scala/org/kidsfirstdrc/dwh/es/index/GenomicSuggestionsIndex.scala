@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.es.index
 
-import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
@@ -22,15 +22,15 @@ class GenomicSuggestionsIndex(releaseId: String)
 
   final val indexColumns = List("type", "symbol", "locus", "suggestion_id", "hgvsg", "suggest", "chromosome", "rsnumber")
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     Map(
-      Public.genes -> spark.table(s"${Public.genes.database}.${Public.genes.name}"),
+      Public.genes -> spark.table(s"${Public.genes.table.get.fullName}"),
       Clinical.variants -> spark.read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId"),
       Clinical.consequences -> spark.read.parquet(s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId")
     )
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val genes = data(Public.genes).select("symbol", "alias", "ensembl_gene_id")
     val variants = data(Clinical.variants).selectLocus(col("hgvsg"), col("name"), col("clinvar_id"))
     val consequences = data(Clinical.consequences)
@@ -47,7 +47,7 @@ class GenomicSuggestionsIndex(releaseId: String)
       .mode(SaveMode.Overwrite)
       .option("format", "parquet")
       .option("path", s"${destination.location}_$releaseId")
-      .saveAsTable(s"${destination.database}.${destination.name}_${releaseId}")
+      .saveAsTable(s"${destination.table.get.fullName}_${releaseId}")
     data
   }
 

@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
@@ -15,7 +15,7 @@ class Consequences(studyId: String, releaseId: String, input: String, cgp_patter
 
   val destination = Clinical.consequences
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     val inputDF = vcf(
       (getVisibleFiles(input, studyId, releaseId, cgp_pattern) ++
       getVisibleFiles(input, studyId, releaseId, post_cgp_pattern)).distinct
@@ -25,11 +25,11 @@ class Consequences(studyId: String, releaseId: String, input: String, cgp_patter
 
     Map(
       HarmonizedData.family_variants_vcf -> inputDF,
-      Public.ensembl_mapping -> spark.table(s"${Public.ensembl_mapping.database}.${Public.ensembl_mapping.name}")
+      Public.ensembl_mapping -> spark.table(s"${Public.ensembl_mapping.table.get.fullName}")
     )
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val ensembl_mappingDf = data(Public.ensembl_mapping)
       .select(
         col("ensembl_transcript_id"),
@@ -82,14 +82,14 @@ class Consequences(studyId: String, releaseId: String, input: String, cgp_patter
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    val tableConsequences = tableName(destination.name, studyId, releaseId)
+    val tableConsequences = tableName(destination.datasetid, studyId, releaseId)
     val salt = (rand * 3).cast(IntegerType) //3 files per chr, tried with 1 file per chr but got an OOM when writing parquet files
     data
       .repartition(69, col("chromosome"), salt)
       .write.mode(SaveMode.Overwrite)
       .partitionBy("study_id", "release_id", "chromosome")
       .format("parquet")
-      .option("path", s"${destination.rootPath}/${destination.name}/$tableConsequences")
+      .option("path", s"${destination.rootPath}/${destination.datasetid}/$tableConsequences")
       .saveAsTable(tableConsequences)
     data
   }

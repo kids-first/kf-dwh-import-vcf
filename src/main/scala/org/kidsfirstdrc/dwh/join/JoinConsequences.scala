@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.join
 
-import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -13,10 +13,10 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisting: Boolean, database: String)(implicit conf: Configuration)
   extends ETL(){
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     val consequences: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
-        val nextDf = spark.table(SparkUtils.tableName(Clinical.consequences.name, studyId, releaseId, database))
+        val nextDf = spark.table(SparkUtils.tableName(Clinical.consequences.datasetid, studyId, releaseId, database))
         if (currentDF.isEmpty)
           nextDf
         else {
@@ -31,7 +31,7 @@ class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisti
     )
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val consequences = data(Clinical.consequences)
@@ -47,8 +47,8 @@ class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisti
     val allColumns = commonColumns :+ col("study_id")
 
     val merged =
-      if (mergeWithExisting && spark.catalog.tableExists(s"${Clinical.consequences.name}")) {
-        val existingConsequences = spark.table(s"${Clinical.consequences.name}")
+      if (mergeWithExisting && spark.catalog.tableExists(s"${Clinical.consequences.datasetid}")) {
+        val existingConsequences = spark.table(s"${Clinical.consequences.datasetid}")
 
         val existingColumns = commonColumns :+ $"study_ids"
         mergeConsequences(releaseId, existingConsequences.select(existingColumns: _*)
@@ -66,7 +66,7 @@ class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisti
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    JoinWrite.write(releaseId, Clinical.consequences.rootPath, Clinical.consequences.name, data, Some(30), database)
+    JoinWrite.write(releaseId, Clinical.consequences.rootPath, Clinical.consequences.datasetid, data, Some(30), database)
   }
 
   private def mergeConsequences(releaseId: String, consequences: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -115,6 +115,8 @@ class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisti
       .withColumn("release_id", lit(releaseId))
 
   }
+
+  override val destination: DatasetConf = Clinical.consequences
 }
 
 object JoinConsequences {

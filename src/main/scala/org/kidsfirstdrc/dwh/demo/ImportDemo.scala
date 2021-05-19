@@ -2,6 +2,7 @@ package org.kidsfirstdrc.dwh.demo
 
 import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SparkSession
+import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.vcf.Variants
 
 object ImportDemo extends App {
@@ -13,9 +14,9 @@ object ImportDemo extends App {
     .enableHiveSupport()
     .appName(s"Import $runType for $demoStudyId - $releaseId").getOrCreate()
 
-  implicit val conf: Configuration = Configuration(List(
-    StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/public/demo")
-  ))
+  implicit val conf: Configuration = Configuration(
+    List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/public/demo")),
+    Catalog.sources.toList)
 
   run(demoStudyId, releaseId, input, runType)
 

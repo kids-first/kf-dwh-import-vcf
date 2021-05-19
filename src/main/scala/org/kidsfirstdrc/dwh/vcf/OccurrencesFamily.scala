@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.{Configuration, SourceConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -16,12 +16,12 @@ class OccurrencesFamily(studyId: String, releaseId: String, input: String, biosp
 
   val destination = Clinical.occurrences_family
 
-  override def extract()(implicit spark: SparkSession): Map[SourceConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
     val inputDF: DataFrame = unionCGPFiles(input, studyId, releaseId, cgp_pattern, post_cgp_pattern)
 
-    val biospecimens = spark.table(s"${DataService.biospecimens.database}.${DataService.biospecimens.name}_${releaseId.toLowerCase}")
-    val participants = spark.table(s"${DataService.participants.database}.${DataService.participants.name}_${releaseId.toLowerCase}")
-    val family_relationships = spark.table(s"${DataService.family_relationships.database}.${DataService.family_relationships.name}_${releaseId.toLowerCase}")
+    val biospecimens = spark.table(s"${DataService.biospecimens.table.get.fullName}_${releaseId.toLowerCase}")
+    val participants = spark.table(s"${DataService.participants.table.get.fullName}_${releaseId.toLowerCase}")
+    val family_relationships = spark.table(s"${DataService.family_relationships.table.get.fullName}_${releaseId.toLowerCase}")
 
     Map(
       DataService.participants -> participants,
@@ -31,7 +31,7 @@ class OccurrencesFamily(studyId: String, releaseId: String, input: String, biosp
     )
   }
 
-  override def transform(data: Map[SourceConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     val participants = data(DataService.participants)
       .withColumn("affected_status",
@@ -82,13 +82,13 @@ class OccurrencesFamily(studyId: String, releaseId: String, input: String, biosp
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val tableOccurence = tableName(destination.name, studyId, releaseId)
+    val tableOccurence = tableName(destination.datasetid, studyId, releaseId)
     data
       .repartitionByRange(700, $"dbgap_consent_code", $"family_id", $"participant_id")
       .write.mode("overwrite")
       .partitionBy("study_id", "dbgap_consent_code", "family_id", "participant_id")
       .format("parquet")
-      .option("path", s"${destination.rootPath}/${destination.name}/$tableOccurence")
+      .option("path", s"${destination.rootPath}/${destination.datasetid}/$tableOccurence")
       .saveAsTable(tableOccurence)
 
     data

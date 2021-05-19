@@ -2,7 +2,9 @@ package org.kidsfirstdrc.dwh.updates
 
 import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SparkSession
+import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
+import org.kidsfirstdrc.dwh.join.Join.output
 
 object Update extends App {
   val Array(source, destination) = args
@@ -12,8 +14,10 @@ object Update extends App {
     .enableHiveSupport()
     .appName(s"Update $destination from $source").getOrCreate()
 
-  implicit val conf: Configuration = Configuration(List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")))
-
+  implicit val conf: Configuration = Configuration(
+    List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")),
+    sources = Catalog.sources.toList
+  )
 
   run(source, destination)
 
