@@ -2,7 +2,7 @@ package org.kidsfirstdrc.dwh.jobs
 
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
-import org.apache.spark.sql.functions.{col, lit, regexp_extract, trim}
+import org.apache.spark.sql.functions.{col, lit, not, regexp_extract, trim}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.glue.UpdateTableComments
 
@@ -27,6 +27,15 @@ abstract class StandardETL(val destination: DatasetConf)
     UpdateTableComments.run(destination)
     Try { spark.sql(s"drop table if exists $view_db.${destination.table.get.name}") }
     spark.sql(s"create or replace view $view_db.${destination.table.get.name} as select * from ${destination.table.get.fullName}")
+  }
+
+  private def updateMetadata(metadata_conf: DatasetConf)(implicit spark: SparkSession): Unit = {
+    import spark.implicits._
+    destination.table.foreach {t =>
+      val metadataDf = Try(metadata_conf.read.filter(not(col("table_name").isin(t.fullName))))
+      val update = Seq()
+    }
+
   }
 
   private def regexp_extractFromCreateStatement[T](regex: String, defaultValue: T)(implicit spark: SparkSession): T = {

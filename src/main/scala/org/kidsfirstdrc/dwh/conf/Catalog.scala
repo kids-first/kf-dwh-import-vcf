@@ -10,6 +10,11 @@ object Catalog {
 
   val kfStudyBucket = "kf-study"
 
+  object Metadata extends StoreFolder {
+    override val alias: String = kfStridesVariantBucket
+    val release_metadata = DatasetConf("release_metadata", alias, "/public/release_metadata", PARQUET, OverWrite, TableConf("variant", "release_metadata"))
+  }
+
   object HarmonizedData extends StoreFolder {
     override val alias: String = kfStudyBucket
     val family_variants_vcf = DatasetConf("family_variants_vcf", alias, "", VCF, OverWrite)

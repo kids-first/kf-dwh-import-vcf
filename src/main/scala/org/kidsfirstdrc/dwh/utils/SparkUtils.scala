@@ -117,7 +117,6 @@ object SparkUtils {
   }
 
   def firstAs(c: String): Column = first(col(c)) as c
-
   object columns {
     val chromosome: Column = ltrim(col("contigName"), "chr") as "chromosome"
     val reference: Column = col("referenceAllele") as "reference"

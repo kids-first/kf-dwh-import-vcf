@@ -19,7 +19,7 @@ object ImportExternal extends App {
     .appName("Import").getOrCreate()
 
   implicit val conf: Configuration = Configuration(
-    List(StorageConf("kf-strides-variant", bucket)),
+    List(StorageConf(Catalog.kfStridesVariantBucket, bucket)),
     sources = Catalog.sources.toList
   )
 

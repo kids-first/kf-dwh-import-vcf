@@ -29,7 +29,6 @@ object Publish extends App {
   }
 
   def publishTable(releaseId: String, tableName: String)(implicit spark: SparkSession): Unit = {
-    
     spark.sql(s"create or replace view variant_live.$tableName as select * from variant.${tableName}_${releaseId.toLowerCase()}")
     spark.sql(s"create or replace view variant.$tableName as select * from variant.${tableName}_${releaseId.toLowerCase()}")
 
