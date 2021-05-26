@@ -37,8 +37,8 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
     ).toDF()
 
     val data = Map(
-      Clinical.occurrences -> occurrencesDf,
-      Raw.all_participants -> participantsDf
+      Clinical.occurrences.id -> occurrencesDf,
+      Raw.all_participants.id -> participantsDf
     )
 
     val output = new Variants(studyId, releaseId ,"portal").transform(data)
@@ -67,8 +67,8 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
     val participantsDf = Seq(ParticipantSaveSet()).toDF()
 
     val data = Map(
-      Clinical.occurrences -> occurrencesDf,
-      Raw.all_participants -> participantsDf
+      Clinical.occurrences.id -> occurrencesDf,
+      Raw.all_participants.id -> participantsDf
     )
 
     val output = new Variants(studyId, releaseId, "variant").transform(data)

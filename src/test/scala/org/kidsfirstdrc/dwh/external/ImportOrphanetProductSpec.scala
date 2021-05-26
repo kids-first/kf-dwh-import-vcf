@@ -22,8 +22,8 @@ class ImportOrphanetProductSpec extends AnyFlatSpec with GivenWhenThen with With
     import spark.implicits._
 
     val extractedData = new ImportOrphanetGeneSet().extract()
-    val gene_associationDF = extractedData(orphanet_gene_association)
-    val disease_historyDF = extractedData(orphanet_disease_history)
+    val gene_associationDF = extractedData(orphanet_gene_association.id)
+    val disease_historyDF = extractedData(orphanet_disease_history.id)
 
     val expectedProduct6 = OrphanetProduct6()
     gene_associationDF.show(false)

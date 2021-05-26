@@ -25,7 +25,7 @@ object UpdateTableComments extends App {
     case "all" => Set(clinvar, orphanet_gene_set).foreach(t => run(t))
     case s: String =>
       val names = s.split(",")
-      Catalog.sources.filter(ds => names.contains(ds.datasetid)).foreach(t => run(t))
+      Catalog.sources.filter(ds => names.contains(ds.id)).foreach(t => run(t))
   }
 
   def run(table: DatasetConf)(implicit spark: SparkSession): Unit = {

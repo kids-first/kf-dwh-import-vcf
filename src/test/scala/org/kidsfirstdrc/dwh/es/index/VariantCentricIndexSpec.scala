@@ -84,11 +84,11 @@ class VariantCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSp
   ).toDF()
 
   val data = Map(
-    Clinical.variants -> joinVariantDf,
-    Clinical.consequences -> joinConsequencesDf,
-    Clinical.occurrences -> occurrencesDf,
-    Public.clinvar -> clinvarDf,
-    Public.genes -> genesDf
+    Clinical.variants.id -> joinVariantDf,
+    Clinical.consequences.id -> joinConsequencesDf,
+    Clinical.occurrences.id -> occurrencesDf,
+    Public.clinvar.id -> clinvarDf,
+    Public.genes.id -> genesDf
   )
 
   val expectedStudies = List(

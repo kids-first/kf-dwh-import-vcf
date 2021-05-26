@@ -13,13 +13,13 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 class ImportDBSNP()(implicit conf: Configuration)
   extends StandardETL(Public.dbsnp)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
-    Map(Raw.dbsnp_vcf -> vcf(Raw.dbsnp_vcf.location))
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+    Map(Raw.dbsnp_vcf.id -> vcf(Raw.dbsnp_vcf.location))
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    data(Raw.dbsnp_vcf)
+    data(Raw.dbsnp_vcf.id)
       .where($"contigName" like "NC_%")
       .withColumn("chromosome", regexp_extract($"contigName", "NC_(\\d+).(\\d+)", 1).cast("int"))
       .select(

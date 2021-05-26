@@ -280,14 +280,14 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
       ).toDF()
 
       val data = Map(
-        Public.`1000_genomes` -> Seq(FrequencyEntry()).toDF(),
-        Public.topmed_bravo -> Seq(FrequencyEntry()).toDF(),
-        Public.gnomad_genomes_2_1 -> Seq(GnomadFrequencyEntry()).toDF(),
-        Public.gnomad_exomes_2_1 -> Seq(GnomadFrequencyEntry()).toDF(),
-        Public.gnomad_genomes_3_0 -> Seq(GnomadFrequencyEntry()).toDF(),
-        Public.clinvar -> Seq(ClinvarEntry()).toDF(),
-        Public.dbsnp -> Seq(DBSNPEntry()).toDF(),
-        Clinical.variants -> variants
+        Public.`1000_genomes`.id -> Seq(FrequencyEntry()).toDF(),
+        Public.topmed_bravo.id -> Seq(FrequencyEntry()).toDF(),
+        Public.gnomad_genomes_2_1.id -> Seq(GnomadFrequencyEntry()).toDF(),
+        Public.gnomad_exomes_2_1.id -> Seq(GnomadFrequencyEntry()).toDF(),
+        Public.gnomad_genomes_3_0.id -> Seq(GnomadFrequencyEntry()).toDF(),
+        Public.clinvar.id -> Seq(ClinvarEntry()).toDF(),
+        Public.dbsnp.id -> Seq(DBSNPEntry()).toDF(),
+        Clinical.variants.id -> variants
       )
 
       val result = new JoinVariants(Seq("SD_222", "SD_111"), "RE_000000", true, "variant")

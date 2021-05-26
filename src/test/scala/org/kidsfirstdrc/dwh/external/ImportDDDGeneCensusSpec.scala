@@ -20,7 +20,7 @@ class ImportDDDGeneCensusSpec extends AnyFlatSpec with GivenWhenThen with WithSp
 
   "run" should "creates ddd gene set table" in {
 
-    val inputData = Map(Raw.ddd_gene_census -> Seq(DddGeneCensusInput()).toDF())
+    val inputData = Map(Raw.ddd_gene_census.id -> Seq(DddGeneCensusInput()).toDF())
 
     val resultDF = new ImportDDDGeneCensus().transform(inputData)
 

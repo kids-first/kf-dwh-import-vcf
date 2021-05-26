@@ -20,7 +20,7 @@ class ImportCancerGeneCensusSpec extends AnyFlatSpec with GivenWhenThen with Wit
 
   "run" should "creates cosmic gene set table" in {
 
-    val inputData = Map(Raw.cosmic_cancer_gene_census -> Seq(CosmicCancerGeneCensusInput()).toDF())
+    val inputData = Map(Raw.cosmic_cancer_gene_census.id -> Seq(CosmicCancerGeneCensusInput()).toDF())
 
     val resultDF = new ImportCancerGeneCensus().transform(inputData)
 

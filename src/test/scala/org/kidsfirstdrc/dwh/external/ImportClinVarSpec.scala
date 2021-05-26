@@ -22,7 +22,7 @@ class ImportClinVarSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
   "run" should "creates clinvar table" in {
 
     withOutputFolder("output") { _ =>
-      val inputData = Map(clinvar_vcf -> Seq(ClinvarInput()).toDF())
+      val inputData = Map(clinvar_vcf.id -> Seq(ClinvarInput()).toDF())
 
       val resultDF = new ImportClinVarJob().transform(inputData)
 

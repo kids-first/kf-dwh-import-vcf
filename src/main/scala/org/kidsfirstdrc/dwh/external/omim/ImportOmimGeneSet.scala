@@ -11,7 +11,7 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 class ImportOmimGeneSet()(implicit conf: Configuration)
   extends StandardETL(Public.omim_gene_set)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val df = spark.read.format("csv")
       .option("inferSchema", "true")
       .option("comment", "#")
@@ -19,12 +19,12 @@ class ImportOmimGeneSet()(implicit conf: Configuration)
       .option("sep", "\t")
       .load(Raw.omim_genemap2.location)
 
-    Map(Raw.omim_genemap2 -> df)
+    Map(Raw.omim_genemap2.id -> df)
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val intermediateDf =
-      data(Raw.omim_genemap2)
+      data(Raw.omim_genemap2.id)
         .select(
           col("_c0") as "chromosome",
           col("_c1") as "start",

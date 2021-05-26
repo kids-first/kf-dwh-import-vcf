@@ -13,15 +13,13 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
 
   val destination = Clinical.variants
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val participantsPath = Raw.all_participants.location
-    val occurrencesPath = s"${Clinical.occurrences.rootPath}/occurrences/${tableName(Clinical.occurrences.datasetid, studyId, releaseId)}"
+    val occurrencesPath = s"${Clinical.occurrences.rootPath}/occurrences/${tableName(Clinical.occurrences.id, studyId, releaseId)}"
 
     Map(
-      Raw.all_participants ->
-        spark.read.json(participantsPath),
-      Clinical.occurrences ->
-        spark.read.parquet(occurrencesPath)
+      Raw.all_participants.id -> spark.read.json(participantsPath),
+      Clinical.occurrences.id -> spark.read.parquet(occurrencesPath)
     )
   }
 
@@ -31,14 +29,14 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
     load(variants)
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
-    val participants = data(Raw.all_participants).select($"id" as "participant_id")
+    val participants = data(Raw.all_participants.id).select($"id" as "participant_id")
 
     val occurrences: DataFrame = schema match {
-      case "portal" => data(Clinical.occurrences).join(broadcast(participants), Seq("participant_id"), "inner")
-      case _ => data(Clinical.occurrences)
+      case "portal" => data(Clinical.occurrences.id).join(broadcast(participants), Seq("participant_id"), "inner")
+      case _ => data(Clinical.occurrences.id)
     }
 
     val participantTotalCount = occurrences.select("participant_id").distinct().count()
@@ -97,13 +95,13 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    val tableVariants = tableName(destination.datasetid, studyId, releaseId)
+    val tableVariants = tableName(destination.id, studyId, releaseId)
     data
       .repartition(col("chromosome"))
       .write.mode(SaveMode.Overwrite)
       .partitionBy("study_id", "release_id", "chromosome")
       .format("parquet")
-      .option("path", s"${destination.rootPath}/${destination.datasetid}/$tableVariants")
+      .option("path", s"${destination.rootPath}/${destination.id}/$tableVariants")
       .saveAsTable(s"$schema.$tableVariants")
     data
   }

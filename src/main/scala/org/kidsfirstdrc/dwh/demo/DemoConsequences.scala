@@ -20,14 +20,14 @@ class DemoConsequences(studyId: String, releaseId: String, input: String)
     load(consequences)
   }
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val df = vcf(input)
       .withColumn("file_name", regexp_extract(input_file_name(), ".*/(.*)", 1))
       .select(chromosome, start, end, reference, alternate, name, annotations)
-    Map(HarmonizedData.family_variants_vcf -> df)
+    Map(HarmonizedData.family_variants_vcf.id -> df)
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     new Consequences(studyId, releaseId, input, "", "").transform(data)
   }
 

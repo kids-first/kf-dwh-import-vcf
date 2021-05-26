@@ -13,10 +13,10 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisting: Boolean, database: String)(implicit conf: Configuration)
   extends ETL(){
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val consequences: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
-        val nextDf = spark.table(SparkUtils.tableName(Clinical.consequences.datasetid, studyId, releaseId, database))
+        val nextDf = spark.table(SparkUtils.tableName(Clinical.consequences.id, studyId, releaseId, database))
         if (currentDF.isEmpty)
           nextDf
         else {
@@ -26,16 +26,16 @@ class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisti
     }
 
     Map(
-      Clinical.consequences -> consequences,
-      Public.dbnsfp_original -> spark.table("variant.dbnsfp_original")
+      Clinical.consequences.id -> consequences,
+      Public.dbnsfp_original.id -> spark.table("variant.dbnsfp_original")
     )
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
-    val consequences = data(Clinical.consequences)
-    val dbnsfp_original = data(Public.dbnsfp_original)
+    val consequences = data(Clinical.consequences.id)
+    val dbnsfp_original = data(Public.dbnsfp_original.id)
 
     val commonColumns = Seq(
       $"chromosome", $"start", $"end", $"reference", $"alternate", $"consequences", $"ensembl_transcript_id", $"ensembl_regulatory_id",
@@ -47,8 +47,8 @@ class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisti
     val allColumns = commonColumns :+ col("study_id")
 
     val merged =
-      if (mergeWithExisting && spark.catalog.tableExists(s"${Clinical.consequences.datasetid}")) {
-        val existingConsequences = spark.table(s"${Clinical.consequences.datasetid}")
+      if (mergeWithExisting && spark.catalog.tableExists(s"${Clinical.consequences.id}")) {
+        val existingConsequences = spark.table(s"${Clinical.consequences.id}")
 
         val existingColumns = commonColumns :+ $"study_ids"
         mergeConsequences(releaseId, existingConsequences.select(existingColumns: _*)
@@ -66,7 +66,7 @@ class JoinConsequences(studyIds: Seq[String], releaseId: String, mergeWithExisti
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    JoinWrite.write(releaseId, Clinical.consequences.rootPath, Clinical.consequences.datasetid, data, Some(30), database)
+    JoinWrite.write(releaseId, Clinical.consequences.rootPath, Clinical.consequences.id, data, Some(30), database)
   }
 
   private def mergeConsequences(releaseId: String, consequences: DataFrame)(implicit spark: SparkSession): DataFrame = {

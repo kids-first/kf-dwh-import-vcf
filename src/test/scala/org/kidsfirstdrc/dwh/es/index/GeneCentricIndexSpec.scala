@@ -19,7 +19,7 @@ class GeneCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
   ).toDF()
 
   val data = Map(
-    Public.genes -> genesDf
+    Public.genes.id -> genesDf
   )
 
   implicit val conf: Configuration =  Configuration(List())

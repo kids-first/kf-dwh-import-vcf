@@ -80,10 +80,10 @@ class GenomicSuggestionsIndexSpec extends AnyFlatSpec with GivenWhenThen with Wi
   ).toDF()
 
   val data = Map(
-    Public.genes -> genesDf,
-    Clinical.occurrences -> occurrencesDf,
-    Clinical.variants -> joinVariantDf,
-    Clinical.consequences -> joinConsequencesDf
+    Public.genes.id -> genesDf,
+    Clinical.occurrences.id -> occurrencesDf,
+    Clinical.variants.id -> joinVariantDf,
+    Clinical.consequences.id -> joinConsequencesDf
   )
 
   implicit val conf: Configuration =  Configuration(List())

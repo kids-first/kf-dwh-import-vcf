@@ -11,18 +11,18 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 class ImportCancerHotspots()(implicit conf: Configuration) extends StandardETL(Public.cancer_hotspots)(conf) with App {
   val chain = "/home/hadoop/b37ToHg38.over.chain"
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val df = spark.read
       .option("comment", "#")
       .option("header", "true")
       .option("sep", "\t").csv(Raw.cancerhotspots_csv.location)
-    Map(Raw.cancerhotspots_csv -> df)
+    Map(Raw.cancerhotspots_csv.id -> df)
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     val lifted: Dataset[Row] =
-      data(Raw.cancerhotspots_csv)
+      data(Raw.cancerhotspots_csv.id)
         .withColumn("end", $"End_Position" + 1)
         .drop($"End_Position")
         .withColumn("lifted", lift_over_coordinates($"Chromosome", $"Start_Position", $"end", chain, 0.90))

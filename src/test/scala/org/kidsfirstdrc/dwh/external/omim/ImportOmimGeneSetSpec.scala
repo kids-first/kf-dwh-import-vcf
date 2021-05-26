@@ -23,13 +23,13 @@ class ImportOmimGeneSetSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
 
     val outputDf = new ImportOmimGeneSet().extract()
 
-    outputDf(Raw.omim_genemap2).as[OmimInput]
+    outputDf(Raw.omim_genemap2.id).as[OmimInput]
 
   }
 
   "ImportOmimGeneSet" should "transform data into expected format" in {
 
-    val inputDf = Map(Raw.omim_genemap2 -> Seq(OmimInput()).toDF())
+    val inputDf = Map(Raw.omim_genemap2.id -> Seq(OmimInput()).toDF())
     val outputDf = new ImportOmimGeneSet().transform(inputDf)
 
     outputDf.as[OmimOutput].collect() should contain theSameElementsAs Seq(OmimOutput())

@@ -13,22 +13,22 @@ import scala.xml.{Elem, Node, XML}
 class ImportOrphanetGeneSet()(implicit conf: Configuration)
   extends StandardETL(Public.orphanet_gene_set)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     import spark.implicits._
 
     def loadXML: String => Elem = str => XML.loadString(spark.read.text(str).collect().map(_.getString(0)).mkString("\n"))
 
     Map(
-      orphanet_gene_association -> parseProduct6XML(loadXML(orphanet_gene_association.location)).toDF,
-      orphanet_disease_history -> parseProduct9XML(loadXML(orphanet_disease_history.location)).toDF
+      orphanet_gene_association.id -> parseProduct6XML(loadXML(orphanet_gene_association.location)).toDF,
+      orphanet_disease_history .id-> parseProduct9XML(loadXML(orphanet_disease_history.location)).toDF
     )
 
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    data(orphanet_gene_association)
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    data(orphanet_gene_association.id)
       .join(
-        data(orphanet_disease_history).select("orpha_code", "average_age_of_onset", "average_age_of_death","type_of_inheritance"),
+        data(orphanet_disease_history.id).select("orpha_code", "average_age_of_onset", "average_age_of_death","type_of_inheritance"),
         Seq("orpha_code"), "left")
   }
 

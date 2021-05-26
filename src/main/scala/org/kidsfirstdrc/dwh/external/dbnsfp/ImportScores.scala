@@ -22,14 +22,14 @@ class ImportScores()(implicit conf: Configuration)
 
   def pred(colName: String): Column = when(element_at_postion(colName) === ".", null).otherwise(element_at_postion(colName)) as colName
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
-      Public.dbnsfp_variant -> spark.table(s"${Public.dbnsfp_variant.table.get.fullName}")
+      Public.dbnsfp_variant.id -> spark.table(s"${Public.dbnsfp_variant.table.get.fullName}")
     )
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    data(Public.dbnsfp_variant).select(
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    data(Public.dbnsfp_variant.id).select(
       col("chromosome"),
       col("start").cast(LongType),
       col("reference"),

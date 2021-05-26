@@ -14,8 +14,8 @@ import scala.collection.mutable
 class ImportCancerGeneCensus()(implicit conf: Configuration)
   extends StandardETL(Public.cosmic_gene_set)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
-    Map(Raw.cosmic_cancer_gene_census -> spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.location))
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+    Map(Raw.cosmic_cancer_gene_census.id -> spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.location))
   }
 
   def trim_array_udf: UserDefinedFunction = udf { array: mutable.WrappedArray[String] =>
@@ -29,11 +29,11 @@ class ImportCancerGeneCensus()(implicit conf: Configuration)
     }
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     spark.udf.register("trim_array", trim_array_udf)
 
-    val df = data(Raw.cosmic_cancer_gene_census)
+    val df = data(Raw.cosmic_cancer_gene_census.id)
       .withColumn("split_loc", split($"Genome Location", ":"))
       .withColumn("chromosome", $"split_loc"(0))
       .withColumn("start", split($"split_loc"(1), "-")(0).cast(LongType))

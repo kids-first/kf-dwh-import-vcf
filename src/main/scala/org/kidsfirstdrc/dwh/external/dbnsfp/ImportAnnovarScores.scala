@@ -12,19 +12,19 @@ class ImportAnnovarScores()(implicit conf: Configuration)
 
     val source: DatasetConf = Raw.annovar_dbnsfp
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val annovar_dbnsfp = spark.read
       .option("sep", "\t")
       .option("header", "true")
       .option("nullValue", ".")
       .csv(source.location)
 
-    Map(source -> annovar_dbnsfp)
+    Map(source.id -> annovar_dbnsfp)
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    data(source)
+    data(source.id)
       .select(
         $"#Chr" as "chromosome",
         $"Start".cast("long") as "start",

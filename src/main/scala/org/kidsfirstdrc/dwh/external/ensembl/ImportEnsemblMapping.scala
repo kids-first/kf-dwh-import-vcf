@@ -11,28 +11,28 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 class ImportEnsemblMapping()(implicit conf: Configuration)
   extends StandardETL(Public.ensembl_mapping)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val tsvWithHeaders = Map("header" -> "true", "sep" -> "\t")
     val tsvWithoutHeaders = Map("header" -> "false", "sep" -> "\t")
     Map(
-      ensembl_canonical -> spark.read.options(tsvWithoutHeaders).csv(ensembl_canonical.location),
-      ensembl_entrez    -> spark.read.options(tsvWithHeaders).csv(ensembl_entrez.location),
-      ensembl_refseq    -> spark.read.options(tsvWithHeaders).csv(ensembl_refseq.location),
-      ensembl_uniprot   -> spark.read.options(tsvWithHeaders).csv(ensembl_uniprot.location),
-      ensembl_ena       -> spark.read.options(tsvWithHeaders).csv(ensembl_ena.location)
+      ensembl_canonical.id -> spark.read.options(tsvWithoutHeaders).csv(ensembl_canonical.location),
+      ensembl_entrez.id    -> spark.read.options(tsvWithHeaders).csv(ensembl_entrez.location),
+      ensembl_refseq.id    -> spark.read.options(tsvWithHeaders).csv(ensembl_refseq.location),
+      ensembl_uniprot.id   -> spark.read.options(tsvWithHeaders).csv(ensembl_uniprot.location),
+      ensembl_ena.id       -> spark.read.options(tsvWithHeaders).csv(ensembl_ena.location)
     )
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    val canonical = data(ensembl_canonical)
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    val canonical = data(ensembl_canonical.id)
       .withColumn("ensembl_gene_id", regexp_extract(col("_c0"), "(ENSG[0-9]+)", 0))
       .withColumn("ensembl_transcript_id", regexp_extract(col("_c1"), "(ENST[0-9]+)", 0))
       .withColumnRenamed("_c2", "tag")
 
-    val refseq = data(ensembl_refseq).renameIds.renameExternalReference("refseq")
-    val entrez = data(ensembl_entrez).renameIds.renameExternalReference("entrez")
-    val uniprot = data(ensembl_uniprot).renameIds.renameExternalReference("uniprot")
-    val ena = data(ensembl_ena).renameIds.withColumnRenamed("taxid", "tax_id")
+    val refseq = data(ensembl_refseq.id).renameIds.renameExternalReference("refseq")
+    val entrez = data(ensembl_entrez.id).renameIds.renameExternalReference("entrez")
+    val uniprot = data(ensembl_uniprot.id).renameIds.renameExternalReference("uniprot")
+    val ena = data(ensembl_ena.id).renameIds.withColumnRenamed("taxid", "tax_id")
 
 
 
