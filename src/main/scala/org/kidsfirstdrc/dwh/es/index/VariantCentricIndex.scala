@@ -20,7 +20,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
 
   val destination = Es.variant_centric
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     import spark.implicits._
     val occurrences: DataFrame = spark
       .read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId")
@@ -31,27 +31,27 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
       .reduce( (df1, df2) => df1.drop("joined_sample_id").unionByName(df2.drop("joined_sample_id")))
 
     Map(
-      Clinical.variants     -> spark.read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId"),
-      Clinical.consequences -> spark.read.parquet(s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId"),
-      Clinical.occurrences  -> occurrences,
-      Public.clinvar        -> spark.table(s"${Public.clinvar.table.get.fullName}"),
-      Public.genes          -> spark.table(s"${Public.genes.table.get.fullName}")
+      Clinical.variants.id     -> spark.read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId"),
+      Clinical.consequences.id -> spark.read.parquet(s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId"),
+      Clinical.occurrences.id  -> occurrences,
+      Public.clinvar.id        -> spark.table(s"${Public.clinvar.table.get.fullName}"),
+      Public.genes.id          -> spark.table(s"${Public.genes.table.get.fullName}")
     )
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    val variants = data(Clinical.variants)
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    val variants = data(Clinical.variants.id)
       .drop("end")
       .withColumnRenamed("dbsnp_id", "rsnumber")
 
-    val consequences = data(Clinical.consequences)
+    val consequences = data(Clinical.consequences.id)
       .withColumnRenamed("impact", "vep_impact")
 
-    val occurrences = data(Clinical.occurrences)
+    val occurrences = data(Clinical.occurrences.id)
       .where(col("has_alt") === 1)
       .selectLocus(col("participant_id"), col("study_id"))
 
-    val clinvar = data(Public.clinvar)
+    val clinvar = data(Public.clinvar.id)
       .selectLocus(
         col("name") as "clinvar_id",
         col("clin_sig"),
@@ -59,7 +59,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
         col("inheritance"),
         col("interpretations"))
 
-    val genes = data(Public.genes).drop("biotype")
+    val genes = data(Public.genes.id).drop("biotype")
       .withColumnRenamed("chromosome", "genes_chromosome")
 
     variants
@@ -88,7 +88,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration)
       .partitionBy("chromosome")
       .mode(SaveMode.Overwrite)
       .option("format", "parquet")
-      .option("path", s"${destination.rootPath}/es_index/${destination.datasetid}_${releaseId}")
+      .option("path", s"${destination.rootPath}/es_index/${destination.id}_${releaseId}")
       .saveAsTable(s"${destination.table.get.fullName}_${releaseId}")
     data
   }

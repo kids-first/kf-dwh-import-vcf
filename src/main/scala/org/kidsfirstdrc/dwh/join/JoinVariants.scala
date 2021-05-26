@@ -13,11 +13,11 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
 class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: Boolean, database: String)(implicit conf: Configuration)
   extends ETL(){
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
 
     val variants: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) {
       (currentDF, studyId) =>
-        val nextDf = spark.table(SparkUtils.tableName(Clinical.variants.datasetid, studyId, releaseId, database))
+        val nextDf = spark.table(SparkUtils.tableName(Clinical.variants.id, studyId, releaseId, database))
         if (currentDF.isEmpty)
           nextDf
         else {
@@ -27,14 +27,14 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
     }
 
     Map(
-      Public.`1000_genomes` -> spark.table(s"variant.${Public.`1000_genomes`.datasetid}"),
-      Public.topmed_bravo -> spark.table(s"variant.${Public.topmed_bravo.datasetid}"),
-      Public.gnomad_genomes_2_1 -> spark.table(s"variant.${Public.gnomad_genomes_2_1.datasetid}"),
-      Public.gnomad_exomes_2_1 -> spark.table(s"variant.${Public.gnomad_exomes_2_1.datasetid}"),
-      Public.gnomad_genomes_3_0 -> spark.table(s"variant.${Public.gnomad_genomes_3_0.datasetid}"),
-      Public.clinvar -> spark.table(s"variant.${Public.clinvar.datasetid}"),
-      Public.dbsnp -> spark.table(s"variant.${Public.dbsnp.datasetid}"),
-      Clinical.variants -> variants
+      Public.`1000_genomes`.id -> spark.table(s"variant.${Public.`1000_genomes`.id}"),
+      Public.topmed_bravo.id -> spark.table(s"variant.${Public.topmed_bravo.id}"),
+      Public.gnomad_genomes_2_1.id -> spark.table(s"variant.${Public.gnomad_genomes_2_1.id}"),
+      Public.gnomad_exomes_2_1.id -> spark.table(s"variant.${Public.gnomad_exomes_2_1.id}"),
+      Public.gnomad_genomes_3_0.id -> spark.table(s"variant.${Public.gnomad_genomes_3_0.id}"),
+      Public.clinvar.id -> spark.table(s"variant.${Public.clinvar.id}"),
+      Public.dbsnp.id -> spark.table(s"variant.${Public.dbsnp.id}"),
+      Clinical.variants.id -> variants
     )
   }
 
@@ -47,10 +47,10 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
       .select("upper_bound_kf_an").as[Long].collect().sum
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
-    val variants = data(Clinical.variants)
+    val variants = data(Clinical.variants.id)
       .withColumn("studies", array(col("study_id")))
       .withRenamedFrequencies("upper_bound_kf")
       .withRenamedFrequencies("lower_bound_kf")
@@ -58,13 +58,13 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
       .withColumnByStudy("lower_bound_kf")
 
     //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
-    val genomes = data(Public.`1000_genomes`).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af")
-    val topmed = data(Public.topmed_bravo).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af", $"homozygotes", $"heterozygotes")
-    val gnomad_genomes_2_1 = data(Public.gnomad_genomes_2_1).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af", $"hom")
-    val gnomad_exomes_2_1 = data(Public.gnomad_exomes_2_1).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af", $"hom")
-    val gnomad_genomes_3_0 = data(Public.gnomad_genomes_3_0).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af", $"hom")
-    val clinvar = data(Public.clinvar).dropDuplicates(locusColumNames)
-    val dbsnp = data(Public.dbsnp).dropDuplicates(locusColumNames)
+    val genomes = data(Public.`1000_genomes`.id).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af")
+    val topmed = data(Public.topmed_bravo.id).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af", $"homozygotes", $"heterozygotes")
+    val gnomad_genomes_2_1 = data(Public.gnomad_genomes_2_1.id).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af", $"hom")
+    val gnomad_exomes_2_1 = data(Public.gnomad_exomes_2_1.id).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af", $"hom")
+    val gnomad_genomes_3_0 = data(Public.gnomad_genomes_3_0.id).dropDuplicates(locusColumNames).selectLocus($"ac", $"an", $"af", $"hom")
+    val clinvar = data(Public.clinvar.id).dropDuplicates(locusColumNames)
+    val dbsnp = data(Public.dbsnp.id).dropDuplicates(locusColumNames)
 
     val commonColumns = Seq($"chromosome", $"start", $"reference", $"alternate", $"end", $"name", $"hgvsg", $"variant_class", $"release_id",
       $"lower_bound_kf_ac_by_study",
@@ -95,9 +95,9 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
       $"study_id"
 
     val merged =
-      if (mergeWithExisting && spark.catalog.tableExists(s"${database}.${Clinical.variants.datasetid}")) {
+      if (mergeWithExisting && spark.catalog.tableExists(s"${database}.${Clinical.variants.id}")) {
         val existingColumns = commonColumns :+ explode($"studies").as("study_id")
-        val existingVariants = spark.table(s"${database}.${Clinical.variants.datasetid}")
+        val existingVariants = spark.table(s"${database}.${Clinical.variants.id}")
           .withRenamedFrequencies("upper_bound_kf")
           .withRenamedFrequencies("lower_bound_kf")
           .select(existingColumns: _*)
@@ -126,7 +126,7 @@ class JoinVariants(studyIds: Seq[String], releaseId: String, mergeWithExisting: 
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    JoinWrite.write(releaseId, Clinical.variants.rootPath, Clinical.variants.datasetid, data, Some(60), database)
+    JoinWrite.write(releaseId, Clinical.variants.rootPath, Clinical.variants.id, data, Some(60), database)
   }
 
   private def mergeVariants(releaseId: String, variants: DataFrame)(implicit spark: SparkSession): DataFrame = {

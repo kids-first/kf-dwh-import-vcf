@@ -12,19 +12,19 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 class ImportHumanGenes()(implicit conf: Configuration)
   extends StandardETL(Public.human_genes)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val df = spark.read.format("csv")
       .option("inferSchema", "true")
       .option("header", "true")
       .option("sep", "\t")
       .option("nullValue", "-")
       .load(Raw.refseq_homo_sapiens_gene.location)
-    Map(Raw.refseq_homo_sapiens_gene -> df)
+    Map(Raw.refseq_homo_sapiens_gene.id -> df)
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    data(Raw.refseq_homo_sapiens_gene)
+    data(Raw.refseq_homo_sapiens_gene.id)
       .select(
         $"#tax_id" as "tax_id",
         $"GeneID" as "entrez_gene_id",

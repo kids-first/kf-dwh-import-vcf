@@ -22,18 +22,18 @@ class GenomicSuggestionsIndex(releaseId: String)
 
   final val indexColumns = List("type", "symbol", "locus", "suggestion_id", "hgvsg", "suggest", "chromosome", "rsnumber")
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
-      Public.genes -> spark.table(s"${Public.genes.table.get.fullName}"),
-      Clinical.variants -> spark.read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId"),
-      Clinical.consequences -> spark.read.parquet(s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId")
+      Public.genes.id -> spark.table(s"${Public.genes.table.get.fullName}"),
+      Clinical.variants.id -> spark.read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId"),
+      Clinical.consequences.id -> spark.read.parquet(s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId")
     )
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    val genes = data(Public.genes).select("symbol", "alias", "ensembl_gene_id")
-    val variants = data(Clinical.variants).selectLocus(col("hgvsg"), col("name"), col("clinvar_id"))
-    val consequences = data(Clinical.consequences)
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    val genes = data(Public.genes.id).select("symbol", "alias", "ensembl_gene_id")
+    val variants = data(Clinical.variants.id).selectLocus(col("hgvsg"), col("name"), col("clinvar_id"))
+    val consequences = data(Clinical.consequences.id)
       .selectLocus(col("symbol"), col("aa_change"), col("ensembl_gene_id"),
         col("ensembl_transcript_id"), col("refseq_mrna_id"), col("refseq_protein_id"))
       .dropDuplicates()

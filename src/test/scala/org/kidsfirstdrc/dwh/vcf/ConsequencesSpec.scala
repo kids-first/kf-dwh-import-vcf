@@ -40,7 +40,7 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
     ).toDF()
 
     val output = new Consequences(studyId, releaseId, "input", "", "")
-      .transform(Map(HarmonizedData.family_variants_vcf -> df, Public.ensembl_mapping -> ensemblDf))
+      .transform(Map(HarmonizedData.family_variants_vcf.id -> df, Public.ensembl_mapping.id -> ensemblDf))
 
     output.as[ConsequenceOutput].collect() should contain theSameElementsAs Seq(
       ConsequenceOutput(),
@@ -65,7 +65,7 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
     val output =
       new Consequences(studyId, releaseId, "input", "", "")
-        .transform(Map(HarmonizedData.family_variants_vcf -> df, Public.ensembl_mapping -> ensemblDf))
+        .transform(Map(HarmonizedData.family_variants_vcf.id -> df, Public.ensembl_mapping.id -> ensemblDf))
 
     output.as[ConsequenceOutput].collect() should contain theSameElementsAs Seq(
       ConsequenceOutput(ensembl_transcript_id = Some("ENST00000332831"), ensembl_regulatory_id = None, feature_type = "Transcript",

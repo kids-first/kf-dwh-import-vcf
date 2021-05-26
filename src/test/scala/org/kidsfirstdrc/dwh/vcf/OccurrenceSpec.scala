@@ -26,7 +26,7 @@ class OccurrenceSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessio
   "transform occurrences_family into occurrences" should "return a dataframe with all expected columns" in {
 
     val data = Map(
-      Clinical.occurrences_family -> Seq(OccurrenceOutput()).toDF
+      Clinical.occurrences_family.id -> Seq(OccurrenceOutput()).toDF
     )
 
     spark.sql("use variant")

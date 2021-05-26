@@ -72,10 +72,10 @@ class OccurrencesFamilySpec extends AnyFlatSpec with GivenWhenThen with WithSpar
       .withColumn("genotype", explode($"genotypes"))
 
     val inputData = Map(
-      DataService.participants -> participantsDf.where($"study_id" === studyId),
-      DataService.biospecimens -> biospecimensDf.where($"study_id" === studyId),
-      DataService.family_relationships -> family_relationshipsDf.where($"study_id" === studyId),
-      HarmonizedData.family_variants_vcf -> postCGP
+      DataService.participants.id -> participantsDf.where($"study_id" === studyId),
+      DataService.biospecimens.id -> biospecimensDf.where($"study_id" === studyId),
+      DataService.family_relationships.id -> family_relationshipsDf.where($"study_id" === studyId),
+      HarmonizedData.family_variants_vcf.id -> postCGP
     )
 
     val outputDf = new OccurrencesFamily(studyId, releaseId, "", "biospecimen_id",

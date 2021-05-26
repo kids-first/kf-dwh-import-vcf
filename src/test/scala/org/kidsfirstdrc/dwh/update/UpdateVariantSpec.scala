@@ -37,7 +37,7 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
 
     val variantDF = Seq(variant).toDF()
     val clinvarDF = Seq(clinvar).toDF()
-    val data = Map(Clinical.variants -> variantDF, Public.clinvar -> clinvarDF)
+    val data = Map(Clinical.variants.id -> variantDF, Public.clinvar.id -> clinvarDF)
 
     val job = new UpdateVariant(Public.clinvar, "variant")
     val resultDF = job.transform(data)
@@ -58,7 +58,7 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
 
     val variantDF = Seq(variant).toDF()
     val topmedDF = Seq(topmed).toDF()
-    val data = Map(Clinical.variants -> variantDF, Public.topmed_bravo -> topmedDF)
+    val data = Map(Clinical.variants.id -> variantDF, Public.topmed_bravo.id -> topmedDF)
 
     val job = new UpdateVariant(Public.topmed_bravo, "variant")
     val resultDF = job.transform(data)
@@ -88,8 +88,8 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
 
 
     val data = job.extract()
-    data(Clinical.variants).show(false)
-    data(Public.clinvar).show(false)
+    data(Clinical.variants.id).show(false)
+    data(Public.clinvar.id).show(false)
 
     val expectedResult = variant.copy(clinvar_id = Some(clinvar.name), clin_sig = clinvar.clin_sig)
 
@@ -101,7 +101,7 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
     resultJobDF.as[Variant].collect().head shouldBe expectedResult
 
     // Checks the values on disk are the same as after the whole ETL was ran
-    val resultDF = job.extract()(spark)(Clinical.variants)
+    val resultDF = job.extract()(spark)(Clinical.variants.id)
     resultDF.as[Variant].collect().head shouldBe expectedResult
 
     ////checks the hive table was published and up to date

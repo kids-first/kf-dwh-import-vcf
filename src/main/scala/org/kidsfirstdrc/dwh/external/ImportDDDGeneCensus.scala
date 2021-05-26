@@ -11,13 +11,13 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 class ImportDDDGeneCensus()(implicit conf: Configuration)
   extends StandardETL(Public.ddd_gene_set)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
-    Map(Raw.ddd_gene_census -> spark.read.option("header", "true").csv(Raw.ddd_gene_census.location))
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+    Map(Raw.ddd_gene_census.id -> spark.read.option("header", "true").csv(Raw.ddd_gene_census.location))
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    data(Raw.ddd_gene_census)
+    data(Raw.ddd_gene_census.id)
       .select(
         $"gene symbol" as "symbol",
         $"gene mim" as "omim_gene_id",

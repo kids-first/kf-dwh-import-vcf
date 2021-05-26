@@ -16,7 +16,7 @@ class OccurrencesFamily(studyId: String, releaseId: String, input: String, biosp
 
   val destination = Clinical.occurrences_family
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val inputDF: DataFrame = unionCGPFiles(input, studyId, releaseId, cgp_pattern, post_cgp_pattern)
 
     val biospecimens = spark.table(s"${DataService.biospecimens.table.get.fullName}_${releaseId.toLowerCase}")
@@ -24,32 +24,32 @@ class OccurrencesFamily(studyId: String, releaseId: String, input: String, biosp
     val family_relationships = spark.table(s"${DataService.family_relationships.table.get.fullName}_${releaseId.toLowerCase}")
 
     Map(
-      DataService.participants -> participants,
-      DataService.biospecimens -> biospecimens,
-      DataService.family_relationships -> family_relationships,
-      HarmonizedData.family_variants_vcf -> inputDF
+      DataService.participants.id -> participants,
+      DataService.biospecimens.id -> biospecimens,
+      DataService.family_relationships.id -> family_relationships,
+      HarmonizedData.family_variants_vcf.id -> inputDF
     )
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val participants = data(DataService.participants)
+    val participants = data(DataService.participants.id)
       .withColumn("affected_status",
         when(col("affected_status").cast(StringType) === "true", lit(true))
           .otherwise(when(col("affected_status") === "affected", lit(true))
             .otherwise(lit(false))))
       .select("kf_id", "is_proband", "affected_status")
 
-    val biospecimens = data(DataService.biospecimens)
+    val biospecimens = data(DataService.biospecimens.id)
       .select(col(biospecimenIdColumn).as("joined_sample_id"), $"biospecimen_id", $"participant_id", $"family_id",
         coalesce($"dbgap_consent_code", lit("_NONE_")) as "dbgap_consent_code",
         ($"consent_type" === "GRU") as "is_gru",
         ($"consent_type" === "HMB") as "is_hmb"
       ).drop("joined_sample_id")
 
-    val family_relationships = data(DataService.family_relationships).where($"participant1_to_participant2_relation".isin("Mother", "Father"))
+    val family_relationships = data(DataService.family_relationships.id).where($"participant1_to_participant2_relation".isin("Mother", "Father"))
 
-    val family_variants_vcf = data(HarmonizedData.family_variants_vcf)
+    val family_variants_vcf = data(HarmonizedData.family_variants_vcf.id)
 
     val occurrences = selectOccurrences(studyId, releaseId, family_variants_vcf)
 
@@ -82,13 +82,13 @@ class OccurrencesFamily(studyId: String, releaseId: String, input: String, biosp
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val tableOccurence = tableName(destination.datasetid, studyId, releaseId)
+    val tableOccurence = tableName(destination.id, studyId, releaseId)
     data
       .repartitionByRange(700, $"dbgap_consent_code", $"family_id", $"participant_id")
       .write.mode("overwrite")
       .partitionBy("study_id", "dbgap_consent_code", "family_id", "participant_id")
       .format("parquet")
-      .option("path", s"${destination.rootPath}/${destination.datasetid}/$tableOccurence")
+      .option("path", s"${destination.rootPath}/${destination.id}/$tableOccurence")
       .saveAsTable(tableOccurence)
 
     data

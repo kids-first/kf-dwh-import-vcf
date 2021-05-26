@@ -10,14 +10,14 @@ class GeneCentricIndex()(override implicit val conf: Configuration) extends ETL(
 
   val destination = Es.gene_centric
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
-      Public.genes -> spark.table(s"${Public.genes.table.get.fullName}")
+      Public.genes.id -> spark.table(s"${Public.genes.table.get.fullName}")
     )
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    data(Public.genes)
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    data(Public.genes.id)
       .withColumn("hash", sha1(col("symbol")))
   }
 

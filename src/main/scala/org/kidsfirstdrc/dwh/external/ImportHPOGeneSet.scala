@@ -11,7 +11,7 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 class ImportHPOGeneSet()(implicit conf: Configuration)
   extends StandardETL(Public.hpo_gene_set)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[DatasetConf, DataFrame] = {
+  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val inputDF: DataFrame = spark.read
       .format("csv")
       .option("inferSchema", "true")
@@ -25,15 +25,15 @@ class ImportHPOGeneSet()(implicit conf: Configuration)
       .select("entrez_gene_id", "ensembl_gene_id"))
 
     Map(
-      Raw.hpo_genes_to_phenotype -> inputDF,
-      Public.human_genes ->  human_genes
+      Raw.hpo_genes_to_phenotype.id -> inputDF,
+      Public.human_genes.id ->  human_genes
     )
   }
 
-  override def transform(data: Map[DatasetConf, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    val human_genes = data(Public.human_genes)
+  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    val human_genes = data(Public.human_genes.id)
     val inputDF =
-      data(Raw.hpo_genes_to_phenotype)
+      data(Raw.hpo_genes_to_phenotype.id)
         .withColumnRenamed("_c0", "entrez_gene_id")
         .withColumnRenamed("_c1", "symbol")
         .withColumnRenamed("_c2", "hpo_term_id")
