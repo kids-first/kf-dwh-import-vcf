@@ -1,7 +1,6 @@
 package org.kidsfirstdrc.dwh.external.clinvar
 
-import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
-import bio.ferlab.datalake.spark3.config.DatasetConf
+import bio.ferlab.datalake.spark3.config.Configuration
 import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
@@ -36,7 +35,7 @@ class ImportClinVarJob()(implicit conf: Configuration)
             alternate +:
             (col("INFO_CLNSIG") as "clin_sig") +:
             (col("INFO_CLNSIGCONF") as "clin_sig_conflict") +:
-            info_fields(df, "INFO_CLNSIG", "INFO_CLNSIGCONF"): _*)
+            escapeInfoAndLowercase(df, "INFO_CLNSIG", "INFO_CLNSIGCONF"): _*)
         .withColumn("clin_sig", split(regexp_replace(concat_ws("|", col("clin_sig")), "^_|\\|_|/", "|"), "\\|"))
         .withColumn("clnrevstat", split(regexp_replace(concat_ws("|", col("clnrevstat")), "^_|\\|_|/", "|"), "\\|"))
         .withColumn("clin_sig_conflict", split(regexp_replace(concat_ws("|", col("clin_sig_conflict")), "\\(\\d{1,2}\\)", ""), "\\|"))
@@ -56,14 +55,6 @@ class ImportClinVarJob()(implicit conf: Configuration)
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     super.load(data.coalesce(1))
-  }
-
-  def info_fields(df: DataFrame, excludes: String*): Seq[Column] = {
-    df.columns.collect { case c if c.startsWith("INFO") && !excludes.contains(c) => col(c) as c.replace("INFO_", "").toLowerCase }
-  }
-
-  def info_fields_names(df: DataFrame, excludes: String*): Seq[String] = {
-    df.columns.collect { case c if c.startsWith("INFO") && !excludes.contains(c) => c.replace("INFO_", "").toLowerCase }
   }
 
   def inheritance_udf: UserDefinedFunction = udf { array: mutable.WrappedArray[String] =>
