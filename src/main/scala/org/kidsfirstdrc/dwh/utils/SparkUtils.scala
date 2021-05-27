@@ -118,6 +118,10 @@ object SparkUtils {
 
   def firstAs(c: String): Column = first(col(c)) as c
 
+  def escapeInfoAndLowercase(df: DataFrame, excludes: String*): Seq[Column] = {
+    df.columns.collect { case c if c.startsWith("INFO") && !excludes.contains(c) => col(c) as c.replace("INFO_", "").toLowerCase }
+  }
+
   object columns {
     val chromosome: Column = ltrim(col("contigName"), "chr") as "chromosome"
     val reference: Column = col("referenceAllele") as "reference"

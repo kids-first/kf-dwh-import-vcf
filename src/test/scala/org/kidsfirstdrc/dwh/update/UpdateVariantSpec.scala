@@ -9,13 +9,13 @@ import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, TopmedBravoOutput
 import org.kidsfirstdrc.dwh.testutils.join.Freq
 import org.kidsfirstdrc.dwh.testutils.update.Variant
 import org.kidsfirstdrc.dwh.updates.UpdateVariant
-import org.scalatest.GivenWhenThen
+import org.scalatest.{BeforeAndAfter, GivenWhenThen}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import scala.util.Try
 
-class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers with BeforeAndAfter {
   import spark.implicits._
 
   implicit val conf: Configuration =
@@ -25,10 +25,12 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
         getClass.getClassLoader.getResource(".").getFile)),
       sources = Catalog.Clinical.sources.toList)
 
-  Try(spark.sql("DROP TABLE IF EXISTS variant.variants"))
-  Try(spark.sql("DROP VIEW IF EXISTS variant.variants"))
-  spark.sql("CREATE DATABASE IF NOT EXISTS variant_live")
-  spark.sql("CREATE DATABASE IF NOT EXISTS variant")
+  before {
+    Try(spark.sql("DROP TABLE IF EXISTS variant.variants"))
+    Try(spark.sql("DROP VIEW IF EXISTS variant.variants"))
+    spark.sql("CREATE DATABASE IF NOT EXISTS variant_live")
+    spark.sql("CREATE DATABASE IF NOT EXISTS variant")
+  }
 
   "transform method for clinvar" should "return expected data given controlled input" in {
 
