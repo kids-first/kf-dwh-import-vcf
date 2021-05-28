@@ -8,11 +8,12 @@ case class GnomadV311Output(
     alternate: String = "C",
     qual: Double = 0.5,
     name: String = "BRAF",
-    ac: List[Long] = List(1),
-    ac_raw: List[Long] = List(2),
-    af: List[BigDecimal] = List(3),
-    af_raw: List[BigDecimal] = List(4),
+    ac: Long = 1,
+    ac_raw: Long = 2,
+    af: BigDecimal = BigDecimal(3.3),
+    af_raw: BigDecimal = BigDecimal(4.4),
     an: Long = 5,
     an_raw: Long = 6,
-    nhomalt_raw: Long = 7
+    nhomalt: Long = 7,
+    nhomalt_raw: Long = 8
 )
