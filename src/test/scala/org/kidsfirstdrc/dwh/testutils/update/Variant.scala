@@ -29,7 +29,7 @@ case class Variant(
     topmed: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
     gnomad_genomes_2_1: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
     gnomad_exomes_2_1: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
-    gnomad_genomes_3_0: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
+    gnomad_genomes_3_1_1: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
     clinvar_id: Option[String] = Some("RCV000436956"),
     clin_sig: List[String] = List("Pathogenic"),
     dbsnp_id: Option[String] = Some("rs1234567"),

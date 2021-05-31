@@ -32,14 +32,14 @@ class JoinVariants(
     }
 
     Map(
-      Public.`1000_genomes`.id     -> spark.table(s"variant.${Public.`1000_genomes`.id}"),
-      Public.topmed_bravo.id       -> spark.table(s"variant.${Public.topmed_bravo.id}"),
-      Public.gnomad_genomes_2_1.id -> spark.table(s"variant.${Public.gnomad_genomes_2_1.id}"),
-      Public.gnomad_exomes_2_1.id  -> spark.table(s"variant.${Public.gnomad_exomes_2_1.id}"),
-      Public.gnomad_genomes_3_0.id -> spark.table(s"variant.${Public.gnomad_genomes_3_0.id}"),
-      Public.clinvar.id            -> spark.table(s"variant.${Public.clinvar.id}"),
-      Public.dbsnp.id              -> spark.table(s"variant.${Public.dbsnp.id}"),
-      Clinical.variants.id         -> variants
+      Public.`1000_genomes`.id       -> spark.table(s"variant.${Public.`1000_genomes`.id}"),
+      Public.topmed_bravo.id         -> spark.table(s"variant.${Public.topmed_bravo.id}"),
+      Public.gnomad_genomes_2_1.id   -> spark.table(s"variant.${Public.gnomad_genomes_2_1.id}"),
+      Public.gnomad_exomes_2_1.id    -> spark.table(s"variant.${Public.gnomad_exomes_2_1.id}"),
+      Public.gnomad_genomes_3_1_1.id -> spark.table(s"variant.${Public.gnomad_genomes_3_1_1.id}"),
+      Public.clinvar.id              -> spark.table(s"variant.${Public.clinvar.id}"),
+      Public.dbsnp.id                -> spark.table(s"variant.${Public.dbsnp.id}"),
+      Clinical.variants.id           -> variants
     )
   }
 
@@ -78,9 +78,9 @@ class JoinVariants(
     val gnomad_exomes_2_1 = data(Public.gnomad_exomes_2_1.id)
       .dropDuplicates(locusColumNames)
       .selectLocus($"ac", $"an", $"af", $"hom")
-    val gnomad_genomes_3_0 = data(Public.gnomad_genomes_3_0.id)
+    val gnomad_genomes_3_1_1 = data(Public.gnomad_genomes_3_1_1.id)
       .dropDuplicates(locusColumNames)
-      .selectLocus($"ac", $"an", $"af", $"hom")
+      .selectLocus($"ac", $"an", $"af", $"nhomalt" as "hom")
     val clinvar = data(Public.clinvar.id).dropDuplicates(locusColumNames)
     val dbsnp   = data(Public.dbsnp.id).dropDuplicates(locusColumNames)
 
@@ -151,7 +151,7 @@ class JoinVariants(
       .joinAndMerge(topmed, "topmed", "left")
       .joinAndMerge(gnomad_genomes_2_1, "gnomad_genomes_2_1", "left")
       .joinAndMerge(gnomad_exomes_2_1, "gnomad_exomes_2_1", "left")
-      .joinAndMerge(gnomad_genomes_3_0, "gnomad_genomes_3_0", "left")
+      .joinAndMerge(gnomad_genomes_3_1_1, "gnomad_genomes_3_1_1", "left")
       .joinWithClinvar(clinvar)
       .joinWithDBSNP(dbsnp)
   }
