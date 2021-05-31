@@ -5,6 +5,7 @@ import org.apache.spark.sql.SaveMode
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.testutils.Model._
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.external.GnomadV311Output
 import org.kidsfirstdrc.dwh.testutils.join.{Freq, JoinVariantOutput}
 import org.kidsfirstdrc.dwh.testutils.vcf.{VariantFrequency, VariantOutput}
 import org.scalatest.GivenWhenThen
@@ -208,7 +209,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         .saveAsTable("gnomad_exomes_2_1_1_liftover_grch38")
 
       And("A table gnomad_genomes_3_1_1 exists")
-      Seq(Gnomad311FrequencyEntry())
+      Seq(GnomadV311Output())
         .toDF()
         .write
         .mode(SaveMode.Overwrite)
@@ -435,7 +436,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         Public.topmed_bravo.id         -> Seq(FrequencyEntry()).toDF(),
         Public.gnomad_genomes_2_1.id   -> Seq(GnomadFrequencyEntry()).toDF(),
         Public.gnomad_exomes_2_1.id    -> Seq(GnomadFrequencyEntry()).toDF(),
-        Public.gnomad_genomes_3_1_1.id -> Seq(Gnomad311FrequencyEntry()).toDF(),
+        Public.gnomad_genomes_3_1_1.id -> Seq(GnomadV311Output()).toDF(),
         Public.clinvar.id              -> Seq(ClinvarEntry()).toDF(),
         Public.dbsnp.id                -> Seq(DBSNPEntry()).toDF(),
         Clinical.variants.id           -> variants
