@@ -37,4 +37,4 @@ assemblyMergeStrategy in assembly := {
     val oldStrategy = (assemblyMergeStrategy in assembly).value
     oldStrategy(x)
 }
-assemblyJarName in assembly := s"kf-dwh-import-vcf-${version.value}.jar"
+assemblyJarName in assembly := s"kf-dwh-import-vcf.jar"
