@@ -8,7 +8,6 @@ import org.apache.spark.sql.SparkSession
 import org.json4s.DefaultFormats
 import org.json4s.jackson.Serialization.write
 
-
 object Stats extends App {
   val Array(es_host) = args
 
@@ -17,19 +16,23 @@ object Stats extends App {
   implicit val formats: DefaultFormats.type = DefaultFormats
 
   implicit val spark: SparkSession = SparkSession.builder
-    .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
+    .config(
+      "hive.metastore.client.factory.class",
+      "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
+    )
     .enableHiveSupport()
-    .appName("Index Variant Stats").getOrCreate()
+    .appName("Index Variant Stats")
+    .getOrCreate()
 
   val occurrencesTables = StatsUtils.getOccurrencesTableWORelease(DATABASE)
-  val occurrencesDF = StatsUtils.getUnionOfOccurrences(DATABASE, occurrencesTables)
-  val stats = StatsUtils.getStats(occurrencesDF)
+  val occurrencesDF     = StatsUtils.getUnionOfOccurrences(DATABASE, occurrencesTables)
+  val stats             = StatsUtils.getStats(occurrencesDF)
 
   val client = new DefaultHttpClient()
 
   val post = new HttpPost(s"${es_host}/variant_stats/doc/1")
 
-  post.addHeader(HttpHeaders.CONTENT_TYPE,"application/json")
+  post.addHeader(HttpHeaders.CONTENT_TYPE, "application/json")
 
   post.setEntity(new StringEntity(write(stats)))
 

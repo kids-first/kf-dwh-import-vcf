@@ -9,10 +9,11 @@ import org.kidsfirstdrc.dwh.external.omim.OmimPhenotype.parse_pheno
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 class ImportOmimGeneSet()(implicit conf: Configuration)
-  extends StandardETL(Public.omim_gene_set)(conf) {
+    extends StandardETL(Public.omim_gene_set)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
-    val df = spark.read.format("csv")
+    val df = spark.read
+      .format("csv")
       .option("inferSchema", "true")
       .option("comment", "#")
       .option("header", "false")
@@ -38,13 +39,19 @@ class ImportOmimGeneSet()(implicit conf: Configuration)
           col("_c9") as "entrez_gene_id",
           col("_c10") as "ensembl_gene_id",
           col("_c11") as "documentation",
-          split(col("_c12"), ";") as "phenotypes")
+          split(col("_c12"), ";") as "phenotypes"
+        )
 
     val nullPhenotypes =
       intermediateDf
         .filter(col("phenotypes").isNull)
         .drop("phenotypes")
-        .withColumn("phenotype", lit(null).cast("struct<name:string,omim_id:string,inheritance:array<string>,inheritance_code:array<string>>"))
+        .withColumn(
+          "phenotype",
+          lit(null).cast(
+            "struct<name:string,omim_id:string,inheritance:array<string>,inheritance_code:array<string>>"
+          )
+        )
 
     intermediateDf
       .withColumn("raw_phenotype", explode(col("phenotypes")))
@@ -54,6 +61,6 @@ class ImportOmimGeneSet()(implicit conf: Configuration)
       .unionByName(nullPhenotypes)
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = super.load(data.coalesce(1))
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame =
+    super.load(data.coalesce(1))
 }
-

@@ -8,16 +8,15 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-
-class ImportOmimGeneSetSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class ImportOmimGeneSetSpec
+    extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   import spark.implicits._
 
   implicit val conf: Configuration =
     Configuration(
-      List(StorageConf(
-        "kf-strides-variant",
-        getClass.getClassLoader.getResource(".").getFile)))
+      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
+    )
 
   "ImportOmimGeneSet" should "read data into expected format" in {
 
@@ -29,7 +28,7 @@ class ImportOmimGeneSetSpec extends AnyFlatSpec with GivenWhenThen with WithSpar
 
   "ImportOmimGeneSet" should "transform data into expected format" in {
 
-    val inputDf = Map(Raw.omim_genemap2.id -> Seq(OmimInput()).toDF())
+    val inputDf  = Map(Raw.omim_genemap2.id -> Seq(OmimInput()).toDF())
     val outputDf = new ImportOmimGeneSet().transform(inputDf)
 
     outputDf.as[OmimOutput].collect() should contain theSameElementsAs Seq(OmimOutput())

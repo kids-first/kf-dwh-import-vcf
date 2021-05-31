@@ -11,16 +11,21 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 import scala.xml.{Elem, Node, XML}
 
 class ImportOrphanetGeneSet()(implicit conf: Configuration)
-  extends StandardETL(Public.orphanet_gene_set)(conf) {
+    extends StandardETL(Public.orphanet_gene_set)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     import spark.implicits._
 
-    def loadXML: String => Elem = str => XML.loadString(spark.read.text(str).collect().map(_.getString(0)).mkString("\n"))
+    def loadXML: String => Elem = str =>
+      XML.loadString(spark.read.text(str).collect().map(_.getString(0)).mkString("\n"))
 
     Map(
-      orphanet_gene_association.id -> parseProduct6XML(loadXML(orphanet_gene_association.location)).toDF,
-      orphanet_disease_history .id-> parseProduct9XML(loadXML(orphanet_disease_history.location)).toDF
+      orphanet_gene_association.id -> parseProduct6XML(
+        loadXML(orphanet_gene_association.location)
+      ).toDF,
+      orphanet_disease_history.id -> parseProduct9XML(
+        loadXML(orphanet_disease_history.location)
+      ).toDF
     )
 
   }
@@ -28,42 +33,58 @@ class ImportOrphanetGeneSet()(implicit conf: Configuration)
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(orphanet_gene_association.id)
       .join(
-        data(orphanet_disease_history.id).select("orpha_code", "average_age_of_onset", "average_age_of_death","type_of_inheritance"),
-        Seq("orpha_code"), "left")
+        data(orphanet_disease_history.id).select(
+          "orpha_code",
+          "average_age_of_onset",
+          "average_age_of_death",
+          "type_of_inheritance"
+        ),
+        Seq("orpha_code"),
+        "left"
+      )
   }
 
   private def getIdFromSourceName: (Node, String) => Option[String] =
-    (genes, name) => (genes \ "ExternalReferenceList" \ "ExternalReference").find(node => (node \ "Source").text == name).map(_ \ "Reference").map(_.text)
+    (genes, name) =>
+      (genes \ "ExternalReferenceList" \ "ExternalReference")
+        .find(node => (node \ "Source").text == name)
+        .map(_ \ "Reference")
+        .map(_.text)
 
-  val ensembl_gene_id:    Node => Option[String] = genes => getIdFromSourceName(genes, "Ensembl")
-  val genatlas_gene_id:   Node => Option[String] = genes => getIdFromSourceName(genes, "Genatlas")
-  val HGNC_gene_id:       Node => Option[String] = genes => getIdFromSourceName(genes, "HGNC")
-  val omim_gene_id:       Node => Option[String] = genes => getIdFromSourceName(genes, "OMIM")
-  val reactome_gene_id:   Node => Option[String] = genes => getIdFromSourceName(genes, "Reactome")
+  val ensembl_gene_id: Node => Option[String]    = genes => getIdFromSourceName(genes, "Ensembl")
+  val genatlas_gene_id: Node => Option[String]   = genes => getIdFromSourceName(genes, "Genatlas")
+  val HGNC_gene_id: Node => Option[String]       = genes => getIdFromSourceName(genes, "HGNC")
+  val omim_gene_id: Node => Option[String]       = genes => getIdFromSourceName(genes, "OMIM")
+  val reactome_gene_id: Node => Option[String]   = genes => getIdFromSourceName(genes, "Reactome")
   val swiss_prot_gene_id: Node => Option[String] = genes => getIdFromSourceName(genes, "SwissProt")
 
   val association_type: Node => Option[String] =
-    geneAssociation => (geneAssociation \ "DisorderGeneAssociationType" \ "Name").headOption.map(_.text)
+    geneAssociation =>
+      (geneAssociation \ "DisorderGeneAssociationType" \ "Name").headOption.map(_.text)
 
   val association_type_id: Node => Option[Long] =
-    geneAssociation => (geneAssociation \ "DisorderGeneAssociationType").headOption.flatMap(_.attribute("id")).map(_.text.toLong)
+    geneAssociation =>
+      (geneAssociation \ "DisorderGeneAssociationType").headOption
+        .flatMap(_.attribute("id"))
+        .map(_.text.toLong)
 
   val association_status: Node => Option[String] =
-    geneAssociation => (geneAssociation \ "DisorderGeneAssociationStatus" \ "Name").headOption.map(_.text)
+    geneAssociation =>
+      (geneAssociation \ "DisorderGeneAssociationStatus" \ "Name").headOption.map(_.text)
 
   def parseProduct6XML(doc: Elem): Seq[OrphanetGeneAssociation] = {
     for {
-      disorder <- doc \\ "DisorderList" \\ "Disorder"
-      orphaNumber <- disorder \ "OrphaCode"
-      expertLink <- disorder \ "ExpertLink"
-      name <- disorder \ "Name"
-      disorderType <- disorder \ "DisorderType"
-      disorderTypeName <- disorderType \ "Name"
-      disorderGroup <- disorder \ "DisorderGroup"
+      disorder          <- doc \\ "DisorderList" \\ "Disorder"
+      orphaNumber       <- disorder \ "OrphaCode"
+      expertLink        <- disorder \ "ExpertLink"
+      name              <- disorder \ "Name"
+      disorderType      <- disorder \ "DisorderType"
+      disorderTypeName  <- disorderType \ "Name"
+      disorderGroup     <- disorder \ "DisorderGroup"
       disorderGroupName <- disorderGroup \ "Name"
-      geneAssociation <- disorder \ "DisorderGeneAssociationList" \ "DisorderGeneAssociation"
-      genes <- geneAssociation \ "Gene"
-      locus <- genes \ "LocusList" \ "Locus"
+      geneAssociation   <- disorder \ "DisorderGeneAssociationList" \ "DisorderGeneAssociation"
+      genes             <- geneAssociation \ "Gene"
+      locus             <- genes \ "LocusList" \ "Locus"
     } yield {
       OrphanetGeneAssociation(
         disorder.attribute("id").get.text.toLong,
@@ -97,13 +118,13 @@ class ImportOrphanetGeneSet()(implicit conf: Configuration)
 
   def parseProduct9XML(doc: Elem): Seq[OrphanetDiseaseHistory] = {
     for {
-      disorder <- doc \\ "DisorderList" \\ "Disorder"
-      orphaCode <- disorder \ "OrphaCode"
-      expertLink <- disorder \ "ExpertLink"
-      name <- disorder \ "Name"
-      disorderType <- disorder \ "DisorderType"
-      disorderTypeName <- disorderType \ "Name"
-      disorderGroup <- disorder \ "DisorderGroup"
+      disorder          <- doc \\ "DisorderList" \\ "Disorder"
+      orphaCode         <- disorder \ "OrphaCode"
+      expertLink        <- disorder \ "ExpertLink"
+      name              <- disorder \ "Name"
+      disorderType      <- disorder \ "DisorderType"
+      disorderTypeName  <- disorderType \ "Name"
+      disorderGroup     <- disorder \ "DisorderGroup"
       disorderGroupName <- disorderType \ "Name"
     } yield {
       OrphanetDiseaseHistory(
@@ -122,6 +143,7 @@ class ImportOrphanetGeneSet()(implicit conf: Configuration)
     }
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = super.load(data.coalesce(1))
+  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame =
+    super.load(data.coalesce(1))
 
 }

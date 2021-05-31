@@ -10,12 +10,12 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 import org.kidsfirstdrc.dwh.vcf.Consequences
 
-class DemoConsequences(studyId: String, releaseId: String, input: String)
-                      (implicit conf: Configuration)
-  extends ETL(){
+class DemoConsequences(studyId: String, releaseId: String, input: String)(implicit
+    conf: Configuration
+) extends ETL() {
 
   override def run()(implicit spark: SparkSession): DataFrame = {
-    val data = extract()
+    val data         = extract()
     val consequences = transform(data)
     load(consequences)
   }

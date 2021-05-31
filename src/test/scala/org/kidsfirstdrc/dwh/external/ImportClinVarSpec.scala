@@ -9,15 +9,13 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-
 class ImportClinVarSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
 
   implicit val conf: Configuration =
     Configuration(
-      List(StorageConf(
-        "kf-strides-variant",
-        getClass.getClassLoader.getResource(".").getFile)))
+      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
+    )
 
   "run" should "creates clinvar table" in {
 
@@ -30,7 +28,7 @@ class ImportClinVarSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
 
       resultDF.as[ClinvarOutput].collect().head shouldBe expectedResult
 
-      }
+    }
   }
 
 }

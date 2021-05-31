@@ -39,7 +39,7 @@ object CovirtOccurrences {
 
     val manifest = broadcast(
       spark
-        .table( "manifest")
+        .table("manifest")
         .select($"vcf_sample_id", $"aliquot_id", $"sample_id", $"sample_type")
     )
 
@@ -48,22 +48,27 @@ object CovirtOccurrences {
       .drop(occurrences("vcf_sample_id"))
   }
 
-  def write(df: DataFrame, output: String, releaseId: String)(implicit spark: SparkSession): Unit = {
+  def write(df: DataFrame, output: String, releaseId: String)(implicit
+      spark: SparkSession
+  ): Unit = {
     import spark.implicits._
     val tableOccurence = s"occurences_${releaseId.toLowerCase}"
     df
       .repartition($"chromosome")
-      .withColumn("bucket",
+      .withColumn(
+        "bucket",
         functions
           .ntile(8)
           .over(
-            Window.partitionBy("chromosome")
+            Window
+              .partitionBy("chromosome")
               .orderBy("start")
           )
       )
       .repartition($"chromosome", $"bucket")
       .sortWithinPartitions($"chromosome", $"bucket", $"start")
-      .write.mode(SaveMode.Overwrite)
+      .write
+      .mode(SaveMode.Overwrite)
       .partitionBy("chromosome")
       .format("parquet")
       .option("path", s"$output/occurrences/covirt/$tableOccurence")

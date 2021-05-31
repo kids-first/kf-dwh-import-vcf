@@ -12,22 +12,37 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-
-class GenomicSuggestionsIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class GenomicSuggestionsIndexSpec
+    extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
-  val studyId1 = "SD_123"
-  val studyId2 = "SD_456"
-  val studyId3 = "SD_789"
+  val studyId1   = "SD_123"
+  val studyId2   = "SD_456"
+  val studyId3   = "SD_789"
   val realeaseId = "RE_ABCDEF"
 
   val occurrencesDf: DataFrame = Seq(
-    OccurrenceOutput(chromosome = "3", `start` = 165310406, `end` = 165310406, is_gru = false, is_hmb = false),
-    OccurrenceOutput(chromosome = "2", `start` = 165310406, `end` = 165310406, is_gru = true, is_hmb = false)
+    OccurrenceOutput(
+      chromosome = "3",
+      `start` = 165310406,
+      `end` = 165310406,
+      is_gru = false,
+      is_hmb = false
+    ),
+    OccurrenceOutput(
+      chromosome = "2",
+      `start` = 165310406,
+      `end` = 165310406,
+      is_gru = true,
+      is_hmb = false
+    )
   ).toDF()
 
   val variant =
     JoinVariantOutput(
-      frequencies = VariantFrequency(Freq(ac = 12, an = 27, af = 0.4444444444, homozygotes = 9, heterozygotes = 7), Freq(ac = 12, an = 27, af = 0.4444444444, homozygotes = 9, heterozygotes = 7)),
+      frequencies = VariantFrequency(
+        Freq(ac = 12, an = 27, af = 0.4444444444, homozygotes = 9, heterozygotes = 7),
+        Freq(ac = 12, an = 27, af = 0.4444444444, homozygotes = 9, heterozygotes = 7)
+      ),
       upper_bound_kf_ac_by_study = Map(studyId1 -> 5, studyId2 -> 5, studyId3 -> 2),
       upper_bound_kf_an_by_study = Map(studyId1 -> 10, studyId2 -> 10, studyId3 -> 7),
       upper_bound_kf_af_by_study = Map(studyId1 -> 0.5, studyId2 -> 0.5, studyId3 -> 0.2857142857),
@@ -40,14 +55,19 @@ class GenomicSuggestionsIndexSpec extends AnyFlatSpec with GivenWhenThen with Wi
       lower_bound_kf_heterozygotes_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 1),
       studies = Set(studyId1, studyId2, studyId3),
       consent_codes = Set("SD_789.c99", "SD_123.c1", "SD_456.c1"),
-      consent_codes_by_study = Map(studyId1 -> Set("SD_123.c1"), studyId2 -> Set("SD_456.c1"), studyId3 -> Set(s"$studyId3.c99")),
+      consent_codes_by_study = Map(
+        studyId1 -> Set("SD_123.c1"),
+        studyId2 -> Set("SD_456.c1"),
+        studyId3 -> Set(s"$studyId3.c99")
+      ),
       release_id = realeaseId,
       clin_sig = Some("pathogenic"),
       clinvar_id = Some("RCV000436956"),
-      name = "rs1313905795")
+      name = "rs1313905795"
+    )
 
   val joinVariantDf: DataFrame = Seq(
-    variant,                       //should be in the index
+    variant //should be in the index
     //variant.copy(chromosome = "3") //should not be in the index
   ).toDF().withColumnRenamed("one_thousand_genomes", "1k_genomes")
 
@@ -62,7 +82,12 @@ class GenomicSuggestionsIndexSpec extends AnyFlatSpec with GivenWhenThen with Wi
 
   val joinConsequencesWithEmptyAndNullDf: DataFrame = Seq(
     JoinConsequenceOutput().copy(symbol = "SCN2A.2", aa_change = None),
-    JoinConsequenceOutput().copy(symbol = "SCN2A", aa_change = null, `refseq_mrna_id` = Some("NM_XXX"), `refseq_protein_id` =  Some("NP_YYY")),
+    JoinConsequenceOutput().copy(
+      symbol = "SCN2A",
+      aa_change = null,
+      `refseq_mrna_id` = Some("NM_XXX"),
+      `refseq_protein_id` = Some("NP_YYY")
+    ),
     JoinConsequenceOutput().copy(symbol = "", aa_change = None),
     JoinConsequenceOutput().copy(symbol = null, aa_change = null)
   ).toDF()
@@ -75,18 +100,19 @@ class GenomicSuggestionsIndexSpec extends AnyFlatSpec with GivenWhenThen with Wi
 
   val genesWithNullsDf: DataFrame = Seq(
     GenesOutput(
-      `alias` = List("BII", "CACH6", "CACNL1A6", "Cav2.3", "", null), `ensembl_gene_id` = null
+      `alias` = List("BII", "CACH6", "CACNL1A6", "Cav2.3", "", null),
+      `ensembl_gene_id` = null
     )
   ).toDF()
 
   val data = Map(
-    Public.genes.id -> genesDf,
-    Clinical.occurrences.id -> occurrencesDf,
-    Clinical.variants.id -> joinVariantDf,
+    Public.genes.id          -> genesDf,
+    Clinical.occurrences.id  -> occurrencesDf,
+    Clinical.variants.id     -> joinVariantDf,
     Clinical.consequences.id -> joinConsequencesDf
   )
 
-  implicit val conf: Configuration =  Configuration(List())
+  implicit val conf: Configuration = Configuration(List())
 
   "suggester index job" should "transform data to the right format" in {
 
@@ -105,20 +131,28 @@ class GenomicSuggestionsIndexSpec extends AnyFlatSpec with GivenWhenThen with Wi
         `rsnumber` = null,
         `suggest` = List(
           SUGGEST(List("OR4F5"), 5),
-          SUGGEST(List("BII", "CACH6", "CACNL1A6", "Cav2.3", "ENSG00000198216"), 3)))
+          SUGGEST(List("BII", "CACH6", "CACNL1A6", "Cav2.3", "ENSG00000198216"), 3)
+        )
+      )
     )
   }
 
   "suggester from variants" should "remove null and empty values" in {
 
-    val result = new GenomicSuggestionsIndex("").getVariantSuggest(joinVariantWithNullDf, joinConsequencesWithEmptyAndNullDf)
+    val result = new GenomicSuggestionsIndex("")
+      .getVariantSuggest(joinVariantWithNullDf, joinConsequencesWithEmptyAndNullDf)
     result.show(false)
 
     val expectedResult = SuggesterIndexOutput(
       `hgvsg` = "",
       `suggest` = List(
         SUGGEST(List("SCN2A", "SCN2A.2", "2-165310406-G-A", "rs1313905795", "RCV000436956"), 4),
-        SUGGEST(List("SCN2A", "SCN2A.2", "ENSG00000136531", "ENST00000486878", "NM_XXX", "NP_YYY"), 2)))
+        SUGGEST(
+          List("SCN2A", "SCN2A.2", "ENSG00000136531", "ENST00000486878", "NM_XXX", "NP_YYY"),
+          2
+        )
+      )
+    )
 
     result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
       expectedResult
@@ -138,9 +172,9 @@ class GenomicSuggestionsIndexSpec extends AnyFlatSpec with GivenWhenThen with Wi
       `hgvsg` = null,
       `symbol` = "OR4F5",
       `rsnumber` = null,
-      `suggest` = List(
-        SUGGEST(List("OR4F5"), 5),
-        SUGGEST(List("BII", "CACH6", "CACNL1A6", "Cav2.3"), 3)))
+      `suggest` =
+        List(SUGGEST(List("OR4F5"), 5), SUGGEST(List("BII", "CACH6", "CACNL1A6", "Cav2.3"), 3))
+    )
 
     result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
       expectedResult

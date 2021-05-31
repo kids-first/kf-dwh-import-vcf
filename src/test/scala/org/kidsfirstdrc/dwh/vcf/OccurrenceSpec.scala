@@ -16,12 +16,14 @@ import org.scalatest.matchers.should.Matchers
 class OccurrenceSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
 
-  val studyId = "SD_123456"
-  val releaseId = "RE_ABCDEF"
+  val studyId      = "SD_123456"
+  val releaseId    = "RE_ABCDEF"
   val releaseId_lc = releaseId.toLowerCase
 
   implicit val conf: Configuration =
-    Configuration(List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile)))
+    Configuration(
+      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
+    )
 
   "transform occurrences_family into occurrences" should "return a dataframe with all expected columns" in {
 
@@ -37,9 +39,6 @@ class OccurrenceSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSessio
 
     outputDf.as[OccurrenceOutput].collect().head shouldBe OccurrenceOutput()
 
-
   }
-
-
 
 }

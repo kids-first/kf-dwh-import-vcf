@@ -6,14 +6,12 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-
 class ImportScoresSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   implicit val conf: Configuration =
     Configuration(
-      List(StorageConf(
-        "kf-strides-variant",
-        getClass.getClassLoader.getResource(".").getFile)))
+      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
+    )
 
   //"ImportScores" should "transform data into expected format" in {
 //

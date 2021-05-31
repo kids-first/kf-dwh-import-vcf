@@ -6,7 +6,11 @@ import org.kidsfirstdrc.dwh.external.ImportHPOGeneSet
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetGeneSet
 import bio.ferlab.datalake.spark3.ClassGenerator._
-import org.kidsfirstdrc.dwh.testutils.external.{CosmicCancerGeneCensusInput, DddGeneCensusInput, OmimInput}
+import org.kidsfirstdrc.dwh.testutils.external.{
+  CosmicCancerGeneCensusInput,
+  DddGeneCensusInput,
+  OmimInput
+}
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
 import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
@@ -18,7 +22,9 @@ object ClassGeneratorMain extends App with WithSparkSession {
 
   import spark.implicits._
 
-  implicit val conf: Configuration = Configuration(List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")))
+  implicit val conf: Configuration = Configuration(
+    List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd"))
+  )
 
   //val path = getClass.getResource("/ensembl/canonical.csv").getFile
   //val path = getClass.getResource("/ensembl/refseq.csv").getFile
@@ -29,40 +35,38 @@ object ClassGeneratorMain extends App with WithSparkSession {
   //df.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external", "EnsemblUniprotInput", root)
 
   /** PREVENTS re-writting these classes by mistake
-   *
-  val clinvarPath = getClass.getResource("/input_vcf/clinvar.vcf").getFile
-  val clinvarInput = spark.read.format("vcf").load(clinvarPath)
-    .where($"contigName" === "2" and $"start" === 69359260 and $"end" === 69359261)
-    .withColumn("sampleId", lit("id"))
-    .withColumn("genotypes", array(struct(col("sampleId") as "sampleId")))
-    .drop("sampleId")
+    *
+    *  val clinvarPath = getClass.getResource("/input_vcf/clinvar.vcf").getFile
+    *  val clinvarInput = spark.read.format("vcf").load(clinvarPath)
+    *    .where($"contigName" === "2" and $"start" === 69359260 and $"end" === 69359261)
+    *    .withColumn("sampleId", lit("id"))
+    *    .withColumn("genotypes", array(struct(col("sampleId") as "sampleId")))
+    *    .drop("sampleId")
+    *
+    *  clinvarInput
+    *    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","ClinvarInput", root)
+    *
+    *  ImportClinVar
+    *    .transform(clinvarInput)
+    *    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","ClinvarOutput", root)
+    *
+    *  spark.read.format("parquet").load("src/test/resources/variants/variants.parquet")
+    *    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.variant","Variant", root)
+    *
+    *  val orphanetPath = getClass.getResource("/raw/orphanet").getFile
+    *  val orphanetData = new ImportOrphanetJob(Environment.LOCAL).extract()(spark)
+    *  orphanetData(orphanet_gene_association).where(col("orpha_code") === 447)
+    *    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","OrphanetProduct6", root)
+    *
+    *  orphanetData(orphanet_disease_history).where(col("orpha_code") === 58)
+    *    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","OrphanetProduct9", root)
+    *
+    *  new ImportOrphanetJob(Environment.LOCAL).transform(orphanetData)(spark)
+    *    .where(col("orpha_code") === 166024)
+    *    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","OrphanetOutput", root)
+    */
 
-  clinvarInput
-    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","ClinvarInput", root)
-
-  ImportClinVar
-    .transform(clinvarInput)
-    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","ClinvarOutput", root)
-
-
-  spark.read.format("parquet").load("src/test/resources/variants/variants.parquet")
-    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.variant","Variant", root)
-
-
-  val orphanetPath = getClass.getResource("/raw/orphanet").getFile
-  val orphanetData = new ImportOrphanetJob(Environment.LOCAL).extract()(spark)
-  orphanetData(orphanet_gene_association).where(col("orpha_code") === 447)
-    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","OrphanetProduct6", root)
-
-  orphanetData(orphanet_disease_history).where(col("orpha_code") === 58)
-    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","OrphanetProduct9", root)
-
-  new ImportOrphanetJob(Environment.LOCAL).transform(orphanetData)(spark)
-    .where(col("orpha_code") === 166024)
-    .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","OrphanetOutput", root)
-   */
-
-    /*
+  /*
   val omimInput = new ImportOmimGeneSet(Environment.LOCAL)
     .extract()
   omimInput(Raw.omim_genemap2)
@@ -100,16 +104,15 @@ object ClassGeneratorMain extends App with WithSparkSession {
     .csv(Raw.dbNSFP_csv.path(LOCAL))
     .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","DbnsfpInput", root)
 
-     */
+   */
   //spark.read.option("header", "true").csv(ddd_gene_census.path(LOCAL))
-    //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","DddGeneCensusInput", root)
+  //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","DddGeneCensusInput", root)
 
   //new ImportDDDGeneCensus(Environment.LOCAL).transform(Map(Raw.ddd_gene_census -> Seq(DddGeneCensusInput()).toDF()))
-    //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","DddGeneCensusOutput", root)
-
+  //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","DddGeneCensusOutput", root)
 
   //spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.path(Environment.LOCAL))
-    //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusInput", root)
+  //.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusInput", root)
 
   //new ImportCancerGeneCensus().transform(Map(Raw.cosmic_cancer_gene_census -> Seq(CosmicCancerGeneCensusInput()).toDF()))
   //  .writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","CosmicCancerGeneCensusOutput", root)
@@ -121,6 +124,5 @@ object ClassGeneratorMain extends App with WithSparkSession {
   //  Seq(
   //    (TestNestedClass())
   //  ).toDF.writeCLassFile("org.kidsfirstdrc.dwh.testutils.external","TestNestedClass", root)
-
 
 }

@@ -10,8 +10,8 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-
-class GeneCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class GeneCentricIndexSpec
+    extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
 
   val genesDf: DataFrame = Seq(
@@ -22,7 +22,7 @@ class GeneCentricIndexSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
     Public.genes.id -> genesDf
   )
 
-  implicit val conf: Configuration =  Configuration(List())
+  implicit val conf: Configuration = Configuration(List())
 
   "Gene_centric index job" should "transform data to the right format" in {
 

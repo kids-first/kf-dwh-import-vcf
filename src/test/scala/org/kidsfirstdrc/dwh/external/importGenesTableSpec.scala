@@ -10,21 +10,24 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class importGenesTableSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class importGenesTableSpec
+    extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
 
   implicit val conf: Configuration =
     Configuration(
-      List(StorageConf(
-        "kf-strides-variant",
-        getClass.getClassLoader.getResource(".").getFile)))
+      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
+    )
 
   "run" should "creates genes table" in {
 
     val inputData = Map(
-      Public.omim_gene_set.id     -> Seq(OmimOutput(omim_gene_id = 601013), OmimOutput(omim_gene_id = 601013, phenotype = PHENOTYPE(null, null, null, null))).toDF(),
+      Public.omim_gene_set.id -> Seq(
+        OmimOutput(omim_gene_id = 601013),
+        OmimOutput(omim_gene_id = 601013, phenotype = PHENOTYPE(null, null, null, null))
+      ).toDF(),
       Public.orphanet_gene_set.id -> Seq(OrphanetOutput(gene_symbol = "OR4F5")).toDF(),
-      Public.hpo_gene_set.id     -> Seq(HpoGeneSetOutput()).toDF(),
+      Public.hpo_gene_set.id      -> Seq(HpoGeneSetOutput()).toDF(),
       Public.human_genes.id       -> Seq(HumanGenesOutput(), HumanGenesOutput(`symbol` = "OR4F4")).toDF(),
       Public.ddd_gene_set.id      -> Seq(DddGeneCensusOutput(`symbol` = "OR4F5")).toDF(),
       Public.cosmic_gene_set.id   -> Seq(CosmicCancerGeneCensusOutput(`symbol` = "OR4F5")).toDF
@@ -32,8 +35,11 @@ class importGenesTableSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
 
     val resultDF = new ImportGenesTable().transform(inputData)
 
-    val expectedOrphanet = List(ORPHANET(17601, "Multiple epiphyseal dysplasia, Al-Gazali type", List("Autosomal recessive")))
-    val expectedOmim = List(OMIM("Shprintzen-Goldberg syndrome", "182212", List("Autosomal dominant"), List("AD")))
+    val expectedOrphanet = List(
+      ORPHANET(17601, "Multiple epiphyseal dysplasia, Al-Gazali type", List("Autosomal recessive"))
+    )
+    val expectedOmim =
+      List(OMIM("Shprintzen-Goldberg syndrome", "182212", List("Autosomal dominant"), List("AD")))
 
     resultDF.show(false)
 
@@ -45,7 +51,11 @@ class importGenesTableSpec extends AnyFlatSpec with GivenWhenThen with WithSpark
       .select(
         functions.size(col("orphanet")),
         functions.size(col("ddd")),
-        functions.size(col("cosmic"))).as[(Long, Long, Long)].collect().head shouldBe (0, 0, 0)
+        functions.size(col("cosmic"))
+      )
+      .as[(Long, Long, Long)]
+      .collect()
+      .head shouldBe (0, 0, 0)
 
   }
 

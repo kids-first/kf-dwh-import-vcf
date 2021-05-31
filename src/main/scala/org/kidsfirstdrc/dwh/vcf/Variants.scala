@@ -9,13 +9,14 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
 class Variants(studyId: String, releaseId: String, schema: String)(implicit conf: Configuration)
-  extends ETL(){
+    extends ETL() {
 
   val destination = Clinical.variants
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val participantsPath = Raw.all_participants.location
-    val occurrencesPath = s"${Clinical.occurrences.rootPath}/occurrences/${tableName(Clinical.occurrences.id, studyId, releaseId)}"
+    val occurrencesPath =
+      s"${Clinical.occurrences.rootPath}/occurrences/${tableName(Clinical.occurrences.id, studyId, releaseId)}"
 
     Map(
       Raw.all_participants.id -> spark.read.json(participantsPath),
@@ -24,7 +25,7 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
   }
 
   override def run()(implicit spark: SparkSession): DataFrame = {
-    val inputDF = extract()(spark)
+    val inputDF             = extract()(spark)
     val variants: DataFrame = transform(inputDF)
     load(variants)
   }
@@ -35,7 +36,8 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
     val participants = data(Raw.all_participants.id).select($"id" as "participant_id")
 
     val occurrences: DataFrame = schema match {
-      case "portal" => data(Clinical.occurrences.id).join(broadcast(participants), Seq("participant_id"), "inner")
+      case "portal" =>
+        data(Clinical.occurrences.id).join(broadcast(participants), Seq("participant_id"), "inner")
       case _ => data(Clinical.occurrences.id)
     }
 
@@ -73,22 +75,34 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
         sum(col("heterozygotes")) as "heterozygotes"
       )
       .withColumn("an_upper_bound_kf", calculate_an_upper_bound_kf(participantTotalCount))
-      .withColumn("frequencies", struct(
+      .withColumn(
+        "frequencies",
         struct(
-          col("ac"),
-          col("an_upper_bound_kf") as "an",
-          calculated_af_from_an(col("an_upper_bound_kf")) as "af",
-          col("homozygotes"),
-          col("heterozygotes")
-      ) as "upper_bound_kf",
-        struct(
-          col("ac"),
-          col("an_lower_bound_kf") as "an",
-          calculated_af_from_an(col("an_lower_bound_kf")) as "af",
-          col("homozygotes"),
-          col("heterozygotes")
-      ) as "lower_bound_kf"))
-      .drop("an", "ac", "af", "heterozygotes", "homozygotes", "an_upper_bound_kf", "an_lower_bound_kf")
+          struct(
+            col("ac"),
+            col("an_upper_bound_kf") as "an",
+            calculated_af_from_an(col("an_upper_bound_kf")) as "af",
+            col("homozygotes"),
+            col("heterozygotes")
+          ) as "upper_bound_kf",
+          struct(
+            col("ac"),
+            col("an_lower_bound_kf") as "an",
+            calculated_af_from_an(col("an_lower_bound_kf")) as "af",
+            col("homozygotes"),
+            col("heterozygotes")
+          ) as "lower_bound_kf"
+        )
+      )
+      .drop(
+        "an",
+        "ac",
+        "af",
+        "heterozygotes",
+        "homozygotes",
+        "an_upper_bound_kf",
+        "an_lower_bound_kf"
+      )
       .withColumn("study_id", lit(studyId))
       .withColumn("release_id", lit(releaseId))
       .withColumn("consent_codes_by_study", map($"study_id", $"consent_codes"))
@@ -98,7 +112,8 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
     val tableVariants = tableName(destination.id, studyId, releaseId)
     data
       .repartition(col("chromosome"))
-      .write.mode(SaveMode.Overwrite)
+      .write
+      .mode(SaveMode.Overwrite)
       .partitionBy("study_id", "release_id", "chromosome")
       .format("parquet")
       .option("path", s"${destination.rootPath}/${destination.id}/$tableVariants")

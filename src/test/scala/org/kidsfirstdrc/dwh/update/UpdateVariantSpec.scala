@@ -15,15 +15,15 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.util.Try
 
-class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers with BeforeAndAfter {
+class UpdateVariantSpec
+    extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers with BeforeAndAfter {
   import spark.implicits._
 
   implicit val conf: Configuration =
     Configuration(
-      List(StorageConf(
-        "kf-strides-variant",
-        getClass.getClassLoader.getResource(".").getFile)),
-      sources = Catalog.Clinical.sources.toList)
+      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile)),
+      sources = Catalog.Clinical.sources.toList
+    )
 
   before {
     Try(spark.sql("DROP TABLE IF EXISTS variant.variants"))
@@ -39,30 +39,30 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
 
     val variantDF = Seq(variant).toDF()
     val clinvarDF = Seq(clinvar).toDF()
-    val data = Map(Clinical.variants.id -> variantDF, Public.clinvar.id -> clinvarDF)
+    val data      = Map(Clinical.variants.id -> variantDF, Public.clinvar.id -> clinvarDF)
 
-    val job = new UpdateVariant(Public.clinvar, "variant")
+    val job      = new UpdateVariant(Public.clinvar, "variant")
     val resultDF = job.transform(data)
 
     val expectedResult = variant.copy(clinvar_id = Some(clinvar.name), clin_sig = clinvar.clin_sig)
 
     // Checks the input values were not the same before the join
-      variant.clinvar_id should not be Some(clinvar.name)
-      variant.clin_sig should not be clinvar.clin_sig
+    variant.clinvar_id should not be Some(clinvar.name)
+    variant.clin_sig should not be clinvar.clin_sig
     // Checks the output values are the same as expected
-      resultDF.as[Variant].collect().head shouldBe expectedResult
+    resultDF.as[Variant].collect().head shouldBe expectedResult
   }
 
   "transform method for topmed" should "return expected data given controlled input" in {
 
     val variant = Variant()
-    val topmed = TopmedBravoOutput()
+    val topmed  = TopmedBravoOutput()
 
     val variantDF = Seq(variant).toDF()
-    val topmedDF = Seq(topmed).toDF()
-    val data = Map(Clinical.variants.id -> variantDF, Public.topmed_bravo.id -> topmedDF)
+    val topmedDF  = Seq(topmed).toDF()
+    val data      = Map(Clinical.variants.id -> variantDF, Public.topmed_bravo.id -> topmedDF)
 
-    val job = new UpdateVariant(Public.topmed_bravo, "variant")
+    val job      = new UpdateVariant(Public.topmed_bravo, "variant")
     val resultDF = job.transform(data)
 
     val expectedResult = variant.copy(topmed = Some(Freq(10, 5, 0.5, 5, 0)))
@@ -88,7 +88,6 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
     new ImportClinVarJob().load(clinvarDF)
     job.load(variantDF)
 
-
     val data = job.extract()
     data(Clinical.variants.id).show(false)
     data(Public.clinvar.id).show(false)
@@ -112,4 +111,3 @@ class UpdateVariantSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
   }
 
 }
-

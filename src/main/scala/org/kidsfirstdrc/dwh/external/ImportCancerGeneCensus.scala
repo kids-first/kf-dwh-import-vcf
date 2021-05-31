@@ -12,17 +12,21 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 import scala.collection.mutable
 
 class ImportCancerGeneCensus()(implicit conf: Configuration)
-  extends StandardETL(Public.cosmic_gene_set)(conf) {
+    extends StandardETL(Public.cosmic_gene_set)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
-    Map(Raw.cosmic_cancer_gene_census.id -> spark.read.option("header", "true").csv(Raw.cosmic_cancer_gene_census.location))
+    Map(
+      Raw.cosmic_cancer_gene_census.id -> spark.read
+        .option("header", "true")
+        .csv(Raw.cosmic_cancer_gene_census.location)
+    )
   }
 
   def trim_array_udf: UserDefinedFunction = udf { array: mutable.WrappedArray[String] =>
     if (array != null) {
       array.map {
         case null => null
-        case str => str.trim()
+        case str  => str.trim()
       }
     } else {
       array
@@ -35,11 +39,13 @@ class ImportCancerGeneCensus()(implicit conf: Configuration)
 
     val df = data(Raw.cosmic_cancer_gene_census.id)
       .withColumn("split_loc", split($"Genome Location", ":"))
-      .withColumn("chromosome", $"split_loc"(0))
-      .withColumn("start", split($"split_loc"(1), "-")(0).cast(LongType))
-      .withColumn("end", split($"split_loc"(1), "-")(1).cast(LongType))
+      .withColumn("chromosome", $"split_loc" (0))
+      .withColumn("start", split($"split_loc" (1), "-")(0).cast(LongType))
+      .withColumn("end", split($"split_loc" (1), "-")(1).cast(LongType))
       .select(
-        $"chromosome", $"start", $"end",
+        $"chromosome",
+        $"start",
+        $"end",
         $"Gene Symbol" as "symbol",
         $"Name" as "name",
         $"Entrez GeneId" as "entrez_gene_id",
@@ -62,10 +68,13 @@ class ImportCancerGeneCensus()(implicit conf: Configuration)
         split($"Synonyms", ",") as "synonyms"
       )
 
-    df.schema
-      .fields
-      .collect { case s@StructField(_, ArrayType(StringType, _), _, _) => s } // take only array type fields
-      .foldLeft(df)((d, f) => d.withColumn(f.name, trim_array_udf(col(f.name)))) // apply trim on each elements of each array
+    df.schema.fields
+      .collect { case s @ StructField(_, ArrayType(StringType, _), _, _) =>
+        s
+      } // take only array type fields
+      .foldLeft(df)((d, f) =>
+        d.withColumn(f.name, trim_array_udf(col(f.name)))
+      ) // apply trim on each elements of each array
 
   }
 

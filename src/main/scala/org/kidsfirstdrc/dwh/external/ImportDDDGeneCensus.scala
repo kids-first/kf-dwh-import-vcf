@@ -9,10 +9,14 @@ import org.kidsfirstdrc.dwh.conf.Catalog._
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 class ImportDDDGeneCensus()(implicit conf: Configuration)
-  extends StandardETL(Public.ddd_gene_set)(conf) {
+    extends StandardETL(Public.ddd_gene_set)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
-    Map(Raw.ddd_gene_census.id -> spark.read.option("header", "true").csv(Raw.ddd_gene_census.location))
+    Map(
+      Raw.ddd_gene_census.id -> spark.read
+        .option("header", "true")
+        .csv(Raw.ddd_gene_census.location)
+    )
   }
 
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {

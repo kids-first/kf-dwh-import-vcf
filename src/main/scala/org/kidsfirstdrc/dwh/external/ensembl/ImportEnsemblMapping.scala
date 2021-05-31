@@ -9,10 +9,10 @@ import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 class ImportEnsemblMapping()(implicit conf: Configuration)
-  extends StandardETL(Public.ensembl_mapping)(conf) {
+    extends StandardETL(Public.ensembl_mapping)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
-    val tsvWithHeaders = Map("header" -> "true", "sep" -> "\t")
+    val tsvWithHeaders    = Map("header" -> "true", "sep" -> "\t")
     val tsvWithoutHeaders = Map("header" -> "false", "sep" -> "\t")
     Map(
       ensembl_canonical.id -> spark.read.options(tsvWithoutHeaders).csv(ensembl_canonical.location),
@@ -29,12 +29,10 @@ class ImportEnsemblMapping()(implicit conf: Configuration)
       .withColumn("ensembl_transcript_id", regexp_extract(col("_c1"), "(ENST[0-9]+)", 0))
       .withColumnRenamed("_c2", "tag")
 
-    val refseq = data(ensembl_refseq.id).renameIds.renameExternalReference("refseq")
-    val entrez = data(ensembl_entrez.id).renameIds.renameExternalReference("entrez")
+    val refseq  = data(ensembl_refseq.id).renameIds.renameExternalReference("refseq")
+    val entrez  = data(ensembl_entrez.id).renameIds.renameExternalReference("entrez")
     val uniprot = data(ensembl_uniprot.id).renameIds.renameExternalReference("uniprot")
-    val ena = data(ensembl_ena.id).renameIds.withColumnRenamed("taxid", "tax_id")
-
-
+    val ena     = data(ensembl_ena.id).renameIds.withColumnRenamed("taxid", "tax_id")
 
     val joinedDf = canonical
       .join(refseq, Seq("ensembl_gene_id", "ensembl_transcript_id"), "left")
@@ -50,22 +48,36 @@ class ImportEnsemblMapping()(implicit conf: Configuration)
           first("species").as("species") :+
           first("tax_id").as("tax_id") :+
           collect_set("primary_accession").as("primary_accessions") :+
-          collect_set("secondary_accession").as("secondary_accessions"):_*
+          collect_set("secondary_accession").as("secondary_accessions"): _*
       )
       .withColumn("refseq_mrna_id", filter(col("refseq"), c => c("id").like("NM_%"))(0)("id"))
       .withColumn("refseq_protein_id", filter(col("refseq"), c => c("id").like("NP_%"))(0)("id"))
-      .withColumn("is_canonical", when(array_contains(col("tags"), "Ensembl Canonical"), lit(true)).otherwise(lit(false)))
-      .withColumn("is_mane_select", when(array_contains(col("tags"), "MANE Select v0.93"), lit(true)).otherwise(lit(false)))
-      .withColumn("is_mane_plus", when(array_contains(col("tags"), "MANE Plus Clinical v0.93"), lit(true)).otherwise(lit(false)))
+      .withColumn(
+        "is_canonical",
+        when(array_contains(col("tags"), "Ensembl Canonical"), lit(true)).otherwise(lit(false))
+      )
+      .withColumn(
+        "is_mane_select",
+        when(array_contains(col("tags"), "MANE Select v0.93"), lit(true)).otherwise(lit(false))
+      )
+      .withColumn(
+        "is_mane_plus",
+        when(array_contains(col("tags"), "MANE Plus Clinical v0.93"), lit(true))
+          .otherwise(lit(false))
+      )
       .withColumn("genome_build", lit("GRCh38"))
       .withColumn("ensembl_release_id", lit(104))
   }
 
   private val externalIDs: List[String] => List[Column] =
-    _.map(externalDb => collect_set(struct(
-      col(s"${externalDb}_id") as "id",
-      col(s"${externalDb}_database") as "database"
-    )) as externalDb)
+    _.map(externalDb =>
+      collect_set(
+        struct(
+          col(s"${externalDb}_id") as "id",
+          col(s"${externalDb}_database") as "database"
+        )
+      ) as externalDb
+    )
 
   implicit class DataFrameOps(df: DataFrame) {
 

@@ -10,16 +10,17 @@ import JoinConsequences._
 object Consequences {
   def run(releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
-    val inputDF = vcf(input)
-    val consequences: DataFrame = build(inputDF)
+    val inputDF                    = vcf(input)
+    val consequences: DataFrame    = build(inputDF)
     val dbnsfp_original: DataFrame = spark.table("variant.dbnsfp_original")
 
-    val joinConsequences = consequences.joinWithDbnsfp(dbnsfp_original)
+    val joinConsequences  = consequences.joinWithDbnsfp(dbnsfp_original)
     val tableConsequences = s"consequences_${releaseId.toLowerCase}"
     joinConsequences
       .repartition($"chromosome")
       .sortWithinPartitions("start")
-      .write.mode(SaveMode.Overwrite)
+      .write
+      .mode(SaveMode.Overwrite)
       .partitionBy("chromosome")
       .format("parquet")
       .option("path", s"$output/consequences/covirt/$tableConsequences")
@@ -46,7 +47,8 @@ object Consequences {
       )
       .withColumn("annotation", explode($"annotations"))
       .drop("annotations")
-      .select($"*",
+      .select(
+        $"*",
         consequences,
         impact,
         symbol,
