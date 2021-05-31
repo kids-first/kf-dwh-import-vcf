@@ -22,15 +22,14 @@ class GeneCentricIndex()(override implicit val conf: Configuration) extends ETL(
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    data
-      .write
+    data.write
       .mode(SaveMode.Overwrite)
       .parquet(s"${destination.location}")
     data
   }
 
   override def run()(implicit spark: SparkSession): DataFrame = {
-    val inputDF = extract()
+    val inputDF  = extract()
     val outputDF = transform(inputDF).persist()
     println(s"count: ${outputDF.count}")
     println(s"distinct symbol: ${outputDF.dropDuplicates("symbol").count()}")

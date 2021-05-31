@@ -6,14 +6,14 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class UpdateTableCommentsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+class UpdateTableCommentsSpec
+    extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   val database = "variant"
-  val table = "orphanet_gene_set"
+  val table    = "orphanet_gene_set"
   spark.sql(s"CREATE DATABASE IF NOT EXISTS ${database}")
   spark.sql(s"DROP TABLE IF EXISTS ${database}.${table}")
-  spark.sql(
-    s"""CREATE TABLE IF NOT EXISTS ${database}.${table}
+  spark.sql(s"""CREATE TABLE IF NOT EXISTS ${database}.${table}
        |(
        |orpha_code BIGINT COMMENT 'test',
        |expert_link STRING,

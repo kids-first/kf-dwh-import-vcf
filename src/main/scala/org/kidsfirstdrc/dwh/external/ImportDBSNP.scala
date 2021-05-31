@@ -10,8 +10,7 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class ImportDBSNP()(implicit conf: Configuration)
-  extends StandardETL(Public.dbsnp)(conf) {
+class ImportDBSNP()(implicit conf: Configuration) extends StandardETL(Public.dbsnp)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(Raw.dbsnp_vcf.id -> vcf(Raw.dbsnp_vcf.location))

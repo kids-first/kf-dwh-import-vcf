@@ -17,21 +17,29 @@ object SparkUtils {
       df
         .withColumn(s"${combined}_ac", col(s"${prefix1}_ac") + col(s"${prefix2}_ac"))
         .withColumn(s"${combined}_an", col(s"${prefix1}_an") + col(s"${prefix2}_an"))
-        .withColumn(s"${combined}_af", (col(s"${combined}_ac") / col(s"${combined}_an")).cast(DecimalType(38, 18)) )
-        .withColumn(s"${combined}_heterozygotes", col(s"${prefix1}_heterozygotes") + col(s"${prefix2}_heterozygotes"))
-        .withColumn(s"${combined}_homozygotes", col(s"${prefix1}_homozygotes") + col(s"${prefix2}_homozygotes"))
+        .withColumn(
+          s"${combined}_af",
+          (col(s"${combined}_ac") / col(s"${combined}_an")).cast(DecimalType(38, 18))
+        )
+        .withColumn(
+          s"${combined}_heterozygotes",
+          col(s"${prefix1}_heterozygotes") + col(s"${prefix2}_heterozygotes")
+        )
+        .withColumn(
+          s"${combined}_homozygotes",
+          col(s"${prefix1}_homozygotes") + col(s"${prefix2}_homozygotes")
+        )
     }
   }
 
   val filename: Column = regexp_extract(input_file_name(), ".*/(.*)", 1)
 
-  /**
-   * Check if the hadoop file exists
-   *
-   * @param path  Path to check. Accept some patterns
-   * @param spark session that contains hadoop config
-   * @return
-   */
+  /** Check if the hadoop file exists
+    *
+    * @param path  Path to check. Accept some patterns
+    * @param spark session that contains hadoop config
+    * @return
+    */
   def fileExist(path: String)(implicit spark: SparkSession): Boolean = {
     val conf = spark.sparkContext.hadoopConfiguration
     val fs = if (path.startsWith("s3a")) {
@@ -45,7 +53,9 @@ object SparkUtils {
     statuses != null && statuses.nonEmpty
   }
 
-  def getVisibleFiles(input: String, studyId: String, releaseId: String, contains: String)(implicit spark: SparkSession): List[String] = {
+  def getVisibleFiles(input: String, studyId: String, releaseId: String, contains: String)(implicit
+      spark: SparkSession
+  ): List[String] = {
     import spark.implicits._
     getGenomicFiles(studyId, releaseId)
       .select("file_name")
@@ -55,24 +65,26 @@ object SparkUtils {
       .filter(_.contains(contains))
       .map(f => {
         if (input.endsWith("/")) s"${input}${f}"
-        else s"$input/$f"})
+        else s"$input/$f"
+      })
       .toList
   }
 
   @Deprecated
   def allFilesPath(input: String): String = s"$input/*.filtered.deNovo.vep.vcf.gz"
 
-  /**
-   * Return vcf entries found in visibles input files by joining table genomic_files
-   *
-   * @param path      Path where find the vcf. Can be any path supported by hadoop
-   * @param studyId   Id of the study for filter which files are visibles
-   * @param releaseId Id of the release for filter which files are visibles
-   * @param spark     session
-   * @return vcf entries enriched with additional columns file_name
-   */
+  /** Return vcf entries found in visibles input files by joining table genomic_files
+    *
+    * @param path      Path where find the vcf. Can be any path supported by hadoop
+    * @param studyId   Id of the study for filter which files are visibles
+    * @param releaseId Id of the release for filter which files are visibles
+    * @param spark     session
+    * @return vcf entries enriched with additional columns file_name
+    */
   @Deprecated
-  def visibleVcf(path: String, studyId: String, releaseId: String)(implicit spark: SparkSession): DataFrame = {
+  def visibleVcf(path: String, studyId: String, releaseId: String)(implicit
+      spark: SparkSession
+  ): DataFrame = {
     val genomicFiles = getGenomicFiles(studyId, releaseId).select("file_name")
     val inputDF = vcf(path)
       .withColumn("file_name", filename)
@@ -85,7 +97,8 @@ object SparkUtils {
 
   def vcf(input: String)(implicit spark: SparkSession): DataFrame = {
     val inputs = input.split(",")
-    val df = spark.read.format("vcf")
+    val df = spark.read
+      .format("vcf")
       .option("flattenInfoFields", "true")
       .load(inputs: _*)
       .withColumnRenamed("filters", "INFO_FILTERS") // Avoid losing filters columns before split
@@ -97,38 +110,45 @@ object SparkUtils {
     s"${table}_${studyId.toLowerCase}_${releaseId.toLowerCase}"
   }
 
-  def tableName(table: String, studyId: String, releaseId: String, database: String = "variant"): String = {
+  def tableName(
+      table: String,
+      studyId: String,
+      releaseId: String,
+      database: String = "variant"
+  ): String = {
     s"${database}.${table}_${studyId.toLowerCase}_${releaseId.toLowerCase}"
   }
 
   def colFromArrayOrField(df: DataFrame, colName: String): Column = {
     df.schema(colName).dataType match {
       case ArrayType(_, _) => df(colName)(0)
-      case _ => df(colName)
+      case _               => df(colName)
     }
   }
 
-  def union(df1: DataFrame, df2: DataFrame)(implicit spark: SparkSession) = (df1, df2)
-  match {
+  def union(df1: DataFrame, df2: DataFrame)(implicit spark: SparkSession) = (df1, df2) match {
     case (p, c) if p.isEmpty => c
     case (p, c) if c.isEmpty => p
-    case (p, c) => p.union(c)
-    case _ => spark.emptyDataFrame
+    case (p, c)              => p.union(c)
+    case _                   => spark.emptyDataFrame
   }
 
   def firstAs(c: String): Column = first(col(c)) as c
 
   def escapeInfoAndLowercase(df: DataFrame, excludes: String*): Seq[Column] = {
-    df.columns.collect { case c if c.startsWith("INFO") && !excludes.contains(c) => col(c) as c.replace("INFO_", "").toLowerCase }
+    df.columns.collect {
+      case c if c.startsWith("INFO") && !excludes.contains(c) =>
+        col(c) as c.replace("INFO_", "").toLowerCase
+    }
   }
 
   object columns {
     val chromosome: Column = ltrim(col("contigName"), "chr") as "chromosome"
-    val reference: Column = col("referenceAllele") as "reference"
-    val start: Column = (col("start") + 1) as "start"
-    val end: Column = (col("end") + 1) as "end"
-    val alternate: Column = col("alternateAlleles")(0) as "alternate"
-    val name: Column = col("names")(0) as "name"
+    val reference: Column  = col("referenceAllele") as "reference"
+    val start: Column      = (col("start") + 1) as "start"
+    val end: Column        = (col("end") + 1) as "end"
+    val alternate: Column  = col("alternateAlleles")(0) as "alternate"
+    val name: Column       = col("names")(0) as "name"
 
     val calculated_duo_af: String => Column = duo => {
       val ac = col(s"${duo}_ac")
@@ -153,8 +173,6 @@ object SparkUtils {
       when(af.isNull, 0).otherwise(af).cast(DoubleType)
     }
 
-
-
     val ac: Column = col("INFO_AC")(0) as "ac"
     val af: Column = (col("INFO_AF")(0) as "af").cast(DoubleType)
     val an: Column = col("INFO_AN") as "an"
@@ -167,15 +185,18 @@ object SparkUtils {
 
     val dp: Column = col("INFO_DP") as "dp"
 
-    val familyVariantWindow: WindowSpec = Window.partitionBy("chromosome", "start", "reference", "alternate", "family_id")
+    val familyVariantWindow: WindowSpec =
+      Window.partitionBy("chromosome", "start", "reference", "alternate", "family_id")
 
-    val familyCalls: Column = map_from_entries(collect_list(struct(col("participant_id"), col("calls"))).over(familyVariantWindow))
+    val familyCalls: Column = map_from_entries(
+      collect_list(struct(col("participant_id"), col("calls"))).over(familyVariantWindow)
+    )
 
-    /**
-     * has_alt return 1 if there is at least one alternative allele. Note : It cannot returned a boolean beacause it's used to partition data.
-     * It looks like Glue does not support partition by boolean
-     * */
-    val has_alt: Column = when(array_contains(col("genotype.calls"), 1), 1).otherwise(0) as "has_alt"
+    /** has_alt return 1 if there is at least one alternative allele. Note : It cannot returned a boolean beacause it's used to partition data.
+      * It looks like Glue does not support partition by boolean
+      */
+    val has_alt: Column =
+      when(array_contains(col("genotype.calls"), 1), 1).otherwise(0) as "has_alt"
 
     val calculated_ac: Column = when(col("zygosity") === "HET", 1)
       .when(col("zygosity") === "HOM", 2)
@@ -186,47 +207,65 @@ object SparkUtils {
       when(col("zygosity") === "HOM" or col("zygosity") === "HET" or col("zygosity") === "WT", 2)
         .otherwise(0) as "an_lower_bound_kf"
 
-    val homozygotes: Column = when(col("zygosity") === "HOM", 1).otherwise(0) as "homozygotes"
+    val homozygotes: Column   = when(col("zygosity") === "HOM", 1).otherwise(0) as "homozygotes"
     val heterozygotes: Column = when(col("zygosity") === "HET", 1).otherwise(0) as "heterozygotes"
 
-    val zygosity: Column => Column = c => when(c(0) === 1 && c(1) === 1, "HOM")
-      .when(c(0) === 0 && c(1) === 1, "HET")
-      .when(c(0) === 0 && c(1) === 0, "WT")
-      .when(c(0) === 1 && c(1) === 0, "HET")
-      .when(c.isNull, lit(null).cast("string"))
-      .otherwise("UNK")
+    val zygosity: Column => Column = c =>
+      when(c(0) === 1 && c(1) === 1, "HOM")
+        .when(c(0) === 0 && c(1) === 1, "HET")
+        .when(c(0) === 0 && c(1) === 0, "WT")
+        .when(c(0) === 1 && c(1) === 0, "HET")
+        .when(c.isNull, lit(null).cast("string"))
+        .otherwise("UNK")
 
     //Annotations
-    val annotations: Column = when(col("splitFromMultiAllelic"), expr("filter(INFO_ANN, ann-> ann.Allele == alternateAlleles[0])")).otherwise(col("INFO_ANN")) as "annotations"
-    val csq: Column = when(col("splitFromMultiAllelic"), expr("filter(INFO_CSQ, ann-> ann.Allele == alternateAlleles[0])")).otherwise(col("INFO_CSQ")) as "annotations"
-    val firstAnn: Column = annotations.getItem(0) as "annotation"
-    val firstCsq: Column = csq.getItem(0) as "annotation"
-    val consequences: Column = col("annotation.Consequence") as "consequences"
-    val impact: Column = col("annotation.IMPACT") as "impact"
-    val symbol: Column = col("annotation.SYMBOL") as "symbol"
-    val feature_type: Column = col("annotation.Feature_type") as "feature_type"
+    val annotations: Column = when(
+      col("splitFromMultiAllelic"),
+      expr("filter(INFO_ANN, ann-> ann.Allele == alternateAlleles[0])")
+    ).otherwise(col("INFO_ANN")) as "annotations"
+    val csq: Column = when(
+      col("splitFromMultiAllelic"),
+      expr("filter(INFO_CSQ, ann-> ann.Allele == alternateAlleles[0])")
+    ).otherwise(col("INFO_CSQ")) as "annotations"
+    val firstAnn: Column        = annotations.getItem(0) as "annotation"
+    val firstCsq: Column        = csq.getItem(0) as "annotation"
+    val consequences: Column    = col("annotation.Consequence") as "consequences"
+    val impact: Column          = col("annotation.IMPACT") as "impact"
+    val symbol: Column          = col("annotation.SYMBOL") as "symbol"
+    val feature_type: Column    = col("annotation.Feature_type") as "feature_type"
     val ensembl_gene_id: Column = col("annotation.Gene") as "ensembl_gene_id"
-    val ensembl_transcript_id: Column = when(col("annotation.Feature_type") === "Transcript", col("annotation.Feature")).otherwise(null) as "ensembl_transcript_id"
-    val ensembl_regulatory_id: Column = when(col("annotation.Feature_type") === "RegulatoryFeature", col("annotation.Feature")).otherwise(null) as "ensembl_regulatory_id"
-    val exon: Column = col("annotation.EXON") as "exon"
+    val ensembl_transcript_id: Column =
+      when(col("annotation.Feature_type") === "Transcript", col("annotation.Feature"))
+        .otherwise(null) as "ensembl_transcript_id"
+    val ensembl_regulatory_id: Column =
+      when(col("annotation.Feature_type") === "RegulatoryFeature", col("annotation.Feature"))
+        .otherwise(null) as "ensembl_regulatory_id"
+    val exon: Column    = col("annotation.EXON") as "exon"
     val biotype: Column = col("annotation.BIOTYPE") as "biotype"
-    val intron: Column = col("annotation.INTRON") as "intron"
-    val hgvsc: Column = col("annotation.HGVSc") as "hgvsc"
-    val hgvsp: Column = col("annotation.HGVSp") as "hgvsp"
+    val intron: Column  = col("annotation.INTRON") as "intron"
+    val hgvsc: Column   = col("annotation.HGVSc") as "hgvsc"
+    val hgvsp: Column   = col("annotation.HGVSp") as "hgvsp"
 
-    val strand: Column = col("annotation.STRAND") as "strand"
-    val cds_position: Column = col("annotation.CDS_position") as "cds_position"
-    val cdna_position: Column = col("annotation.cDNA_position") as "cdna_position"
+    val strand: Column           = col("annotation.STRAND") as "strand"
+    val cds_position: Column     = col("annotation.CDS_position") as "cds_position"
+    val cdna_position: Column    = col("annotation.cDNA_position") as "cdna_position"
     val protein_position: Column = col("annotation.Protein_position") as "protein_position"
-    val amino_acids: Column = col("annotation.Amino_acids") as "amino_acids"
-    val codons: Column = col("annotation.Codons") as "codons"
-    val variant_class: Column = col("annotation.VARIANT_CLASS") as "variant_class"
-    val hgvsg: Column = col("annotation.HGVSg") as "hgvsg"
-    val original_canonical: Column = when(col("annotation.CANONICAL") === "YES", lit(true)).otherwise(lit(false)) as "original_canonical"
-    val is_multi_allelic: Column = col("splitFromMultiAllelic") as "is_multi_allelic"
+    val amino_acids: Column      = col("annotation.Amino_acids") as "amino_acids"
+    val codons: Column           = col("annotation.Codons") as "codons"
+    val variant_class: Column    = col("annotation.VARIANT_CLASS") as "variant_class"
+    val hgvsg: Column            = col("annotation.HGVSg") as "hgvsg"
+    val original_canonical: Column = when(col("annotation.CANONICAL") === "YES", lit(true))
+      .otherwise(lit(false)) as "original_canonical"
+    val is_multi_allelic: Column  = col("splitFromMultiAllelic") as "is_multi_allelic"
     val old_multi_allelic: Column = col("INFO_OLD_MULTIALLELIC") as "old_multi_allelic"
 
-    def optional_info(df: DataFrame, colName: String, alias: String, colType: String = "string"): Column = (if (df.columns.contains(colName)) col(colName) else lit(null).cast(colType)).as(alias)
+    def optional_info(
+        df: DataFrame,
+        colName: String,
+        alias: String,
+        colType: String = "string"
+    ): Column =
+      (if (df.columns.contains(colName)) col(colName) else lit(null).cast(colType)).as(alias)
 
     //the order matters, do not change it
     val locusColumNames: Seq[String] = Seq("chromosome", "start", "reference", "alternate")
@@ -234,8 +273,10 @@ object SparkUtils {
     val locus: Seq[Column] = locusColumNames.map(col)
   }
 
-  val removeEmptyObjectsIn: String => Column = column => when(to_json(col(column)) === lit("[{}]"), array()).otherwise(col(column))
+  val removeEmptyObjectsIn: String => Column = column =>
+    when(to_json(col(column)) === lit("[{}]"), array()).otherwise(col(column))
 
-  def getColumnOrElse(colName: String, default: Any = ""): Column = when(col(colName).isNull, lit(default)).otherwise(trim(col(colName)))
+  def getColumnOrElse(colName: String, default: Any = ""): Column =
+    when(col(colName).isNull, lit(default)).otherwise(trim(col(colName)))
 
 }

@@ -15,9 +15,13 @@ object ImportExternal extends App {
   val Array(jobType, bucketPath) = args
 
   implicit val spark: SparkSession = SparkSession.builder
-    .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
+    .config(
+      "hive.metastore.client.factory.class",
+      "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
+    )
     .enableHiveSupport()
-    .appName("Import").getOrCreate()
+    .appName("Import")
+    .getOrCreate()
 
   implicit val conf: Configuration = Configuration(
     List(StorageConf(Catalog.kfStridesVariantBucket, bucketPath)),

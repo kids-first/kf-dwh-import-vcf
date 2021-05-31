@@ -9,8 +9,7 @@ import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils.removeEmptyObjectsIn
 
-class ImportGenesTable()(implicit conf: Configuration)
-  extends StandardETL(Public.genes)(conf) {
+class ImportGenesTable()(implicit conf: Configuration) extends StandardETL(Public.genes)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
@@ -27,16 +26,26 @@ class ImportGenesTable()(implicit conf: Configuration)
     import spark.implicits._
 
     val humanGenes = data(Public.human_genes.id)
-      .select($"chromosome", $"symbol", $"entrez_gene_id", $"omim_gene_id",
+      .select(
+        $"chromosome",
+        $"symbol",
+        $"entrez_gene_id",
+        $"omim_gene_id",
         $"external_references.hgnc" as "hgnc",
         $"ensembl_gene_id",
         $"map_location" as "location",
         $"description" as "name",
         $"synonyms" as "alias",
-        regexp_replace($"type_of_gene", "-", "_") as "biotype")
+        regexp_replace($"type_of_gene", "-", "_") as "biotype"
+      )
 
     val orphanet = data(Public.orphanet_gene_set.id)
-      .select($"gene_symbol" as "symbol", $"disorder_id", $"name" as "panel", $"type_of_inheritance" as "inheritance")
+      .select(
+        $"gene_symbol" as "symbol",
+        $"disorder_id",
+        $"name" as "panel",
+        $"type_of_inheritance" as "inheritance"
+      )
 
     val omim = data(Public.omim_gene_set.id)
       .where($"phenotype.name".isNotNull)
@@ -45,7 +54,8 @@ class ImportGenesTable()(implicit conf: Configuration)
         $"phenotype.name" as "name",
         $"phenotype.omim_id" as "omim_id",
         $"phenotype.inheritance" as "inheritance",
-        $"phenotype.inheritance_code" as "inheritance_code")
+        $"phenotype.inheritance_code" as "inheritance_code"
+      )
 
     val hpo = data(Public.hpo_gene_set.id)
       .select($"entrez_gene_id", $"hpo_term_id", $"hpo_term_name")
@@ -68,14 +78,18 @@ class ImportGenesTable()(implicit conf: Configuration)
   }
 
   implicit class DataFrameOps(df: DataFrame) {
-    def joinAndMergeWith(gene_set: DataFrame, joinOn: Seq[String], asColumnName: String): DataFrame = {
+    def joinAndMergeWith(
+        gene_set: DataFrame,
+        joinOn: Seq[String],
+        asColumnName: String
+    ): DataFrame = {
       df
         .join(gene_set, joinOn, "left")
         .groupBy("symbol")
         .agg(
           first(struct(df("*"))) as "hg",
-          collect_list(struct(gene_set.drop(joinOn:_*)("*"))) as asColumnName,
-         )
+          collect_list(struct(gene_set.drop(joinOn: _*)("*"))) as asColumnName
+        )
         .select(col("hg.*"), col(asColumnName))
         .withColumn(asColumnName, removeEmptyObjectsIn(asColumnName))
     }
@@ -85,4 +99,3 @@ class ImportGenesTable()(implicit conf: Configuration)
     super.load(data.repartition(1))
   }
 }
-

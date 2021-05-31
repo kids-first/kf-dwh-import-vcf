@@ -10,21 +10,22 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.vcf.OccurrencesFamily
 
-class DemoOccurrences(studyId: String, releaseId: String, input: String)
-                     (implicit conf: Configuration)
-  extends ETL(){
+class DemoOccurrences(studyId: String, releaseId: String, input: String)(implicit
+    conf: Configuration
+) extends ETL() {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val inputDF = vcf(input)
       .withColumn("genotype", explode(col("genotypes")))
       .withColumn("file_name", regexp_extract(input_file_name(), ".*/(.*)", 1))
 
-    val relations = spark.read.option("sep", "\t")
+    val relations = spark.read
+      .option("sep", "\t")
       .option("header", "true")
       .csv("s3a://kf-strides-variant-parquet-prd/raw/1000Genomes/20130606_g1k.ped")
 
     Map(
-      DataService.family_relationships.id -> relations,
+      DataService.family_relationships.id   -> relations,
       HarmonizedData.family_variants_vcf.id -> inputDF
     )
   }
@@ -32,12 +33,19 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
-    val occurenceJob = new OccurrencesFamily(studyId, releaseId, input, "biospecimen_id",
-      ".CGP.filtered.deNovo.vep.vcf.gz", ".postCGP.filtered.deNovo.vep.vcf.gz")
+    val occurenceJob = new OccurrencesFamily(
+      studyId,
+      releaseId,
+      input,
+      "biospecimen_id",
+      ".CGP.filtered.deNovo.vep.vcf.gz",
+      ".postCGP.filtered.deNovo.vep.vcf.gz"
+    )
 
     val inputDF = data(HarmonizedData.family_variants_vcf.id)
 
-    val occurrences = occurenceJob.selectOccurrences(studyId, releaseId, inputDF)
+    val occurrences = occurenceJob
+      .selectOccurrences(studyId, releaseId, inputDF)
       .withColumn("participant_id", col("biospecimen_id"))
       .withColumn("is_gru", lit(null).cast(BooleanType))
       .withColumn("is_hmb", lit(null).cast(BooleanType))
@@ -50,8 +58,10 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)
       .select(
         when($"Family ID" === 0, lit(null).cast("string")).otherwise($"Family ID") as "family_id",
         $"Individual ID" as "participant_id",
-        when($"Maternal ID" === 0, lit(null).cast("string")).otherwise($"Maternal ID") as "mother_id",
-        when($"Paternal ID" === 0, lit(null).cast("string")).otherwise($"Paternal ID") as "father_id",
+        when($"Maternal ID" === 0, lit(null).cast("string"))
+          .otherwise($"Maternal ID") as "mother_id",
+        when($"Paternal ID" === 0, lit(null).cast("string"))
+          .otherwise($"Paternal ID") as "father_id",
         $"Population" as "ethnicity"
       )
 
@@ -65,8 +75,14 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    new OccurrencesFamily(studyId, releaseId, input, "biospecimen_id",
-      ".CGP.filtered.deNovo.vep.vcf.gz", ".postCGP.filtered.deNovo.vep.vcf.gz").load(data)
+    new OccurrencesFamily(
+      studyId,
+      releaseId,
+      input,
+      "biospecimen_id",
+      ".CGP.filtered.deNovo.vep.vcf.gz",
+      ".postCGP.filtered.deNovo.vep.vcf.gz"
+    ).load(data)
   }
 
   override val destination: DatasetConf = Catalog.Clinical.occurrences

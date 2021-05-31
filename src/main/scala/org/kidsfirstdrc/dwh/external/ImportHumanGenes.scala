@@ -10,10 +10,11 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 class ImportHumanGenes()(implicit conf: Configuration)
-  extends StandardETL(Public.human_genes)(conf) {
+    extends StandardETL(Public.human_genes)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
-    val df = spark.read.format("csv")
+    val df = spark.read
+      .format("csv")
       .option("inferSchema", "true")
       .option("header", "true")
       .option("sep", "\t")
@@ -51,12 +52,12 @@ class ImportHumanGenes()(implicit conf: Configuration)
     super.load(data.coalesce(1))
   }
 
-  val splitToMapFn : String => Option[Map[String, String]] = {line =>
+  val splitToMapFn: String => Option[Map[String, String]] = { line =>
     Option(line)
-      .map {l =>
+      .map { l =>
         val elements = l.split("\\|")
         val m = elements.map { e =>
-          val Array(key,value) = e.split(":", 2)
+          val Array(key, value) = e.split(":", 2)
           key.toLowerCase.replaceAll("/", "_").replaceAll("-", "_") -> value
         }
         m.toMap

@@ -9,7 +9,7 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 class ImportHPOGeneSet()(implicit conf: Configuration)
-  extends StandardETL(Public.hpo_gene_set)(conf) {
+    extends StandardETL(Public.hpo_gene_set)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val inputDF: DataFrame = spark.read
@@ -21,12 +21,15 @@ class ImportHPOGeneSet()(implicit conf: Configuration)
       .option("nullValue", "-")
       .load(Raw.hpo_genes_to_phenotype.location)
 
-    val human_genes = broadcast(spark.table("variant.human_genes")
-      .select("entrez_gene_id", "ensembl_gene_id"))
+    val human_genes = broadcast(
+      spark
+        .table("variant.human_genes")
+        .select("entrez_gene_id", "ensembl_gene_id")
+    )
 
     Map(
       Raw.hpo_genes_to_phenotype.id -> inputDF,
-      Public.human_genes.id ->  human_genes
+      Public.human_genes.id         -> human_genes
     )
   }
 
@@ -45,7 +48,10 @@ class ImportHPOGeneSet()(implicit conf: Configuration)
         .withColumnRenamed("_c8", "source_id")
 
     inputDF
-      .join(spark.table("variant.human_genes"), inputDF("entrez_gene_id") === human_genes("entrez_gene_id"))
+      .join(
+        spark.table("variant.human_genes"),
+        inputDF("entrez_gene_id") === human_genes("entrez_gene_id")
+      )
       .select(inputDF("*"), human_genes("ensembl_gene_id"))
   }
 

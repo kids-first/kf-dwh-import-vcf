@@ -10,40 +10,51 @@ import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
 import org.kidsfirstdrc.dwh.utils.SparkUtils.getColumnOrElse
 
-class GenomicSuggestionsIndex(releaseId: String)
-                             (override implicit val conf: Configuration) extends ETL() {
+class GenomicSuggestionsIndex(releaseId: String)(override implicit val conf: Configuration)
+    extends ETL() {
 
   val destination = Es.genomic_suggestions
 
-  final val geneSymbolWeight = 5
-  final val geneAliasesWeight = 3
+  final val geneSymbolWeight            = 5
+  final val geneAliasesWeight           = 3
   final val variantSymbolAaChangeWeight = 4
-  final val variantSymbolWeight = 2
+  final val variantSymbolWeight         = 2
 
-  final val indexColumns = List("type", "symbol", "locus", "suggestion_id", "hgvsg", "suggest", "chromosome", "rsnumber")
+  final val indexColumns =
+    List("type", "symbol", "locus", "suggestion_id", "hgvsg", "suggest", "chromosome", "rsnumber")
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
       Public.genes.id -> spark.table(s"${Public.genes.table.get.fullName}"),
-      Clinical.variants.id -> spark.read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId"),
-      Clinical.consequences.id -> spark.read.parquet(s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId")
+      Clinical.variants.id -> spark.read.parquet(
+        s"${Clinical.variants.rootPath}/variants/variants_$releaseId"
+      ),
+      Clinical.consequences.id -> spark.read.parquet(
+        s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId"
+      )
     )
   }
 
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val genes = data(Public.genes.id).select("symbol", "alias", "ensembl_gene_id")
-    val variants = data(Clinical.variants.id).selectLocus(col("hgvsg"), col("name"), col("clinvar_id"))
+    val variants =
+      data(Clinical.variants.id).selectLocus(col("hgvsg"), col("name"), col("clinvar_id"))
     val consequences = data(Clinical.consequences.id)
-      .selectLocus(col("symbol"), col("aa_change"), col("ensembl_gene_id"),
-        col("ensembl_transcript_id"), col("refseq_mrna_id"), col("refseq_protein_id"))
+      .selectLocus(
+        col("symbol"),
+        col("aa_change"),
+        col("ensembl_gene_id"),
+        col("ensembl_transcript_id"),
+        col("refseq_mrna_id"),
+        col("refseq_protein_id")
+      )
       .dropDuplicates()
 
     getGenesSuggest(genes).unionByName(getVariantSuggest(variants, consequences))
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    data
-      .write
+    data.write
       .mode(SaveMode.Overwrite)
       .option("format", "parquet")
       .option("path", s"${destination.location}_$releaseId")
@@ -61,7 +72,7 @@ class GenomicSuggestionsIndex(releaseId: String)
       .withColumn("symbol_aa_change", trim(concat_ws(" ", col("symbol"), col("aa_change"))))
       .withColumn("refseq_mrna_id", getColumnOrElse("refseq_mrna_id"))
       .withColumn("refseq_protein_id", getColumnOrElse("refseq_protein_id"))
-      .groupBy(locus:_*)
+      .groupBy(locus: _*)
       .agg(
         collect_set(col("symbol")) as "symbol",
         collect_set(col("aa_change")) as "aa_change",
@@ -69,7 +80,7 @@ class GenomicSuggestionsIndex(releaseId: String)
         collect_set(col("ensembl_gene_id")) as "ensembl_gene_id",
         collect_set(col("ensembl_transcript_id")) as "ensembl_transcript_id",
         collect_set(col("refseq_mrna_id")) as "refseq_mrna_id",
-        collect_set(col("refseq_protein_id")) as "refseq_protein_id",
+        collect_set(col("refseq_protein_id")) as "refseq_protein_id"
       )
 
     variants
@@ -78,30 +89,49 @@ class GenomicSuggestionsIndex(releaseId: String)
       .withColumn("rsnumber", getColumnOrElse("name"))
       .joinByLocus(groupedByLocusConsequences, "left")
       .withColumn("type", lit("variant"))
-      .withColumn("locus", concat_ws("-", locus:_*))
-      .withColumn("suggestion_id", sha1(col("locus"))) //this maps to `hash` column in variant_centric index
+      .withColumn("locus", concat_ws("-", locus: _*))
+      .withColumn(
+        "suggestion_id",
+        sha1(col("locus"))
+      ) //this maps to `hash` column in variant_centric index
       .withColumn("hgvsg", col("hgvsg"))
-      .withColumn("suggest", array(
-        struct(
-          array_remove(flatten(array(
-            col("symbol_aa_change"),
-            array(col("hgvsg")),
-            array(col("locus")),
-            array(col("rsnumber")),
-            array(col("clinvar_id")))), "") as "input",
-          lit(variantSymbolAaChangeWeight) as "weight"),
-        struct(
-          array_remove(flatten(array(
-            col("symbol"),
-            col("ensembl_gene_id"),
-            col("ensembl_transcript_id"),
-            col("refseq_mrna_id"),
-            col("refseq_protein_id")
-          )), "") as "input",
-          lit(variantSymbolWeight) as "weight"),
-        ))
+      .withColumn(
+        "suggest",
+        array(
+          struct(
+            array_remove(
+              flatten(
+                array(
+                  col("symbol_aa_change"),
+                  array(col("hgvsg")),
+                  array(col("locus")),
+                  array(col("rsnumber")),
+                  array(col("clinvar_id"))
+                )
+              ),
+              ""
+            ) as "input",
+            lit(variantSymbolAaChangeWeight) as "weight"
+          ),
+          struct(
+            array_remove(
+              flatten(
+                array(
+                  col("symbol"),
+                  col("ensembl_gene_id"),
+                  col("ensembl_transcript_id"),
+                  col("refseq_mrna_id"),
+                  col("refseq_protein_id")
+                )
+              ),
+              ""
+            ) as "input",
+            lit(variantSymbolWeight) as "weight"
+          )
+        )
+      )
       .withColumn("symbol", col("symbol")(0))
-      .select(indexColumns.head, indexColumns.tail:_*)
+      .select(indexColumns.head, indexColumns.tail: _*)
   }
 
   def getGenesSuggest(genes: DataFrame): DataFrame = {
@@ -109,22 +139,35 @@ class GenomicSuggestionsIndex(releaseId: String)
       .withColumn("ensembl_gene_id", getColumnOrElse("ensembl_gene_id"))
       .withColumn("symbol", getColumnOrElse("symbol"))
       .withColumn("type", lit("gene"))
-      .withColumn("suggestion_id", sha1(col("symbol"))) //this maps to `hash` column in gene_centric index
+      .withColumn(
+        "suggestion_id",
+        sha1(col("symbol"))
+      ) //this maps to `hash` column in gene_centric index
       .withColumn("hgvsg", lit(null).cast(StringType))
       .withColumn("rsnumber", lit(null).cast(StringType))
       .withColumn("locus", lit(null).cast(StringType))
       .withColumn("chromosome", lit(null).cast(StringType))
-      .withColumn("suggest", array(
-        struct(
-          array(col("symbol")) as "input",
-          lit(geneSymbolWeight) as "weight"
-        ), struct(
-          array_remove(flatten(array(
-            functions.transform(col("alias"), c => when(c.isNull, lit("")).otherwise(c)),
-            array(col("ensembl_gene_id"))
-          )), "") as "input",
-          lit(geneAliasesWeight) as "weight"
-      )))
-      .select(indexColumns.head, indexColumns.tail:_*)
+      .withColumn(
+        "suggest",
+        array(
+          struct(
+            array(col("symbol")) as "input",
+            lit(geneSymbolWeight) as "weight"
+          ),
+          struct(
+            array_remove(
+              flatten(
+                array(
+                  functions.transform(col("alias"), c => when(c.isNull, lit("")).otherwise(c)),
+                  array(col("ensembl_gene_id"))
+                )
+              ),
+              ""
+            ) as "input",
+            lit(geneAliasesWeight) as "weight"
+          )
+        )
+      )
+      .select(indexColumns.head, indexColumns.tail: _*)
   }
 }

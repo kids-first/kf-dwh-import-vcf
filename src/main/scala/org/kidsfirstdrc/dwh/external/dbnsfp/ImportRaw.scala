@@ -6,8 +6,7 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
-class ImportRaw()(implicit conf: Configuration)
-  extends StandardETL(Public.dbnsfp_variant)(conf) {
+class ImportRaw()(implicit conf: Configuration) extends StandardETL(Public.dbnsfp_variant)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val dbnsfpDF =
@@ -26,8 +25,7 @@ class ImportRaw()(implicit conf: Configuration)
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    data
-      .write
+    data.write
       .mode(SaveMode.Overwrite)
       .partitionBy("chromosome")
       .format("parquet")
@@ -36,4 +34,3 @@ class ImportRaw()(implicit conf: Configuration)
     data
   }
 }
-

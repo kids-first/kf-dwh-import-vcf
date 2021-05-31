@@ -68,7 +68,12 @@ class SparkUtilsSpec extends AnyFlatSpec with WithSparkSession with Matchers {
     val df1 = Seq("1", "2").toDF("a")
     val df2 = Seq("3", "4").toDF("a")
 
-    union(df1, df2).select("a").as[String].collect() should contain theSameElementsAs Seq("1", "2", "3", "4")
+    union(df1, df2).select("a").as[String].collect() should contain theSameElementsAs Seq(
+      "1",
+      "2",
+      "3",
+      "4"
+    )
   }
 
   it should "return df1 if df2 is empty" in {

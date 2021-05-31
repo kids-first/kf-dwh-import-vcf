@@ -9,8 +9,7 @@ import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class Import1k()(implicit conf: Configuration)
-  extends StandardETL(Public.`1000_genomes`)(conf) {
+class Import1k()(implicit conf: Configuration) extends StandardETL(Public.`1000_genomes`)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(Raw.`1000genomes_vcf`.id -> vcf(Raw.`1000genomes_vcf`.location))
@@ -18,7 +17,8 @@ class Import1k()(implicit conf: Configuration)
 
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(Raw.`1000genomes_vcf`.id)
-      .select(chromosome,
+      .select(
+        chromosome,
         start,
         end,
         name,

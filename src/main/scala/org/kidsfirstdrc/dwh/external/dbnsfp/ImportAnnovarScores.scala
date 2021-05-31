@@ -8,9 +8,9 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 class ImportAnnovarScores()(implicit conf: Configuration)
-  extends StandardETL(Public.dbnsfp_annovar)(conf) {
+    extends StandardETL(Public.dbnsfp_annovar)(conf) {
 
-    val source: DatasetConf = Raw.annovar_dbnsfp
+  val source: DatasetConf = Raw.annovar_dbnsfp
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val annovar_dbnsfp = spark.read
@@ -86,14 +86,15 @@ class ImportAnnovarScores()(implicit conf: Configuration)
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    data.repartition(col("chromosome"))
+    data
+      .repartition(col("chromosome"))
       .sortWithinPartitions("start")
-      .write.mode("overwrite")
+      .write
+      .mode("overwrite")
       .partitionBy("chromosome")
       .format(destination.format.sparkFormat)
       .option("path", destination.location)
       .saveAsTable(s"${destination.table.get.fullName}")
-      data
+    data
   }
 }
-
