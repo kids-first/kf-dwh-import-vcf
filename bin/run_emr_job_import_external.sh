@@ -1,7 +1,7 @@
 #!/bin/bash
-job_type=${1:-"ensembl_mapping"}
-config=${2:-"config/production.conf"}
-# bucket=${3:-"s3a://kf-strides-variant-parquet-prd"}
+job_type=${1:-"clinvar"}
+# config=${2:-"config/production.conf"}
+bucket=${3:-"s3a://kf-strides-variant-parquet-prd"}
 instance_count=${4:-"4"}
 instance_type=${5:-"m5.xlarge"}
 
@@ -27,7 +27,7 @@ steps=$(cat <<EOF
       "--class", "org.kidsfirstdrc.dwh.external.ImportExternal",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
       "${job_type}",
-      "${config}"
+      "${bucket}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",
