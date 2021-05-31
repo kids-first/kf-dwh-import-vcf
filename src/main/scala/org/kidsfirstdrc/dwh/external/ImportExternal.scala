@@ -11,7 +11,7 @@ import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetGeneSet
 
 object ImportExternal extends App {
 
-  val Array(jobType, bucket) = args
+  val Array(jobType, bucketPath) = args
 
   implicit val spark: SparkSession = SparkSession.builder
     .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
@@ -19,7 +19,7 @@ object ImportExternal extends App {
     .appName("Import").getOrCreate()
 
   implicit val conf: Configuration = Configuration(
-    List(StorageConf("kf-strides-variant", bucket)),
+    List(StorageConf(Catalog.kfStridesVariantBucket, bucketPath)),
     sources = Catalog.sources.toList
   )
 
