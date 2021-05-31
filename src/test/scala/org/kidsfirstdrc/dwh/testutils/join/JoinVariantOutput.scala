@@ -18,7 +18,7 @@ case class JoinVariantOutput(
     topmed: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
     gnomad_genomes_2_1: Option[GnomadFreq] = Some(GnomadFreq(10, 20, 0.5, 10)),
     gnomad_exomes_2_1: Option[GnomadFreq] = Some(GnomadFreq(10, 20, 0.5, 10)),
-    gnomad_genomes_3_0: Option[GnomadFreq] = Some(GnomadFreq(10, 20, 0.5, 10)),
+    gnomad_genomes_3_1_1: Option[GnomadFreq] = Some(GnomadFreq(10, 20, 0.5, 10)),
     clinvar_id: Option[String] = Some("RCV000436956"),
     clin_sig: Option[String] = Some("Pathogenic"),
     dbsnp_id: Option[String] = Some("rs1234567"),

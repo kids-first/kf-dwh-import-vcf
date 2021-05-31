@@ -34,7 +34,7 @@ object VariantCentricOutput {
       topmed: Freq = Freq(),
       gnomad_genomes_2_1: GnomadFreqOutput = GnomadFreqOutput(),
       gnomad_exomes_2_1: GnomadFreqOutput = GnomadFreqOutput(),
-      gnomad_genomes_3_0: GnomadFreqOutput = GnomadFreqOutput(),
+      gnomad_genomes_3_1_1: GnomadFreqOutput = GnomadFreqOutput(),
       internal: InternalFrequencies = InternalFrequencies()
   )
 

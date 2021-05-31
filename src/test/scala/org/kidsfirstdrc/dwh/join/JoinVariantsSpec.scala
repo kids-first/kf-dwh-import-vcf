@@ -207,14 +207,14 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         .format("parquet")
         .saveAsTable("gnomad_exomes_2_1_1_liftover_grch38")
 
-      And("A table gnomad_genomes_3_0 exists")
-      Seq(GnomadFrequencyEntry())
+      And("A table gnomad_genomes_3_1_1 exists")
+      Seq(Gnomad311FrequencyEntry())
         .toDF()
         .write
         .mode(SaveMode.Overwrite)
-        .option("path", s"$outputDir/gnomad_genomes_3_0")
+        .option("path", s"$outputDir/gnomad_genomes_3_1_1")
         .format("parquet")
-        .saveAsTable("gnomad_genomes_3_0")
+        .saveAsTable("gnomad_genomes_3_1_1")
 
       And("A table clinvar exists")
       Seq(ClinvarEntry())
@@ -304,7 +304,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           consent_codes_by_study = Map(studyId1 -> variant2.consent_codes),
           one_thousand_genomes = None,
           gnomad_exomes_2_1 = None,
-          gnomad_genomes_3_0 = None
+          gnomad_genomes_3_1_1 = None
         ),
         JoinVariantOutput(
           chromosome = "3",
@@ -336,13 +336,13 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           consent_codes_by_study = Map(studyId2 -> variant3.consent_codes),
           one_thousand_genomes = None,
           gnomad_exomes_2_1 = None,
-          gnomad_genomes_3_0 = None
+          gnomad_genomes_3_1_1 = None
         ),
         existingVariant2.copy(
           release_id = releaseId,
           one_thousand_genomes = None,
           gnomad_exomes_2_1 = None,
-          gnomad_genomes_3_0 = None,
+          gnomad_genomes_3_1_1 = None,
           frequencies = VariantFrequency(
             Freq(11, 2, 0.18181818181818182, 1, 1),
             Freq(3, 2, 0.6666666666666666, 1, 1)
@@ -431,14 +431,14 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
       ).toDF()
 
       val data = Map(
-        Public.`1000_genomes`.id     -> Seq(FrequencyEntry()).toDF(),
-        Public.topmed_bravo.id       -> Seq(FrequencyEntry()).toDF(),
-        Public.gnomad_genomes_2_1.id -> Seq(GnomadFrequencyEntry()).toDF(),
-        Public.gnomad_exomes_2_1.id  -> Seq(GnomadFrequencyEntry()).toDF(),
-        Public.gnomad_genomes_3_0.id -> Seq(GnomadFrequencyEntry()).toDF(),
-        Public.clinvar.id            -> Seq(ClinvarEntry()).toDF(),
-        Public.dbsnp.id              -> Seq(DBSNPEntry()).toDF(),
-        Clinical.variants.id         -> variants
+        Public.`1000_genomes`.id       -> Seq(FrequencyEntry()).toDF(),
+        Public.topmed_bravo.id         -> Seq(FrequencyEntry()).toDF(),
+        Public.gnomad_genomes_2_1.id   -> Seq(GnomadFrequencyEntry()).toDF(),
+        Public.gnomad_exomes_2_1.id    -> Seq(GnomadFrequencyEntry()).toDF(),
+        Public.gnomad_genomes_3_1_1.id -> Seq(Gnomad311FrequencyEntry()).toDF(),
+        Public.clinvar.id              -> Seq(ClinvarEntry()).toDF(),
+        Public.dbsnp.id                -> Seq(DBSNPEntry()).toDF(),
+        Clinical.variants.id           -> variants
       )
 
       val result = new JoinVariants(Seq("SD_222", "SD_111"), "RE_000000", true, "variant")

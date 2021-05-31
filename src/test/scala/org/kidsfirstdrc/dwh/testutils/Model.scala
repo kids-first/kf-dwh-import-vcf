@@ -22,6 +22,17 @@ object Model {
       hom: Long = 10
   )
 
+  case class Gnomad311FrequencyEntry(
+      chromosome: String = "2",
+      start: Long = 165310406,
+      reference: String = "G",
+      alternate: String = "A",
+      ac: Long = 10,
+      an: Long = 20,
+      af: Double = 0.5,
+      nhomalt: Long = 10
+  )
+
   case class FrequencyEntry(
       chromosome: String = "2",
       start: Long = 165310406,

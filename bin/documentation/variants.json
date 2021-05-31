@@ -71,8 +71,8 @@
     "comment": "Gives data set of the gnomAD v2 cohort (125,748 exomes mapped to the GRCh37/hg19)"
   },
   {
-    "col_name": "gnomad_genomes_3_0",
-    "comment": "Gives data set of the gnomAD v3 cohort (71,702 whole genomes and no exomes, all mapped to the GRCh38 reference sequence). Note that most of the genomes v2 are included in v3"
+    "col_name": "gnomad_genomes_3_1_1",
+    "comment": "Gives data set of the gnomAD v3.1 cohort (76,156 whole genomes and no exomes, all mapped to the GRCh38 reference sequence). Note that most of the genomes v2 are included in v3"
   },
   {
     "col_name": "clinvar_id",
