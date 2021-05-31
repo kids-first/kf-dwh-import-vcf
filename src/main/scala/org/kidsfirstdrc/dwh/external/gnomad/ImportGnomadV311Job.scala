@@ -2,6 +2,7 @@ package org.kidsfirstdrc.dwh.external.gnomad
 
 import bio.ferlab.datalake.spark3.config.Configuration
 import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.types.ArrayType
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw.gnomad_genomes_3_1_1
@@ -33,8 +34,6 @@ class ImportGnomadV311Job(implicit conf: Configuration)
   }
 
   private def flattenInfo(df: DataFrame): Seq[Column] = {
-    val isArrayType: String => Boolean = dataType => dataType == "array"
-
     val replaceColumnName: String => String = name => name.replace("INFO_", "").toLowerCase
 
     df.schema.toList.collect {
@@ -42,7 +41,7 @@ class ImportGnomadV311Job(implicit conf: Configuration)
           if (c.name.startsWith("INFO_AN") ||
             c.name.startsWith("INFO_AC") ||
             c.name.startsWith("INFO_AF") ||
-            c.name.startsWith("INFO_nhomalt")) && isArrayType(c.dataType.typeName) =>
+            c.name.startsWith("INFO_nhomalt")) && c.dataType.isInstanceOf[ArrayType] =>
         col(c.name)(0) as replaceColumnName(c.name)
       case c if c.name.startsWith("INFO_") =>
         col(c.name) as replaceColumnName(c.name)
