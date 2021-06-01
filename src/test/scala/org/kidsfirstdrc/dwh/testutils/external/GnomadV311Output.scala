@@ -6,14 +6,14 @@ case class GnomadV311Output(
     end: Long = 165310407,
     reference: String = "G",
     alternate: String = "A",
+    qual: Double = 0.5,
+    name: String = "BRAF",
     ac: Long = 10,
     ac_raw: Long = 11,
-    an: Long = 20,
-    an_raw: Long = 21,
     af: Double = 0.5,
     af_raw: Double = 0.6,
+    an: Long = 20,
+    an_raw: Long = 21,
     nhomalt: Long = 10,
-    nhomalt_raw: Long = 11,
-    qual: Double = 0.5,
-    name: String = "BRAF"
+    nhomalt_raw: Long = 11
 )
