@@ -17,7 +17,7 @@ import scala.util.{Success, Try}
 
 class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) extends ETL()(conf) {
 
-  val destination = Es.variant_centric
+  override val destination: DatasetConf = Es.variant_centric
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     import spark.implicits._
@@ -127,9 +127,9 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
       .repartition(1000, col("chromosome"))
       .write
       .option("maxRecordsPerFile", 200000)
-      .partitionBy("chromosome")
+      .partitionBy(destination.partitionby:_*)
       .mode(SaveMode.Overwrite)
-      .option("format", "parquet")
+      .option("format", destination.format.sparkFormat)
       .option("path", s"${destination.rootPath}/es_index/${destination.id}_${releaseId}")
       .saveAsTable(s"${destination.table.get.fullName}_${releaseId}")
     data

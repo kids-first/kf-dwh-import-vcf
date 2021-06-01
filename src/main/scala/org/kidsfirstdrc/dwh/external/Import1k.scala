@@ -37,14 +37,8 @@ class Import1k()(implicit conf: Configuration) extends StandardETL(Public.`1000_
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    data
+    super.load(data
       .repartition(col("chromosome"))
-      .sortWithinPartitions("start")
-      .write
-      .mode(SaveMode.Overwrite)
-      .format("parquet")
-      .option("path", destination.location)
-      .saveAsTable(s"${destination.table.get.fullName}")
-    data
+      .sortWithinPartitions("start"))
   }
 }

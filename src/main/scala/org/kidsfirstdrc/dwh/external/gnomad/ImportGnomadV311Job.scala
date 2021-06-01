@@ -18,6 +18,8 @@ class ImportGnomadV311Job(implicit conf: Configuration)
   }
 
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+
     val df = data(gnomad_genomes_3_1_1.id)
 
     df
@@ -27,7 +29,7 @@ class ImportGnomadV311Job(implicit conf: Configuration)
           end +:
           reference +:
           alternate +:
-          (col("qual") as "qual") +:
+          $"qual" +:
           name +:
           flattenInfo(df): _*
       )

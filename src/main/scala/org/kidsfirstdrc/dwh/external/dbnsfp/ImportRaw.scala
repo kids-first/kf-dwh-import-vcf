@@ -23,14 +23,4 @@ class ImportRaw()(implicit conf: Configuration) extends StandardETL(Public.dbnsf
       .withColumnRenamed("#chr", "chr")
       .withColumnRenamed("position_1-based", "start")
   }
-
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    data.write
-      .mode(SaveMode.Overwrite)
-      .partitionBy("chromosome")
-      .format("parquet")
-      .option("path", destination.location)
-      .saveAsTable(s"${destination.table.get.fullName}")
-    data
-  }
 }

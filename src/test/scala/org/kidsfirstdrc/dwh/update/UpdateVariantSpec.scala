@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.update
 
-import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.spark3.config.{Configuration, ConfigurationLoader, StorageConf}
 import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
@@ -9,9 +9,9 @@ import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, TopmedBravoOutput
 import org.kidsfirstdrc.dwh.testutils.join.Freq
 import org.kidsfirstdrc.dwh.testutils.update.Variant
 import org.kidsfirstdrc.dwh.updates.UpdateVariant
-import org.scalatest.{BeforeAndAfter, GivenWhenThen}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.{BeforeAndAfter, GivenWhenThen}
 
 import scala.util.Try
 
@@ -19,11 +19,8 @@ class UpdateVariantSpec
     extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers with BeforeAndAfter {
   import spark.implicits._
 
-  implicit val conf: Configuration =
-    Configuration(
-      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile)),
-      sources = Catalog.Clinical.sources.toList
-    )
+  implicit val conf: Configuration = ConfigurationLoader.loadFromResources("config/test.conf")
+    .copy(storages = List(StorageConf(Catalog.kfStridesVariantBucket, getClass.getClassLoader.getResource(".").getFile)))
 
   before {
     Try(spark.sql("DROP TABLE IF EXISTS variant.variants"))

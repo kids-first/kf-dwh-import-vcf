@@ -1,11 +1,10 @@
 package org.kidsfirstdrc.dwh.external.clinvar
 
-import bio.ferlab.datalake.spark3.config.Configuration
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
-import org.kidsfirstdrc.dwh.conf.Catalog.Raw.clinvar_vcf
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
@@ -14,7 +13,10 @@ import scala.collection.mutable
 
 class ImportClinVarJob()(implicit conf: Configuration) extends StandardETL(Public.clinvar)(conf) {
 
+  val clinvar_vcf: DatasetConf = conf.getDataset("clinvar_vcf")
+
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+
     Map(clinvar_vcf.id -> vcf(clinvar_vcf.location))
   }
 

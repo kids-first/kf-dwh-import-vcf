@@ -154,7 +154,8 @@ object Catalog {
       "/public/dbnsfp/variant",
       PARQUET,
       OverWrite,
-      TableConf("variant", "dbnsfp")
+      Some(TableConf("variant", "dbnsfp")),
+      partitionby = List("chromosome")
     )
     val dbnsfp_annovar = DatasetConf(
       "dbnsfp_annovar",
@@ -162,7 +163,8 @@ object Catalog {
       "/public/annovar/dbnsfp",
       PARQUET,
       OverWrite,
-      TableConf("variant", "dbnsfp_annovar")
+      Some(TableConf("variant", "dbnsfp_annovar")),
+      partitionby = List("chromosome")
     )
     val dbnsfp_original = DatasetConf(
       "dbnsfp_original",
@@ -178,7 +180,8 @@ object Catalog {
       "/public/dbsnp",
       PARQUET,
       OverWrite,
-      TableConf("variant", "dbsnp")
+      Some(TableConf("variant", "dbsnp")),
+      partitionby = List("chromosome")
     )
     val ddd_gene_set = DatasetConf(
       "ddd_gene_set",
@@ -234,7 +237,8 @@ object Catalog {
       "/public/gnomad_genomes_3_1_1",
       PARQUET,
       OverWrite,
-      TableConf("variant", "gnomad_genomes_3_1_1")
+      Some(TableConf("variant", "gnomad_genomes_3_1_1")),
+      partitionby = List("chromosome")
     )
     val human_genes = DatasetConf(
       "human_genes",
@@ -381,7 +385,8 @@ object Catalog {
       s"$relativePath/variant_centric",
       PARQUET,
       OverWrite,
-      TableConf("portal", "variant_centric")
+      Some(TableConf("portal", "variant_centric")),
+      partitionby = List("chromosome")
     )
     val gene_centric = DatasetConf(
       "gene_centric",

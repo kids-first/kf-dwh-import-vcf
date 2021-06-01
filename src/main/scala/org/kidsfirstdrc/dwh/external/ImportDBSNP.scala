@@ -37,15 +37,8 @@ class ImportDBSNP()(implicit conf: Configuration) extends StandardETL(Public.dbs
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    data
+    super.load(data
       .repartition($"chromosome")
-      .sortWithinPartitions("start")
-      .write
-      .partitionBy("chromosome")
-      .mode(SaveMode.Overwrite)
-      .format(destination.format.sparkFormat)
-      .option("path", destination.location)
-      .saveAsTable(s"${destination.table.get.fullName}")
-    data
+      .sortWithinPartitions("start"))
   }
 }

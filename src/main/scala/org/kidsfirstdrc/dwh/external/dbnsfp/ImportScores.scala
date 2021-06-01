@@ -293,15 +293,8 @@ class ImportScores()(implicit conf: Configuration)
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    data
+    super.load(data
       .repartition(col("chromosome"))
-      .sortWithinPartitions("start")
-      .write
-      .mode(SaveMode.Overwrite)
-      .partitionBy("chromosome")
-      .format("parquet")
-      .option("path", destination.location)
-      .saveAsTable(s"${destination.table.get.fullName}")
-    data
+      .sortWithinPartitions("start"))
   }
 }
