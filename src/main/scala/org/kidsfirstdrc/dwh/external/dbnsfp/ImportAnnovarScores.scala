@@ -86,15 +86,8 @@ class ImportAnnovarScores()(implicit conf: Configuration)
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    data
+    super.load(data
       .repartition(col("chromosome"))
-      .sortWithinPartitions("start")
-      .write
-      .mode("overwrite")
-      .partitionBy("chromosome")
-      .format(destination.format.sparkFormat)
-      .option("path", destination.location)
-      .saveAsTable(s"${destination.table.get.fullName}")
-    data
+      .sortWithinPartitions("start"))
   }
 }

@@ -2,8 +2,8 @@ package org.kidsfirstdrc.dwh.jobs
 
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.{col, lit, regexp_extract, trim}
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.glue.UpdateTableComments
 
 import scala.util.Try
@@ -12,15 +12,6 @@ abstract class StandardETL(val destination: DatasetConf)(implicit conf: Configur
     extends ETL() {
 
   val view_db = "variant_live"
-
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
-    data.write
-      .mode(SaveMode.Overwrite)
-      .format("parquet")
-      .option("path", destination.location)
-      .saveAsTable(s"${destination.table.get.fullName}")
-    data
-  }
 
   override def publish()(implicit spark: SparkSession): Unit = {
     UpdateTableComments.run(destination)

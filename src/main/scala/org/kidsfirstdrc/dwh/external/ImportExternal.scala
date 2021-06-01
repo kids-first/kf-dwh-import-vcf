@@ -1,8 +1,6 @@
 package org.kidsfirstdrc.dwh.external
 
-import bio.ferlab.datalake.spark3.config.{Configuration, ConfigurationLoader, StorageConf}
-import org.apache.spark.sql.SparkSession
-import org.kidsfirstdrc.dwh.conf.Catalog
+import bio.ferlab.datalake.spark3.public.SparkApp
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.external.dbnsfp.{ImportAnnovarScores, ImportRaw, ImportScores}
 import org.kidsfirstdrc.dwh.external.ensembl.ImportEnsemblMapping
@@ -10,25 +8,12 @@ import org.kidsfirstdrc.dwh.external.gnomad.ImportGnomadV311Job
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetGeneSet
 
-object ImportExternal extends App {
+object ImportExternal extends SparkApp {
 
-  val Array(jobType, bucketPath) = args
+  val Array(_, jobType) = args
 
-  implicit val spark: SparkSession = SparkSession.builder
-    .config(
-      "hive.metastore.client.factory.class",
-      "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
-    )
-    .enableHiveSupport()
-    .appName("Import")
-    .getOrCreate()
-
-  implicit val conf: Configuration = Configuration(
-    List(StorageConf(Catalog.kfStridesVariantBucket, bucketPath)),
-    sources = Catalog.sources.toList
-  )
-
-  //implicit val conf: Configuration = ConfigurationLoader.loadFromResources(config)
+  // calls SparkApp.init() to load configuration file passed as first argument as well as an instance of SparkSession
+  implicit val (conf, spark) = init()
 
   jobType.toLowerCase match {
     case "1000genomes"          => new Import1k().run()

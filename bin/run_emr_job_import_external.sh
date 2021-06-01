@@ -1,9 +1,8 @@
 #!/bin/bash
-job_type=${1:-"clinvar"}
-# config=${2:-"config/production.conf"}
-bucket=${3:-"s3a://kf-strides-variant-parquet-prd"}
-instance_count=${4:-"4"}
-instance_type=${5:-"m5.xlarge"}
+config=${1:-"config/production.conf"}
+job_type=${2:-"clinvar"}
+instance_count=${3:-"1"}
+instance_type=${4:-"m5.xlarge"}
 
 aws s3 cp bootstrap-actions s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions --recursive
 aws s3 cp documentation s3://kf-strides-variant-parquet-prd/jobs/documentation --recursive
@@ -26,8 +25,8 @@ steps=$(cat <<EOF
       "client",
       "--class", "org.kidsfirstdrc.dwh.external.ImportExternal",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
-      "${job_type}",
-      "${bucket}"
+      "${config}",
+      "${job_type}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",

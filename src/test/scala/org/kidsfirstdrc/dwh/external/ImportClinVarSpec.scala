@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
-import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
-import org.kidsfirstdrc.dwh.conf.Catalog.Raw.clinvar_vcf
+import bio.ferlab.datalake.spark3.config.{Configuration, ConfigurationLoader, DatasetConf, StorageConf}
+import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.{ClinvarInput, ClinvarOutput}
@@ -12,10 +12,10 @@ import org.scalatest.matchers.should.Matchers
 class ImportClinVarSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
 
-  implicit val conf: Configuration =
-    Configuration(
-      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
-    )
+  implicit val conf: Configuration = ConfigurationLoader.loadFromResources("config/test.conf")
+    .copy(storages = List(StorageConf(Catalog.kfStridesVariantBucket, getClass.getClassLoader.getResource(".").getFile)))
+
+  val clinvar_vcf: DatasetConf = conf.getDataset("clinvar_vcf")
 
   "run" should "creates clinvar table" in {
 
