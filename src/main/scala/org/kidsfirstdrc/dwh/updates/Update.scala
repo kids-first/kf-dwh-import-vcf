@@ -36,6 +36,10 @@ object Update extends App {
         new UpdateVariant(Public.topmed_bravo, "variant").run()
         new UpdateVariant(Public.topmed_bravo, "portal").run()
 
+      case ("gnomad_genomes_3_1_1", "variants") =>
+        new UpdateVariant(Public.gnomad_genomes_3_1_1, "variant").run()
+        new UpdateVariant(Public.gnomad_genomes_3_1_1, "portal").run()
+
       case _ => throw new IllegalArgumentException(s"No job found for : ($source, $destination)")
     }
   }

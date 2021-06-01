@@ -5,8 +5,8 @@ import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
-import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, TopmedBravoOutput}
-import org.kidsfirstdrc.dwh.testutils.join.Freq
+import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, GnomadV311Output, TopmedBravoOutput}
+import org.kidsfirstdrc.dwh.testutils.join.{Freq, GnomadFreq}
 import org.kidsfirstdrc.dwh.testutils.update.Variant
 import org.kidsfirstdrc.dwh.updates.UpdateVariant
 import org.scalatest.flatspec.AnyFlatSpec
@@ -66,6 +66,29 @@ class UpdateVariantSpec
 
     // Checks the input values were not the same before the join
     variant.topmed should not be Some(Freq(10, 5, 0.5, 5, 0))
+    // Checks the output values are the same as expected
+    resultDF.as[Variant].collect().head shouldBe expectedResult
+  }
+
+  "transform method for gnomad 3.1.1" should "return expected data given controlled input" in {
+
+    val variant   = Variant(start = 165310406, reference = "G", name = "rs1057520413")
+    val gnomad311 = GnomadV311Output(an = 21, ac = 11, af = 0.51, nhomalt = 11)
+
+    val variantDF   = Seq(variant).toDF()
+    val gnomad311DF = Seq(gnomad311).toDF()
+    val data        = Map(Clinical.variants.id -> variantDF, Public.gnomad_genomes_3_1_1.id -> gnomad311DF)
+
+    val job      = new UpdateVariant(Public.gnomad_genomes_3_1_1, "variant")
+    val resultDF = job.transform(data)
+
+    val expectedResult =
+      variant.copy(gnomad_genomes_3_1_1 = Some(GnomadFreq(an = 21, ac = 11, af = 0.51, hom = 11)))
+
+    // Checks the input values were not the same before the join
+    variant.gnomad_genomes_3_1_1 should not be Some(
+      GnomadFreq(an = 21, ac = 11, af = 0.51, hom = 11)
+    )
     // Checks the output values are the same as expected
     resultDF.as[Variant].collect().head shouldBe expectedResult
   }

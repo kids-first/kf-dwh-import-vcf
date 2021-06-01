@@ -3,7 +3,7 @@
   */
 package org.kidsfirstdrc.dwh.testutils.update
 
-import org.kidsfirstdrc.dwh.testutils.join.Freq
+import org.kidsfirstdrc.dwh.testutils.join.{Freq, GnomadFreq}
 
 case class Variant(
     chromosome: String = "2",
@@ -27,9 +27,9 @@ case class Variant(
     //1k_genomes: Option[Freq] = Some(Freq(20, 10, 0.5, Some(10), Some(10))),
     onek_genomes: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
     topmed: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
-    gnomad_genomes_2_1: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
-    gnomad_exomes_2_1: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
-    gnomad_genomes_3_1_1: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
+    gnomad_genomes_2_1: Option[GnomadFreq] = Some(GnomadFreq()),
+    gnomad_exomes_2_1: Option[GnomadFreq] = Some(GnomadFreq()),
+    gnomad_genomes_3_1_1: Option[GnomadFreq] = Some(GnomadFreq()),
     clinvar_id: Option[String] = Some("RCV000436956"),
     clin_sig: List[String] = List("Pathogenic"),
     dbsnp_id: Option[String] = Some("rs1234567"),

@@ -46,11 +46,25 @@ class UpdateVariant(source: DatasetConf, schema: String)(implicit conf: Configur
       .joinAndMerge(topmed, "topmed")
   }
 
+  private def updateGnomad311(
+      data: Map[String, DataFrame]
+  )(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+    val variant = data(destination.id)
+    val gnomad311 = data(Public.gnomad_genomes_3_1_1.id)
+      .selectLocus($"ac", $"an", $"af", $"nhomalt" as "hom")
+    variant
+      .withColumnRenamed("gnomad_genomes_3_0", "gnomad_genomes_3_1_1")
+      .drop("gnomad_genomes_3_1_1")
+      .joinAndMerge(gnomad311, "gnomad_genomes_3_1_1")
+  }
+
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     source match {
-      case Public.clinvar      => updateClinvar(data)
-      case Public.topmed_bravo => updateTopmed(data)
-      case _                   => throw new IllegalArgumentException(s"Nothing to do for $source")
+      case Public.clinvar              => updateClinvar(data)
+      case Public.topmed_bravo         => updateTopmed(data)
+      case Public.gnomad_genomes_3_1_1 => updateGnomad311(data)
+      case _                           => throw new IllegalArgumentException(s"Nothing to do for $source")
     }
   }
 
