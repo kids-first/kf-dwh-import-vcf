@@ -1,0 +1,2725 @@
+[{
+  "col_name": "ac",
+  "comment": "Alternate allele count"
+}, {
+  "col_name": "an",
+  "comment": "Total number of alleles"
+}, {
+  "col_name": "af",
+  "comment": "Alternate allele frequency"
+}, {
+  "col_name": "popmax",
+  "comment": "Population with maximum AF"
+}, {
+  "col_name": "faf95_popmax",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for the population with the maximum allele frequency"
+}, {
+  "col_name": "ac_non_v2_xx",
+  "comment": "Alternate allele count for XX samples in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_xx",
+  "comment": "Total number of alleles in XX samples in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_xx",
+  "comment": "Alternate allele frequency in XX samples in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_xx",
+  "comment": "Count of homozygous individuals in XX samples in non_v2 subset"
+}, {
+  "col_name": "ac_non_cancer_fin_xx",
+  "comment": "Alternate allele count for XX samples of Finnish ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_fin_xx",
+  "comment": "Total number of alleles in XX samples of Finnish ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_fin_xx",
+  "comment": "Alternate allele frequency in XX samples of Finnish ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_fin_xx",
+  "comment": "Count of homozygous individuals in XX samples of Finnish ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_neuro_nfe",
+  "comment": "Alternate allele count for samples of Non-Finnish European ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_nfe",
+  "comment": "Total number of alleles in samples of Non-Finnish European ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_nfe",
+  "comment": "Alternate allele frequency in samples of Non-Finnish European ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_nfe",
+  "comment": "Count of homozygous individuals in samples of Non-Finnish European ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_neuro_afr_xy",
+  "comment": "Alternate allele count for XY samples of African/African-American ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_afr_xy",
+  "comment": "Total number of alleles in XY samples of African/African-American ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_afr_xy",
+  "comment": "Alternate allele frequency in XY samples of African/African-American ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_afr_xy",
+  "comment": "Count of homozygous individuals in XY samples of African/African-American ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_neuro_nfe_xy",
+  "comment": "Alternate allele count for XY samples of Non-Finnish European ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_nfe_xy",
+  "comment": "Total number of alleles in XY samples of Non-Finnish European ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_nfe_xy",
+  "comment": "Alternate allele frequency in XY samples of Non-Finnish European ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_nfe_xy",
+  "comment": "Count of homozygous individuals in XY samples of Non-Finnish European ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_eas_xy",
+  "comment": "Alternate allele count for XY samples of East Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_eas_xy",
+  "comment": "Total number of alleles in XY samples of East Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_eas_xy",
+  "comment": "Alternate allele frequency in XY samples of East Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_eas_xy",
+  "comment": "Count of homozygous individuals in XY samples of East Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_neuro_sas_xx",
+  "comment": "Alternate allele count for XX samples of South Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_sas_xx",
+  "comment": "Total number of alleles in XX samples of South Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_sas_xx",
+  "comment": "Alternate allele frequency in XX samples of South Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_sas_xx",
+  "comment": "Count of homozygous individuals in XX samples of South Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_v2",
+  "comment": "Alternate allele count in non_v2 subset"
+}, {
+  "col_name": "an_non_v2",
+  "comment": "Total number of alleles in non_v2 subset"
+}, {
+  "col_name": "af_non_v2",
+  "comment": "Alternate allele frequency in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2",
+  "comment": "Count of homozygous individuals in non_v2 subset"
+}, {
+  "col_name": "ac_non_topmed_nfe_xx",
+  "comment": "Alternate allele count for XX samples of Non-Finnish European ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_nfe_xx",
+  "comment": "Total number of alleles in XX samples of Non-Finnish European ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_nfe_xx",
+  "comment": "Alternate allele frequency in XX samples of Non-Finnish European ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_nfe_xx",
+  "comment": "Count of homozygous individuals in XX samples of Non-Finnish European ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_v2_mid",
+  "comment": "Alternate allele count for samples of Middle Eastern ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_mid",
+  "comment": "Total number of alleles in samples of Middle Eastern ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_mid",
+  "comment": "Alternate allele frequency in samples of Middle Eastern ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_mid",
+  "comment": "Count of homozygous individuals in samples of Middle Eastern ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_topmed_sas",
+  "comment": "Alternate allele count for samples of South Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_sas",
+  "comment": "Total number of alleles in samples of South Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_sas",
+  "comment": "Alternate allele frequency in samples of South Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_sas",
+  "comment": "Count of homozygous individuals in samples of South Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_cancer_eas_xx",
+  "comment": "Alternate allele count for XX samples of East Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_eas_xx",
+  "comment": "Total number of alleles in XX samples of East Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_eas_xx",
+  "comment": "Alternate allele frequency in XX samples of East Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_eas_xx",
+  "comment": "Count of homozygous individuals in XX samples of East Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_amr_xy",
+  "comment": "Alternate allele count for XY samples of Latino ancestry"
+}, {
+  "col_name": "an_amr_xy",
+  "comment": "Total number of alleles in XY samples of Latino ancestry"
+}, {
+  "col_name": "af_amr_xy",
+  "comment": "Alternate allele frequency in XY samples of Latino ancestry"
+}, {
+  "col_name": "nhomalt_amr_xy",
+  "comment": "Count of homozygous individuals in XY samples of Latino ancestry"
+}, {
+  "col_name": "ac_non_v2_nfe_xx",
+  "comment": "Alternate allele count for XX samples of Non-Finnish European ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_nfe_xx",
+  "comment": "Total number of alleles in XX samples of Non-Finnish European ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_nfe_xx",
+  "comment": "Alternate allele frequency in XX samples of Non-Finnish European ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_nfe_xx",
+  "comment": "Count of homozygous individuals in XX samples of Non-Finnish European ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_xy",
+  "comment": "Alternate allele count for XY samples in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_xy",
+  "comment": "Total number of alleles in XY samples in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_xy",
+  "comment": "Alternate allele frequency in XY samples in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_xy",
+  "comment": "Count of homozygous individuals in XY samples in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_neuro_asj_xy",
+  "comment": "Alternate allele count for XY samples of Ashkenazi Jewish ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_asj_xy",
+  "comment": "Total number of alleles in XY samples of Ashkenazi Jewish ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_asj_xy",
+  "comment": "Alternate allele frequency in XY samples of Ashkenazi Jewish ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_asj_xy",
+  "comment": "Count of homozygous individuals in XY samples of Ashkenazi Jewish ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_oth",
+  "comment": "Alternate allele count for samples of Other ancestry"
+}, {
+  "col_name": "an_oth",
+  "comment": "Total number of alleles in samples of Other ancestry"
+}, {
+  "col_name": "af_oth",
+  "comment": "Alternate allele frequency in samples of Other ancestry"
+}, {
+  "col_name": "nhomalt_oth",
+  "comment": "Count of homozygous individuals in samples of Other ancestry"
+}, {
+  "col_name": "ac_non_topmed_mid_xy",
+  "comment": "Alternate allele count for XY samples of Middle Eastern ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_mid_xy",
+  "comment": "Total number of alleles in XY samples of Middle Eastern ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_mid_xy",
+  "comment": "Alternate allele frequency in XY samples of Middle Eastern ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_mid_xy",
+  "comment": "Count of homozygous individuals in XY samples of Middle Eastern ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_cancer_asj_xx",
+  "comment": "Alternate allele count for XX samples of Ashkenazi Jewish ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_asj_xx",
+  "comment": "Total number of alleles in XX samples of Ashkenazi Jewish ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_asj_xx",
+  "comment": "Alternate allele frequency in XX samples of Ashkenazi Jewish ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_asj_xx",
+  "comment": "Count of homozygous individuals in XX samples of Ashkenazi Jewish ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_sas_xy",
+  "comment": "Alternate allele count for XY samples of South Asian ancestry"
+}, {
+  "col_name": "an_sas_xy",
+  "comment": "Total number of alleles in XY samples of South Asian ancestry"
+}, {
+  "col_name": "af_sas_xy",
+  "comment": "Alternate allele frequency in XY samples of South Asian ancestry"
+}, {
+  "col_name": "nhomalt_sas_xy",
+  "comment": "Count of homozygous individuals in XY samples of South Asian ancestry"
+}, {
+  "col_name": "ac_non_neuro_fin",
+  "comment": "Alternate allele count for samples of Finnish ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_fin",
+  "comment": "Total number of alleles in samples of Finnish ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_fin",
+  "comment": "Alternate allele frequency in samples of Finnish ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_fin",
+  "comment": "Count of homozygous individuals in samples of Finnish ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_topmed_amr_xy",
+  "comment": "Alternate allele count for XY samples of Latino ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_amr_xy",
+  "comment": "Total number of alleles in XY samples of Latino ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_amr_xy",
+  "comment": "Alternate allele frequency in XY samples of Latino ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_amr_xy",
+  "comment": "Count of homozygous individuals in XY samples of Latino ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_neuro_xx",
+  "comment": "Alternate allele count for XX samples in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_xx",
+  "comment": "Total number of alleles in XX samples in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_xx",
+  "comment": "Alternate allele frequency in XX samples in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_xx",
+  "comment": "Count of homozygous individuals in XX samples in non_neuro subset"
+}, {
+  "col_name": "ac_fin_xx",
+  "comment": "Alternate allele count for XX samples of Finnish ancestry"
+}, {
+  "col_name": "an_fin_xx",
+  "comment": "Total number of alleles in XX samples of Finnish ancestry"
+}, {
+  "col_name": "af_fin_xx",
+  "comment": "Alternate allele frequency in XX samples of Finnish ancestry"
+}, {
+  "col_name": "nhomalt_fin_xx",
+  "comment": "Count of homozygous individuals in XX samples of Finnish ancestry"
+}, {
+  "col_name": "ac_controls_and_biobanks_asj_xx",
+  "comment": "Alternate allele count for XX samples of Ashkenazi Jewish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_asj_xx",
+  "comment": "Total number of alleles in XX samples of Ashkenazi Jewish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_asj_xx",
+  "comment": "Alternate allele frequency in XX samples of Ashkenazi Jewish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_asj_xx",
+  "comment": "Count of homozygous individuals in XX samples of Ashkenazi Jewish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_v2_raw",
+  "comment": "Alternate allele count for samples, before removing low-confidence genotypes in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_raw",
+  "comment": "Total number of alleles in samples, before removing low-confidence genotypes in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_raw",
+  "comment": "Alternate allele frequency in samples, before removing low-confidence genotypes in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_raw",
+  "comment": "Count of homozygous individuals in samples, before removing low-confidence genotypes in non_v2 subset"
+}, {
+  "col_name": "ac_non_v2_asj",
+  "comment": "Alternate allele count for samples of Ashkenazi Jewish ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_asj",
+  "comment": "Total number of alleles in samples of Ashkenazi Jewish ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_asj",
+  "comment": "Alternate allele frequency in samples of Ashkenazi Jewish ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_asj",
+  "comment": "Count of homozygous individuals in samples of Ashkenazi Jewish ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_nfe_xx",
+  "comment": "Alternate allele count for XX samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "an_nfe_xx",
+  "comment": "Total number of alleles in XX samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "af_nfe_xx",
+  "comment": "Alternate allele frequency in XX samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "nhomalt_nfe_xx",
+  "comment": "Count of homozygous individuals in XX samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "ac_controls_and_biobanks_raw",
+  "comment": "Alternate allele count for samples, before removing low-confidence genotypes in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_raw",
+  "comment": "Total number of alleles in samples, before removing low-confidence genotypes in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_raw",
+  "comment": "Alternate allele frequency in samples, before removing low-confidence genotypes in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_raw",
+  "comment": "Count of homozygous individuals in samples, before removing low-confidence genotypes in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_ami",
+  "comment": "Alternate allele count for samples of Amish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_ami",
+  "comment": "Total number of alleles in samples of Amish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_ami",
+  "comment": "Alternate allele frequency in samples of Amish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_ami",
+  "comment": "Count of homozygous individuals in samples of Amish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_topmed_eas",
+  "comment": "Alternate allele count for samples of East Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_eas",
+  "comment": "Total number of alleles in samples of East Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_eas",
+  "comment": "Alternate allele frequency in samples of East Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_eas",
+  "comment": "Count of homozygous individuals in samples of East Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_v2_amr",
+  "comment": "Alternate allele count for samples of Latino ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_amr",
+  "comment": "Total number of alleles in samples of Latino ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_amr",
+  "comment": "Alternate allele frequency in samples of Latino ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_amr",
+  "comment": "Count of homozygous individuals in samples of Latino ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_neuro_sas",
+  "comment": "Alternate allele count for samples of South Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_sas",
+  "comment": "Total number of alleles in samples of South Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_sas",
+  "comment": "Alternate allele frequency in samples of South Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_sas",
+  "comment": "Count of homozygous individuals in samples of South Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_cancer_fin_xy",
+  "comment": "Alternate allele count for XY samples of Finnish ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_fin_xy",
+  "comment": "Total number of alleles in XY samples of Finnish ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_fin_xy",
+  "comment": "Alternate allele frequency in XY samples of Finnish ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_fin_xy",
+  "comment": "Count of homozygous individuals in XY samples of Finnish ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_cancer_nfe_xy",
+  "comment": "Alternate allele count for XY samples of Non-Finnish European ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_nfe_xy",
+  "comment": "Total number of alleles in XY samples of Non-Finnish European ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_nfe_xy",
+  "comment": "Alternate allele frequency in XY samples of Non-Finnish European ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_nfe_xy",
+  "comment": "Count of homozygous individuals in XY samples of Non-Finnish European ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_v2_oth",
+  "comment": "Alternate allele count for samples of Other ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_oth",
+  "comment": "Total number of alleles in samples of Other ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_oth",
+  "comment": "Alternate allele frequency in samples of Other ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_oth",
+  "comment": "Count of homozygous individuals in samples of Other ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_ami",
+  "comment": "Alternate allele count for samples of Amish ancestry"
+}, {
+  "col_name": "an_ami",
+  "comment": "Total number of alleles in samples of Amish ancestry"
+}, {
+  "col_name": "af_ami",
+  "comment": "Alternate allele frequency in samples of Amish ancestry"
+}, {
+  "col_name": "nhomalt_ami",
+  "comment": "Count of homozygous individuals in samples of Amish ancestry"
+}, {
+  "col_name": "ac_non_cancer_xy",
+  "comment": "Alternate allele count for XY samples in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_xy",
+  "comment": "Total number of alleles in XY samples in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_xy",
+  "comment": "Alternate allele frequency in XY samples in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_xy",
+  "comment": "Count of homozygous individuals in XY samples in non_cancer subset"
+}, {
+  "col_name": "ac_non_v2_sas",
+  "comment": "Alternate allele count for samples of South Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_sas",
+  "comment": "Total number of alleles in samples of South Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_sas",
+  "comment": "Alternate allele frequency in samples of South Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_sas",
+  "comment": "Count of homozygous individuals in samples of South Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_topmed_afr_xx",
+  "comment": "Alternate allele count for XX samples of African/African-American ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_afr_xx",
+  "comment": "Total number of alleles in XX samples of African/African-American ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_afr_xx",
+  "comment": "Alternate allele frequency in XX samples of African/African-American ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_afr_xx",
+  "comment": "Count of homozygous individuals in XX samples of African/African-American ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_sas",
+  "comment": "Alternate allele count for samples of South Asian ancestry"
+}, {
+  "col_name": "an_sas",
+  "comment": "Total number of alleles in samples of South Asian ancestry"
+}, {
+  "col_name": "af_sas",
+  "comment": "Alternate allele frequency in samples of South Asian ancestry"
+}, {
+  "col_name": "nhomalt_sas",
+  "comment": "Count of homozygous individuals in samples of South Asian ancestry"
+}, {
+  "col_name": "ac_non_neuro_nfe_xx",
+  "comment": "Alternate allele count for XX samples of Non-Finnish European ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_nfe_xx",
+  "comment": "Total number of alleles in XX samples of Non-Finnish European ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_nfe_xx",
+  "comment": "Alternate allele frequency in XX samples of Non-Finnish European ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_nfe_xx",
+  "comment": "Count of homozygous individuals in XX samples of Non-Finnish European ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_topmed_ami_xx",
+  "comment": "Alternate allele count for XX samples of Amish ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_ami_xx",
+  "comment": "Total number of alleles in XX samples of Amish ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_ami_xx",
+  "comment": "Alternate allele frequency in XX samples of Amish ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_ami_xx",
+  "comment": "Count of homozygous individuals in XX samples of Amish ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_ami_xy",
+  "comment": "Alternate allele count for XY samples of Amish ancestry"
+}, {
+  "col_name": "an_ami_xy",
+  "comment": "Total number of alleles in XY samples of Amish ancestry"
+}, {
+  "col_name": "af_ami_xy",
+  "comment": "Alternate allele frequency in XY samples of Amish ancestry"
+}, {
+  "col_name": "nhomalt_ami_xy",
+  "comment": "Count of homozygous individuals in XY samples of Amish ancestry"
+}, {
+  "col_name": "ac_oth_xx",
+  "comment": "Alternate allele count for XX samples of Other ancestry"
+}, {
+  "col_name": "an_oth_xx",
+  "comment": "Total number of alleles in XX samples of Other ancestry"
+}, {
+  "col_name": "af_oth_xx",
+  "comment": "Alternate allele frequency in XX samples of Other ancestry"
+}, {
+  "col_name": "nhomalt_oth_xx",
+  "comment": "Count of homozygous individuals in XX samples of Other ancestry"
+}, {
+  "col_name": "ac_non_cancer_eas",
+  "comment": "Alternate allele count for samples of East Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_eas",
+  "comment": "Total number of alleles in samples of East Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_eas",
+  "comment": "Alternate allele frequency in samples of East Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_eas",
+  "comment": "Count of homozygous individuals in samples of East Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_topmed_xy",
+  "comment": "Alternate allele count for XY samples in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_xy",
+  "comment": "Total number of alleles in XY samples in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_xy",
+  "comment": "Alternate allele frequency in XY samples in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_xy",
+  "comment": "Count of homozygous individuals in XY samples in non_topmed subset"
+}, {
+  "col_name": "ac_non_v2_ami",
+  "comment": "Alternate allele count for samples of Amish ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_ami",
+  "comment": "Total number of alleles in samples of Amish ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_ami",
+  "comment": "Alternate allele frequency in samples of Amish ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_ami",
+  "comment": "Count of homozygous individuals in samples of Amish ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_neuro",
+  "comment": "Alternate allele count in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro",
+  "comment": "Total number of alleles in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro",
+  "comment": "Alternate allele frequency in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro",
+  "comment": "Count of homozygous individuals in non_neuro subset"
+}, {
+  "col_name": "ac_amr_xx",
+  "comment": "Alternate allele count for XX samples of Latino ancestry"
+}, {
+  "col_name": "an_amr_xx",
+  "comment": "Total number of alleles in XX samples of Latino ancestry"
+}, {
+  "col_name": "af_amr_xx",
+  "comment": "Alternate allele frequency in XX samples of Latino ancestry"
+}, {
+  "col_name": "nhomalt_amr_xx",
+  "comment": "Count of homozygous individuals in XX samples of Latino ancestry"
+}, {
+  "col_name": "ac_controls_and_biobanks_nfe_xy",
+  "comment": "Alternate allele count for XY samples of Non-Finnish European ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_nfe_xy",
+  "comment": "Total number of alleles in XY samples of Non-Finnish European ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_nfe_xy",
+  "comment": "Alternate allele frequency in XY samples of Non-Finnish European ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_nfe_xy",
+  "comment": "Count of homozygous individuals in XY samples of Non-Finnish European ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_eas",
+  "comment": "Alternate allele count for samples of East Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_eas",
+  "comment": "Total number of alleles in samples of East Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_eas",
+  "comment": "Alternate allele frequency in samples of East Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_eas",
+  "comment": "Count of homozygous individuals in samples of East Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_xx",
+  "comment": "Alternate allele count for XX samples"
+}, {
+  "col_name": "an_xx",
+  "comment": "Total number of alleles in XX samples"
+}, {
+  "col_name": "af_xx",
+  "comment": "Alternate allele frequency in XX samples"
+}, {
+  "col_name": "nhomalt_xx",
+  "comment": "Count of homozygous individuals in XX samples"
+}, {
+  "col_name": "ac_non_cancer_oth_xy",
+  "comment": "Alternate allele count for XY samples of Other ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_oth_xy",
+  "comment": "Total number of alleles in XY samples of Other ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_oth_xy",
+  "comment": "Alternate allele frequency in XY samples of Other ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_oth_xy",
+  "comment": "Count of homozygous individuals in XY samples of Other ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_v2_xy",
+  "comment": "Alternate allele count for XY samples in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_xy",
+  "comment": "Total number of alleles in XY samples in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_xy",
+  "comment": "Alternate allele frequency in XY samples in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_xy",
+  "comment": "Count of homozygous individuals in XY samples in non_v2 subset"
+}, {
+  "col_name": "ac_non_topmed_amr_xx",
+  "comment": "Alternate allele count for XX samples of Latino ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_amr_xx",
+  "comment": "Total number of alleles in XX samples of Latino ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_amr_xx",
+  "comment": "Alternate allele frequency in XX samples of Latino ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_amr_xx",
+  "comment": "Count of homozygous individuals in XX samples of Latino ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_fin",
+  "comment": "Alternate allele count for samples of Finnish ancestry"
+}, {
+  "col_name": "an_fin",
+  "comment": "Total number of alleles in samples of Finnish ancestry"
+}, {
+  "col_name": "af_fin",
+  "comment": "Alternate allele frequency in samples of Finnish ancestry"
+}, {
+  "col_name": "nhomalt_fin",
+  "comment": "Count of homozygous individuals in samples of Finnish ancestry"
+}, {
+  "col_name": "ac_controls_and_biobanks_nfe_xx",
+  "comment": "Alternate allele count for XX samples of Non-Finnish European ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_nfe_xx",
+  "comment": "Total number of alleles in XX samples of Non-Finnish European ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_nfe_xx",
+  "comment": "Alternate allele frequency in XX samples of Non-Finnish European ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_nfe_xx",
+  "comment": "Count of homozygous individuals in XX samples of Non-Finnish European ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_afr",
+  "comment": "Alternate allele count for samples of African/African-American ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_afr",
+  "comment": "Total number of alleles in samples of African/African-American ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_afr",
+  "comment": "Alternate allele frequency in samples of African/African-American ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_afr",
+  "comment": "Count of homozygous individuals in samples of African/African-American ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_asj_xx",
+  "comment": "Alternate allele count for XX samples of Ashkenazi Jewish ancestry"
+}, {
+  "col_name": "an_asj_xx",
+  "comment": "Total number of alleles in XX samples of Ashkenazi Jewish ancestry"
+}, {
+  "col_name": "af_asj_xx",
+  "comment": "Alternate allele frequency in XX samples of Ashkenazi Jewish ancestry"
+}, {
+  "col_name": "nhomalt_asj_xx",
+  "comment": "Count of homozygous individuals in XX samples of Ashkenazi Jewish ancestry"
+}, {
+  "col_name": "ac_non_topmed_mid",
+  "comment": "Alternate allele count for samples of Middle Eastern ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_mid",
+  "comment": "Total number of alleles in samples of Middle Eastern ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_mid",
+  "comment": "Alternate allele frequency in samples of Middle Eastern ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_mid",
+  "comment": "Count of homozygous individuals in samples of Middle Eastern ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_cancer_sas_xy",
+  "comment": "Alternate allele count for XY samples of South Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_sas_xy",
+  "comment": "Total number of alleles in XY samples of South Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_sas_xy",
+  "comment": "Alternate allele frequency in XY samples of South Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_sas_xy",
+  "comment": "Count of homozygous individuals in XY samples of South Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_sas_xx",
+  "comment": "Alternate allele count for XX samples of South Asian ancestry"
+}, {
+  "col_name": "an_sas_xx",
+  "comment": "Total number of alleles in XX samples of South Asian ancestry"
+}, {
+  "col_name": "af_sas_xx",
+  "comment": "Alternate allele frequency in XX samples of South Asian ancestry"
+}, {
+  "col_name": "nhomalt_sas_xx",
+  "comment": "Count of homozygous individuals in XX samples of South Asian ancestry"
+}, {
+  "col_name": "ac_non_topmed",
+  "comment": "Alternate allele count in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed",
+  "comment": "Total number of alleles in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed",
+  "comment": "Alternate allele frequency in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed",
+  "comment": "Count of homozygous individuals in non_topmed subset"
+}, {
+  "col_name": "ac_non_v2_oth_xx",
+  "comment": "Alternate allele count for XX samples of Other ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_oth_xx",
+  "comment": "Total number of alleles in XX samples of Other ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_oth_xx",
+  "comment": "Alternate allele frequency in XX samples of Other ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_oth_xx",
+  "comment": "Count of homozygous individuals in XX samples of Other ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_neuro_ami_xy",
+  "comment": "Alternate allele count for XY samples of Amish ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_ami_xy",
+  "comment": "Total number of alleles in XY samples of Amish ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_ami_xy",
+  "comment": "Alternate allele frequency in XY samples of Amish ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_ami_xy",
+  "comment": "Count of homozygous individuals in XY samples of Amish ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_afr_xy",
+  "comment": "Alternate allele count for XY samples of African/African-American ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_afr_xy",
+  "comment": "Total number of alleles in XY samples of African/African-American ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_afr_xy",
+  "comment": "Alternate allele frequency in XY samples of African/African-American ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_afr_xy",
+  "comment": "Count of homozygous individuals in XY samples of African/African-American ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_amr_xx",
+  "comment": "Alternate allele count for XX samples of Latino ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_amr_xx",
+  "comment": "Total number of alleles in XX samples of Latino ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_amr_xx",
+  "comment": "Alternate allele frequency in XX samples of Latino ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_amr_xx",
+  "comment": "Count of homozygous individuals in XX samples of Latino ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_topmed_amr",
+  "comment": "Alternate allele count for samples of Latino ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_amr",
+  "comment": "Total number of alleles in samples of Latino ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_amr",
+  "comment": "Alternate allele frequency in samples of Latino ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_amr",
+  "comment": "Count of homozygous individuals in samples of Latino ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_sas_xx",
+  "comment": "Alternate allele count for XX samples of South Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_sas_xx",
+  "comment": "Total number of alleles in XX samples of South Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_sas_xx",
+  "comment": "Alternate allele frequency in XX samples of South Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_sas_xx",
+  "comment": "Count of homozygous individuals in XX samples of South Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_amr",
+  "comment": "Alternate allele count for samples of Latino ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_amr",
+  "comment": "Total number of alleles in samples of Latino ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_amr",
+  "comment": "Alternate allele frequency in samples of Latino ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_amr",
+  "comment": "Count of homozygous individuals in samples of Latino ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_neuro_fin_xx",
+  "comment": "Alternate allele count for XX samples of Finnish ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_fin_xx",
+  "comment": "Total number of alleles in XX samples of Finnish ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_fin_xx",
+  "comment": "Alternate allele frequency in XX samples of Finnish ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_fin_xx",
+  "comment": "Count of homozygous individuals in XX samples of Finnish ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_cancer_raw",
+  "comment": "Alternate allele count for samples, before removing low-confidence genotypes in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_raw",
+  "comment": "Total number of alleles in samples, before removing low-confidence genotypes in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_raw",
+  "comment": "Alternate allele frequency in samples, before removing low-confidence genotypes in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_raw",
+  "comment": "Count of homozygous individuals in samples, before removing low-confidence genotypes in non_cancer subset"
+}, {
+  "col_name": "ac_non_neuro_mid",
+  "comment": "Alternate allele count for samples of Middle Eastern ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_mid",
+  "comment": "Total number of alleles in samples of Middle Eastern ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_mid",
+  "comment": "Alternate allele frequency in samples of Middle Eastern ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_mid",
+  "comment": "Count of homozygous individuals in samples of Middle Eastern ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_v2_asj_xy",
+  "comment": "Alternate allele count for XY samples of Ashkenazi Jewish ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_asj_xy",
+  "comment": "Total number of alleles in XY samples of Ashkenazi Jewish ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_asj_xy",
+  "comment": "Alternate allele frequency in XY samples of Ashkenazi Jewish ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_asj_xy",
+  "comment": "Count of homozygous individuals in XY samples of Ashkenazi Jewish ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_v2_afr",
+  "comment": "Alternate allele count for samples of African/African-American ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_afr",
+  "comment": "Total number of alleles in samples of African/African-American ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_afr",
+  "comment": "Alternate allele frequency in samples of African/African-American ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_afr",
+  "comment": "Count of homozygous individuals in samples of African/African-American ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_neuro_fin_xy",
+  "comment": "Alternate allele count for XY samples of Finnish ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_fin_xy",
+  "comment": "Total number of alleles in XY samples of Finnish ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_fin_xy",
+  "comment": "Alternate allele frequency in XY samples of Finnish ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_fin_xy",
+  "comment": "Count of homozygous individuals in XY samples of Finnish ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_cancer_afr",
+  "comment": "Alternate allele count for samples of African/African-American ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_afr",
+  "comment": "Total number of alleles in samples of African/African-American ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_afr",
+  "comment": "Alternate allele frequency in samples of African/African-American ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_afr",
+  "comment": "Count of homozygous individuals in samples of African/African-American ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_topmed_sas_xy",
+  "comment": "Alternate allele count for XY samples of South Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_sas_xy",
+  "comment": "Total number of alleles in XY samples of South Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_sas_xy",
+  "comment": "Alternate allele frequency in XY samples of South Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_sas_xy",
+  "comment": "Count of homozygous individuals in XY samples of South Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_mid_xy",
+  "comment": "Alternate allele count for XY samples of Middle Eastern ancestry"
+}, {
+  "col_name": "an_mid_xy",
+  "comment": "Total number of alleles in XY samples of Middle Eastern ancestry"
+}, {
+  "col_name": "af_mid_xy",
+  "comment": "Alternate allele frequency in XY samples of Middle Eastern ancestry"
+}, {
+  "col_name": "nhomalt_mid_xy",
+  "comment": "Count of homozygous individuals in XY samples of Middle Eastern ancestry"
+}, {
+  "col_name": "ac_non_v2_oth_xy",
+  "comment": "Alternate allele count for XY samples of Other ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_oth_xy",
+  "comment": "Total number of alleles in XY samples of Other ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_oth_xy",
+  "comment": "Alternate allele frequency in XY samples of Other ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_oth_xy",
+  "comment": "Count of homozygous individuals in XY samples of Other ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_fin",
+  "comment": "Alternate allele count for samples of Finnish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_fin",
+  "comment": "Total number of alleles in samples of Finnish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_fin",
+  "comment": "Alternate allele frequency in samples of Finnish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_fin",
+  "comment": "Count of homozygous individuals in samples of Finnish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_neuro_eas_xy",
+  "comment": "Alternate allele count for XY samples of East Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_eas_xy",
+  "comment": "Total number of alleles in XY samples of East Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_eas_xy",
+  "comment": "Alternate allele frequency in XY samples of East Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_eas_xy",
+  "comment": "Count of homozygous individuals in XY samples of East Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_topmed_eas_xx",
+  "comment": "Alternate allele count for XX samples of East Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_eas_xx",
+  "comment": "Total number of alleles in XX samples of East Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_eas_xx",
+  "comment": "Alternate allele frequency in XX samples of East Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_eas_xx",
+  "comment": "Count of homozygous individuals in XX samples of East Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_v2_afr_xx",
+  "comment": "Alternate allele count for XX samples of African/African-American ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_afr_xx",
+  "comment": "Total number of alleles in XX samples of African/African-American ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_afr_xx",
+  "comment": "Alternate allele frequency in XX samples of African/African-American ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_afr_xx",
+  "comment": "Count of homozygous individuals in XX samples of African/African-American ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_neuro_amr_xx",
+  "comment": "Alternate allele count for XX samples of Latino ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_amr_xx",
+  "comment": "Total number of alleles in XX samples of Latino ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_amr_xx",
+  "comment": "Alternate allele frequency in XX samples of Latino ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_amr_xx",
+  "comment": "Count of homozygous individuals in XX samples of Latino ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_cancer_ami",
+  "comment": "Alternate allele count for samples of Amish ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_ami",
+  "comment": "Total number of alleles in samples of Amish ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_ami",
+  "comment": "Alternate allele frequency in samples of Amish ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_ami",
+  "comment": "Count of homozygous individuals in samples of Amish ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_xy",
+  "comment": "Alternate allele count for XY samples"
+}, {
+  "col_name": "an_xy",
+  "comment": "Total number of alleles in XY samples"
+}, {
+  "col_name": "af_xy",
+  "comment": "Alternate allele frequency in XY samples"
+}, {
+  "col_name": "nhomalt_xy",
+  "comment": "Count of homozygous individuals in XY samples"
+}, {
+  "col_name": "ac_non_topmed_asj_xx",
+  "comment": "Alternate allele count for XX samples of Ashkenazi Jewish ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_asj_xx",
+  "comment": "Total number of alleles in XX samples of Ashkenazi Jewish ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_asj_xx",
+  "comment": "Alternate allele frequency in XX samples of Ashkenazi Jewish ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_asj_xx",
+  "comment": "Count of homozygous individuals in XX samples of Ashkenazi Jewish ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_topmed_eas_xy",
+  "comment": "Alternate allele count for XY samples of East Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_eas_xy",
+  "comment": "Total number of alleles in XY samples of East Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_eas_xy",
+  "comment": "Alternate allele frequency in XY samples of East Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_eas_xy",
+  "comment": "Count of homozygous individuals in XY samples of East Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_v2_eas_xy",
+  "comment": "Alternate allele count for XY samples of East Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_eas_xy",
+  "comment": "Total number of alleles in XY samples of East Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_eas_xy",
+  "comment": "Alternate allele frequency in XY samples of East Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_eas_xy",
+  "comment": "Count of homozygous individuals in XY samples of East Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_eas",
+  "comment": "Alternate allele count for samples of East Asian ancestry"
+}, {
+  "col_name": "an_eas",
+  "comment": "Total number of alleles in samples of East Asian ancestry"
+}, {
+  "col_name": "af_eas",
+  "comment": "Alternate allele frequency in samples of East Asian ancestry"
+}, {
+  "col_name": "nhomalt_eas",
+  "comment": "Count of homozygous individuals in samples of East Asian ancestry"
+}, {
+  "col_name": "ac_asj_xy",
+  "comment": "Alternate allele count for XY samples of Ashkenazi Jewish ancestry"
+}, {
+  "col_name": "an_asj_xy",
+  "comment": "Total number of alleles in XY samples of Ashkenazi Jewish ancestry"
+}, {
+  "col_name": "af_asj_xy",
+  "comment": "Alternate allele frequency in XY samples of Ashkenazi Jewish ancestry"
+}, {
+  "col_name": "nhomalt_asj_xy",
+  "comment": "Count of homozygous individuals in XY samples of Ashkenazi Jewish ancestry"
+}, {
+  "col_name": "ac_non_v2_eas_xx",
+  "comment": "Alternate allele count for XX samples of East Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_eas_xx",
+  "comment": "Total number of alleles in XX samples of East Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_eas_xx",
+  "comment": "Alternate allele frequency in XX samples of East Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_eas_xx",
+  "comment": "Count of homozygous individuals in XX samples of East Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_mid_xy",
+  "comment": "Alternate allele count for XY samples of Middle Eastern ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_mid_xy",
+  "comment": "Total number of alleles in XY samples of Middle Eastern ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_mid_xy",
+  "comment": "Alternate allele frequency in XY samples of Middle Eastern ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_mid_xy",
+  "comment": "Count of homozygous individuals in XY samples of Middle Eastern ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_fin_xy",
+  "comment": "Alternate allele count for XY samples of Finnish ancestry"
+}, {
+  "col_name": "an_fin_xy",
+  "comment": "Total number of alleles in XY samples of Finnish ancestry"
+}, {
+  "col_name": "af_fin_xy",
+  "comment": "Alternate allele frequency in XY samples of Finnish ancestry"
+}, {
+  "col_name": "nhomalt_fin_xy",
+  "comment": "Count of homozygous individuals in XY samples of Finnish ancestry"
+}, {
+  "col_name": "ac_non_topmed_nfe",
+  "comment": "Alternate allele count for samples of Non-Finnish European ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_nfe",
+  "comment": "Total number of alleles in samples of Non-Finnish European ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_nfe",
+  "comment": "Alternate allele frequency in samples of Non-Finnish European ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_nfe",
+  "comment": "Count of homozygous individuals in samples of Non-Finnish European ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_amr",
+  "comment": "Alternate allele count for samples of Latino ancestry"
+}, {
+  "col_name": "an_amr",
+  "comment": "Total number of alleles in samples of Latino ancestry"
+}, {
+  "col_name": "af_amr",
+  "comment": "Alternate allele frequency in samples of Latino ancestry"
+}, {
+  "col_name": "nhomalt_amr",
+  "comment": "Count of homozygous individuals in samples of Latino ancestry"
+}, {
+  "col_name": "ac_non_neuro_ami",
+  "comment": "Alternate allele count for samples of Amish ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_ami",
+  "comment": "Total number of alleles in samples of Amish ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_ami",
+  "comment": "Alternate allele frequency in samples of Amish ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_ami",
+  "comment": "Count of homozygous individuals in samples of Amish ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_cancer_nfe_xx",
+  "comment": "Alternate allele count for XX samples of Non-Finnish European ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_nfe_xx",
+  "comment": "Total number of alleles in XX samples of Non-Finnish European ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_nfe_xx",
+  "comment": "Alternate allele frequency in XX samples of Non-Finnish European ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_nfe_xx",
+  "comment": "Count of homozygous individuals in XX samples of Non-Finnish European ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_cancer_mid",
+  "comment": "Alternate allele count for samples of Middle Eastern ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_mid",
+  "comment": "Total number of alleles in samples of Middle Eastern ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_mid",
+  "comment": "Alternate allele frequency in samples of Middle Eastern ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_mid",
+  "comment": "Count of homozygous individuals in samples of Middle Eastern ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_v2_mid_xy",
+  "comment": "Alternate allele count for XY samples of Middle Eastern ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_mid_xy",
+  "comment": "Total number of alleles in XY samples of Middle Eastern ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_mid_xy",
+  "comment": "Alternate allele frequency in XY samples of Middle Eastern ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_mid_xy",
+  "comment": "Count of homozygous individuals in XY samples of Middle Eastern ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_amr_xy",
+  "comment": "Alternate allele count for XY samples of Latino ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_amr_xy",
+  "comment": "Total number of alleles in XY samples of Latino ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_amr_xy",
+  "comment": "Alternate allele frequency in XY samples of Latino ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_amr_xy",
+  "comment": "Count of homozygous individuals in XY samples of Latino ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_cancer_ami_xy",
+  "comment": "Alternate allele count for XY samples of Amish ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_ami_xy",
+  "comment": "Total number of alleles in XY samples of Amish ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_ami_xy",
+  "comment": "Alternate allele frequency in XY samples of Amish ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_ami_xy",
+  "comment": "Count of homozygous individuals in XY samples of Amish ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_neuro_asj_xx",
+  "comment": "Alternate allele count for XX samples of Ashkenazi Jewish ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_asj_xx",
+  "comment": "Total number of alleles in XX samples of Ashkenazi Jewish ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_asj_xx",
+  "comment": "Alternate allele frequency in XX samples of Ashkenazi Jewish ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_asj_xx",
+  "comment": "Count of homozygous individuals in XX samples of Ashkenazi Jewish ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_afr",
+  "comment": "Alternate allele count for samples of African/African-American ancestry"
+}, {
+  "col_name": "an_afr",
+  "comment": "Total number of alleles in samples of African/African-American ancestry"
+}, {
+  "col_name": "af_afr",
+  "comment": "Alternate allele frequency in samples of African/African-American ancestry"
+}, {
+  "col_name": "nhomalt_afr",
+  "comment": "Count of homozygous individuals in samples of African/African-American ancestry"
+}, {
+  "col_name": "ac_non_v2_sas_xx",
+  "comment": "Alternate allele count for XX samples of South Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_sas_xx",
+  "comment": "Total number of alleles in XX samples of South Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_sas_xx",
+  "comment": "Alternate allele frequency in XX samples of South Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_sas_xx",
+  "comment": "Count of homozygous individuals in XX samples of South Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_neuro_afr_xx",
+  "comment": "Alternate allele count for XX samples of African/African-American ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_afr_xx",
+  "comment": "Total number of alleles in XX samples of African/African-American ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_afr_xx",
+  "comment": "Alternate allele frequency in XX samples of African/African-American ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_afr_xx",
+  "comment": "Count of homozygous individuals in XX samples of African/African-American ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_cancer_sas",
+  "comment": "Alternate allele count for samples of South Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_sas",
+  "comment": "Total number of alleles in samples of South Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_sas",
+  "comment": "Alternate allele frequency in samples of South Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_sas",
+  "comment": "Count of homozygous individuals in samples of South Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_topmed_fin",
+  "comment": "Alternate allele count for samples of Finnish ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_fin",
+  "comment": "Total number of alleles in samples of Finnish ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_fin",
+  "comment": "Alternate allele frequency in samples of Finnish ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_fin",
+  "comment": "Count of homozygous individuals in samples of Finnish ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_cancer_asj_xy",
+  "comment": "Alternate allele count for XY samples of Ashkenazi Jewish ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_asj_xy",
+  "comment": "Total number of alleles in XY samples of Ashkenazi Jewish ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_asj_xy",
+  "comment": "Alternate allele frequency in XY samples of Ashkenazi Jewish ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_asj_xy",
+  "comment": "Count of homozygous individuals in XY samples of Ashkenazi Jewish ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_cancer_mid_xy",
+  "comment": "Alternate allele count for XY samples of Middle Eastern ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_mid_xy",
+  "comment": "Total number of alleles in XY samples of Middle Eastern ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_mid_xy",
+  "comment": "Alternate allele frequency in XY samples of Middle Eastern ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_mid_xy",
+  "comment": "Count of homozygous individuals in XY samples of Middle Eastern ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_raw",
+  "comment": "Alternate allele count for samples, before removing low-confidence genotypes"
+}, {
+  "col_name": "an_raw",
+  "comment": "Total number of alleles in samples, before removing low-confidence genotypes"
+}, {
+  "col_name": "af_raw",
+  "comment": "Alternate allele frequency in samples, before removing low-confidence genotypes"
+}, {
+  "col_name": "nhomalt_raw",
+  "comment": "Count of homozygous individuals in samples, before removing low-confidence genotypes"
+}, {
+  "col_name": "ac_non_topmed_xx",
+  "comment": "Alternate allele count for XX samples in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_xx",
+  "comment": "Total number of alleles in XX samples in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_xx",
+  "comment": "Alternate allele frequency in XX samples in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_xx",
+  "comment": "Count of homozygous individuals in XX samples in non_topmed subset"
+}, {
+  "col_name": "ac_ami_xx",
+  "comment": "Alternate allele count for XX samples of Amish ancestry"
+}, {
+  "col_name": "an_ami_xx",
+  "comment": "Total number of alleles in XX samples of Amish ancestry"
+}, {
+  "col_name": "af_ami_xx",
+  "comment": "Alternate allele frequency in XX samples of Amish ancestry"
+}, {
+  "col_name": "nhomalt_ami_xx",
+  "comment": "Count of homozygous individuals in XX samples of Amish ancestry"
+}, {
+  "col_name": "ac_eas_xy",
+  "comment": "Alternate allele count for XY samples of East Asian ancestry"
+}, {
+  "col_name": "an_eas_xy",
+  "comment": "Total number of alleles in XY samples of East Asian ancestry"
+}, {
+  "col_name": "af_eas_xy",
+  "comment": "Alternate allele frequency in XY samples of East Asian ancestry"
+}, {
+  "col_name": "nhomalt_eas_xy",
+  "comment": "Count of homozygous individuals in XY samples of East Asian ancestry"
+}, {
+  "col_name": "ac_controls_and_biobanks_mid",
+  "comment": "Alternate allele count for samples of Middle Eastern ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_mid",
+  "comment": "Total number of alleles in samples of Middle Eastern ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_mid",
+  "comment": "Alternate allele frequency in samples of Middle Eastern ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_mid",
+  "comment": "Count of homozygous individuals in samples of Middle Eastern ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_v2_nfe_xy",
+  "comment": "Alternate allele count for XY samples of Non-Finnish European ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_nfe_xy",
+  "comment": "Total number of alleles in XY samples of Non-Finnish European ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_nfe_xy",
+  "comment": "Alternate allele frequency in XY samples of Non-Finnish European ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_nfe_xy",
+  "comment": "Count of homozygous individuals in XY samples of Non-Finnish European ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_sas",
+  "comment": "Alternate allele count for samples of South Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_sas",
+  "comment": "Total number of alleles in samples of South Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_sas",
+  "comment": "Alternate allele frequency in samples of South Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_sas",
+  "comment": "Count of homozygous individuals in samples of South Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_v2_eas",
+  "comment": "Alternate allele count for samples of East Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_eas",
+  "comment": "Total number of alleles in samples of East Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_eas",
+  "comment": "Alternate allele frequency in samples of East Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_eas",
+  "comment": "Count of homozygous individuals in samples of East Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_mid",
+  "comment": "Alternate allele count for samples of Middle Eastern ancestry"
+}, {
+  "col_name": "an_mid",
+  "comment": "Total number of alleles in samples of Middle Eastern ancestry"
+}, {
+  "col_name": "af_mid",
+  "comment": "Alternate allele frequency in samples of Middle Eastern ancestry"
+}, {
+  "col_name": "nhomalt_mid",
+  "comment": "Count of homozygous individuals in samples of Middle Eastern ancestry"
+}, {
+  "col_name": "ac_oth_xy",
+  "comment": "Alternate allele count for XY samples of Other ancestry"
+}, {
+  "col_name": "an_oth_xy",
+  "comment": "Total number of alleles in XY samples of Other ancestry"
+}, {
+  "col_name": "af_oth_xy",
+  "comment": "Alternate allele frequency in XY samples of Other ancestry"
+}, {
+  "col_name": "nhomalt_oth_xy",
+  "comment": "Count of homozygous individuals in XY samples of Other ancestry"
+}, {
+  "col_name": "ac_non_cancer_nfe",
+  "comment": "Alternate allele count for samples of Non-Finnish European ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_nfe",
+  "comment": "Total number of alleles in samples of Non-Finnish European ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_nfe",
+  "comment": "Alternate allele frequency in samples of Non-Finnish European ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_nfe",
+  "comment": "Count of homozygous individuals in samples of Non-Finnish European ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_neuro_eas_xx",
+  "comment": "Alternate allele count for XX samples of East Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_eas_xx",
+  "comment": "Total number of alleles in XX samples of East Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_eas_xx",
+  "comment": "Alternate allele frequency in XX samples of East Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_eas_xx",
+  "comment": "Count of homozygous individuals in XX samples of East Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_neuro_sas_xy",
+  "comment": "Alternate allele count for XY samples of South Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_sas_xy",
+  "comment": "Total number of alleles in XY samples of South Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_sas_xy",
+  "comment": "Alternate allele frequency in XY samples of South Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_sas_xy",
+  "comment": "Count of homozygous individuals in XY samples of South Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_cancer_ami_xx",
+  "comment": "Alternate allele count for XX samples of Amish ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_ami_xx",
+  "comment": "Total number of alleles in XX samples of Amish ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_ami_xx",
+  "comment": "Alternate allele frequency in XX samples of Amish ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_ami_xx",
+  "comment": "Count of homozygous individuals in XX samples of Amish ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_mid_xx",
+  "comment": "Alternate allele count for XX samples of Middle Eastern ancestry"
+}, {
+  "col_name": "an_mid_xx",
+  "comment": "Total number of alleles in XX samples of Middle Eastern ancestry"
+}, {
+  "col_name": "af_mid_xx",
+  "comment": "Alternate allele frequency in XX samples of Middle Eastern ancestry"
+}, {
+  "col_name": "nhomalt_mid_xx",
+  "comment": "Count of homozygous individuals in XX samples of Middle Eastern ancestry"
+}, {
+  "col_name": "ac_non_topmed_asj",
+  "comment": "Alternate allele count for samples of Ashkenazi Jewish ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_asj",
+  "comment": "Total number of alleles in samples of Ashkenazi Jewish ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_asj",
+  "comment": "Alternate allele frequency in samples of Ashkenazi Jewish ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_asj",
+  "comment": "Count of homozygous individuals in samples of Ashkenazi Jewish ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_v2_asj_xx",
+  "comment": "Alternate allele count for XX samples of Ashkenazi Jewish ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_asj_xx",
+  "comment": "Total number of alleles in XX samples of Ashkenazi Jewish ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_asj_xx",
+  "comment": "Alternate allele frequency in XX samples of Ashkenazi Jewish ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_asj_xx",
+  "comment": "Count of homozygous individuals in XX samples of Ashkenazi Jewish ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt",
+  "comment": "Count of homozygous individuals"
+}, {
+  "col_name": "ac_non_v2_amr_xy",
+  "comment": "Alternate allele count for XY samples of Latino ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_amr_xy",
+  "comment": "Total number of alleles in XY samples of Latino ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_amr_xy",
+  "comment": "Alternate allele frequency in XY samples of Latino ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_amr_xy",
+  "comment": "Count of homozygous individuals in XY samples of Latino ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_cancer_amr_xx",
+  "comment": "Alternate allele count for XX samples of Latino ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_amr_xx",
+  "comment": "Total number of alleles in XX samples of Latino ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_amr_xx",
+  "comment": "Alternate allele frequency in XX samples of Latino ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_amr_xx",
+  "comment": "Count of homozygous individuals in XX samples of Latino ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_afr_xx",
+  "comment": "Alternate allele count for XX samples of African/African-American ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_afr_xx",
+  "comment": "Total number of alleles in XX samples of African/African-American ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_afr_xx",
+  "comment": "Alternate allele frequency in XX samples of African/African-American ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_afr_xx",
+  "comment": "Count of homozygous individuals in XX samples of African/African-American ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_asj",
+  "comment": "Alternate allele count for samples of Ashkenazi Jewish ancestry"
+}, {
+  "col_name": "an_asj",
+  "comment": "Total number of alleles in samples of Ashkenazi Jewish ancestry"
+}, {
+  "col_name": "af_asj",
+  "comment": "Alternate allele frequency in samples of Ashkenazi Jewish ancestry"
+}, {
+  "col_name": "nhomalt_asj",
+  "comment": "Count of homozygous individuals in samples of Ashkenazi Jewish ancestry"
+}, {
+  "col_name": "ac_non_topmed_asj_xy",
+  "comment": "Alternate allele count for XY samples of Ashkenazi Jewish ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_asj_xy",
+  "comment": "Total number of alleles in XY samples of Ashkenazi Jewish ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_asj_xy",
+  "comment": "Alternate allele frequency in XY samples of Ashkenazi Jewish ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_asj_xy",
+  "comment": "Count of homozygous individuals in XY samples of Ashkenazi Jewish ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_v2_fin_xx",
+  "comment": "Alternate allele count for XX samples of Finnish ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_fin_xx",
+  "comment": "Total number of alleles in XX samples of Finnish ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_fin_xx",
+  "comment": "Alternate allele frequency in XX samples of Finnish ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_fin_xx",
+  "comment": "Count of homozygous individuals in XX samples of Finnish ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_topmed_ami",
+  "comment": "Alternate allele count for samples of Amish ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_ami",
+  "comment": "Total number of alleles in samples of Amish ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_ami",
+  "comment": "Alternate allele frequency in samples of Amish ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_ami",
+  "comment": "Count of homozygous individuals in samples of Amish ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_eas_xx",
+  "comment": "Alternate allele count for XX samples of East Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_eas_xx",
+  "comment": "Total number of alleles in XX samples of East Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_eas_xx",
+  "comment": "Alternate allele frequency in XX samples of East Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_eas_xx",
+  "comment": "Count of homozygous individuals in XX samples of East Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_fin_xx",
+  "comment": "Alternate allele count for XX samples of Finnish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_fin_xx",
+  "comment": "Total number of alleles in XX samples of Finnish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_fin_xx",
+  "comment": "Alternate allele frequency in XX samples of Finnish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_fin_xx",
+  "comment": "Count of homozygous individuals in XX samples of Finnish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_topmed_raw",
+  "comment": "Alternate allele count for samples, before removing low-confidence genotypes in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_raw",
+  "comment": "Total number of alleles in samples, before removing low-confidence genotypes in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_raw",
+  "comment": "Alternate allele frequency in samples, before removing low-confidence genotypes in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_raw",
+  "comment": "Count of homozygous individuals in samples, before removing low-confidence genotypes in non_topmed subset"
+}, {
+  "col_name": "ac_non_cancer_eas_xy",
+  "comment": "Alternate allele count for XY samples of East Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_eas_xy",
+  "comment": "Total number of alleles in XY samples of East Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_eas_xy",
+  "comment": "Alternate allele frequency in XY samples of East Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_eas_xy",
+  "comment": "Count of homozygous individuals in XY samples of East Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_cancer",
+  "comment": "Alternate allele count in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer",
+  "comment": "Total number of alleles in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer",
+  "comment": "Alternate allele frequency in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer",
+  "comment": "Count of homozygous individuals in non_cancer subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_ami_xy",
+  "comment": "Alternate allele count for XY samples of Amish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_ami_xy",
+  "comment": "Total number of alleles in XY samples of Amish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_ami_xy",
+  "comment": "Alternate allele frequency in XY samples of Amish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_ami_xy",
+  "comment": "Count of homozygous individuals in XY samples of Amish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_mid_xx",
+  "comment": "Alternate allele count for XX samples of Middle Eastern ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_mid_xx",
+  "comment": "Total number of alleles in XX samples of Middle Eastern ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_mid_xx",
+  "comment": "Alternate allele frequency in XX samples of Middle Eastern ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_mid_xx",
+  "comment": "Count of homozygous individuals in XX samples of Middle Eastern ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_v2_afr_xy",
+  "comment": "Alternate allele count for XY samples of African/African-American ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_afr_xy",
+  "comment": "Total number of alleles in XY samples of African/African-American ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_afr_xy",
+  "comment": "Alternate allele frequency in XY samples of African/African-American ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_afr_xy",
+  "comment": "Count of homozygous individuals in XY samples of African/African-American ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_v2_sas_xy",
+  "comment": "Alternate allele count for XY samples of South Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_sas_xy",
+  "comment": "Total number of alleles in XY samples of South Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_sas_xy",
+  "comment": "Alternate allele frequency in XY samples of South Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_sas_xy",
+  "comment": "Count of homozygous individuals in XY samples of South Asian ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_v2_fin",
+  "comment": "Alternate allele count for samples of Finnish ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_fin",
+  "comment": "Total number of alleles in samples of Finnish ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_fin",
+  "comment": "Alternate allele frequency in samples of Finnish ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_fin",
+  "comment": "Count of homozygous individuals in samples of Finnish ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_neuro_oth",
+  "comment": "Alternate allele count for samples of Other ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_oth",
+  "comment": "Total number of alleles in samples of Other ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_oth",
+  "comment": "Alternate allele frequency in samples of Other ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_oth",
+  "comment": "Count of homozygous individuals in samples of Other ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_cancer_sas_xx",
+  "comment": "Alternate allele count for XX samples of South Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_sas_xx",
+  "comment": "Total number of alleles in XX samples of South Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_sas_xx",
+  "comment": "Alternate allele frequency in XX samples of South Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_sas_xx",
+  "comment": "Count of homozygous individuals in XX samples of South Asian ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_neuro_asj",
+  "comment": "Alternate allele count for samples of Ashkenazi Jewish ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_asj",
+  "comment": "Total number of alleles in samples of Ashkenazi Jewish ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_asj",
+  "comment": "Alternate allele frequency in samples of Ashkenazi Jewish ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_asj",
+  "comment": "Count of homozygous individuals in samples of Ashkenazi Jewish ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_topmed_afr",
+  "comment": "Alternate allele count for samples of African/African-American ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_afr",
+  "comment": "Total number of alleles in samples of African/African-American ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_afr",
+  "comment": "Alternate allele frequency in samples of African/African-American ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_afr",
+  "comment": "Count of homozygous individuals in samples of African/African-American ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_topmed_afr_xy",
+  "comment": "Alternate allele count for XY samples of African/African-American ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_afr_xy",
+  "comment": "Total number of alleles in XY samples of African/African-American ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_afr_xy",
+  "comment": "Alternate allele frequency in XY samples of African/African-American ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_afr_xy",
+  "comment": "Count of homozygous individuals in XY samples of African/African-American ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_neuro_eas",
+  "comment": "Alternate allele count for samples of East Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_eas",
+  "comment": "Total number of alleles in samples of East Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_eas",
+  "comment": "Alternate allele frequency in samples of East Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_eas",
+  "comment": "Count of homozygous individuals in samples of East Asian ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_afr_xx",
+  "comment": "Alternate allele count for XX samples of African/African-American ancestry"
+}, {
+  "col_name": "an_afr_xx",
+  "comment": "Total number of alleles in XX samples of African/African-American ancestry"
+}, {
+  "col_name": "af_afr_xx",
+  "comment": "Alternate allele frequency in XX samples of African/African-American ancestry"
+}, {
+  "col_name": "nhomalt_afr_xx",
+  "comment": "Count of homozygous individuals in XX samples of African/African-American ancestry"
+}, {
+  "col_name": "ac_non_neuro_mid_xy",
+  "comment": "Alternate allele count for XY samples of Middle Eastern ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_mid_xy",
+  "comment": "Total number of alleles in XY samples of Middle Eastern ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_mid_xy",
+  "comment": "Alternate allele frequency in XY samples of Middle Eastern ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_mid_xy",
+  "comment": "Count of homozygous individuals in XY samples of Middle Eastern ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_topmed_fin_xx",
+  "comment": "Alternate allele count for XX samples of Finnish ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_fin_xx",
+  "comment": "Total number of alleles in XX samples of Finnish ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_fin_xx",
+  "comment": "Alternate allele frequency in XX samples of Finnish ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_fin_xx",
+  "comment": "Count of homozygous individuals in XX samples of Finnish ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_cancer_amr",
+  "comment": "Alternate allele count for samples of Latino ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_amr",
+  "comment": "Total number of alleles in samples of Latino ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_amr",
+  "comment": "Alternate allele frequency in samples of Latino ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_amr",
+  "comment": "Count of homozygous individuals in samples of Latino ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_v2_ami_xx",
+  "comment": "Alternate allele count for XX samples of Amish ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_ami_xx",
+  "comment": "Total number of alleles in XX samples of Amish ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_ami_xx",
+  "comment": "Alternate allele frequency in XX samples of Amish ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_ami_xx",
+  "comment": "Count of homozygous individuals in XX samples of Amish ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_afr_xy",
+  "comment": "Alternate allele count for XY samples of African/African-American ancestry"
+}, {
+  "col_name": "an_afr_xy",
+  "comment": "Total number of alleles in XY samples of African/African-American ancestry"
+}, {
+  "col_name": "af_afr_xy",
+  "comment": "Alternate allele frequency in XY samples of African/African-American ancestry"
+}, {
+  "col_name": "nhomalt_afr_xy",
+  "comment": "Count of homozygous individuals in XY samples of African/African-American ancestry"
+}, {
+  "col_name": "ac_non_v2_mid_xx",
+  "comment": "Alternate allele count for XX samples of Middle Eastern ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_mid_xx",
+  "comment": "Total number of alleles in XX samples of Middle Eastern ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_mid_xx",
+  "comment": "Alternate allele frequency in XX samples of Middle Eastern ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_mid_xx",
+  "comment": "Count of homozygous individuals in XX samples of Middle Eastern ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_topmed_fin_xy",
+  "comment": "Alternate allele count for XY samples of Finnish ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_fin_xy",
+  "comment": "Total number of alleles in XY samples of Finnish ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_fin_xy",
+  "comment": "Alternate allele frequency in XY samples of Finnish ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_fin_xy",
+  "comment": "Count of homozygous individuals in XY samples of Finnish ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_neuro_amr_xy",
+  "comment": "Alternate allele count for XY samples of Latino ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_amr_xy",
+  "comment": "Total number of alleles in XY samples of Latino ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_amr_xy",
+  "comment": "Alternate allele frequency in XY samples of Latino ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_amr_xy",
+  "comment": "Count of homozygous individuals in XY samples of Latino ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_topmed_mid_xx",
+  "comment": "Alternate allele count for XX samples of Middle Eastern ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_mid_xx",
+  "comment": "Total number of alleles in XX samples of Middle Eastern ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_mid_xx",
+  "comment": "Alternate allele frequency in XX samples of Middle Eastern ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_mid_xx",
+  "comment": "Count of homozygous individuals in XX samples of Middle Eastern ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_asj_xy",
+  "comment": "Alternate allele count for XY samples of Ashkenazi Jewish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_asj_xy",
+  "comment": "Total number of alleles in XY samples of Ashkenazi Jewish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_asj_xy",
+  "comment": "Alternate allele frequency in XY samples of Ashkenazi Jewish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_asj_xy",
+  "comment": "Count of homozygous individuals in XY samples of Ashkenazi Jewish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_v2_fin_xy",
+  "comment": "Alternate allele count for XY samples of Finnish ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_fin_xy",
+  "comment": "Total number of alleles in XY samples of Finnish ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_fin_xy",
+  "comment": "Alternate allele frequency in XY samples of Finnish ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_fin_xy",
+  "comment": "Count of homozygous individuals in XY samples of Finnish ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_ami_xx",
+  "comment": "Alternate allele count for XX samples of Amish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_ami_xx",
+  "comment": "Total number of alleles in XX samples of Amish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_ami_xx",
+  "comment": "Alternate allele frequency in XX samples of Amish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_ami_xx",
+  "comment": "Count of homozygous individuals in XX samples of Amish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_eas_xx",
+  "comment": "Alternate allele count for XX samples of East Asian ancestry"
+}, {
+  "col_name": "an_eas_xx",
+  "comment": "Total number of alleles in XX samples of East Asian ancestry"
+}, {
+  "col_name": "af_eas_xx",
+  "comment": "Alternate allele frequency in XX samples of East Asian ancestry"
+}, {
+  "col_name": "nhomalt_eas_xx",
+  "comment": "Count of homozygous individuals in XX samples of East Asian ancestry"
+}, {
+  "col_name": "ac_non_cancer_amr_xy",
+  "comment": "Alternate allele count for XY samples of Latino ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_amr_xy",
+  "comment": "Total number of alleles in XY samples of Latino ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_amr_xy",
+  "comment": "Alternate allele frequency in XY samples of Latino ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_amr_xy",
+  "comment": "Count of homozygous individuals in XY samples of Latino ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_neuro_ami_xx",
+  "comment": "Alternate allele count for XX samples of Amish ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_ami_xx",
+  "comment": "Total number of alleles in XX samples of Amish ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_ami_xx",
+  "comment": "Alternate allele frequency in XX samples of Amish ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_ami_xx",
+  "comment": "Count of homozygous individuals in XX samples of Amish ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_controls_and_biobanks",
+  "comment": "Alternate allele count in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks",
+  "comment": "Total number of alleles in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks",
+  "comment": "Alternate allele frequency in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks",
+  "comment": "Count of homozygous individuals in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_oth",
+  "comment": "Alternate allele count for samples of Other ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_oth",
+  "comment": "Total number of alleles in samples of Other ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_oth",
+  "comment": "Alternate allele frequency in samples of Other ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_oth",
+  "comment": "Count of homozygous individuals in samples of Other ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_nfe_xy",
+  "comment": "Alternate allele count for XY samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "an_nfe_xy",
+  "comment": "Total number of alleles in XY samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "af_nfe_xy",
+  "comment": "Alternate allele frequency in XY samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "nhomalt_nfe_xy",
+  "comment": "Count of homozygous individuals in XY samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "ac_non_cancer_afr_xx",
+  "comment": "Alternate allele count for XX samples of African/African-American ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_afr_xx",
+  "comment": "Total number of alleles in XX samples of African/African-American ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_afr_xx",
+  "comment": "Alternate allele frequency in XX samples of African/African-American ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_afr_xx",
+  "comment": "Count of homozygous individuals in XX samples of African/African-American ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_sas_xy",
+  "comment": "Alternate allele count for XY samples of South Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_sas_xy",
+  "comment": "Total number of alleles in XY samples of South Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_sas_xy",
+  "comment": "Alternate allele frequency in XY samples of South Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_sas_xy",
+  "comment": "Count of homozygous individuals in XY samples of South Asian ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_cancer_oth",
+  "comment": "Alternate allele count for samples of Other ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_oth",
+  "comment": "Total number of alleles in samples of Other ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_oth",
+  "comment": "Alternate allele frequency in samples of Other ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_oth",
+  "comment": "Count of homozygous individuals in samples of Other ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_topmed_oth",
+  "comment": "Alternate allele count for samples of Other ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_oth",
+  "comment": "Total number of alleles in samples of Other ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_oth",
+  "comment": "Alternate allele frequency in samples of Other ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_oth",
+  "comment": "Count of homozygous individuals in samples of Other ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_topmed_nfe_xy",
+  "comment": "Alternate allele count for XY samples of Non-Finnish European ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_nfe_xy",
+  "comment": "Total number of alleles in XY samples of Non-Finnish European ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_nfe_xy",
+  "comment": "Alternate allele frequency in XY samples of Non-Finnish European ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_nfe_xy",
+  "comment": "Count of homozygous individuals in XY samples of Non-Finnish European ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_topmed_sas_xx",
+  "comment": "Alternate allele count for XX samples of South Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_sas_xx",
+  "comment": "Total number of alleles in XX samples of South Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_sas_xx",
+  "comment": "Alternate allele frequency in XX samples of South Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_sas_xx",
+  "comment": "Count of homozygous individuals in XX samples of South Asian ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_v2_nfe",
+  "comment": "Alternate allele count for samples of Non-Finnish European ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_nfe",
+  "comment": "Total number of alleles in samples of Non-Finnish European ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_nfe",
+  "comment": "Alternate allele frequency in samples of Non-Finnish European ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_nfe",
+  "comment": "Count of homozygous individuals in samples of Non-Finnish European ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_topmed_oth_xx",
+  "comment": "Alternate allele count for XX samples of Other ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_oth_xx",
+  "comment": "Total number of alleles in XX samples of Other ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_oth_xx",
+  "comment": "Alternate allele frequency in XX samples of Other ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_oth_xx",
+  "comment": "Count of homozygous individuals in XX samples of Other ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_cancer_mid_xx",
+  "comment": "Alternate allele count for XX samples of Middle Eastern ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_mid_xx",
+  "comment": "Total number of alleles in XX samples of Middle Eastern ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_mid_xx",
+  "comment": "Alternate allele frequency in XX samples of Middle Eastern ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_mid_xx",
+  "comment": "Count of homozygous individuals in XX samples of Middle Eastern ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_nfe",
+  "comment": "Alternate allele count for samples of Non-Finnish European ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_nfe",
+  "comment": "Total number of alleles in samples of Non-Finnish European ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_nfe",
+  "comment": "Alternate allele frequency in samples of Non-Finnish European ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_nfe",
+  "comment": "Count of homozygous individuals in samples of Non-Finnish European ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_oth_xy",
+  "comment": "Alternate allele count for XY samples of Other ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_oth_xy",
+  "comment": "Total number of alleles in XY samples of Other ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_oth_xy",
+  "comment": "Alternate allele frequency in XY samples of Other ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_oth_xy",
+  "comment": "Count of homozygous individuals in XY samples of Other ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_fin_xy",
+  "comment": "Alternate allele count for XY samples of Finnish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_fin_xy",
+  "comment": "Total number of alleles in XY samples of Finnish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_fin_xy",
+  "comment": "Alternate allele frequency in XY samples of Finnish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_fin_xy",
+  "comment": "Count of homozygous individuals in XY samples of Finnish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_v2_amr_xx",
+  "comment": "Alternate allele count for XX samples of Latino ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_amr_xx",
+  "comment": "Total number of alleles in XX samples of Latino ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_amr_xx",
+  "comment": "Alternate allele frequency in XX samples of Latino ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_amr_xx",
+  "comment": "Count of homozygous individuals in XX samples of Latino ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_cancer_asj",
+  "comment": "Alternate allele count for samples of Ashkenazi Jewish ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_asj",
+  "comment": "Total number of alleles in samples of Ashkenazi Jewish ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_asj",
+  "comment": "Alternate allele frequency in samples of Ashkenazi Jewish ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_asj",
+  "comment": "Count of homozygous individuals in samples of Ashkenazi Jewish ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_cancer_oth_xx",
+  "comment": "Alternate allele count for XX samples of Other ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_oth_xx",
+  "comment": "Total number of alleles in XX samples of Other ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_oth_xx",
+  "comment": "Alternate allele frequency in XX samples of Other ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_oth_xx",
+  "comment": "Count of homozygous individuals in XX samples of Other ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_neuro_amr",
+  "comment": "Alternate allele count for samples of Latino ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_amr",
+  "comment": "Total number of alleles in samples of Latino ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_amr",
+  "comment": "Alternate allele frequency in samples of Latino ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_amr",
+  "comment": "Count of homozygous individuals in samples of Latino ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_cancer_xx",
+  "comment": "Alternate allele count for XX samples in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_xx",
+  "comment": "Total number of alleles in XX samples in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_xx",
+  "comment": "Alternate allele frequency in XX samples in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_xx",
+  "comment": "Count of homozygous individuals in XX samples in non_cancer subset"
+}, {
+  "col_name": "ac_non_v2_ami_xy",
+  "comment": "Alternate allele count for XY samples of Amish ancestry in non_v2 subset"
+}, {
+  "col_name": "an_non_v2_ami_xy",
+  "comment": "Total number of alleles in XY samples of Amish ancestry in non_v2 subset"
+}, {
+  "col_name": "af_non_v2_ami_xy",
+  "comment": "Alternate allele frequency in XY samples of Amish ancestry in non_v2 subset"
+}, {
+  "col_name": "nhomalt_non_v2_ami_xy",
+  "comment": "Count of homozygous individuals in XY samples of Amish ancestry in non_v2 subset"
+}, {
+  "col_name": "ac_non_neuro_raw",
+  "comment": "Alternate allele count for samples, before removing low-confidence genotypes in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_raw",
+  "comment": "Total number of alleles in samples, before removing low-confidence genotypes in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_raw",
+  "comment": "Alternate allele frequency in samples, before removing low-confidence genotypes in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_raw",
+  "comment": "Count of homozygous individuals in samples, before removing low-confidence genotypes in non_neuro subset"
+}, {
+  "col_name": "ac_non_neuro_afr",
+  "comment": "Alternate allele count for samples of African/African-American ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_afr",
+  "comment": "Total number of alleles in samples of African/African-American ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_afr",
+  "comment": "Alternate allele frequency in samples of African/African-American ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_afr",
+  "comment": "Count of homozygous individuals in samples of African/African-American ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_topmed_ami_xy",
+  "comment": "Alternate allele count for XY samples of Amish ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_ami_xy",
+  "comment": "Total number of alleles in XY samples of Amish ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_ami_xy",
+  "comment": "Alternate allele frequency in XY samples of Amish ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_ami_xy",
+  "comment": "Count of homozygous individuals in XY samples of Amish ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_neuro_oth_xy",
+  "comment": "Alternate allele count for XY samples of Other ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_oth_xy",
+  "comment": "Total number of alleles in XY samples of Other ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_oth_xy",
+  "comment": "Alternate allele frequency in XY samples of Other ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_oth_xy",
+  "comment": "Count of homozygous individuals in XY samples of Other ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_non_neuro_oth_xx",
+  "comment": "Alternate allele count for XX samples of Other ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_oth_xx",
+  "comment": "Total number of alleles in XX samples of Other ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_oth_xx",
+  "comment": "Alternate allele frequency in XX samples of Other ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_oth_xx",
+  "comment": "Count of homozygous individuals in XX samples of Other ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_xx",
+  "comment": "Alternate allele count for XX samples in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_xx",
+  "comment": "Total number of alleles in XX samples in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_xx",
+  "comment": "Alternate allele frequency in XX samples in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_xx",
+  "comment": "Count of homozygous individuals in XX samples in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_cancer_afr_xy",
+  "comment": "Alternate allele count for XY samples of African/African-American ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_afr_xy",
+  "comment": "Total number of alleles in XY samples of African/African-American ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_afr_xy",
+  "comment": "Alternate allele frequency in XY samples of African/African-American ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_afr_xy",
+  "comment": "Count of homozygous individuals in XY samples of African/African-American ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_non_cancer_fin",
+  "comment": "Alternate allele count for samples of Finnish ancestry in non_cancer subset"
+}, {
+  "col_name": "an_non_cancer_fin",
+  "comment": "Total number of alleles in samples of Finnish ancestry in non_cancer subset"
+}, {
+  "col_name": "af_non_cancer_fin",
+  "comment": "Alternate allele frequency in samples of Finnish ancestry in non_cancer subset"
+}, {
+  "col_name": "nhomalt_non_cancer_fin",
+  "comment": "Count of homozygous individuals in samples of Finnish ancestry in non_cancer subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_asj",
+  "comment": "Alternate allele count for samples of Ashkenazi Jewish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_asj",
+  "comment": "Total number of alleles in samples of Ashkenazi Jewish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_asj",
+  "comment": "Alternate allele frequency in samples of Ashkenazi Jewish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_asj",
+  "comment": "Count of homozygous individuals in samples of Ashkenazi Jewish ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_topmed_oth_xy",
+  "comment": "Alternate allele count for XY samples of Other ancestry in non_topmed subset"
+}, {
+  "col_name": "an_non_topmed_oth_xy",
+  "comment": "Total number of alleles in XY samples of Other ancestry in non_topmed subset"
+}, {
+  "col_name": "af_non_topmed_oth_xy",
+  "comment": "Alternate allele frequency in XY samples of Other ancestry in non_topmed subset"
+}, {
+  "col_name": "nhomalt_non_topmed_oth_xy",
+  "comment": "Count of homozygous individuals in XY samples of Other ancestry in non_topmed subset"
+}, {
+  "col_name": "ac_non_neuro_mid_xx",
+  "comment": "Alternate allele count for XX samples of Middle Eastern ancestry in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_mid_xx",
+  "comment": "Total number of alleles in XX samples of Middle Eastern ancestry in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_mid_xx",
+  "comment": "Alternate allele frequency in XX samples of Middle Eastern ancestry in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_mid_xx",
+  "comment": "Count of homozygous individuals in XX samples of Middle Eastern ancestry in non_neuro subset"
+}, {
+  "col_name": "ac_controls_and_biobanks_oth_xx",
+  "comment": "Alternate allele count for XX samples of Other ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "an_controls_and_biobanks_oth_xx",
+  "comment": "Total number of alleles in XX samples of Other ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "af_controls_and_biobanks_oth_xx",
+  "comment": "Alternate allele frequency in XX samples of Other ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "nhomalt_controls_and_biobanks_oth_xx",
+  "comment": "Count of homozygous individuals in XX samples of Other ancestry in controls_and_biobanks subset"
+}, {
+  "col_name": "ac_non_neuro_xy",
+  "comment": "Alternate allele count for XY samples in non_neuro subset"
+}, {
+  "col_name": "an_non_neuro_xy",
+  "comment": "Total number of alleles in XY samples in non_neuro subset"
+}, {
+  "col_name": "af_non_neuro_xy",
+  "comment": "Alternate allele frequency in XY samples in non_neuro subset"
+}, {
+  "col_name": "nhomalt_non_neuro_xy",
+  "comment": "Count of homozygous individuals in XY samples in non_neuro subset"
+}, {
+  "col_name": "ac_nfe",
+  "comment": "Alternate allele count for samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "an_nfe",
+  "comment": "Total number of alleles in samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "af_nfe",
+  "comment": "Alternate allele frequency in samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "nhomalt_nfe",
+  "comment": "Count of homozygous individuals in samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "ac_popmax",
+  "comment": "Allele count in the population with the maximum AF"
+}, {
+  "col_name": "an_popmax",
+  "comment": "Total number of alleles in the population with the maximum AF"
+}, {
+  "col_name": "af_popmax",
+  "comment": "Maximum allele frequency across populations"
+}, {
+  "col_name": "nhomalt_popmax",
+  "comment": "Count of homozygous individuals in the population with the maximum allele frequency"
+}, {
+  "col_name": "faf95_amr_xy",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for XY samples of Latino ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf99_amr_xy",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for XY samples of Latino ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf95_sas_xy",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for XY samples of South Asian ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf99_sas_xy",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for XY samples of South Asian ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf95_nfe_xx",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for XX samples of Non-Finnish European ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf99_nfe_xx",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for XX samples of Non-Finnish European ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf95_sas",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for samples of South Asian ancestry"
+}, {
+  "col_name": "faf99_sas",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for samples of South Asian ancestry"
+}, {
+  "col_name": "faf95_amr_xx",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for XX samples of Latino ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf99_amr_xx",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for XX samples of Latino ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf95_xx",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for XX samples in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf99_xx",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for XX samples in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf95_sas_xx",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for XX samples of South Asian ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf99_sas_xx",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for XX samples of South Asian ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf95_xy",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for XY samples in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf99_xy",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for XY samples in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf95_eas",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for samples of East Asian ancestry"
+}, {
+  "col_name": "faf99_eas",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for samples of East Asian ancestry"
+}, {
+  "col_name": "faf95_amr",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for samples of Latino ancestry"
+}, {
+  "col_name": "faf99_amr",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for samples of Latino ancestry"
+}, {
+  "col_name": "faf95_afr",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for samples of African/African-American ancestry"
+}, {
+  "col_name": "faf99_afr",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for samples of African/African-American ancestry"
+}, {
+  "col_name": "faf95_eas_xy",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for XY samples of East Asian ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf99_eas_xy",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for XY samples of East Asian ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf95",
+  "comment": "Filtering allele frequency (using Poisson 95% CI)"
+}, {
+  "col_name": "faf99",
+  "comment": "Filtering allele frequency (using Poisson 99% CI)"
+}, {
+  "col_name": "faf95_afr_xx",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for XX samples of African/African-American ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf99_afr_xx",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for XX samples of African/African-American ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf95_afr_xy",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for XY samples of African/African-American ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf99_afr_xy",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for XY samples of African/African-American ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf95_eas_xx",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for XX samples of East Asian ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf99_eas_xx",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for XX samples of East Asian ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf95_nfe_xy",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for XY samples of Non-Finnish European ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf99_nfe_xy",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for XY samples of Non-Finnish European ancestry in non-PAR regions of sex chromosomes only"
+}, {
+  "col_name": "faf95_nfe",
+  "comment": "Filtering allele frequency (using Poisson 95% CI) for samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "faf99_nfe",
+  "comment": "Filtering allele frequency (using Poisson 99% CI) for samples of Non-Finnish European ancestry"
+}, {
+  "col_name": "age_hist_het_bin_freq",
+  "comment": "Histogram of ages of heterozygous individuals; bin edges are: 30.0|35.0|40.0|45.0|50.0|55.0|60.0|65.0|70.0|75.0|80.0; total number of individuals of any genotype bin: bin_edges|bin_freq|n_smaller|n_larger"
+}, {
+  "col_name": "age_hist_het_n_smaller",
+  "comment": "Count of age values falling below lowest histogram bin edge for heterozygous individuals"
+}, {
+  "col_name": "age_hist_het_n_larger",
+  "comment": "Count of age values falling above highest histogram bin edge for heterozygous individuals"
+}, {
+  "col_name": "age_hist_hom_bin_freq",
+  "comment": "Histogram of ages of homozygous alternate individuals; bin edges are: 30.0|35.0|40.0|45.0|50.0|55.0|60.0|65.0|70.0|75.0|80.0; total number of individuals of any genotype bin: bin_edges|bin_freq|n_smaller|n_larger"
+}, {
+  "col_name": "age_hist_hom_n_smaller",
+  "comment": "Count of age values falling below lowest histogram bin edge for homozygous alternate individuals"
+}, {
+  "col_name": "age_hist_hom_n_larger",
+  "comment": "Count of age values falling above highest histogram bin edge for homozygous alternate individuals"
+}, {
+  "col_name": "fs",
+  "comment": "Phred-scaled p-value of Fisher's exact test for strand bias"
+}, {
+  "col_name": "mq",
+  "comment": "Root mean square of the mapping quality of reads across all samples"
+}, {
+  "col_name": "mqranksum",
+  "comment": "Z-score from Wilcoxon rank sum test of alternate vs. reference read mapping qualities"
+}, {
+  "col_name": "qd",
+  "comment": "Variant call confidence normalized by depth of sample reads supporting a variant"
+}, {
+  "col_name": "readposranksum",
+  "comment": "Z-score from Wilcoxon rank sum test of alternate vs. reference read position bias"
+}, {
+  "col_name": "vardp",
+  "comment": "Depth over variant genotypes (does not include depth of reference samples)"
+}, {
+  "col_name": "monoallelic",
+  "comment": "All samples are all homozygous alternate for the variant"
+}, {
+  "col_name": "qualapprox",
+  "comment": "Sum of PL[0] values; used to approximate the QUAL score"
+}, {
+  "col_name": "transmitted_singleton",
+  "comment": "Variant was a callset-wide doubleton that was transmitted within a family from a parent to a child (i.e., a singleton amongst unrelated samples in cohort)"
+}, {
+  "col_name": "as_fs",
+  "comment": "Allele-specific phred-scaled p-value of Fisher's exact test for strand bias"
+}, {
+  "col_name": "as_mq",
+  "comment": "Allele-specific root mean square of the mapping quality of reads across all samples"
+}, {
+  "col_name": "as_mqranksum",
+  "comment": "Allele-specific z-score from Wilcoxon rank sum test of alternate vs. reference read mapping qualities"
+}, {
+  "col_name": "as_pab_max",
+  "comment": "Maximum p-value over callset for binomial test of observed allele balance for a heterozygous genotype, given expectation of 0.5"
+}, {
+  "col_name": "as_qd",
+  "comment": "Allele-specific variant call confidence normalized by depth of sample reads supporting a variant"
+}, {
+  "col_name": "as_readposranksum",
+  "comment": "Allele-specific z-score from Wilcoxon rank sum test of alternate vs. reference read position bias"
+}, {
+  "col_name": "as_sor",
+  "comment": "Allele-specific strand bias estimated by the symmetric odds ratio test"
+}, {
+  "col_name": "inbreedingcoeff",
+  "comment": "Inbreeding coefficient, the excess heterozygosity at a variant site, computed as 1 - (the number of heterozygous genotypes)/(the number of heterozygous genotypes expected under Hardy-Weinberg equilibrium)"
+}, {
+  "col_name": "as_sb_table",
+  "comment": "Allele-specific forward/reverse read counts for strand bias tests"
+}, {
+  "col_name": "as_vqslod",
+  "comment": "Allele-specific log-odds ratio of being a true variant versus being a false positive under the trained VQSR Gaussian mixture model"
+}, {
+  "col_name": "as_culprit",
+  "comment": "Allele-specific worst-performing annotation in the VQSR Gaussian mixture model"
+}, {
+  "col_name": "negative_train_site",
+  "comment": "Variant was used to build the negative training set of low-quality variants for VQSR"
+}, {
+  "col_name": "positive_train_site",
+  "comment": "Variant was used to build the positive training set of high-quality variants for VQSR"
+}, {
+  "col_name": "allele_type",
+  "comment": "Allele type (snv, insertion, deletion, or mixed)"
+}, {
+  "col_name": "n_alt_alleles",
+  "comment": "Total number of alternate alleles observed at variant locus"
+}, {
+  "col_name": "variant_type",
+  "comment": "Variant type (snv, indel, multi-snv, multi-indel, or mixed)"
+}, {
+  "col_name": "was_mixed",
+  "comment": "Variant type was mixed"
+}, {
+  "col_name": "lcr",
+  "comment": "Variant falls within a low complexity region"
+}, {
+  "col_name": "nonpar",
+  "comment": "Variant (on sex chromosome) falls outside a pseudoautosomal region"
+}, {
+  "col_name": "segdup",
+  "comment": "Variant falls within a segmental duplication region"
+}, {
+  "col_name": "gq_hist_alt_bin_freq",
+  "comment": "Histogram for GQ in heterozygous individuals calculated on high quality genotypes; bin edges are: 0|5|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95|100"
+}, {
+  "col_name": "gq_hist_all_bin_freq",
+  "comment": "Histogram for GQ calculated on high quality genotypes; bin edges are: 0|5|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95|100"
+}, {
+  "col_name": "dp_hist_alt_bin_freq",
+  "comment": "Histogram for DP in heterozygous individuals calculated on high quality genotypes; bin edges are: 0|5|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95|100"
+}, {
+  "col_name": "dp_hist_alt_n_larger",
+  "comment": "Count of DP values falling above highest histogram bin edge DP in heterozygous individuals calculated on high quality genotypes"
+}, {
+  "col_name": "dp_hist_all_bin_freq",
+  "comment": "Histogram for DP calculated on high quality genotypes; bin edges are: 0|5|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95|100"
+}, {
+  "col_name": "dp_hist_all_n_smaller",
+  "comment": "Count of DP values falling below lowest histogram bin edge DP calculated on high quality genotypes"
+}, {
+  "col_name": "dp_hist_all_n_larger",
+  "comment": "Count of DP values falling above highest histogram bin edge DP calculated on high quality genotypes"
+}, {
+  "col_name": "ab_hist_alt_bin_freq",
+  "comment": "Histogram for AB in heterozygous individuals calculated on high quality genotypes; bin edges are: 0.00|0.05|0.10|0.15|0.20|0.25|0.30|0.35|0.40|0.45|0.50|0.55|0.60|0.65|0.70|0.75|0.80|0.85|0.90|0.95|1.00"
+}, {
+  "col_name": "cadd_raw_score",
+  "comment": "Raw CADD scores are interpretable as the extent to which the annotation profile for a given variant suggests that the variant is likely to be 'observed' (negative values) vs 'simulated' (positive values). Larger values are more deleterious."
+}, {
+  "col_name": "cadd_phred",
+  "comment": "Cadd Phred-like scores ('scaled C-scores') ranging from 1 to 99, based on the rank of each variant relative to all possible 8.6 billion substitutions in the human reference genome. Larger values are more deleterious"
+}, {
+  "col_name": "revel_score",
+  "comment": "dbNSFP's Revel score from 0 to 1. Variants with higher scores are predicted to be more likely to be deleterious."
+}, {
+  "col_name": "splice_ai_max_ds",
+  "comment": "Illumina's SpliceAI max delta score; interpreted as the probability of the variant being splice-altering."
+}, {
+  "col_name": "splice_ai_consequence",
+  "comment": "The consequence term associated with the max delta score in 'splice_ai_max_ds'."
+}, {
+  "col_name": "primate_ai_score",
+  "comment": "PrimateAI's deleteriousness score from 0 (less deleterious) to 1 (more deleterious)."
+}, {
+  "col_name": "vep",
+  "comment": "Consequence annotations from Ensembl VEP. Format: Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature|BIOTYPE|EXON|INTRON|HGVSc|HGVSp|cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|ALLELE_NUM|DISTANCE|STRAND|VARIANT_CLASS|MINIMISED|SYMBOL_SOURCE|HGNC_ID|CANONICAL|TSL|APPRIS|CCDS|ENSP|SWISSPROT|TREMBL|UNIPARC|GENE_PHENO|SIFT|PolyPhen|DOMAINS|HGVS_OFFSET|MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE|LoF|LoF_filter|LoF_flags|LoF_info"
+}]

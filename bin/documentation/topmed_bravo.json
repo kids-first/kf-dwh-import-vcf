@@ -1,8 +1,7 @@
-[
-  {
-    "col_name": "chromosome",
-    "comment": "chromosomial position of the variant"
-  },
+[{
+  "col_name": "chromosome",
+  "comment": "chromosomial position of the variant"
+},
   {
     "col_name": "start",
     "comment": "starting position of the variant on the chromosome"
@@ -25,16 +24,14 @@
   },
   {
     "col_name": "ac",
-    "comment": ""
-  },
-  {
-    "col_name": "af",
-    "comment": ""
-  },
-  {
-    "col_name": "an",
-    "comment": ""
-  },
+    "comment": "Alternate allele count"
+  }, {
+  "col_name": "an",
+  "comment": "Total number of alleles"
+}, {
+  "col_name": "af",
+  "comment": "Alternate allele frequency"
+},
   {
     "col_name": "homozygotes",
     "comment": "number of homozygotes"
@@ -56,4 +53,3 @@
     "comment": "either PASS or failed (SVM, DISC or EXHET)"
   }
 ]
-

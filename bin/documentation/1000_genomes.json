@@ -1,0 +1,85 @@
+[{
+  "col_name": "ciend",
+  "comment": "Confidence interval around END for imprecise variants"
+}, {
+  "col_name": "cipos",
+  "comment": "Confidence interval around POS for imprecise variants"
+}, {
+  "col_name": "cs",
+  "comment": "Source call set."
+}, {
+  "col_name": "end",
+  "comment": "End coordinate of this variant"
+}, {
+  "col_name": "imprecise",
+  "comment": "Imprecise structural variation"
+}, {
+  "col_name": "mc",
+  "comment": "Merged calls."
+}, {
+  "col_name": "meinfo",
+  "comment": "Mobile element info of the form NAME,START,END<POLARITY; If there is only 5' OR 3' support for this call, will be NULL NULL for START and END"
+}, {
+  "col_name": "mend",
+  "comment": "Mitochondrial end coordinate of inserted sequence"
+}, {
+  "col_name": "mlen",
+  "comment": "Estimated length of mitochondrial insert"
+}, {
+  "col_name": "mstart",
+  "comment": "Mitochondrial start coordinate of inserted sequence"
+}, {
+  "col_name": "svlen",
+  "comment": "SV length. It is only calculated for structural variation MEIs. For other types of SVs, one may calculate the SV length by INFO:END-START+1, or by finding the difference between lengthes of REF and ALT alleles"
+}, {
+  "col_name": "svtype",
+  "comment": "Type of structural variant"
+}, {
+  "col_name": "tsd",
+  "comment": "Precise Target Site Duplication for bases, if unknown, value will be NULL"
+}, {
+  "col_name": "ac",
+  "comment": "Total number of alternate alleles in called genotypes"
+}, {
+  "col_name": "af",
+  "comment": "Estimated allele frequency in the range (0,1)"
+}, {
+  "col_name": "ns",
+  "comment": "Number of samples with data"
+}, {
+  "col_name": "an",
+  "comment": "Total number of alleles in called genotypes"
+}, {
+  "col_name": "eas_af",
+  "comment": "Allele frequency in the EAS populations calculated from AC and AN, in the range (0,1)"
+}, {
+  "col_name": "eur_af",
+  "comment": "Allele frequency in the EUR populations calculated from AC and AN, in the range (0,1)"
+}, {
+  "col_name": "afr_af",
+  "comment": "Allele frequency in the AFR populations calculated from AC and AN, in the range (0,1)"
+}, {
+  "col_name": "amr_af",
+  "comment": "Allele frequency in the AMR populations calculated from AC and AN, in the range (0,1)"
+}, {
+  "col_name": "sas_af",
+  "comment": "Allele frequency in the SAS populations calculated from AC and AN, in the range (0,1)"
+}, {
+  "col_name": "dp",
+  "comment": "Total read depth; only low coverage data were counted towards the DP, exome data were not used"
+}, {
+  "col_name": "aa",
+  "comment": "Ancestral Allele. Format: AA|REF|ALT|IndelType. AA: Ancestral allele, REF:Reference Allele, ALT:Alternate Allele, IndelType:Type of Indel (REF, ALT and IndelType are only defined for indels)"
+}, {
+  "col_name": "vt",
+  "comment": "indicates what type of variant the line represents"
+}, {
+  "col_name": "ex_target",
+  "comment": "indicates whether a variant is within the exon pull down target boundaries"
+}, {
+  "col_name": "multi_allelic",
+  "comment": "indicates whether a site is multi-allelic"
+}, {
+  "col_name": "old_variant",
+  "comment": "old variant location. Format chrom:position:REF_allele/ALT_allele"
+}]

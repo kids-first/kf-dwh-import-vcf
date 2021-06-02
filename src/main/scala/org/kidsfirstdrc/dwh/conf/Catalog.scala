@@ -9,6 +9,9 @@ object Catalog {
   val kfStridesVariantBucket = "kf-strides-variant"
 
   val kfStudyBucket = "kf-study"
+  
+  val variantDb = "variant"
+  val variantLiveDb = "variant_live"
 
   object HarmonizedData extends StoreFolder {
     override val alias: String = kfStudyBucket
@@ -73,8 +76,8 @@ object Catalog {
       CSV,
       OverWrite
     )
-    val gnomad_genomes_3_1_1 = DatasetConf(
-      "gnomad_genomes_3_1_1",
+    val gnomad_genomes_3_1_1_vcf = DatasetConf(
+      "gnomad_genomes_3_1_1_vcf",
       alias,
       "/raw/gnomad/r3.1.1/gnomad.genomes.v3.1.1.sites.*.vcf.gz",
       VCF,
@@ -122,7 +125,8 @@ object Catalog {
       "/public/1000_genomes",
       PARQUET,
       OverWrite,
-      TableConf("variant", "1000_genomes")
+      TableConf(variantDb, "1000_genomes"),
+      TableConf(variantLiveDb, "1000_genomes")
     )
     val cancer_hotspots = DatasetConf(
       "cancer_hotspots",
@@ -130,7 +134,8 @@ object Catalog {
       "/public/cancer_hotspots",
       PARQUET,
       OverWrite,
-      TableConf("variant", "cancer_hotspots")
+      TableConf(variantDb, "cancer_hotspots"),
+      TableConf(variantLiveDb, "cancer_hotspots")
     )
     val clinvar = DatasetConf(
       "clinvar",
@@ -138,7 +143,8 @@ object Catalog {
       "/public/clinvar",
       PARQUET,
       OverWrite,
-      TableConf("variant", "clinvar")
+      TableConf(variantDb, "clinvar"),
+      TableConf(variantLiveDb, "clinvar")
     )
     val cosmic_gene_set = DatasetConf(
       "cosmic_gene_set",
@@ -146,7 +152,8 @@ object Catalog {
       "/public/cosmic_gene_set",
       PARQUET,
       OverWrite,
-      TableConf("variant", "cosmic_gene_set")
+      TableConf(variantDb, "cosmic_gene_set"),
+      TableConf(variantLiveDb, "cosmic_gene_set")
     )
     val dbnsfp_variant = DatasetConf(
       "dbnsfp",
@@ -154,7 +161,8 @@ object Catalog {
       "/public/dbnsfp/variant",
       PARQUET,
       OverWrite,
-      Some(TableConf("variant", "dbnsfp")),
+      table = Some(TableConf(variantDb, "dbnsfp")),
+      view = Some(TableConf(variantLiveDb, "dbnsfp")),
       partitionby = List("chromosome")
     )
     val dbnsfp_annovar = DatasetConf(
@@ -163,7 +171,8 @@ object Catalog {
       "/public/annovar/dbnsfp",
       PARQUET,
       OverWrite,
-      Some(TableConf("variant", "dbnsfp_annovar")),
+      table = Some(TableConf(variantDb, "dbnsfp_annovar")),
+      view = Some(TableConf(variantLiveDb, "dbnsfp_annovar")),
       partitionby = List("chromosome")
     )
     val dbnsfp_original = DatasetConf(
@@ -172,7 +181,8 @@ object Catalog {
       "/public/dbnsfp/scores",
       PARQUET,
       OverWrite,
-      TableConf("variant", "dbnsfp_original")
+      TableConf(variantDb, "dbnsfp_original"),
+      TableConf(variantLiveDb, "dbnsfp_original")
     )
     val dbsnp = DatasetConf(
       "dbsnp",
@@ -180,7 +190,8 @@ object Catalog {
       "/public/dbsnp",
       PARQUET,
       OverWrite,
-      Some(TableConf("variant", "dbsnp")),
+      table = Some(TableConf(variantDb, "dbsnp")),
+      view = Some(TableConf(variantLiveDb, "dbsnp")),
       partitionby = List("chromosome")
     )
     val ddd_gene_set = DatasetConf(
@@ -189,7 +200,8 @@ object Catalog {
       "/public/ddd_gene_set",
       PARQUET,
       OverWrite,
-      TableConf("variant", "ddd_gene_set")
+      TableConf(variantDb, "ddd_gene_set"),
+      TableConf(variantLiveDb, "ddd_gene_set")
     )
     val ensembl_mapping = DatasetConf(
       "ensembl_mapping",
@@ -197,7 +209,8 @@ object Catalog {
       "/public/ensembl_mapping",
       PARQUET,
       OverWrite,
-      TableConf("variant", "ensembl_mapping")
+      TableConf(variantDb, "ensembl_mapping"),
+      TableConf(variantLiveDb, "ensembl_mapping")
     )
     val genes = DatasetConf(
       "genes",
@@ -205,7 +218,8 @@ object Catalog {
       "/public/genes",
       PARQUET,
       OverWrite,
-      TableConf("variant", "genes")
+      TableConf(variantDb, "genes"),
+      TableConf(variantLiveDb, "genes")
     )
     val gnomad_genomes_2_1 = DatasetConf(
       "gnomad_genomes_2_1_1_liftover_grch38",
@@ -213,7 +227,8 @@ object Catalog {
       "/public/gnomad_genomes_2_1_1_liftover_grch38",
       PARQUET,
       OverWrite,
-      TableConf("variant", "gnomad_genomes_2_1_1_liftover_grch38")
+      TableConf(variantDb, "gnomad_genomes_2_1_1_liftover_grch38"),
+      TableConf(variantLiveDb, "gnomad_genomes_2_1_1_liftover_grch38")
     )
     val gnomad_exomes_2_1 = DatasetConf(
       "gnomad_exomes_2_1_1_liftover_grch38",
@@ -221,7 +236,8 @@ object Catalog {
       "/public/gnomad_exomes_2_1_1_liftover_grch38",
       PARQUET,
       OverWrite,
-      TableConf("variant", "gnomad_exomes_2_1_1_liftover_grch38")
+      TableConf(variantDb, "gnomad_exomes_2_1_1_liftover_grch38"),
+      TableConf(variantLiveDb, "gnomad_exomes_2_1_1_liftover_grch38")
     )
     val gnomad_genomes_3_0 = DatasetConf(
       "gnomad_genomes_3_0",
@@ -229,7 +245,8 @@ object Catalog {
       "/public/gnomad_genomes_3_0",
       PARQUET,
       OverWrite,
-      TableConf("variant", "gnomad_genomes_3_0")
+      TableConf(variantDb, "gnomad_genomes_3_0"),
+      TableConf(variantLiveDb, "gnomad_genomes_3_0")
     )
     val gnomad_genomes_3_1_1 = DatasetConf(
       "gnomad_genomes_3_1_1",
@@ -237,7 +254,8 @@ object Catalog {
       "/public/gnomad_genomes_3_1_1",
       PARQUET,
       OverWrite,
-      Some(TableConf("variant", "gnomad_genomes_3_1_1")),
+      table = Some(TableConf(variantDb, "gnomad_genomes_3_1_1")),
+      view = Some(TableConf(variantLiveDb, "gnomad_genomes_3_1_1")),
       partitionby = List("chromosome")
     )
     val human_genes = DatasetConf(
@@ -246,7 +264,8 @@ object Catalog {
       "/public/human_genes",
       PARQUET,
       OverWrite,
-      TableConf("variant", "human_genes")
+      TableConf(variantDb, "human_genes"),
+      TableConf(variantLiveDb, "human_genes")
     )
     val hpo_gene_set = DatasetConf(
       "hpo_gene_set",
@@ -254,7 +273,8 @@ object Catalog {
       "/public/hpo_gene_set",
       PARQUET,
       OverWrite,
-      TableConf("variant", "hpo_gene_set")
+      TableConf(variantDb, "hpo_gene_set"),
+      TableConf(variantLiveDb, "hpo_gene_set")
     )
     val omim_gene_set = DatasetConf(
       "omim_gene_set",
@@ -262,7 +282,8 @@ object Catalog {
       "/public/omim_gene_set",
       PARQUET,
       OverWrite,
-      TableConf("variant", "omim_gene_set")
+      TableConf(variantDb, "omim_gene_set"),
+      TableConf(variantLiveDb, "omim_gene_set")
     )
     val orphanet_gene_set = DatasetConf(
       "orphanet_gene_set",
@@ -270,7 +291,8 @@ object Catalog {
       "/public/orphanet_gene_set",
       PARQUET,
       OverWrite,
-      TableConf("variant", "orphanet_gene_set")
+      TableConf(variantDb, "orphanet_gene_set"),
+      TableConf(variantLiveDb, "orphanet_gene_set")
     )
     val topmed_bravo = DatasetConf(
       "topmed_bravo",
@@ -278,7 +300,8 @@ object Catalog {
       "/public/topmed_bravo",
       PARQUET,
       OverWrite,
-      TableConf("variant", "topmed_bravo")
+      TableConf(variantDb, "topmed_bravo"),
+      TableConf(variantLiveDb, "topmed_bravo")
     )
   }
 
@@ -292,7 +315,8 @@ object Catalog {
       "/dataservice/studies/studies_re_*",
       PARQUET,
       OverWrite,
-      TableConf("variant", "studies")
+      TableConf(variantDb, "studies"),
+      TableConf(variantLiveDb, "studies")
     )
     val biospecimens = DatasetConf(
       "biospecimens",
@@ -300,7 +324,8 @@ object Catalog {
       "/dataservice/biospecimens/biospecimens_re_*",
       PARQUET,
       OverWrite,
-      TableConf("variant", "biospecimens")
+      TableConf(variantDb, "biospecimens"),
+      TableConf(variantLiveDb, "biospecimens")
     )
     val family_relationships = DatasetConf(
       "family_relationships",
@@ -308,7 +333,8 @@ object Catalog {
       "/dataservice/family_relationships/family_relationships_re_*",
       PARQUET,
       OverWrite,
-      TableConf("variant", "family_relationships")
+      TableConf(variantDb, "family_relationships"),
+      TableConf(variantLiveDb, "family_relationships")
     )
     val participants = DatasetConf(
       "participants",
@@ -316,7 +342,8 @@ object Catalog {
       "/dataservice/participants/participants_re_*",
       PARQUET,
       OverWrite,
-      TableConf("variant", "participants")
+      TableConf(variantDb, "participants"),
+      TableConf(variantLiveDb, "participants")
     )
     val genomic_files = DatasetConf(
       "genomic_files",
@@ -324,7 +351,8 @@ object Catalog {
       "/dataservice/genomic_files/genomic_files_re_*",
       PARQUET,
       OverWrite,
-      TableConf("variant", "genomic_files")
+      TableConf(variantDb, "genomic_files"),
+      TableConf(variantLiveDb, "genomic_files")
     )
     val genomic_files_override = DatasetConf(
       "genomic_files_override",
@@ -332,7 +360,8 @@ object Catalog {
       "/genomic_files_override",
       CSV,
       OverWrite,
-      TableConf("variant", "genomic_files_override")
+      TableConf(variantDb, "genomic_files_override"),
+      TableConf(variantLiveDb, "genomic_files_override")
     )
 
   }
@@ -347,7 +376,8 @@ object Catalog {
       "/consequences/consequences_re_*",
       PARQUET,
       OverWrite,
-      TableConf("variant", "consequences")
+      TableConf(variantDb, "consequences"),
+      TableConf(variantLiveDb, "consequences")
     )
     val occurrences = DatasetConf(
       "occurrences",
@@ -355,7 +385,8 @@ object Catalog {
       "/occurrences/occurrences_sd_*_re_*",
       PARQUET,
       OverWrite,
-      TableConf("variant", "occurrences")
+      TableConf(variantDb, "occurrences"),
+      TableConf(variantLiveDb, "occurrences")
     )
     val occurrences_family = DatasetConf(
       "occurrences_family",
@@ -363,7 +394,8 @@ object Catalog {
       "/occurrences/occurrences_family_sd_*_re_*",
       PARQUET,
       OverWrite,
-      TableConf("variant", "occurrences_family")
+      TableConf(variantDb, "occurrences_family"),
+      TableConf(variantLiveDb, "occurrences_family")
     )
     val variants = DatasetConf(
       "variants",
@@ -371,7 +403,8 @@ object Catalog {
       "/variants/variants_re_*",
       PARQUET,
       OverWrite,
-      TableConf("variant", "variants")
+      TableConf(variantDb, "variants"),
+      TableConf(variantLiveDb, "variants")
     )
   }
 

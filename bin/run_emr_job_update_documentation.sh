@@ -1,6 +1,5 @@
 #!/bin/bash
 jobType=${1:-"all"}
-runEnv=${2:-"PROD"}
 instance_count=${3:-"1"}
 instance_type=${4:-"m5.xlarge"}
 
@@ -17,8 +16,7 @@ steps=$(cat <<EOF
       "--deploy-mode", "client",
       "--class", "org.kidsfirstdrc.dwh.glue.UpdateTableComments",
       "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
-      "${jobType}",
-      "${runEnv}"
+      "${jobType}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",
