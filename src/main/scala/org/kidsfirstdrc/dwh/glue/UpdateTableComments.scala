@@ -3,13 +3,14 @@ package org.kidsfirstdrc.dwh.glue
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf, StorageConf}
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog
-import org.kidsfirstdrc.dwh.conf.Catalog.Public.{clinvar, orphanet_gene_set}
+import org.kidsfirstdrc.dwh.conf.Catalog.Clinical.{consequences, occurrences, variants}
+import org.kidsfirstdrc.dwh.conf.Catalog.Public._
 
 import scala.util.{Failure, Success, Try}
 
 object UpdateTableComments extends App {
 
-  val Array(jobType, runEnv) = args
+  val Array(jobType) = args
   implicit val spark: SparkSession = SparkSession.builder
     .config(
       "hive.metastore.client.factory.class",
@@ -21,18 +22,30 @@ object UpdateTableComments extends App {
 
   implicit val conf: Configuration = Configuration(
     List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")),
-    sources = Catalog.sources.toList
+    sources = Catalog.sources.toList.map(s => s.copy(documentationpath = s"s3a://kf-strides-variant-parquet-prd/jobs/documentation/${s.id}.json"))
   )
 
+  val ids = Set(
+    `1000_genomes`, clinvar, consequences, cosmic_gene_set, dbsnp, ddd_gene_set, genes,
+    gnomad_genomes_3_1_1, omim_gene_set, orphanet_gene_set, topmed_bravo, variants)
+    .map(_.id)
+
   jobType match {
-    case "all" => Set(clinvar, orphanet_gene_set).foreach(t => run(t))
-    case s: String =>
-      val names = s.split(",")
-      Catalog.sources.filter(ds => names.contains(ds.id)).foreach(t => run(t))
+    case "all" => ids.foreach(id => run(conf.getDataset(id)))
+    case s: String => s.split(",").foreach(id => run(conf.getDataset(id)))
   }
 
-  def run(table: DatasetConf)(implicit spark: SparkSession): Unit = {
-    run(table.table.get.database, table.table.get.name, table.documentationpath)
+  def run(ds: DatasetConf)(implicit spark: SparkSession): Unit = {
+    (ds.table, ds.view) match {
+      case (None, Some(v)) =>
+        run(v.database, v.name, ds.documentationpath)
+      case (Some(t), None) =>
+        run(t.database, t.name, ds.documentationpath)
+      case (Some(t), Some(v)) =>
+        run(t.database, t.name, ds.documentationpath)
+        run(v.database, v.name, ds.documentationpath)
+      case (None, None) =>
+    }
   }
 
   def run(database: String, table: String, metadata_file: String)(implicit

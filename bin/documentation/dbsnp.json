@@ -1,0 +1,94 @@
+[{
+  "col_name": "rs",
+  "comment": "dbSNP ID (i.e. rs number)"
+}, {
+  "col_name": "geneinfo",
+  "comment": "Pairs each of gene symbol:gene id.  The gene symbol and id are delimited by a colon (:) and each pair is delimited by a vertical bar (|).  Does not include pseudogenes."
+}, {
+  "col_name": "pseudogeneinfo",
+  "comment": "Pairs each of pseudogene symbol:gene id.  The pseudogene symbol and id are delimited by a colon (:) and each pair is delimited by a vertical bar (|)"
+}, {
+  "col_name": "dbsnpbuildid",
+  "comment": "First dbSNP Build for RS"
+}, {
+  "col_name": "sao",
+  "comment": "Variant Allele Origin: 0 - unspecified, 1 - Germline, 2 - Somatic, 3 - Both"
+}, {
+  "col_name": "ssr",
+  "comment": "Variant Suspect Reason Codes (may be more than one value added together) 0 - unspecified, 1 - Paralog, 2 - byEST, 4 - oldAlign, 8 - Para_EST, 16 - 1kg_failed, 1024 - other"
+}, {
+  "col_name": "vc",
+  "comment": "Variation Class"
+}, {
+  "col_name": "pm",
+  "comment": "Variant has associated publication"
+}, {
+  "col_name": "nsf",
+  "comment": "Has non-synonymous frameshift A coding region variation where one allele in the set changes all downstream amino acids. FxnClass = 44"
+}, {
+  "col_name": "nsm",
+  "comment": "Has non-synonymous missense A coding region variation where one allele in the set changes protein peptide. FxnClass = 42"
+}, {
+  "col_name": "nsn",
+  "comment": "Has non-synonymous nonsense A coding region variation where one allele in the set changes to STOP codon (TER). FxnClass = 41"
+}, {
+  "col_name": "syn",
+  "comment": "Has synonymous A coding region variation where one allele in the set does not change the encoded amino acid. FxnCode = 3"
+}, {
+  "col_name": "u3",
+  "comment": "In 3' UTR Location is in an untranslated region (UTR). FxnCode = 53"
+}, {
+  "col_name": "u5",
+  "comment": "In 5' UTR Location is in an untranslated region (UTR). FxnCode = 55"
+}, {
+  "col_name": "ass",
+  "comment": "In acceptor splice site FxnCode = 73"
+}, {
+  "col_name": "dss",
+  "comment": "In donor splice-site FxnCode = 75"
+}, {
+  "col_name": "int",
+  "comment": "In Intron FxnCode = 6"
+}, {
+  "col_name": "r3",
+  "comment": "In 3' gene region FxnCode = 13"
+}, {
+  "col_name": "r5",
+  "comment": "In 5' gene region FxnCode = 15"
+}, {
+  "col_name": "gno",
+  "comment": "Genotypes available."
+}, {
+  "col_name": "pub",
+  "comment": "RefSNP or associated SubSNP is mentioned in a publication"
+}, {
+  "col_name": "freq",
+  "comment": "An ordered list of allele frequencies as reported by various genomic studies, starting with the reference allele followed by alternate alleles as ordered in the ALT column. When not already in the dbSNP allele set, alleles from the studies are added to the ALT column.  The minor allele, which was previuosly reported in VCF as the GMAF, is the second largest value in the list.  This is the GMAF reported on the RefSNP and EntrezSNP pages and VariationReporter"
+}, {
+  "col_name": "common",
+  "comment": "RS is a common SNP.  A common SNP is one that has at least one 1000Genomes population with a minor allele of frequency >= 1% and for which 2 or more founders contribute to that minor allele frequency."
+}, {
+  "col_name": "clnhgvs",
+  "comment": "Variant names from HGVS.    The order of these variants corresponds to the order of the info in the other clinical  INFO tags."
+}, {
+  "col_name": "clnvi",
+  "comment": "Variant Identifiers provided and maintained by organizations outside of NCBI, such as OMIM.  Source and id separated by colon (:).  Each identifier is separated by a vertical bar (|)"
+}, {
+  "col_name": "clnorigin",
+  "comment": "Allele Origin. One or more of the following values may be summed: 0 - unknown; 1 - germline; 2 - somatic; 4 - inherited; 8 - paternal; 16 - maternal; 32 - de-novo; 64 - biparental; 128 - uniparental; 256 - not-tested; 512 - tested-inconclusive; 1073741824 - other"
+}, {
+  "col_name": "clnsig",
+  "comment": "Variant Clinical Significance, 0 - Uncertain significance, 1 - not provided, 2 - Benign, 3 - Likely benign, 4 - Likely pathogenic, 5 - Pathogenic, 6 - drug response, 8 - confers sensitivity, 9 - risk-factor, 10 - association, 11 - protective, 12 - conflict, 13 - affects, 255 - other"
+}, {
+  "col_name": "clndisdb",
+  "comment": "Variant disease database name and ID, separated by colon (:)"
+}, {
+  "col_name": "clndn",
+  "comment": "Preferred ClinVar disease name"
+}, {
+  "col_name": "clnrevstat",
+  "comment": "ClinVar Review Status: no_assertion - No asserition provided by submitter, no_criteria - No assertion criteria provided by submitter, single - Classified by single submitter, mult - Classified by multiple submitters, conf - Criteria provided conflicting interpretations, exp - Reviewed by expert panel, guideline - Practice guideline"
+}, {
+  "col_name": "clnacc",
+  "comment": "For each allele (comma delimited), this is a pipe-delimited list of the Clinvar RCV phenotype accession.version strings associated with that allele."
+}]

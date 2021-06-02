@@ -19,7 +19,7 @@ class ImportGnomadV311Spec
     )
 
   "transform" should "transform genomes from gnomad" in {
-    val inputData      = Map(Raw.gnomad_genomes_3_1_1.id -> Seq(GnomadV311Input()).toDF())
+    val inputData      = Map(Raw.gnomad_genomes_3_1_1_vcf.id -> Seq(GnomadV311Input()).toDF())
     val resultDF       = new ImportGnomadV311Job().transform(inputData)
     val expectedResult = GnomadV311Output()
     resultDF.as[GnomadV311Output].collect().head shouldBe expectedResult
