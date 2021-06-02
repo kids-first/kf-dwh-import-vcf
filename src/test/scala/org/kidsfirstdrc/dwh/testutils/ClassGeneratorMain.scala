@@ -6,11 +6,7 @@ import org.kidsfirstdrc.dwh.external.ImportHPOGeneSet
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetGeneSet
 import bio.ferlab.datalake.spark3.ClassGenerator._
-import org.kidsfirstdrc.dwh.testutils.external.{
-  CosmicCancerGeneCensusInput,
-  DddGeneCensusInput,
-  OmimInput
-}
+import org.kidsfirstdrc.dwh.testutils.external._
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
 import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}

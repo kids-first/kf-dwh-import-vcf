@@ -7,7 +7,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark Name=Zeppelin Name=
   --ec2-attributes '{"KeyName":"flintrock","InstanceProfile":"kf-variant-emr-ec2-prd-profile","SubnetId":"subnet-00aab84919d5a44e2","ServiceAccessSecurityGroup":"sg-0587a1d20e24f4104","EmrManagedSlaveSecurityGroup":"sg-0dc6b48e674070821","EmrManagedMasterSecurityGroup":"sg-0a31895d33d1643da"}' \
   --service-role kf-variant-emr-prd-role \
   --enable-debugging \
-  --release-label emr-6.2.0 \
+  --release-label emr-6.3.0 \
   --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
   --bootstrap-actions Path="s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions/enable-ssm.sh" \
   --name 'Variant with Glow' \
