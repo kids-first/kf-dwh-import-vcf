@@ -48,7 +48,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --ec2-attributes "${ec2_attributes}" \
 --service-role ${emrServiceRole} \
 --enable-debugging \
---release-label emr-6.2.0 \
+--release-label emr-6.3.0 \
 --log-uri 's3://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --steps "${steps}" \
 --name "Index Variant Stats" \

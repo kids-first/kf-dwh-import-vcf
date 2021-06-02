@@ -8,4 +8,4 @@ docker run --rm -v $(pwd):/app/build \
     -v ~/.sbt:/app/.sbt \
     -v ~/.sbt_cache:/app/.cache \
     -w /app/build hseeberger/scala-sbt:11.0.10_1.5.2_2.12.13 \
-    sbt -Duser.home=/app clean test
+    sbt -Duser.home=/app clean compile
