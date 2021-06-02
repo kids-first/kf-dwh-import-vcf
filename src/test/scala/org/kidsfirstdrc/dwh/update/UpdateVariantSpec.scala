@@ -70,7 +70,35 @@ class UpdateVariantSpec
     resultDF.as[Variant].collect().head shouldBe expectedResult
   }
 
-  "transform method for gnomad 3.1.1" should "return expected data given controlled input" in {
+  "transform method for gnomad 3.1.1" should "return expected data given controlled input and delete existing gnomad_genomes_3_0" in {
+
+    val variant   = Variant(start = 165310406, reference = "G", name = "rs1057520413")
+    val gnomad311 = GnomadV311Output(an = 21, ac = 11, af = 0.51, nhomalt = 11)
+
+    // Variant has an old gnomad_genomes_3_0 column.
+    val variantDF   = Seq(variant).toDF().withColumnRenamed("gnomad_genomes_3_1_1", "gnomad_genomes_3_0")
+    val gnomad311DF = Seq(gnomad311).toDF()
+    val data        = Map(Clinical.variants.id -> variantDF, Public.gnomad_genomes_3_1_1.id -> gnomad311DF)
+
+    val job      = new UpdateVariant(Public.gnomad_genomes_3_1_1, "variant")
+    val resultDF = job.transform(data)
+
+    val expectedResult =
+      variant.copy(gnomad_genomes_3_1_1 = Some(GnomadFreq(an = 21, ac = 11, af = 0.51, hom = 11)))
+
+    // Checks the input values were not the same before the join
+    variant.gnomad_genomes_3_1_1 should not be Some(
+      GnomadFreq(an = 21, ac = 11, af = 0.51, hom = 11)
+    )
+
+    // Result doesn't include old column gnomad_genomes_3_0.
+    resultDF.columns.contains("gnomad_genomes_3_0") shouldBe false
+
+    // Checks the output values are the same as expected
+    resultDF.as[Variant].collect().head shouldBe expectedResult
+  }
+
+  "transform method for gnomad 3.1.1" should "return expected data given controlled input without old column gnomad_genomes_3_0" in {
 
     val variant   = Variant(start = 165310406, reference = "G", name = "rs1057520413")
     val gnomad311 = GnomadV311Output(an = 21, ac = 11, af = 0.51, nhomalt = 11)
@@ -89,6 +117,7 @@ class UpdateVariantSpec
     variant.gnomad_genomes_3_1_1 should not be Some(
       GnomadFreq(an = 21, ac = 11, af = 0.51, hom = 11)
     )
+
     // Checks the output values are the same as expected
     resultDF.as[Variant].collect().head shouldBe expectedResult
   }
