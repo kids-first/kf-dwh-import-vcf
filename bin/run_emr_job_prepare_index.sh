@@ -3,6 +3,7 @@ job_type=${1:-"genomic_suggestions"}
 release_id=${2:-"re_000011"}
 number_instance=${3:-"15"}
 instance_type=${4:-"r5.4xlarge"}
+env=${5:-"qa"}
 
 steps=$(cat <<EOF
 [
@@ -16,7 +17,7 @@ steps=$(cat <<EOF
       "client",
       "--class",
       "org.kidsfirstdrc.dwh.es.index.PrepareIndex",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
+      "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${job_type}",
       "${release_id}"
     ],

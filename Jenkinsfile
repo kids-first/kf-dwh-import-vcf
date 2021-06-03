@@ -22,7 +22,7 @@ pipeline {
         '''
       }
     }
-    stage('deploy JAR'){
+    stage('deploy to qa'){
       when {
         expression {
           return env.BRANCH_NAME == 'master';
@@ -31,7 +31,24 @@ pipeline {
       steps{
         pending("${env.JOB_NAME}","prd")
         sh '''
-           ./deploy.sh
+           ./deploy.sh $(git log -n 1 --pretty=format:'%h') qa
+          '''
+        success("${env.JOB_NAME}","prd")
+      }
+      post {
+        failure {
+          fail("${env.JOB_NAME}","prd")
+        }
+      }
+    }
+    stage('deploy to prd'){
+      when {
+        buildingTag()
+      }
+      steps{
+        pending("${env.JOB_NAME}","prd")
+        sh '''
+           ./deploy.sh $(git tag --sort version:refname | tail -1) prd
           '''
         success("${env.JOB_NAME}","prd")
       }

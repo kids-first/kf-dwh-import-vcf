@@ -2,6 +2,7 @@
 jobType=${1:-"all"}
 instance_count=${3:-"1"}
 instance_type=${4:-"m5.xlarge"}
+env=${5:-"qa"}
 
 aws s3 cp documentation s3://kf-strides-variant-parquet-prd/jobs/documentation --recursive
 
@@ -15,7 +16,7 @@ steps=$(cat <<EOF
       "org.apache.httpcomponents:httpcore,org.apache.httpcomponents:httpclient",
       "--deploy-mode", "client",
       "--class", "org.kidsfirstdrc.dwh.glue.UpdateTableComments",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
+      "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${jobType}"
     ],
     "Type": "CUSTOM_JAR",

@@ -3,6 +3,7 @@ config=${1:-"config/production.conf"}
 job_type=${2:-"gnomad_genomes_3_1_1"}
 instance_count=${3:-"20"}
 instance_type=${4:-"m5.4xlarge"}
+env=${5:-"qa"}
 
 aws s3 cp bootstrap-actions s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions --recursive
 aws s3 cp documentation s3://kf-strides-variant-parquet-prd/jobs/documentation --recursive
@@ -24,7 +25,7 @@ steps=$(cat <<EOF
       "--deploy-mode",
       "client",
       "--class", "org.kidsfirstdrc.dwh.external.ImportExternal",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
+      "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${config}",
       "${job_type}"
     ],

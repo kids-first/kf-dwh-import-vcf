@@ -5,6 +5,7 @@ output=${2:-"s3a://kf-strides-variant-parquet-prd/sql"}
 extras=${3:-"occurrences_sd_46sk55a3_re_000011,occurrences_family_sd_46sk55a3_re_000011"}
 instance_count=${4:-"4"}
 instance_type=${5:-"m5.4xlarge"}
+env=${6:-"qa"}
 
 
 steps=$(cat <<EOF
@@ -19,7 +20,7 @@ steps=$(cat <<EOF
       "client",
       "--class",
       "org.kidsfirstdrc.dwh.sql.ExportCreateTables",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
+      "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${schema}",
       "${output}",
       "${extras}"
