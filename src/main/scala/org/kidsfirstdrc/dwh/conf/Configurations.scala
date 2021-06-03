@@ -6,7 +6,7 @@ object Configurations extends App {
 
   //example of storages per environment
   val productionStorage = List(StorageConf(Catalog.kfStridesVariantBucket, "s3a://kf-strides-variant-parquet-prd"))
-  val qaStorage = List(StorageConf(Catalog.kfStridesVariantBucket, "s3a://kf-strides-variant-parquet-qa"))
+  val qaStorage = List(StorageConf(Catalog.kfStridesVariantBucket, "s3a://kf-strides-variant-parquet-prd"))
   val localStorage = List(StorageConf(Catalog.kfStridesVariantBucket, getClass.getClassLoader.getResource(".").getFile))
 
   // common options for EMR execution
