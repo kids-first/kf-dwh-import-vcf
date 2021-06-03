@@ -46,14 +46,13 @@ object Publish extends App {
     }
   }
 
-  def publishTable(releaseId: String, tableName: String)(implicit spark: SparkSession): Unit = {
+  def publishTable(releaseId: String, tableName: String, schema: String = "variant")(implicit spark: SparkSession): Unit = {
 
-    spark.sql(
-      s"create or replace view variant_live.$tableName as select * from variant.${tableName}_${releaseId.toLowerCase()}"
-    )
-    spark.sql(
-      s"create or replace view variant.$tableName as select * from variant.${tableName}_${releaseId.toLowerCase()}"
-    )
+    List(schema, s"${schema}_live").foreach {s =>
+      spark.sql(
+        s"create or replace view $s.$tableName as select * from variant.${tableName}_${releaseId.toLowerCase()}"
+      )
+    }
 
   }
 
