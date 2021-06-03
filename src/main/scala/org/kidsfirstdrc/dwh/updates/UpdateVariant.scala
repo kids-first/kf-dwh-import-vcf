@@ -74,7 +74,7 @@ class UpdateVariant(source: DatasetConf, schema: String)(implicit conf: Configur
     val releaseId_datetime = s"${lastReleaseId}_$localTimeNow"
 
     write(releaseId_datetime, destination.rootPath, destination.id, data, Some(60), schema)
-    publishTable(releaseId_datetime, destination.id)
+    publishTable(releaseId_datetime, destination.id, schema)
     data
   }
 }
