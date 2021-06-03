@@ -13,6 +13,7 @@ post_cgp_pattern=${7:-".CGP.filtered.vep.vcf.gz"}
 biospecimen_id_column=${8:-"biospecimen_id"}
 instance_count=${9:-"14"}
 instance_type=${10:-"m5.4xlarge"}
+env=${11:-"qa"}
 
 
 steps=$(cat <<EOF
@@ -27,7 +28,7 @@ steps=$(cat <<EOF
       "client",
       "--class",
       "org.kidsfirstdrc.dwh.vcf.ImportVcf",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
+      "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${study_id}",
       "${release_id}",
       "${folder}",

@@ -1,8 +1,9 @@
 #!/bin/bash
 source=${1:-"clinvar"}
 destination=${2:-"variants"}
-number_instance=${4:-"10"}
-instance_type=${5:-"r5.4xlarge"}
+number_instance=${3:-"10"}
+instance_type=${4:-"r5.4xlarge"}
+env=${5:-"qa"}
 
 steps=$(cat <<EOF
 [
@@ -16,7 +17,7 @@ steps=$(cat <<EOF
       "client",
       "--class",
       "org.kidsfirstdrc.dwh.updates.Update",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
+      "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${source}",
       "${destination}"
     ],

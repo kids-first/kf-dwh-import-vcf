@@ -4,6 +4,7 @@ job=${2:-"all"}
 instance_type=${3:-"r5.4xlarge"}
 instance_count=${4:-"20"}
 input=${5:-"s3://bix-dev-data-bucket/1000g/harmonized-data/family-variants/*.postCGP.filtered.deNovo.vep.vcf.gz"}
+env=${6:-"qa"}
 
 steps=$(cat <<EOF
 [
@@ -17,7 +18,7 @@ steps=$(cat <<EOF
       "client",
       "--class",
       "org.kidsfirstdrc.dwh.demo.ImportDemo",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
+      "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${release_id}",
       "${input}",
       "${job}"

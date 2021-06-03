@@ -2,7 +2,7 @@
 es_nodes=${1:-"https://vpc-kf-arranger-blue-es-service-exwupkrf4dyupg24dnfmvzcwri.us-east-1.es.amazonaws.com"}
 instance_type=${2:-"r5.4xlarge"}
 number_instance=${3:-"10"}
-env=${4:-"dev"}
+env=${4:-"qa"}
 
 # default is dev vpc-05be68d35774905e8
 subnetId="subnet-0f822f9f9ff99871a"
@@ -28,7 +28,7 @@ steps=$(cat <<EOF
       "org.apache.httpcomponents:httpcore,org.apache.httpcomponents:httpclient",
       "--deploy-mode", "client",
       "--class", "org.kidsfirstdrc.dwh.es.stats.Stats",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
+      "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${es_nodes}"
     ],
     "Type": "CUSTOM_JAR",

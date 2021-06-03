@@ -1,7 +1,8 @@
 #!/bin/bash
 study_ids=$1
 release_id=$2
-instance_type=${5:-"m5.xlarge"}
+instance_type=${3:-"m5.xlarge"}
+env=${4:-"qa"}
 
 steps=$(cat <<EOF
 [
@@ -15,7 +16,7 @@ steps=$(cat <<EOF
       "client",
       "--class",
       "org.kidsfirstdrc.dwh.publish.Publish",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
+      "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${study_ids}",
       "${release_id}"
     ],

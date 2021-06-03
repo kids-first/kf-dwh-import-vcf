@@ -3,6 +3,7 @@ job_type=${1:-"genes"}
 config=${2:-"config/public_data_production.conf"}
 instance_count=${4:-"4"}
 instance_type=${5:-"m5.xlarge"}
+env=${6:-"qa"}
 
 aws s3 cp bootstrap-actions s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions --recursive
 aws s3 cp documentation s3://kf-strides-variant-parquet-prd/jobs/documentation --recursive
@@ -24,7 +25,7 @@ steps=$(cat <<EOF
       "--deploy-mode",
       "client",
       "--class", "bio.ferlab.datalake.spark3.public.ImportPublicTable",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
+      "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${config}",
       "${job_type}"
     ],

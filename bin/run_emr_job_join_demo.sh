@@ -4,6 +4,7 @@ release_id=$1
 job=${2:-"all"}
 instance_type=${3:-"r5.4xlarge"}
 instance_count=${4:-"20"}
+env=${5:-"qa"}
 
 steps=$(cat <<EOF
 [
@@ -17,7 +18,7 @@ steps=$(cat <<EOF
       "client",
       "--class",
       "org.kidsfirstdrc.dwh.join.Join",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
+      "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${study_ids}",
       "${release_id}",
       "s3a://kf-strides-variant-parquet-prd/public/demo",

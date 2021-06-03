@@ -4,6 +4,7 @@ release_id=$2
 mergeExisting=${3:-"true"}
 tables=${4:-"all"}
 instance_type=${5:-"m5.xlarge"}
+env=${6:-"qa"}
 
 steps=$(cat <<EOF
 [
@@ -17,7 +18,7 @@ steps=$(cat <<EOF
       "client",
       "--class",
       "org.kidsfirstdrc.dwh.external.ImportDataservice",
-      "s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar",
+      "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${study_ids}",
       "${release_id}",
       "s3a://kf-strides-variant-parquet-prd/raw/dataservice",
