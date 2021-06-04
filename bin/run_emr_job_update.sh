@@ -1,8 +1,8 @@
 #!/bin/bash
 source=${1:-"clinvar"}
 destination=${2:-"variants"}
-number_instance=${3:-"10"}
-instance_type=${4:-"r5.4xlarge"}
+number_instance=${3:-"7"}
+instance_type=${4:-"m5.4xlarge"}
 env=${5:-"qa"}
 
 steps=$(cat <<EOF
@@ -40,7 +40,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --release-label emr-6.3.0 \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --steps "${steps}" \
---name "Update ${destination} based on ${source} [${runEnv}]" \
+--name "Update ${destination} based on ${source} [${env}]" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \
