@@ -50,7 +50,7 @@ object Publish extends App {
 
     List(schema, s"${schema}_live").foreach {s =>
       spark.sql(
-        s"create or replace view $s.$tableName as select * from variant.${tableName}_${releaseId.toLowerCase()}"
+        s"create or replace view $s.$tableName as select * from $schema.${tableName}_${releaseId.toLowerCase()}"
       )
     }
 
