@@ -1,8 +1,8 @@
 #!/bin/bash
-job_type=${1:-"genomic_suggestions"}
+job_type=${1:-"variant_centric"}
 release_id=${2:-"re_000011"}
 number_instance=${3:-"15"}
-instance_type=${4:-"r5.4xlarge"}
+instance_type=${4:-"m5.4xlarge"}
 env=${5:-"qa"}
 
 steps=$(cat <<EOF
