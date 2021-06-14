@@ -327,6 +327,7 @@ object VariantCentricIndex {
           ).as("topmed"),
           frequenciesForGnomad("gnomad_genomes_2_1"),
           frequenciesForGnomad("gnomad_exomes_2_1"),
+          frequenciesForGnomad("gnomad_genomes_3_0"),
           frequenciesForGnomad("gnomad_genomes_3_1_1"),
           struct(
             frequenciesForPrefix("upper_bound_kf"),

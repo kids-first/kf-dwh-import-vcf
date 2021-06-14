@@ -208,6 +208,15 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         .format("parquet")
         .saveAsTable("gnomad_exomes_2_1_1_liftover_grch38")
 
+      And("A table gnomad_genomes_3_0 exists")
+      Seq(GnomadFrequencyEntry())
+        .toDF()
+        .write
+        .mode(SaveMode.Overwrite)
+        .option("path", s"$outputDir/gnomad_genomes_3_0")
+        .format("parquet")
+        .saveAsTable("gnomad_genomes_3_0")
+
       And("A table gnomad_genomes_3_1_1 exists")
       Seq(GnomadV311Output())
         .toDF()
@@ -273,7 +282,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
             studyId1 -> Set("SD_123.c1"),
             studyId2 -> Set("SD_456.c1"),
             studyId3 -> Set(s"$studyId3.c99")
-          )
+          ),
         ),
         JoinVariantOutput(
           chromosome = "3",
@@ -305,6 +314,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           consent_codes_by_study = Map(studyId1 -> variant2.consent_codes),
           one_thousand_genomes = None,
           gnomad_exomes_2_1 = None,
+          gnomad_genomes_3_0 = None,
           gnomad_genomes_3_1_1 = None
         ),
         JoinVariantOutput(
@@ -337,12 +347,14 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           consent_codes_by_study = Map(studyId2 -> variant3.consent_codes),
           one_thousand_genomes = None,
           gnomad_exomes_2_1 = None,
+          gnomad_genomes_3_0 = None,
           gnomad_genomes_3_1_1 = None
         ),
         existingVariant2.copy(
           release_id = releaseId,
           one_thousand_genomes = None,
           gnomad_exomes_2_1 = None,
+          gnomad_genomes_3_0 = None,
           gnomad_genomes_3_1_1 = None,
           frequencies = VariantFrequency(
             Freq(11, 2, 0.18181818181818182, 1, 1),
@@ -351,7 +363,18 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         )
       )
       output.collect() should contain theSameElementsAs expectedOutput
+      /*
+      JoinVariantOutput(2,165310406,165310406,G,A,rs1057520413,chr2:g.166166916G>A,SNV,VariantFrequency(Freq(11,6,0.5454545454545454,7,1),Freq(11,6,0.5454545454545454,7,1)),Some(OneThousandGenomesFreq(20,10,0.5)),Some(Freq(20,10,0.5,10,10)),Some(GnomadFreq(10,20,0.5,10)),Some(GnomadFreq(10,20,0.5,10)),None,Some(GnomadFreq(10,20,0.5,10)),Some(RCV000436956),Some(Pathogenic),Some(rs1234567),Map(SD_789 -> 2, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 7, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 0.2857142857142857, SD_123 -> 1.0, SD_456 -> 1.0),Map(SD_789 -> 5, SD_123 -> 1, SD_456 -> 1),Map(SD_789 -> 1, SD_123 -> 0, SD_456 -> 0),Map(SD_789 -> 2, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 7, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 0.2857142857142857, SD_123 -> 1.0, SD_456 -> 1.0),Map(SD_789 -> 5, SD_123 -> 1, SD_456 -> 1),Map(SD_789 -> 1, SD_123 -> 0, SD_456 -> 0),Set(SD_789, SD_123, SD_456),Set(SD_789.c99, SD_123.c1, SD_456.c1),Map(SD_789 -> Set(SD_789.c99), SD_123 -> Set(SD_123.c1), SD_456 -> Set(SD_456.c1)),RE_ABCDEF),
+      JoinVariantOutput(2,165310406,165310406,G,A,rs1057520413,chr2:g.166166916G>A,SNV,VariantFrequency(Freq(11,6,0.5454545454545454,7,1),Freq(11,6,0.5454545454545454,7,1)),Some(OneThousandGenomesFreq(20,10,0.5)),Some(Freq(20,10,0.5,10,10)),Some(GnomadFreq(10,20,0.5,10)),Some(GnomadFreq(10,20,0.5,10)),None,Some(GnomadFreq(10,20,0.5,10)),Some(RCV000436956),Some(Pathogenic),Some(rs1234567),Map(SD_789 -> 2, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 7, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 0.2857142857142857, SD_123 -> 1.0, SD_456 -> 1.0),Map(SD_789 -> 5, SD_123 -> 1, SD_456 -> 1),Map(SD_789 -> 1, SD_123 -> 0, SD_456 -> 0),Map(SD_789 -> 2, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 7, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 0.2857142857142857, SD_123 -> 1.0, SD_456 -> 1.0),Map(SD_789 -> 5, SD_123 -> 1, SD_456 -> 1),Map(SD_789 -> 1, SD_123 -> 0, SD_456 -> 0),Set(SD_123, SD_456, SD_789),Set(SD_789.c99, SD_123.c1, SD_456.c1),Map(SD_123 -> Set(SD_123.c1), SD_456 -> Set(SD_456.c1), SD_789 -> Set(SD_789.c99)),RE_ABCDEF),
 
+      JoinVariantOutput(3,3000,3000,T,G,mutation_2,chr3:g.2000T>G,SNV,VariantFrequency(Freq(11,2,0.18181818181818182,1,0),Freq(2,2,1.0,1,0)),None,None,None,None,None,None,None,None,None,Map(SD_123 -> 2),Map(SD_123 -> 2),Map(SD_123 -> 1.0),Map(SD_123 -> 1),Map(SD_123 -> 0),Map(SD_123 -> 2),Map(SD_123 -> 2),Map(SD_123 -> 1.0),Map(SD_123 -> 1),Map(SD_123 -> 0),Set(SD_123),Set(SD_123.c2),Map(SD_123 -> Set(SD_123.c2)),RE_ABCDEF),
+      JoinVariantOutput(3,3000,3000,C,A,mutation_2,chr3:g.2000T>G,SNV,VariantFrequency(Freq(11,2,0.18181818181818182,1,0),Freq(2,2,1.0,1,0)),None,None,None,None,None,None,None,None,None,Map(SD_456 -> 2),Map(SD_456 -> 2),Map(SD_456 -> 1.0),Map(SD_456 -> 1),Map(SD_456 -> 0),Map(SD_456 -> 2),Map(SD_456 -> 2),Map(SD_456 -> 1.0),Map(SD_456 -> 1),Map(SD_456 -> 0),Set(SD_456),Set(SD_456.c0),Map(SD_456 -> Set(SD_456.c0)),RE_ABCDEF),
+      JoinVariantOutput(4,4000,4000,T,G,rs1057520413,chr2:g.166166916G>A,SNV,VariantFrequency(Freq(11,2,0.18181818181818182,1,1),Freq(3,2,0.6666666666666666,1,1)),None,None,None,None,None,None,None,None,None,Map(SD_789 -> 2),Map(SD_789 -> 3),Map(SD_789 -> 0.6666666666666666),Map(SD_789 -> 1),Map(SD_789 -> 1),Map(SD_789 -> 2),Map(SD_789 -> 3),Map(SD_789 -> 0.6666666666666666),Map(SD_789 -> 1),Map(SD_789 -> 1),Set(SD_789),Set(SD_789.c99),Map(SD_789 -> Set(SD_789.c99)),RE_ABCDEF)) did not contain the same elements as List(
+
+      JoinVariantOutput(3,3000,3000,T,G,mutation_2,chr3:g.2000T>G,SNV,VariantFrequency(Freq(11,2,0.18181818181818182,1,0),Freq(2,2,1.0,1,0)),None,None,None,None,None,None,None,None,None,Map(SD_123 -> 2),Map(SD_123 -> 2),Map(SD_123 -> 1.0),Map(SD_123 -> 1),Map(SD_123 -> 0),Map(SD_123 -> 2),Map(SD_123 -> 2),Map(SD_123 -> 1.0),Map(SD_123 -> 1),Map(SD_123 -> 0),Set(SD_123),Set(SD_123.c2),Map(SD_123 -> Set(SD_123.c2)),RE_ABCDEF),
+      JoinVariantOutput(3,3000,3000,C,A,mutation_2,chr3:g.2000T>G,SNV,VariantFrequency(Freq(11,2,0.18181818181818182,1,0),Freq(2,2,1.0,1,0)),None,None,None,None,None,None,None,None,None,Map(SD_456 -> 2),Map(SD_456 -> 2),Map(SD_456 -> 1.0),Map(SD_456 -> 1),Map(SD_456 -> 0),Map(SD_456 -> 2),Map(SD_456 -> 2),Map(SD_456 -> 1.0),Map(SD_456 -> 1),Map(SD_456 -> 0),Set(SD_456),Set(SD_456.c0),Map(SD_456 -> Set(SD_456.c0)),RE_ABCDEF)
+      JoinVariantOutput(4,4000,4000,T,G,rs1057520413,chr2:g.166166916G>A,SNV,VariantFrequency(Freq(11,2,0.18181818181818182,1,1),Freq(3,2,0.6666666666666666,1,1)),None,None,None,None,None,None,None,None,None,Map(SD_789 -> 2),Map(SD_789 -> 3),Map(SD_789 -> 0.6666666666666666),Map(SD_789 -> 1),Map(SD_789 -> 1),Map(SD_789 -> 2),Map(SD_789 -> 3),Map(SD_789 -> 0.6666666666666666),Map(SD_789 -> 1),Map(SD_789 -> 1),Set(SD_789),Set(SD_789.c99),Map(SD_789 -> Set(SD_789.c99)),RE_ABCDEF))
+      */
     }
   }
 
@@ -436,6 +459,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         Public.topmed_bravo.id         -> Seq(FrequencyEntry()).toDF(),
         Public.gnomad_genomes_2_1.id   -> Seq(GnomadFrequencyEntry()).toDF(),
         Public.gnomad_exomes_2_1.id    -> Seq(GnomadFrequencyEntry()).toDF(),
+        Public.gnomad_genomes_3_0.id   -> Seq(GnomadFrequencyEntry()).toDF(),
         Public.gnomad_genomes_3_1_1.id -> Seq(GnomadV311Output()).toDF(),
         Public.clinvar.id              -> Seq(ClinvarEntry()).toDF(),
         Public.dbsnp.id                -> Seq(DBSNPEntry()).toDF(),
@@ -444,6 +468,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
       val result = new JoinVariants(Seq("SD_222", "SD_111"), "RE_000000", true, "variant")
         .transform(data)
+
+      result.columns should contain allElementsOf List("gnomad_genomes_2_1", "gnomad_exomes_2_1", "gnomad_genomes_3_0", "gnomad_genomes_3_1_1")
 
       result
         .select(
