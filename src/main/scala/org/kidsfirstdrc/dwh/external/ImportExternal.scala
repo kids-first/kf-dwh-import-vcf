@@ -31,7 +31,7 @@ object ImportExternal extends SparkApp {
     case "hpo_gene_set"         => new ImportHPOGeneSet().run()
     case "human_genes"          => new ImportHumanGenes().run()
     case "omim_gene_set"        => new ImportOmimGeneSet().run()
-    case "orphanet"             => new ImportOrphanetGeneSet().run()
+    case "orphanet_gene_set"    => new ImportOrphanetGeneSet().run()
     case "topmed_bravo"         => new ImportTopMed().run()
   }
 
