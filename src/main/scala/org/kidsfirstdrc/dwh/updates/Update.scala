@@ -1,47 +1,39 @@
 package org.kidsfirstdrc.dwh.updates
 
-import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.spark3.public.SparkApp
 import org.apache.spark.sql.SparkSession
-import org.kidsfirstdrc.dwh.conf.Catalog
-import org.kidsfirstdrc.dwh.conf.Catalog.Public
-import org.kidsfirstdrc.dwh.join.Join.output
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 
-object Update extends App {
-  val Array(source, destination) = args
+object Update extends SparkApp {
 
-  implicit val spark: SparkSession = SparkSession.builder
-    .config(
-      "hive.metastore.client.factory.class",
-      "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
-    )
-    .enableHiveSupport()
-    .appName(s"Update $destination from $source")
-    .getOrCreate()
+  val Array(_, source, destination) = args
 
-  implicit val conf: Configuration = Configuration(
-    List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")),
-    sources = Catalog.sources.toList
-  )
+  // calls SparkApp.init() to load configuration file passed as first argument as well as an instance of SparkSession
+  implicit val (conf, spark) = init()
 
   run(source, destination)
 
   def run(source: String, destination: String)(implicit spark: SparkSession): Unit = {
 
-    (source, destination) match {
-      case ("clinvar", "variants") =>
-        new UpdateVariant(Public.clinvar, "variant").run()
-        new UpdateVariant(Public.clinvar, "portal").run()
+    Seq("variant", "portal")
+      .foreach { schema =>
+        (source, destination) match {
+          case ("clinvar", "variants") =>
+            new UpdateClinical(Public.clinvar, Clinical.variants, schema).run()
 
-      case ("topmed_bravo", "variants") =>
-        new UpdateVariant(Public.topmed_bravo, "variant").run()
-        new UpdateVariant(Public.topmed_bravo, "portal").run()
+          case ("topmed_bravo", "variants") =>
+            new UpdateClinical(Public.topmed_bravo, Clinical.variants, schema).run()
 
-      case ("gnomad_genomes_3_1_1", "variants") =>
-        new UpdateVariant(Public.gnomad_genomes_3_1_1, "variant").run()
-        new UpdateVariant(Public.gnomad_genomes_3_1_1, "portal").run()
+          case ("gnomad_genomes_3_1_1", "variants") =>
+            new UpdateClinical(Public.gnomad_genomes_3_1_1, Clinical.variants, schema).run()
 
-      case _ => throw new IllegalArgumentException(s"No job found for : ($source, $destination)")
-    }
+          case ("dbnsfp_original", "consequences") =>
+            new UpdateClinical(Public.dbnsfp_original, Clinical.consequences, schema).run()
+
+          case _ => throw new IllegalArgumentException(s"No job found for : ($source, $destination)")
+        }
+      }
+
   }
 
 }

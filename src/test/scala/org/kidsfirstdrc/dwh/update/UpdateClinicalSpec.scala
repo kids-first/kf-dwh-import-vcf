@@ -5,17 +5,17 @@ import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
-import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, GnomadV311Output, TopmedBravoOutput}
-import org.kidsfirstdrc.dwh.testutils.join.{Freq, GnomadFreq}
+import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, GnomadV311Output, ImportScores, TopmedBravoOutput}
+import org.kidsfirstdrc.dwh.testutils.join.{Freq, GnomadFreq, JoinConsequenceOutput}
 import org.kidsfirstdrc.dwh.testutils.update.Variant
-import org.kidsfirstdrc.dwh.updates.UpdateVariant
+import org.kidsfirstdrc.dwh.updates.UpdateClinical
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfter, GivenWhenThen}
 
 import scala.util.Try
 
-class UpdateVariantSpec
+class UpdateClinicalSpec
     extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers with BeforeAndAfter {
   import spark.implicits._
 
@@ -38,7 +38,7 @@ class UpdateVariantSpec
     val clinvarDF = Seq(clinvar).toDF()
     val data      = Map(Clinical.variants.id -> variantDF, Public.clinvar.id -> clinvarDF)
 
-    val job      = new UpdateVariant(Public.clinvar, "variant")
+    val job      = new UpdateClinical(Public.clinvar, Clinical.variants, "variant")
     val resultDF = job.transform(data)
 
     val expectedResult = variant.copy(clinvar_id = Some(clinvar.name), clin_sig = clinvar.clin_sig)
@@ -59,7 +59,7 @@ class UpdateVariantSpec
     val topmedDF  = Seq(topmed).toDF()
     val data      = Map(Clinical.variants.id -> variantDF, Public.topmed_bravo.id -> topmedDF)
 
-    val job      = new UpdateVariant(Public.topmed_bravo, "variant")
+    val job      = new UpdateClinical(Public.topmed_bravo, Clinical.variants, "variant")
     val resultDF = job.transform(data)
 
     val expectedResult = variant.copy(topmed = Some(Freq(10, 5, 0.5, 5, 0)))
@@ -70,17 +70,17 @@ class UpdateVariantSpec
     resultDF.as[Variant].collect().head shouldBe expectedResult
   }
 
-  "transform method for gnomad 3.1.1" should "return expected data given controlled input and delete existing gnomad_genomes_3_0" in {
+  "transform method for gnomad 3.1.1" should "return expected data" in {
 
     val variant   = Variant(start = 165310406, reference = "G", name = "rs1057520413")
     val gnomad311 = GnomadV311Output(an = 21, ac = 11, af = 0.51, nhomalt = 11)
 
     // Variant has an old gnomad_genomes_3_0 column.
-    val variantDF   = Seq(variant).toDF().withColumnRenamed("gnomad_genomes_3_1_1", "gnomad_genomes_3_0")
+    val variantDF   = Seq(variant).toDF()
     val gnomad311DF = Seq(gnomad311).toDF()
     val data        = Map(Clinical.variants.id -> variantDF, Public.gnomad_genomes_3_1_1.id -> gnomad311DF)
 
-    val job      = new UpdateVariant(Public.gnomad_genomes_3_1_1, "variant")
+    val job      = new UpdateClinical(Public.gnomad_genomes_3_1_1, Clinical.variants, "variant")
     val resultDF = job.transform(data)
 
     val expectedResult =
@@ -90,36 +90,26 @@ class UpdateVariantSpec
     variant.gnomad_genomes_3_1_1 should not be Some(
       GnomadFreq(an = 21, ac = 11, af = 0.51, hom = 11)
     )
-
-    // Result doesn't include old column gnomad_genomes_3_0.
-    resultDF.columns.contains("gnomad_genomes_3_0") shouldBe false
 
     // Checks the output values are the same as expected
     resultDF.as[Variant].collect().head shouldBe expectedResult
   }
 
-  "transform method for gnomad 3.1.1" should "return expected data given controlled input without old column gnomad_genomes_3_0" in {
+  "transform method for dbnsfp_original" should "return expected data" in {
 
-    val variant   = Variant(start = 165310406, reference = "G", name = "rs1057520413")
-    val gnomad311 = GnomadV311Output(an = 21, ac = 11, af = 0.51, nhomalt = 11)
+    val consequences = JoinConsequenceOutput(start = 165310406, reference = "G", alternate = "A", ensembl_transcript_id = "ENST00000486878", SIFT_converted_rankscore = None)
+    val dbnsfp_original = ImportScores.Output(start = 165310406, reference = "G", `alternate` = "A", ensembl_transcript_id = "ENST00000486878", SIFT_converted_rankscore = Some(0.9))
 
-    val variantDF   = Seq(variant).toDF()
-    val gnomad311DF = Seq(gnomad311).toDF()
-    val data        = Map(Clinical.variants.id -> variantDF, Public.gnomad_genomes_3_1_1.id -> gnomad311DF)
+    val consequencesDF = Seq(consequences).toDF()
+    val dbnsfp_originalDF = Seq(dbnsfp_original).toDF()
+    val data = Map(Clinical.consequences.id -> consequencesDF, Public.dbnsfp_original.id -> dbnsfp_originalDF)
 
-    val job      = new UpdateVariant(Public.gnomad_genomes_3_1_1, "variant")
+    val job = new UpdateClinical(Public.dbnsfp_original, Clinical.consequences, "variant")
     val resultDF = job.transform(data)
 
-    val expectedResult =
-      variant.copy(gnomad_genomes_3_1_1 = Some(GnomadFreq(an = 21, ac = 11, af = 0.51, hom = 11)))
-
-    // Checks the input values were not the same before the join
-    variant.gnomad_genomes_3_1_1 should not be Some(
-      GnomadFreq(an = 21, ac = 11, af = 0.51, hom = 11)
-    )
-
-    // Checks the output values are the same as expected
-    resultDF.as[Variant].collect().head shouldBe expectedResult
+    //checks that the result is still in the same format ie. JoinConsequenceOutput
+    //also checks that SIFT_converted_rankscore is now the value of dbnsfp_original.SIFT_converted_rankscore
+    resultDF.as[JoinConsequenceOutput].collect().head.`SIFT_converted_rankscore` shouldBe dbnsfp_original.`SIFT_converted_rankscore`
   }
 
   "load method" should "overwrite data" in {
@@ -132,7 +122,7 @@ class UpdateVariantSpec
 
     Given("existing data")
 
-    val job = new UpdateVariant(Public.clinvar, "variant")
+    val job = new UpdateClinical(Public.clinvar, Clinical.variants, "variant")
 
     new ImportClinVarJob().load(clinvarDF)
     job.load(variantDF)
