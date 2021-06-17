@@ -1,7 +1,8 @@
 package org.kidsfirstdrc.dwh.updates
 
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 import org.kidsfirstdrc.dwh.join.JoinConsequences._
@@ -25,9 +26,7 @@ class UpdateClinical(source: DatasetConf, destination: DatasetConf, schema: Stri
     )
   }
 
-  private def updateClinvar(
-      data: Map[String, DataFrame]
-  )(implicit spark: SparkSession): DataFrame = {
+  private def updateClinvar(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     val variant = data(destination.id).drop("clinvar_id", "clin_sig")
     val clinvar = data(Public.clinvar.id)
     variant
@@ -35,27 +34,17 @@ class UpdateClinical(source: DatasetConf, destination: DatasetConf, schema: Stri
       .select(variant("*"), clinvar("name") as "clinvar_id", clinvar("clin_sig") as "clin_sig")
   }
 
-  private def updateTopmed(
-      data: Map[String, DataFrame]
-  )(implicit spark: SparkSession): DataFrame = {
+  private def genericUpdate(data: Map[String, DataFrame],
+                            inputColumns: Seq[Column],
+                            outputColumn: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val variant = data(destination.id)
-    val topmed = data(Public.topmed_bravo.id)
-      .selectLocus($"ac", $"an", $"af", $"homozygotes", $"heterozygotes")
-    variant
-      .drop("topmed")
-      .joinAndMerge(topmed, "topmed")
-  }
+    val sourceDf = data(source.id)
+      .selectLocus(inputColumns:_*)
+      //.selectLocus($"ac", $"an", $"af")
 
-  private def updateGnomad311(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    import spark.implicits._
-    val variant = data(destination.id)
-    val gnomad311 = data(Public.gnomad_genomes_3_1_1.id)
-      .selectLocus($"ac", $"an", $"af", $"nhomalt" as "hom")
-
-    variant
-      .drop("gnomad_genomes_3_1_1")
-      .joinAndMerge(gnomad311, "gnomad_genomes_3_1_1")
+    data(destination.id)
+      .drop(outputColumn)
+      .joinAndMerge(sourceDf, outputColumn, "left")
   }
 
   private def updateDbnsfp(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
@@ -79,10 +68,15 @@ class UpdateClinical(source: DatasetConf, destination: DatasetConf, schema: Stri
   }
 
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
     (source, destination) match {
       case (Public.clinvar             , Clinical.variants)     => updateClinvar(data)
-      case (Public.topmed_bravo        , Clinical.variants)     => updateTopmed(data)
-      case (Public.gnomad_genomes_3_1_1, Clinical.variants)     => updateGnomad311(data)
+      case (Public.topmed_bravo        , Clinical.variants)     => genericUpdate(data, Seq($"ac", $"an", $"af", $"homozygotes", $"heterozygotes"), "topmed")
+      case (Public.gnomad_exomes_2_1   , Clinical.variants)     => genericUpdate(data, Seq($"ac", $"an", $"af", $"hom"), "gnomad_exomes_2_1")
+      case (Public.gnomad_genomes_2_1  , Clinical.variants)     => genericUpdate(data, Seq($"ac", $"an", $"af", $"hom"), "gnomad_genomes_2_1")
+      case (Public.gnomad_genomes_3_0  , Clinical.variants)     => genericUpdate(data, Seq($"ac", $"an", $"af", $"hom"), "gnomad_genomes_3_0")
+      case (Public.gnomad_genomes_3_1_1, Clinical.variants)     => genericUpdate(data, Seq($"ac", $"an", $"af", $"nhomalt" as "hom"), "gnomad_genomes_3_1_1")
+      case (Public.`1000_genomes`      , Clinical.variants)     => genericUpdate(data, Seq($"ac", $"an", $"af"), "1k_genomes")
       case (Public.dbnsfp_original     , Clinical.consequences) => updateDbnsfp(data)
       case _                           => throw new IllegalArgumentException(s"Nothing to do for ${source.id} -> ${destination.id}")
     }
