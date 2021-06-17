@@ -21,8 +21,20 @@ object Update extends SparkApp {
           case ("clinvar", "variants") =>
             new UpdateClinical(Public.clinvar, Clinical.variants, schema).run()
 
+          case ("1000_genomes", "variants") =>
+            new UpdateClinical(Public.`1000_genomes`, Clinical.variants, schema).run()
+
           case ("topmed_bravo", "variants") =>
             new UpdateClinical(Public.topmed_bravo, Clinical.variants, schema).run()
+
+          case ("gnomad_exomes_2_1", "variants") =>
+            new UpdateClinical(Public.gnomad_exomes_2_1, Clinical.variants, schema).run()
+
+          case ("gnomad_genomes_2_1", "variants") =>
+            new UpdateClinical(Public.gnomad_genomes_2_1, Clinical.variants, schema).run()
+
+          case ("gnomad_genomes_3_0", "variants") =>
+            new UpdateClinical(Public.gnomad_genomes_3_0, Clinical.variants, schema).run()
 
           case ("gnomad_genomes_3_1_1", "variants") =>
             new UpdateClinical(Public.gnomad_genomes_3_1_1, Clinical.variants, schema).run()
