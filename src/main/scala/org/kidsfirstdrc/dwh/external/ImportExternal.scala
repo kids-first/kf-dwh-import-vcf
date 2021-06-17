@@ -16,7 +16,7 @@ object ImportExternal extends SparkApp {
   implicit val (conf, spark) = init()
 
   jobType.toLowerCase match {
-    case "1000genomes"          => new Import1k().run()
+    case "1000_genomes"         => new Import1k().run()
     case "annovar_scores"       => new ImportAnnovarScores().run()
     case "cancer_hotspots"      => new ImportCancerHotspots().run()
     case "clinvar"              => new ImportClinVarJob().run()
