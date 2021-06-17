@@ -40,6 +40,13 @@ class JoinConsequences(
 
     val consequences    = data(Clinical.consequences.id)
     val dbnsfp_original = data(Public.dbnsfp_original.id)
+      .drop(
+        "aaref",
+        "symbol",
+        "ensembl_gene_id",
+        "ensembl_protein_id",
+        "VEP_canonical",
+        "cds_strand")
 
     val commonColumns = Seq(
       $"chromosome",
@@ -178,20 +185,9 @@ class JoinConsequences(
 
 object JoinConsequences {
   implicit class DataFrameOperations(df: DataFrame) {
-    def joinWithDbnsfp(dbnsfp_original: DataFrame) = {
+    def joinWithDbnsfp(dbnsfp_original: DataFrame): DataFrame = {
       df
-        .join(
-          dbnsfp_original.drop(
-            "aaref",
-            "symbol",
-            "ensembl_gene_id",
-            "ensembl_protein_id",
-            "VEP_canonical",
-            "cds_strand"
-          ),
-          Seq("chromosome", "start", "reference", "alternate", "ensembl_transcript_id"),
-          "left"
-        )
+        .join(dbnsfp_original, Seq("chromosome", "start", "reference", "alternate", "ensembl_transcript_id"), "left")
     }
   }
 }

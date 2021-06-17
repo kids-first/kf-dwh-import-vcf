@@ -4,7 +4,7 @@ object ImportScores {
 
   case class Output(
       `chromosome`: String = "2",
-      `start`: String = "165310406",
+      `start`: Long = 165310406,
       `reference`: String = "G",
       `alternate`: String = "A",
       `aaref`: String = "V",
