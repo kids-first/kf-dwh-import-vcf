@@ -1,7 +1,7 @@
 #!/bin/bash
 study_ids=$1
 release_id=$2
-mergeExisting=${3:-"true"}
+merge_existing=${3:-"true"}
 tables=${4:-"all"}
 instance_type=${5:-"m5.xlarge"}
 env=${6:-"qa"}
@@ -23,7 +23,7 @@ steps=$(cat <<EOF
       "${release_id}",
       "s3a://kf-strides-variant-parquet-prd/raw/dataservice",
       "s3a://kf-strides-variant-parquet-prd/dataservice",
-      "${mergeExisting}",
+      "${merge_existing}",
       "${tables}"
     ],
     "Type": "CUSTOM_JAR",

@@ -86,14 +86,13 @@ object ImportDataservice extends App {
       if (currentDF.isEmpty) {
         nextDf
       } else {
-        currentDF
-          .union(nextDf)
+        currentDF.unionByName(nextDf).dropDuplicates()
       }
     }
     val existingTableName = s"variant.$name"
     val merged = if (mergeExisting && spark.catalog.tableExists(existingTableName)) {
       val existing = spark.table(existingTableName).where(not($"study_id".isin(studyIds.toSeq: _*)))
-      existing.union(unionsDF)
+      existing.unionByName(unionsDF).dropDuplicates()
     } else {
       unionsDF
     }
