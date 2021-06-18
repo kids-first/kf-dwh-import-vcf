@@ -4,11 +4,13 @@ import io.projectglow.Glow
 import org.apache.hadoop.fs.Path
 import org.apache.spark.sql.expressions.{Window, WindowSpec}
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ArrayType, DecimalType, DoubleType}
+import org.apache.spark.sql.types.{ArrayType, DecimalType, DoubleType, StringType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getGenomicFiles
 
 import java.net.URI
+
+
 
 object SparkUtils {
 
@@ -29,6 +31,14 @@ object SparkUtils {
           s"${combined}_homozygotes",
           col(s"${prefix1}_homozygotes") + col(s"${prefix2}_homozygotes")
         )
+    }
+
+    def withSplitMultiAllelic: DataFrame = {
+      Glow.transform("split_multiallelics", df)
+    }
+
+    def withNormalizedVariants(referenceGenomePath: String = "/home/hadoop/GRCh38_full_analysis_set_plus_decoy_hla.fa"): DataFrame = {
+      Glow.transform("normalize_variants", df, ("reference_genome_path", referenceGenomePath))
     }
   }
 
@@ -53,9 +63,10 @@ object SparkUtils {
     statuses != null && statuses.nonEmpty
   }
 
-  def getVisibleFiles(input: String, studyId: String, releaseId: String, contains: String)(implicit
-      spark: SparkSession
-  ): List[String] = {
+  def getVisibleFiles(input: String,
+                      studyId: String,
+                      releaseId: String,
+                      contains: String)(implicit spark: SparkSession): List[String] = {
     import spark.implicits._
     getGenomicFiles(studyId, releaseId)
       .select("file_name")
@@ -70,40 +81,36 @@ object SparkUtils {
       .toList
   }
 
-  @Deprecated
-  def allFilesPath(input: String): String = s"$input/*.filtered.deNovo.vep.vcf.gz"
-
-  /** Return vcf entries found in visibles input files by joining table genomic_files
-    *
-    * @param path      Path where find the vcf. Can be any path supported by hadoop
-    * @param studyId   Id of the study for filter which files are visibles
-    * @param releaseId Id of the release for filter which files are visibles
-    * @param spark     session
-    * @return vcf entries enriched with additional columns file_name
-    */
-  @Deprecated
-  def visibleVcf(path: String, studyId: String, releaseId: String)(implicit
-      spark: SparkSession
-  ): DataFrame = {
-    val genomicFiles = getGenomicFiles(studyId, releaseId).select("file_name")
-    val inputDF = vcf(path)
-      .withColumn("file_name", filename)
-    inputDF
-      .join(genomicFiles, inputDF("file_name") === genomicFiles("file_name"), "inner")
-      .drop(genomicFiles("file_name"))
+  def vcf(files: List[String], referenceGenomePath: Option[String])(implicit spark: SparkSession): DataFrame = {
+    vcf(files.mkString(","), referenceGenomePath)
   }
 
-  def vcf(files: List[String])(implicit spark: SparkSession): DataFrame = vcf(files.mkString(","))
-
-  def vcf(input: String)(implicit spark: SparkSession): DataFrame = {
+  /**
+   * Reads vcf files into dataframe and apply transformations:
+   *  - split_multiallelics
+   *  - optionally normalize_variants if a path to a reference genome is given
+   *
+   * @param input where the vcf files are located
+   * @param referenceGenomePath reference genome path. This path has to be local for each executors
+   * @param spark a Spark session
+   * @return data into a dataframe
+   */
+  def vcf(input: String, referenceGenomePath: Option[String])(implicit spark: SparkSession): DataFrame = {
     val inputs = input.split(",")
+
     val df = spark.read
       .format("vcf")
       .option("flattenInfoFields", "true")
       .load(inputs: _*)
       .withColumnRenamed("filters", "INFO_FILTERS") // Avoid losing filters columns before split
-
-    Glow.transform("split_multiallelics", df)
+      .withSplitMultiAllelic
+    referenceGenomePath
+      .fold(
+        df.withColumn("normalizationStatus",
+          struct(
+            lit(false) as "changed",
+            lit(null).cast(StringType) as "errorMessage"))
+      )(path => df.withNormalizedVariants(path))
   }
 
   def tableName(table: String, studyId: String, releaseId: String): String = {
@@ -197,6 +204,8 @@ object SparkUtils {
       */
     val has_alt: Column =
       when(array_contains(col("genotype.calls"), 1), 1).otherwise(0) as "has_alt"
+
+    val is_normalized: Column = col("normalizationStatus.changed") as "is_normalized"
 
     val calculated_ac: Column = when(col("zygosity") === "HET", 1)
       .when(col("zygosity") === "HOM", 2)

@@ -1,14 +1,9 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
-import bio.ferlab.datalake.spark3.config.DatasetConf
-import org.apache.spark.sql.functions.{array_sort, col, explode, lit}
-import org.apache.spark.sql.{DataFrame, SaveMode}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}
+import org.kidsfirstdrc.dwh.conf.Catalog.Clinical
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
-import org.kidsfirstdrc.dwh.testutils.dataservice._
-import org.kidsfirstdrc.dwh.testutils.vcf.{OccurrenceOutput, PostCGPInput}
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.annotations
+import org.kidsfirstdrc.dwh.testutils.vcf.OccurrenceOutput
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

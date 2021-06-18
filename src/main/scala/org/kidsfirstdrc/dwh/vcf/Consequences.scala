@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
+import bio.ferlab.datalake.spark3.config.Configuration
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
@@ -9,24 +9,24 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, HarmonizedData, Public}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class Consequences(
-    studyId: String,
-    releaseId: String,
-    input: String,
-    cgp_pattern: String,
-    post_cgp_pattern: String
-)(implicit conf: Configuration)
-    extends ETL() {
+class Consequences(studyId: String,
+                   releaseId: String,
+                   input: String,
+                   cgpPattern: String,
+                   postCgpPattern: String,
+                   referenceGenomePath: Option[String] = None)(implicit conf: Configuration)
+  extends ETL() {
 
   val destination = Clinical.consequences
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val inputDF = vcf(
-      (getVisibleFiles(input, studyId, releaseId, cgp_pattern) ++
-        getVisibleFiles(input, studyId, releaseId, post_cgp_pattern)).distinct
+      (getVisibleFiles(input, studyId, releaseId, cgpPattern) ++
+        getVisibleFiles(input, studyId, releaseId, postCgpPattern)).distinct,
+      referenceGenomePath
     )
       .withColumn("file_name", filename)
-      .select(chromosome, start, end, reference, alternate, name, annotations)
+      .select(chromosome, start, end, reference, alternate, name, annotations, is_normalized)
 
     Map(
       HarmonizedData.family_variants_vcf.id -> inputDF,
@@ -44,13 +44,13 @@ class Consequences(
         col("refseq_mrna_id"),
         col("refseq_protein_id")
       )
-
     val consequencesDf = data(HarmonizedData.family_variants_vcf.id)
       .groupBy(locus: _*)
       .agg(
         first("annotations") as "annotations",
         first("name") as "name",
-        first("end") as "end"
+        first("end") as "end",
+        first("is_normalized") as "is_normalized"
       )
       .withColumn("annotation", explode(col("annotations")))
       .drop("annotations")

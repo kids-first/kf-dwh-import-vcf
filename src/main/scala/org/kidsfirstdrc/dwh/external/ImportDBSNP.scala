@@ -13,7 +13,7 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 class ImportDBSNP()(implicit conf: Configuration) extends StandardETL(Public.dbsnp)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
-    Map(Raw.dbsnp_vcf.id -> vcf(Raw.dbsnp_vcf.location))
+    Map(Raw.dbsnp_vcf.id -> vcf(Raw.dbsnp_vcf.location, None))
   }
 
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {

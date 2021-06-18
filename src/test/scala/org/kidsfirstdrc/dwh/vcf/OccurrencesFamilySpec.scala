@@ -1,7 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
-import bio.ferlab.datalake.spark3.config.DatasetConf
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf, StorageConf}
 import org.apache.spark.sql.functions.{array_sort, col, explode, lit}
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.kidsfirstdrc.dwh.conf.Catalog.{DataService, HarmonizedData}
@@ -201,7 +200,8 @@ class OccurrencesFamilySpec
       input,
       "biospecimen_id",
       ".CGP.filtered.deNovo.vep.vcf.gz",
-      ".postCGP.filtered.deNovo.vep.vcf.gz"
+      ".postCGP.filtered.deNovo.vep.vcf.gz",
+      None
     ).run()
 
     outputDf.select("participant_id").show(false)

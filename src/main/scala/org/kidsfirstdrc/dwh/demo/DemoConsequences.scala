@@ -21,7 +21,7 @@ class DemoConsequences(studyId: String, releaseId: String, input: String)(implic
   }
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
-    val df = vcf(input)
+    val df = vcf(input, None)
       .withColumn("file_name", regexp_extract(input_file_name(), ".*/(.*)", 1))
       .select(chromosome, start, end, reference, alternate, name, annotations)
     Map(HarmonizedData.family_variants_vcf.id -> df)

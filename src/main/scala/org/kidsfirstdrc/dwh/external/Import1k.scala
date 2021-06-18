@@ -12,7 +12,7 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 class Import1k()(implicit conf: Configuration) extends StandardETL(Public.`1000_genomes`)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
-    Map(Raw.`1000genomes_vcf`.id -> vcf(Raw.`1000genomes_vcf`.location))
+    Map(Raw.`1000genomes_vcf`.id -> vcf(Raw.`1000genomes_vcf`.location, None))
   }
 
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
