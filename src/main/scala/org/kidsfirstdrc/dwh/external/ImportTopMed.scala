@@ -13,7 +13,7 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 class ImportTopMed()(implicit conf: Configuration) extends StandardETL(Public.topmed_bravo)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
-    Map(Raw.topmed_bravo_dbsnp.id -> vcf(Raw.topmed_bravo_dbsnp.location)(spark))
+    Map(Raw.topmed_bravo_dbsnp.id -> vcf(Raw.topmed_bravo_dbsnp.location, None)(spark))
   }
 
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {

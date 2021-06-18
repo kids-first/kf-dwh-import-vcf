@@ -14,7 +14,7 @@ object CovirtOccurrences {
 
   def build(input: String)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    val occurrences = vcf(input)
+    val occurrences = vcf(input, None)
       .withColumn("genotype", explode($"genotypes"))
       .select(
         chromosome,

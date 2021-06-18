@@ -17,7 +17,7 @@ class ImportClinVarJob()(implicit conf: Configuration) extends StandardETL(Publi
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
 
-    Map(clinvar_vcf.id -> vcf(clinvar_vcf.location))
+    Map(clinvar_vcf.id -> vcf(clinvar_vcf.location, None))
   }
 
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {

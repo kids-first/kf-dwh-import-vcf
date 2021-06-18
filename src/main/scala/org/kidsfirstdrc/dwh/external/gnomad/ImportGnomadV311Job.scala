@@ -12,7 +12,7 @@ import org.kidsfirstdrc.dwh.utils.SparkUtils.vcf
 class ImportGnomadV311Job(implicit conf: Configuration) extends StandardETL(Public.gnomad_genomes_3_1_1)(conf) {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
-    Map(Raw.gnomad_genomes_3_1_1_vcf.id -> vcf(Raw.gnomad_genomes_3_1_1_vcf.location))
+    Map(Raw.gnomad_genomes_3_1_1_vcf.id -> vcf(Raw.gnomad_genomes_3_1_1_vcf.location, None))
   }
 
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {

@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
+import bio.ferlab.datalake.spark3.config.Configuration
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -9,20 +9,20 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}
 import org.kidsfirstdrc.dwh.utils.SparkUtils._
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
 
-class OccurrencesFamily(
-    studyId: String,
-    releaseId: String,
-    input: String,
-    biospecimenIdColumn: String,
-    cgp_pattern: String,
-    post_cgp_pattern: String
+class OccurrencesFamily(studyId: String,
+                        releaseId: String,
+                        input: String,
+                        biospecimenIdColumn: String,
+                        cgpPattern: String,
+                        postCgpPattern: String,
+                        referenceGenomePath: Option[String] = None
 )(implicit conf: Configuration)
     extends ETL() {
 
   val destination = Clinical.occurrences_family
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
-    val inputDF: DataFrame = unionCGPFiles(input, studyId, releaseId, cgp_pattern, post_cgp_pattern)
+    val inputDF: DataFrame = unionCGPFiles(input, studyId, releaseId, cgpPattern, postCgpPattern, referenceGenomePath)
 
     val biospecimens =
       spark.table(s"${DataService.biospecimens.table.get.fullName}_${releaseId.toLowerCase}")
@@ -198,7 +198,8 @@ class OccurrencesFamily(
         optional_info(inputDF, "INFO_HaplotypeScore", "info_haplotype_score", "float"),
         $"file_name",
         lit(studyId) as "study_id",
-        lit(releaseId) as "release_id"
+        lit(releaseId) as "release_id",
+        is_normalized
       )
       .withColumn(
         "is_lo_conf_denovo",
@@ -222,22 +223,22 @@ class OccurrencesFamily(
     * @param spark
     * @return a dataframe that unions cgp and postcgp vcf
     */
-  private def unionCGPFiles(
-      input: String,
-      studyId: String,
-      releaseId: String,
-      cgp_pattern: String,
-      post_cgp_pattern: String
+  private def unionCGPFiles(input: String,
+                            studyId: String,
+                            releaseId: String,
+                            cgpPattern: String,
+                            postCgpPattern: String,
+                            referenceGenomePath: Option[String] = None
   )(implicit spark: SparkSession): DataFrame = {
-    val postCGPFiles = getVisibleFiles(input, studyId, releaseId, post_cgp_pattern)
-    val CGPFiles     = getVisibleFiles(input, studyId, releaseId, cgp_pattern)
+    val postCGPFiles = getVisibleFiles(input, studyId, releaseId, postCgpPattern)
+    val CGPFiles     = getVisibleFiles(input, studyId, releaseId, cgpPattern)
     val vcfDf = (postCGPFiles, CGPFiles) match {
       case (Nil, Nil)                                   => throw new IllegalStateException("No VCF files found!")
-      case (Nil, genomicFiles) if genomicFiles.nonEmpty => asCGP(vcf(genomicFiles))
-      case (genomicFiles, Nil) if genomicFiles.nonEmpty => asPostCGP(vcf(genomicFiles))
+      case (Nil, genomicFiles) if genomicFiles.nonEmpty => asCGP(vcf(genomicFiles, referenceGenomePath))
+      case (genomicFiles, Nil) if genomicFiles.nonEmpty => asPostCGP(vcf(genomicFiles, referenceGenomePath))
       case (postCGPFiles, cgpFiles) =>
-        val postCGP = asPostCGP(vcf(postCGPFiles))
-        val cgp     = asCGP(vcf(cgpFiles))
+        val postCGP = asPostCGP(vcf(postCGPFiles, referenceGenomePath))
+        val cgp     = asCGP(vcf(cgpFiles, referenceGenomePath))
         union(postCGP, cgp)
 
     }

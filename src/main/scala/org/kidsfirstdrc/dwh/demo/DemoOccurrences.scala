@@ -15,7 +15,7 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)(implici
 ) extends ETL() {
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
-    val inputDF = vcf(input)
+    val inputDF = vcf(input, None)
       .withColumn("genotype", explode(col("genotypes")))
       .withColumn("file_name", regexp_extract(input_file_name(), ".*/(.*)", 1))
 

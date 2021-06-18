@@ -8,5 +8,6 @@ case class ConsequenceRowInput(
     alternate: String = "A",
     name: String = "rs1057520413",
     annotations: Seq[ConsequenceInput] = Seq(ConsequenceInput()),
-    splitFromMultiAllelic: Boolean = false
+    splitFromMultiAllelic: Boolean = false,
+    is_normalized: Boolean = true
 )

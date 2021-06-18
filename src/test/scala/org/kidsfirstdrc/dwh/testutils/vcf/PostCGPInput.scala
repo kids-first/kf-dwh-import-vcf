@@ -40,8 +40,12 @@ case class PostCGPInput(
     `INFO_ExcessHet`: Double = 3.6798,
     `INFO_DS`: Option[Boolean] = None,
     `INFO_OLD_MULTIALLELIC`: Option[String] = None,
-    `genotypes`: List[GENOTYPES] = List(GENOTYPES(), GENOTYPES(`sampleId` = "BS_HIJKKL"))
+    `genotypes`: List[GENOTYPES] = List(GENOTYPES(), GENOTYPES(`sampleId` = "BS_HIJKKL")),
+    `normalizationStatus`: NormalizationStatus = NormalizationStatus()
 )
+
+case class NormalizationStatus(changed: Boolean = true,
+                               errorMessage: Option[String] = None)
 
 case class Info_Ann(
     `Allele`: String = "T",

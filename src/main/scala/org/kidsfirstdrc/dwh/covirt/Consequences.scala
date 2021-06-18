@@ -10,7 +10,7 @@ import JoinConsequences._
 object Consequences {
   def run(releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
-    val inputDF                    = vcf(input)
+    val inputDF                    = vcf(input, None)
     val consequences: DataFrame    = build(inputDF)
     val dbnsfp_original: DataFrame = spark.table("variant.dbnsfp_original")
 
