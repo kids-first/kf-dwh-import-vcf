@@ -1,14 +1,14 @@
 #!/bin/bash
 set -x
 study_id=$1
-release_id=${2:-"re_000011"}
-job=${3:-"variants"}
-schema=${4:-"portal"}
-cgp_pattern=${5:-"--"}
-post_cgp_pattern=${6:-".CGP.filtered.deNovo.vep.vcf.gz"}
-folder=${7:-"harmonized-data/family-variants/"}
+release_id=${2:-"re_000012"}
+job=${3:-"occurrences_family"}
+schema=${4:-"variant"}
+cgp_pattern=${5:-".CGP.filtered.deNovo.vep.vcf.gz"}
+post_cgp_pattern=${6:-".postCGP.filtered.deNovo.vep.vcf.gz"}
+folder=${7:-"harmonized/family-variants/"}
 biospecimen_id_column=${8:-"biospecimen_id"}
-instance_count=${9:-"15"}
+instance_count=${9:-"25"}
 instance_type=${10:-"m5.4xlarge"}
 env=${11:-"qa"}
 
