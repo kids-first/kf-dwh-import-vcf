@@ -122,6 +122,7 @@ class OccurrencesFamily(studyId: String,
       .withColumn("zygosity", zygosity($"calls"))
       .withColumn("mother_zygosity", zygosity($"mother_calls"))
       .withColumn("father_zygosity", zygosity($"father_calls"))
+      .withParentalOrigin("parental_origin", $"father_calls", $"mother_calls")
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -324,5 +325,6 @@ class OccurrencesFamily(studyId: String,
       .withColumn("zygosity", zygosity($"calls"))
       .withColumn("mother_zygosity", zygosity($"mother_calls"))
       .withColumn("father_zygosity", zygosity($"father_calls"))
+      .withParentalOrigin("parental_origin", $"father_calls", $"mother_calls")
   }
 }

@@ -60,6 +60,7 @@ case class OccurrenceOutput(
     `father_id`: Option[String] = None,
     `mother_calls`: Option[List[Int]] = None,
     `father_calls`: Option[List[Int]] = None,
+    `parental_origin`: Option[String] = None,
     `zygosity`: String = "WT",
     `mother_zygosity`: Option[String] = None,
     `father_zygosity`: Option[String] = None,

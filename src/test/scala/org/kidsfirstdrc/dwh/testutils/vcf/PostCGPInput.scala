@@ -40,7 +40,10 @@ case class PostCGPInput(
     `INFO_ExcessHet`: Double = 3.6798,
     `INFO_DS`: Option[Boolean] = None,
     `INFO_OLD_MULTIALLELIC`: Option[String] = None,
-    `genotypes`: List[GENOTYPES] = List(GENOTYPES(), GENOTYPES(`sampleId` = "BS_HIJKKL")),
+    `genotypes`: List[GENOTYPES] = List(
+      GENOTYPES(`sampleId` = "BS_HIJKKL", calls = List(1, 0)),    //child
+      GENOTYPES(`sampleId` = "BS_HIJKKL2", calls = List(0, 0)),   //mother
+      GENOTYPES(`sampleId` = "BS_2CZNEQQ5", calls = List(1, -1))),//father
     `normalizationStatus`: NormalizationStatus = NormalizationStatus()
 )
 
@@ -79,7 +82,7 @@ case class Info_Ann(
 )
 
 case class GENOTYPES(
-    `sampleId`: String = "BS_HIJKKL2",
+    `sampleId`: String = "BS_HIJKKL",
     `conditionalQuality`: Int = 99,
     `filters`: Option[List[String]] = None,
     `SB`: Option[List[Int]] = None,
@@ -87,7 +90,7 @@ case class GENOTYPES(
     `PP`: List[Int] = List(0, 99, 1066),
     `PID`: Option[String] = None,
     `phased`: Boolean = false,
-    `calls`: List[Int] = List(0, 0),
+    `calls`: List[Int] = List(1, 0),
     `MIN_DP`: Option[Int] = None,
     `JL`: Int = 72,
     `PGT`: Option[String] = None,
