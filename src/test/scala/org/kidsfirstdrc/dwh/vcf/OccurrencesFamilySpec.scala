@@ -111,6 +111,12 @@ class OccurrencesFamilySpec
       affected_status = true,
       is_proband = true,
       study_id = "SD_123456"
+    ),
+    ParticipantOutput(
+      kf_id = "PT_000003",
+      affected_status = true,
+      is_proband = true,
+      study_id = "SD_123456"
     )
   ).toDF
 
@@ -123,8 +129,22 @@ class OccurrencesFamilySpec
       study_id = "SD_123456"
     ),
     FamilyRelationshipOutput(
+      kf_id = "FR_000003",
+      participant2 = "PT_000001",
+      participant1 = "PT_000003",
+      participant1_to_participant2_relation = "Father",
+      study_id = "SD_123456"
+    ),
+    FamilyRelationshipOutput(
       kf_id = "FR_000002",
       participant2 = "PT_000002",
+      participant1 = "PT_000001",
+      participant1_to_participant2_relation = "Child",
+      study_id = "SD_123456"
+    ),
+    FamilyRelationshipOutput(
+      kf_id = "FR_000004",
+      participant2 = "PT_000003",
       participant1 = "PT_000001",
       participant1_to_participant2_relation = "Child",
       study_id = "SD_123456"
@@ -162,13 +182,21 @@ class OccurrencesFamilySpec
     ).transform(inputData)
 
     outputDf.as[OccurrenceOutput].collect() should contain theSameElementsAs Seq(
-      OccurrenceOutput(participant_id = "PT_000002", biospecimen_id = "BS_HIJKKL2"),
+      OccurrenceOutput(participant_id = "PT_000002", biospecimen_id = "BS_HIJKKL2", `calls` = List(0, 0), `zygosity` = "WT", `has_alt` = 0),
+      OccurrenceOutput(participant_id = "PT_000003", biospecimen_id = "BS_2CZNEQQ5", `calls` = List(1, -1), `zygosity` = "UNK", `has_alt` = 1),
       OccurrenceOutput(
-        participant_id = "PT_000001",
-        biospecimen_id = "BS_HIJKKL",
+        `participant_id` = "PT_000001",
+        `biospecimen_id` = "BS_HIJKKL",
         `mother_id` = Some("PT_000002"),
-        mother_calls = Some(List(0, 0)),
-        mother_zygosity = Some("WT")
+        `father_id` = Some("PT_000003"),
+        `mother_calls` = Some(List(0, 0)),
+        `father_calls` = Some(List(1, -1)),
+        `calls` = List(1, 0),
+        `parental_origin` = Some("father"),
+        `mother_zygosity` = Some("WT"),
+        `father_zygosity` = Some("UNK"),
+        `zygosity` = "HET",
+        `has_alt` = 1
       )
     )
   }
@@ -204,9 +232,11 @@ class OccurrencesFamilySpec
       None
     ).run()
 
-    outputDf.select("participant_id").show(false)
+    outputDf.select(
+      "chromosome", "start", "reference", "alternate",
+      "participant_id", "zygosity", "mother_calls", "father_calls", "parental_origin").show(false)
 
-    outputDf.as[OccurrenceOutput].count shouldBe 8
+    outputDf.as[OccurrenceOutput].count shouldBe 12
   }
 
   private def loadTestData(
