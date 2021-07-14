@@ -112,17 +112,17 @@ class SparkUtilsSpec extends AnyFlatSpec with WithSparkSession with Matchers {
     val FTH = "fth"
 
     val input_occurrences = Seq(
-      ("Y", "Male", Array(0, 1) , null        , Array(0, 1), "HET", FTH),
-      ("X", "Male", Array(-1, 1), Array(0, 1) , Array(0, 1), "HET", MTH),
-      ("1", "Male", Array(0, 1) , Array(0, 1) , Array(0, 0), "WT" , null),
-      ("1", "Male", Array(0, 1) , Array(0, 0) , Array(0, 1), "HET", FTH),
-      ("1", "Male", Array(0, 0) , Array(0, 1) , Array(0, 1), "HET", MTH),
-      ("1", "Male", Array(0, 1) , Array(1, 1) , Array(0, 1), "HET", MTH),
-      ("1", "Male", Array(1, 1) , Array(0, 1) , Array(0, 1), "HET", FTH),
-      ("1", "Male", Array(-1, 1), Array(1, 1) , Array(0, 1), "HET", MTH),
-      ("1", "Male", Array(1, 1) , Array(-1, 1), Array(0, 1), "HET", FTH),
-      ("1", "Male", Array(1, 0) , Array(1, 0) , Array(0, 1), "HET", null)
-    ).toDF("chromosome", "gender", "father_calls", "mother_calls", "calls", "zygosity", "expectedResult")
+      ("Y", true , Array(0, 1), Array(0, 1) , null        , "HET", null),
+      ("X", true , Array(0, 1), Array(-1, 1), Array(0, 1) , "HET", null),
+      ("1", true , Array(0, 0), Array(0, 1) , Array(0, 1) , "WT" , null),
+      ("1", true , Array(0, 1), Array(0, 1) , Array(0, 0) , "HET", FTH),
+      ("1", true , Array(0, 1), Array(0, 0) , Array(0, 1) , "HET", MTH),
+      ("1", true , Array(0, 1), Array(0, 1) , Array(1, 1) , "HET", MTH),
+      ("1", true , Array(0, 1), Array(1, 1) , Array(0, 1) , "HET", FTH),
+      ("1", true , Array(0, 1), Array(-1, 1), Array(1, 1) , "HET", MTH),
+      ("1", true , Array(0, 1), Array(1, 1) , Array(-1, 1), "HET", FTH),
+      ("1", true , Array(0, 1), Array(0, 1) , Array(0, 1) , "HET", null)
+    ).toDF("chromosome", "is_multi_allelic", "calls", "father_calls", "mother_calls", "zygosity", "expectedResult")
 
     val result = input_occurrences.withParentalOrigin("parental_origin", $"father_calls", $"mother_calls", MTH, FTH)
 
@@ -132,6 +132,65 @@ class SparkUtilsSpec extends AnyFlatSpec with WithSparkSession with Matchers {
       .select("expectedResult", "parental_origin")
       .as[(String, String)]
       .collect() shouldBe Array.empty[(String, String)]
+
+  }
+
+  it should "return transmissions accordingly" in {
+
+    val input_occurrences = List(
+      ("1", "Male"  , false, Array(0, 0)  , Array(0, 0), Array(0, 0), false, false, false, "non carrier proband"),
+      ("X", "Female", false, Array(0, 0)  , Array(0, 0), Array(0, 0), false, false, false, "non carrier proband"),
+      ("1", "Female", false, null         , Array(0, 0), Array(0, 0), false, false, false, "unknown proband genotype"),
+      ("X", "Male"  , false, null         , Array(0, 0), Array(0, 0), false, false, false, "unknown proband genotype"),
+      ("1", "Female", false, Array(-1, -1), Array(0, 0), Array(0, 0), false, false, false, "unknown proband genotype"),
+      ("X", "Male"  , false, Array(-1, -1), Array(0, 0), Array(0, 0), false, false, false, "unknown proband genotype"),
+      ("1", "Male"  , false, Array(0, 1)  , Array(0, 0), Array(0, 0), true, false, false, "autosomal_dominant (de_novo)"),
+      ("1", "Male"  , false, Array(0, 1)  , Array(0, 0), Array(0, 1), true, false, true , "autosomal_dominant"),
+      ("1", "Male"  , false, Array(0, 1)  , Array(0, 1), Array(0, 0), true, true , false, "autosomal_dominant"),
+      ("1", "Male"  , false, Array(0, 1)  , Array(0, 1), Array(0, 1), true, true , true , "autosomal_dominant"),
+      ("1", "Male"  , false, Array(1, 1)  , Array(0, 1), Array(0, 1), true, false, false, "autosomal_recessive"),
+      ("1", "Male"  , false, Array(1, 1)  , Array(0, 1), Array(1, 1), true, false, true , "autosomal_recessive"),
+      ("1", "Male"  , false, Array(1, 1)  , Array(1, 1), Array(0, 1), true, true , false, "autosomal_recessive"),
+      ("1", "Male"  , false, Array(1, 1)  , Array(1, 1), Array(1, 1), true, true , true , "autosomal_recessive"),
+      ("X", "Female", false, Array(0, 1)  , Array(0, 0), Array(0, 0), true, false, false, "x_linked_dominant (de_novo)"),
+      ("X", "Male"  , false, Array(0, 1)  , Array(0, 0), Array(0, 0), true, false, false, "x_linked_recessive (de_novo)"),
+      ("X", "Female", false, Array(0, 1)  , Array(0, 0), Array(0, 1), true, false, true , "x_linked_dominant"),
+      ("X", "Male"  , false, Array(0, 1)  , Array(0, 0), Array(0, 1), true, false, false, "x_linked_recessive"),
+      ("X", "Male"  , false, Array(0, 1)  , Array(0, 0), Array(1, 1), true, false, true, "x_linked_recessive"),
+      ("X", "Female", false, Array(0, 1)  , Array(0, 1), Array(0, 0), true, true , false, "x_linked_dominant"),
+      ("X", "Female", false, Array(0, 1)  , Array(0, 1), Array(0, 1), true, true , true , "x_linked_dominant"),
+      ("X", "Male"  , false, Array(0, 1)  , Array(0, 1), Array(0, 1), true, true , false, "x_linked_recessive"),
+      ("X", "Male"  , false, Array(0, 1)  , Array(0, 1), Array(1, 1), true, true , true , "x_linked_recessive"),
+      ("X", "Female", false, Array(0, 1)  , Array(1, 1), Array(0, 0), true, true , false, "x_linked_recessive"),
+      ("X", "Female", false, Array(0, 1)  , Array(1, 1), Array(0, 1), true, true , true , "x_linked_dominant"),
+      ("X", "Male"  , false, Array(0, 1)  , Array(1, 1), Array(0, 1), true, true , false, "x_linked_recessive"),
+      ("X", "Male"  , false, Array(0, 1)  , Array(1, 1), Array(1, 1), true, true , true , "x_linked_recessive"),
+      ("X", "Male"  , false, Array(1, 1)  , Array(0, 0), Array(0, 0), true, false, false, "x_linked_recessive (de_novo)"),
+      ("X", "Male"  , false, Array(1, 1)  , Array(0, 0), Array(0, 1), true, false, false, "x_linked_recessive"),
+      ("X", "Male"  , false, Array(1, 1)  , Array(0, 0), Array(1, 1), true, false, true , "x_linked_recessive"),
+      ("X", "Female", false, Array(1, 1)  , Array(0, 1), Array(0, 1), true, true , false, "x_linked_recessive"),
+      ("X", "Male"  , false, Array(1, 1)  , Array(0, 1), Array(0, 1), true, true , false, "x_linked_recessive"),
+      ("X", "Female", false, Array(1, 1)  , Array(0, 1), Array(1, 1), true, true , true , "x_linked_recessive"),
+      ("X", "Male"  , false, Array(1, 1)  , Array(0, 1), Array(1, 1), true, true , true , "x_linked_recessive"),
+      ("X", "Female", false, Array(1, 1)  , Array(1, 1), Array(0, 1), true, true , false, "x_linked_recessive"),
+      ("X", "Male"  , false, Array(1, 1)  , Array(1, 1), Array(0, 1), true, true , false, "x_linked_recessive"),
+      ("X", "Female", false, Array(1, 1)  , Array(1, 1), Array(1, 1), true, true , true , "x_linked_recessive"),
+      ("X", "Male"  , false, Array(1, 1)  , Array(1, 1), Array(1, 1), true, true , true , "x_linked_recessive"),
+    )
+      .toDF("chromosome", "gender", "is_multi_allelic", "calls", "father_calls", "mother_calls",
+        "affected_status", "father_affected_status", "mother_affected_status", "expectedResult")
+
+    val result = input_occurrences
+      .withGenotypeTransmission("transmission", $"father_calls", $"mother_calls")
+
+    result.show(false)
+    result
+      .where(
+        functions.not(col("expectedResult") === col("transmission")) or
+        (col("expectedResult").isNotNull and col("transmission").isNull))
+      .select("expectedResult", "transmission")
+      .as[(String, String)]
+      .collect() shouldBe Array.empty[(String, String)] //makes it easy to debug in case the test fails
 
   }
 

@@ -39,7 +39,7 @@
     "comment": "Values are: true or false"
   },
   {
-    "col_name": "is_multi_alellic",
+    "col_name": "is_multi_allelic",
     "comment": "Values are: true or false"
   },
   {

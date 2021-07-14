@@ -190,13 +190,20 @@ class OccurrencesFamilySpec
         `calls` = List(0, 0),
         `zygosity` = "WT",
         `has_alt` = 0,
-        `gender` = "Female"),
+        `gender` = "Female",
+        `is_multi_allelic` = true,
+        `transmission` = Some("non carrier proband"),
+        `hgvsg` = null,
+        `variant_class` = null),
       OccurrenceOutput(participant_id = "PT_000003",
         biospecimen_id = "BS_2CZNEQQ5",
         `calls` = List(1, -1),
         `zygosity` = "UNK",
         `has_alt` = 1,
-        `gender` = "Male"),
+        `is_multi_allelic` = true,
+        `gender` = "Male",
+        `hgvsg` = null,
+        `variant_class` = null),
       OccurrenceOutput(
         `participant_id` = "PT_000001",
         `biospecimen_id` = "BS_HIJKKL",
@@ -205,12 +212,17 @@ class OccurrencesFamilySpec
         `mother_calls` = Some(List(0, 0)),
         `father_calls` = Some(List(1, -1)),
         `calls` = List(1, 0),
+        `is_multi_allelic` = true,
         `parental_origin` = Some("father"),
         `mother_zygosity` = Some("WT"),
         `father_zygosity` = Some("UNK"),
         `zygosity` = "HET",
         `has_alt` = 1,
-        `gender` = "Male"
+        `gender` = "Male",
+        `mother_affected_status` = Some(true),
+        `father_affected_status` = Some(true),
+        `hgvsg` = null,
+        `variant_class` = null
       )
     )
   }

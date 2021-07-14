@@ -9,7 +9,7 @@ case class PostCGPInput(
     `alternateAlleles`: List[String] = List("A"),
     `qual`: Double = 39.48,
     `INFO_FILTERS`: List[String] = List("VQSRTrancheINDEL99.90to99.95"),
-    `splitFromMultiAllelic`: Boolean = false,
+    `splitFromMultiAllelic`: Boolean = true,
     `INFO_loConfDeNovo`: Option[String] = None,
     `INFO_NEGATIVE_TRAIN_SITE`: Boolean = true,
     `INFO_AC`: List[Int] = List(1),
