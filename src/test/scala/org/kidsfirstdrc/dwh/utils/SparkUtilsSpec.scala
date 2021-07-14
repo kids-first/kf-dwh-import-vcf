@@ -1,9 +1,11 @@
 package org.kidsfirstdrc.dwh.utils
 
+import org.apache.spark.sql.functions
 import org.kidsfirstdrc.dwh.testutils.Model._
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
-import org.kidsfirstdrc.dwh.utils.SparkUtils.{fileExist, filename, union}
+import org.kidsfirstdrc.dwh.utils.SparkUtils.{SparkUtilsOperations, fileExist, filename, union}
+import org.apache.spark.sql.functions._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -103,6 +105,34 @@ class SparkUtilsSpec extends AnyFlatSpec with WithSparkSession with Matchers {
     val vcf = s"$path/*.CGP.filtered.deNovo.vep.vcf.gz"
     println(vcf)
     fileExist(vcf) shouldBe true
+  }
+
+  it should "return parental origins accordingly" in {
+    val MTH = "mth"
+    val FTH = "fth"
+
+    val input_occurrences = Seq(
+      ("Y", "Male", Array(0, 1) , null        , Array(0, 1), "HET", FTH),
+      ("X", "Male", Array(-1, 1), Array(0, 1) , Array(0, 1), "HET", MTH),
+      ("1", "Male", Array(0, 1) , Array(0, 1) , Array(0, 0), "WT" , null),
+      ("1", "Male", Array(0, 1) , Array(0, 0) , Array(0, 1), "HET", FTH),
+      ("1", "Male", Array(0, 0) , Array(0, 1) , Array(0, 1), "HET", MTH),
+      ("1", "Male", Array(0, 1) , Array(1, 1) , Array(0, 1), "HET", MTH),
+      ("1", "Male", Array(1, 1) , Array(0, 1) , Array(0, 1), "HET", FTH),
+      ("1", "Male", Array(-1, 1), Array(1, 1) , Array(0, 1), "HET", MTH),
+      ("1", "Male", Array(1, 1) , Array(-1, 1), Array(0, 1), "HET", FTH),
+      ("1", "Male", Array(1, 0) , Array(1, 0) , Array(0, 1), "HET", null)
+    ).toDF("chromosome", "gender", "father_calls", "mother_calls", "calls", "zygosity", "expectedResult")
+
+    val result = input_occurrences.withParentalOrigin("parental_origin", $"father_calls", $"mother_calls", MTH, FTH)
+
+    result.show(false)
+    result
+      .where(functions.not(col("expectedResult") === col("parental_origin")))
+      .select("expectedResult", "parental_origin")
+      .as[(String, String)]
+      .collect() shouldBe Array.empty[(String, String)]
+
   }
 
 }

@@ -51,7 +51,7 @@ class OccurrencesFamily(studyId: String,
               .otherwise(lit(false))
           )
       )
-      .select("kf_id", "is_proband", "affected_status")
+      .select("kf_id", "is_proband", "affected_status", "gender")
 
     val biospecimens = data(DataService.biospecimens.id)
       .select(
@@ -75,7 +75,7 @@ class OccurrencesFamily(studyId: String,
     val joinedBiospecimen =
       biospecimens
         .join(participants, biospecimens("participant_id") === participants("kf_id"))
-        .select(biospecimens("*"), $"is_proband", $"affected_status")
+        .select(biospecimens("*"), $"is_proband", $"affected_status", $"gender")
 
     val relations =
       family_relationships
@@ -296,9 +296,7 @@ class OccurrencesFamily(studyId: String,
       )
   }
 
-  def joinOccurrencesWithInheritance(occurrences: DataFrame, relations: DataFrame)(implicit
-      spark: SparkSession
-  ): DataFrame = {
+  def joinOccurrencesWithInheritance(occurrences: DataFrame, relations: DataFrame)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     occurrences
       .join(relations, occurrences("participant_id") === relations("participant_id"), "left")

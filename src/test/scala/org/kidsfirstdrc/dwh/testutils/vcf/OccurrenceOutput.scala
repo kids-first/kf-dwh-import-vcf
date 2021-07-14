@@ -64,5 +64,6 @@ case class OccurrenceOutput(
     `zygosity`: String = "WT",
     `mother_zygosity`: Option[String] = None,
     `father_zygosity`: Option[String] = None,
-    `is_normalized`: Boolean = true
+    `is_normalized`: Boolean = true,
+    `gender`: String = "Male"
 )
