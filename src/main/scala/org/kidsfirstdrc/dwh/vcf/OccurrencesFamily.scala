@@ -100,29 +100,17 @@ class OccurrencesFamily(studyId: String,
 
     occurrences
       .join(broadcast(joinedRelation), Seq("biospecimen_id"))
-      .withColumn(
-        "family_calls",
-        when($"family_id".isNotNull, familyCalls).otherwise(
-          lit(null).cast(MapType(StringType, ArrayType(IntegerType)))
-        )
-      )
-      .withColumn(
-        "mother_calls",
-        when($"family_id".isNotNull, $"family_calls" ($"mother_id")).otherwise(
-          lit(null).cast(ArrayType(IntegerType))
-        )
-      )
-      .withColumn(
-        "father_calls",
-        when($"family_id".isNotNull, $"family_calls" ($"father_id")).otherwise(
-          lit(null).cast(ArrayType(IntegerType))
-        )
-      )
-      .drop("family_calls")
+      .withColumn("family_info", familyInfo)
+      .withColumn("mother_calls", motherCalls)
+      .withColumn("father_calls", fatherCalls)
+      .withColumn("mother_affected_status", motherAffectedStatus)
+      .withColumn("father_affected_status", fatherAffectedStatus)
+      .drop("family_info")
       .withColumn("zygosity", zygosity($"calls"))
       .withColumn("mother_zygosity", zygosity($"mother_calls"))
       .withColumn("father_zygosity", zygosity($"father_calls"))
       .withParentalOrigin("parental_origin", $"father_calls", $"mother_calls")
+      .withGenotypeTransmission("transmission", $"father_calls", $"mother_calls")
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
@@ -301,28 +289,16 @@ class OccurrencesFamily(studyId: String,
     occurrences
       .join(relations, occurrences("participant_id") === relations("participant_id"), "left")
       .drop(relations("participant_id"))
-      .withColumn(
-        "family_calls",
-        when($"family_id".isNotNull, familyCalls).otherwise(
-          lit(null).cast(MapType(StringType, ArrayType(IntegerType)))
-        )
-      )
-      .withColumn(
-        "mother_calls",
-        when($"family_id".isNotNull, $"family_calls" ($"mother_id")).otherwise(
-          lit(null).cast(ArrayType(IntegerType))
-        )
-      )
-      .withColumn(
-        "father_calls",
-        when($"family_id".isNotNull, $"family_calls" ($"father_id")).otherwise(
-          lit(null).cast(ArrayType(IntegerType))
-        )
-      )
+      .withColumn("family_info", familyInfo)
+      .withColumn("mother_calls", motherCalls)
+      .withColumn("father_calls", fatherCalls)
+      .withColumn("mother_affected_status", motherAffectedStatus)
+      .withColumn("father_affected_status", fatherAffectedStatus)
       .drop("family_calls")
       .withColumn("zygosity", zygosity($"calls"))
       .withColumn("mother_zygosity", zygosity($"mother_calls"))
       .withColumn("father_zygosity", zygosity($"father_calls"))
       .withParentalOrigin("parental_origin", $"father_calls", $"mother_calls")
+      .withGenotypeTransmission("transmission", $"father_calls", $"mother_calls")
   }
 }

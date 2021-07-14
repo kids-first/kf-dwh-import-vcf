@@ -3,7 +3,7 @@ package org.kidsfirstdrc.dwh.utils
 import io.projectglow.Glow
 import org.apache.hadoop.fs.Path
 import org.apache.spark.sql.expressions.{Window, WindowSpec}
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.{when, _}
 import org.apache.spark.sql.types.{ArrayType, DecimalType, DoubleType, StringType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getGenomicFiles
@@ -40,11 +40,122 @@ object SparkUtils {
       Glow.transform("normalize_variants", df, ("reference_genome_path", referenceGenomePath))
     }
 
+    val normalized_call: Column => Column = calls =>
+      when(col("is_multi_allelic"), transform(calls, c => when(c === -1, lit(0)).otherwise(c))).otherwise(calls)
+
+    val is_heterozygote: Column = col("zygosity") === "HET"
+
+    val is_sexual_genotype: Column = col("chromosome").isin("X", "Y")
+
+    val strict_autosomal_transmissions = List(
+      //(proband_calls, father_calls, mother_calls, father_affected, mother_affected, transmission)
+      //(“0/1”, “0/0”, “0/0”) -> 	autosomal_dominant (de_novo) [if both parents unaffected]
+      (Array(0, 1), Array(0, 0), Array(0, 0), false, false, "autosomal_dominant (de_novo)"),
+      //(“0/1”, “0/0”, “0/1”) -> 	autosomal_dominant [if affected mother and unaffected father]
+      (Array(0, 1), Array(0, 0), Array(0, 1), false, true , "autosomal_dominant"),
+      //(“0/1”, “0/1”, “0/0”) -> 	autosomal_dominant [if affected father and unaffected mother]
+      (Array(0, 1), Array(0, 1), Array(0, 0), true , false, "autosomal_dominant"),
+      //(“0/1”, “0/1”, “0/1”) -> 	autosomal_dominant [if both parents affected]
+      (Array(0, 1), Array(0, 1), Array(0, 1), true, true, "autosomal_dominant"),
+      //(“1/1”, “0/1”, “0/1”) -> 	autosomal_recessive [if both parents unaffected]
+      (Array(1, 1), Array(0, 1), Array(0, 1), false, false, "autosomal_recessive"),
+      //(“1/1”, “0/1”, “1/1”) -> 	autosomal_recessive [if affected mother and unaffected father]
+      (Array(1, 1), Array(0, 1), Array(1, 1), false, true, "autosomal_recessive"),
+      //(“1/1”, “1/1”, “0/1”) -> 	autosomal_recessive [if affected father and unaffected mother]
+      (Array(1, 1), Array(1, 1), Array(0, 1), true, false, "autosomal_recessive"),
+      //(“1/1”, “1/1”, “1/1”) -> 	autosomal_recessive [if both parents affected]
+      (Array(1, 1), Array(1, 1), Array(1, 1), true, true, "autosomal_recessive")
+    )
+
+    val strict_sexual_transmissions = List(
+      //(gender, proband_calls, father_calls, mother_calls, father_affected, mother_affected, transmission)
+      //(“0/1”, “0/0”, “0/0”) -> 	x_linked_dominant (de_novo) [if female proband with both parents unaffected]
+      //			                    x_linked_recessive (de_novo) [if male proband with both parents unaffected]
+      ("Female", Array(0, 1), Array(0, 0), Array(0, 0), false, false, "x_linked_dominant (de_novo)"),
+      ("Male"  , Array(0, 1), Array(0, 0), Array(0, 0), false, false, "x_linked_recessive (de_novo)"),
+      //(“0/1”, “0/0”, “0/1”) -> 	x_linked_dominant [if female proband with affected mother and unaffected father]
+      //                          x_linked_recessive [if male proband with both parents unaffected]
+      ("Female", Array(0, 1), Array(0, 0), Array(0, 1), false, true , "x_linked_dominant"),
+      ("Male"  , Array(0, 1), Array(0, 0), Array(0, 1), false, false, "x_linked_recessive"),
+      //(“0/1”, “0/0”, “1/1”) -> 	x_linked_recessive [if male proband with affected mother and unaffected father]
+      ("Male"  , Array(0, 1), Array(0, 0), Array(1, 1), false, true, "x_linked_recessive"),
+      //(“0/1”, “0/1”, “0/0”) -> 	x_linked_dominant [if female proband with affected father and unaffected mother]
+      ("Female", Array(0, 1), Array(0, 1), Array(0, 0), true, false, "x_linked_dominant"),
+      //(“0/1”, “0/1”, “0/1”) -> 	x_linked_dominant [if female proband with both parents affected]
+      //                          x_linked_recessive [if male proband with affected father and unaffected mother]
+      ("Female", Array(0, 1), Array(0, 1), Array(0, 1), true, true , "x_linked_dominant"),
+      ("Male"  , Array(0, 1), Array(0, 1), Array(0, 1), true, false, "x_linked_recessive"),
+      //(“0/1”, “0/1”, “1/1”) ->  x_linked_recessive [if male proband with both parents affected]
+      ("Male"  , Array(0, 1), Array(0, 1), Array(1, 1), true, true, "x_linked_recessive"),
+      //(“0/1”, “1/1”, “0/0”) -> 	x_linked_dominant [if female proband affected father and unaffected mother]
+      ("Female", Array(0, 1), Array(1, 1), Array(0, 0), true, false, "x_linked_recessive"),
+      //(“0/1”, “1/1”, “0/1”) -> 	x_linked_dominant [if female proband with both parents affected]
+      //                          x_linked_recessive [if male proband with affected father and unaffected mother]
+      ("Female", Array(0, 1), Array(1, 1), Array(0, 1), true, true , "x_linked_dominant"),
+      ("Male"  , Array(0, 1), Array(1, 1), Array(0, 1), true, false, "x_linked_recessive"),
+      //(“0/1”, “1/1”, “1/1”) -> 	x_linked_recessive [if male proband with both parents affected]
+      ("Male"  , Array(0, 1), Array(1, 1), Array(1, 1), true, true, "x_linked_recessive"),
+      //(“1/1”, “0/0”, “0/0”) -> 	x_linked_recessive (de_novo) [if male proband with both parents unaffected]
+      ("Male"  , Array(1, 1), Array(0, 0), Array(0, 0), false, false, "x_linked_recessive (de_novo)"),
+      //(“1/1”, “0/0”, “0/1”) ->	x_linked_recessive [if male proband with both parents unaffected]
+      ("Male"  , Array(1, 1), Array(0, 0), Array(0, 1), false, false, "x_linked_recessive"),
+      //(“1/1”, “0/0”, “1/1”) -> 	x_linked_recessive [if male proband with affected mother and unaffected father]
+      ("Male"  , Array(1, 1), Array(0, 0), Array(1, 1), false, true, "x_linked_recessive"),
+      //(“1/1”, “0/1”, “0/1”) -> 	x_linked_recessive [if affected father and unaffected mother]
+      ("Female", Array(1, 1), Array(0, 1), Array(0, 1), true, false, "x_linked_recessive"),
+      ("Male"  , Array(1, 1), Array(0, 1), Array(0, 1), true, false, "x_linked_recessive"),
+      //(“1/1”, “0/1”, “1/1”) -> 	x_linked_recessive [if both parents affected]
+      ("Female", Array(1, 1), Array(0, 1), Array(1, 1), true, true, "x_linked_recessive"),
+      ("Male"  , Array(1, 1), Array(0, 1), Array(1, 1), true, true, "x_linked_recessive"),
+      //(“1/1”, “1/1”, “0/1”) -> 	x_linked_recessive [if affected father and unaffected mother]
+      ("Female", Array(1, 1), Array(1, 1), Array(0, 1), true, false, "x_linked_recessive"),
+      ("Male"  , Array(1, 1), Array(1, 1), Array(0, 1), true, false, "x_linked_recessive"),
+      //(“1/1”, “1/1”, “1/1”) -> 	x_linked_recessive [if both parents affected]
+      ("Female", Array(1, 1), Array(1, 1), Array(1, 1), true, true, "x_linked_recessive"),
+      ("Male"  , Array(1, 1), Array(1, 1), Array(1, 1), true, true, "x_linked_recessive"),
+    )
+
+    def withGenotypeTransmission(as: String, fth_calls: Column, mth_calls: Column): DataFrame = {
+      val normalizedCallsDf =
+        df.withColumn("norm_fth_calls", normalized_call(fth_calls))
+          .withColumn("norm_mth_calls", normalized_call(mth_calls))
+
+      val static_transmissions =
+          when(col("calls") === Array(0, 0), lit("non carrier proband"))
+            .when(col("calls").isNull or col("calls") === Array(-1, -1), lit("unknown proband genotype"))
+
+      val autosomal_transmissions: Column = strict_autosomal_transmissions.foldLeft[Column](static_transmissions){
+        case (c, (proband_calls, fth_calls, mth_calls, fth_affected_status, mth_affected_status, transmission)) =>
+          c.when(
+            col("mother_affected_status") === mth_affected_status and
+              col("father_affected_status") === fth_affected_status and
+              col("calls") === proband_calls and
+              col("norm_fth_calls") === fth_calls and
+              col("norm_mth_calls") === mth_calls, lit(transmission))
+      }
+
+      val sexual_transmissions: Column = strict_sexual_transmissions.foldLeft[Column](static_transmissions){
+        case (c, (gender, proband_calls, fth_calls, mth_calls, fth_affected_status, mth_affected_status, transmission)) =>
+          c.when(
+            col("gender") === gender and
+            col("mother_affected_status") === mth_affected_status and
+              col("father_affected_status") === fth_affected_status and
+              col("calls") === proband_calls and
+              col("norm_fth_calls") === fth_calls and
+              col("norm_mth_calls") === mth_calls, lit(transmission))
+      }
+
+      normalizedCallsDf
+        .withColumn(as, when(is_sexual_genotype, sexual_transmissions).otherwise(autosomal_transmissions))
+        .drop("norm_fth_calls", "norm_mth_calls")
+    }
+
+
     def withParentalOrigin(as: String, fth_calls: Column, mth_calls: Column, MTH: String = "mother", FTH: String = "father"): DataFrame = {
       val normalizedCallsDf =
-        df.withColumn("norm_fth_calls", transform(fth_calls, c => when(c === -1, lit(0)).otherwise(c)))
-          .withColumn("norm_mth_calls", transform(mth_calls, c => when(c === -1, lit(0)).otherwise(c)))
-      val is_heterozygote = col("zygosity") === "HET"
+        df.withColumn("norm_fth_calls", normalized_call(fth_calls))
+          .withColumn("norm_mth_calls", normalized_call(mth_calls))
+
       val origins = List(
         //(father_calls, mother_calls, origin)
         (Array(0, 1), Array(0, 0), FTH),
@@ -58,10 +169,7 @@ object SparkUtils {
         (Array(1, 0), Array(0, 0), FTH),
         (Array(0, 0), Array(1, 0), MTH)
       )
-      val static_origins =
-        when(not(is_heterozygote), lit(null).cast(StringType))
-          .when(col("chromosome") === "Y", lit(FTH))
-          .when(col("gender") === "Male" and col("chromosome") === "X", lit(MTH))
+      val static_origins = when(not(is_heterozygote), lit(null).cast(StringType))
 
       val parental_origin = origins.foldLeft[Column](static_origins){
         case (c, (fth, mth, origin)) => c.when(col("norm_fth_calls") === fth and col("norm_mth_calls") === mth, lit(origin))
@@ -225,9 +333,18 @@ object SparkUtils {
     val familyVariantWindow: WindowSpec =
       Window.partitionBy("chromosome", "start", "reference", "alternate", "family_id")
 
-    val familyCalls: Column = map_from_entries(
-      collect_list(struct(col("participant_id"), col("calls"))).over(familyVariantWindow)
+    val familyInfo: Column = when(col("family_id").isNotNull,
+      map_from_entries(
+        collect_list(
+          struct(col("participant_id"), struct(col("calls"), col("affected_status")))
+        ).over(familyVariantWindow)
+      )
     )
+
+    val motherCalls: Column = col("family_info")(col("mother_id"))("calls")
+    val fatherCalls: Column = col("family_info")(col("father_id"))("calls")
+    val motherAffectedStatus: Column = col("family_info")(col("mother_id"))("affected_status")
+    val fatherAffectedStatus: Column = col("family_info")(col("father_id"))("affected_status")
 
     /** has_alt return 1 if there is at least one alternative allele. Note : It cannot returned a boolean beacause it's used to partition data.
       * It looks like Glue does not support partition by boolean
