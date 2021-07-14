@@ -104,19 +104,22 @@ class OccurrencesFamilySpec
       kf_id = "PT_000001",
       affected_status = true,
       is_proband = true,
-      study_id = "SD_123456"
+      study_id = "SD_123456",
+      gender = "Male"
     ),
     ParticipantOutput(
       kf_id = "PT_000002",
       affected_status = true,
       is_proband = true,
-      study_id = "SD_123456"
+      study_id = "SD_123456",
+      gender = "Female"
     ),
     ParticipantOutput(
       kf_id = "PT_000003",
       affected_status = true,
       is_proband = true,
-      study_id = "SD_123456"
+      study_id = "SD_123456",
+      gender = "Male"
     )
   ).toDF
 
@@ -182,8 +185,18 @@ class OccurrencesFamilySpec
     ).transform(inputData)
 
     outputDf.as[OccurrenceOutput].collect() should contain theSameElementsAs Seq(
-      OccurrenceOutput(participant_id = "PT_000002", biospecimen_id = "BS_HIJKKL2", `calls` = List(0, 0), `zygosity` = "WT", `has_alt` = 0),
-      OccurrenceOutput(participant_id = "PT_000003", biospecimen_id = "BS_2CZNEQQ5", `calls` = List(1, -1), `zygosity` = "UNK", `has_alt` = 1),
+      OccurrenceOutput(participant_id = "PT_000002",
+        biospecimen_id = "BS_HIJKKL2",
+        `calls` = List(0, 0),
+        `zygosity` = "WT",
+        `has_alt` = 0,
+        `gender` = "Female"),
+      OccurrenceOutput(participant_id = "PT_000003",
+        biospecimen_id = "BS_2CZNEQQ5",
+        `calls` = List(1, -1),
+        `zygosity` = "UNK",
+        `has_alt` = 1,
+        `gender` = "Male"),
       OccurrenceOutput(
         `participant_id` = "PT_000001",
         `biospecimen_id` = "BS_HIJKKL",
@@ -196,7 +209,8 @@ class OccurrencesFamilySpec
         `mother_zygosity` = Some("WT"),
         `father_zygosity` = Some("UNK"),
         `zygosity` = "HET",
-        `has_alt` = 1
+        `has_alt` = 1,
+        `gender` = "Male"
       )
     )
   }

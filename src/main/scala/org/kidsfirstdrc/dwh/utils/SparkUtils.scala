@@ -11,7 +11,6 @@ import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getGenomicFiles
 import java.net.URI
 
 
-
 object SparkUtils {
 
   implicit class SparkUtilsOperations(df: DataFrame) {
@@ -41,14 +40,13 @@ object SparkUtils {
       Glow.transform("normalize_variants", df, ("reference_genome_path", referenceGenomePath))
     }
 
-    def withParentalOrigin(as: String, fth_calls: Column, mth_calls: Column): DataFrame = {
+    def withParentalOrigin(as: String, fth_calls: Column, mth_calls: Column, MTH: String = "mother", FTH: String = "father"): DataFrame = {
       val normalizedCallsDf =
         df.withColumn("norm_fth_calls", transform(fth_calls, c => when(c === -1, lit(0)).otherwise(c)))
           .withColumn("norm_mth_calls", transform(mth_calls, c => when(c === -1, lit(0)).otherwise(c)))
-      val MTH = "mother"
-      val FTH = "father"
-      val proband_heterozygote = col("zygosity") === "HET"
+      val is_heterozygote = col("zygosity") === "HET"
       val origins = List(
+        //(father_calls, mother_calls, origin)
         (Array(0, 1), Array(0, 0), FTH),
         (Array(0, 0), Array(0, 1), MTH),
         (Array(1, 1), Array(0, 0), FTH),
@@ -60,11 +58,17 @@ object SparkUtils {
         (Array(1, 0), Array(0, 0), FTH),
         (Array(0, 0), Array(1, 0), MTH)
       )
-      val parental_origin = origins.foldLeft[Column](when(not(proband_heterozygote), lit(null).cast(StringType))){
+      val static_origins =
+        when(not(is_heterozygote), lit(null).cast(StringType))
+          .when(col("chromosome") === "Y", lit(FTH))
+          .when(col("gender") === "Male" and col("chromosome") === "X", lit(MTH))
+
+      val parental_origin = origins.foldLeft[Column](static_origins){
         case (c, (fth, mth, origin)) => c.when(col("norm_fth_calls") === fth and col("norm_mth_calls") === mth, lit(origin))
       }
 
       normalizedCallsDf.withColumn(as, parental_origin)
+        .drop("norm_fth_calls", "norm_mth_calls")
     }
   }
 
