@@ -6,9 +6,9 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
-import org.kidsfirstdrc.dwh.utils.SparkUtils
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.{calculated_duo_af, locusColumNames}
-import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
+import bio.ferlab.datalake.spark3.implicits.SparkUtils
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns.{calculated_duo_af, locusColumNames}
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.firstAs
 
 class JoinVariants(
     studyIds: Seq[String],

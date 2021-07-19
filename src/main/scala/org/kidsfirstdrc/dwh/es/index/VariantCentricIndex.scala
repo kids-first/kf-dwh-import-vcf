@@ -9,8 +9,8 @@ import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
 import org.kidsfirstdrc.dwh.es.index.VariantCentricIndex._
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
-import org.kidsfirstdrc.dwh.utils.SparkUtils._
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
+import bio.ferlab.datalake.spark3.implicits.SparkUtils._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns.locus
 
 import scala.collection.mutable
 import scala.util.{Success, Try}

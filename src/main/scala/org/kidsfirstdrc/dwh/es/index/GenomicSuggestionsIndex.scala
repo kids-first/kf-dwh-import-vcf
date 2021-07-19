@@ -7,8 +7,8 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locus
-import org.kidsfirstdrc.dwh.utils.SparkUtils.getColumnOrElse
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns.locus
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.getColumnOrElse
 
 class GenomicSuggestionsIndex(releaseId: String)(override implicit val conf: Configuration)
     extends ETL() {

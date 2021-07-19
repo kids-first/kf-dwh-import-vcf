@@ -4,7 +4,7 @@ import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Clinical
-import org.kidsfirstdrc.dwh.utils.SparkUtils._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils._
 
 class Occurrences(studyId: String, releaseId: String)(implicit conf: Configuration) extends ETL() {
 

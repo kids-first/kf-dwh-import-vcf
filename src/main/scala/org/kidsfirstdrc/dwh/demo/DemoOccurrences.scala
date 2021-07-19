@@ -7,7 +7,7 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}
-import org.kidsfirstdrc.dwh.utils.SparkUtils._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils._
 import org.kidsfirstdrc.dwh.vcf.OccurrencesFamily
 
 class DemoOccurrences(studyId: String, releaseId: String, input: String)(implicit
