@@ -6,8 +6,8 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.join.JoinConsequences._
-import org.kidsfirstdrc.dwh.utils.SparkUtils
-import org.kidsfirstdrc.dwh.utils.SparkUtils.firstAs
+import bio.ferlab.datalake.spark3.implicits.SparkUtils
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.firstAs
 
 class JoinConsequences(
     studyIds: Seq[String],

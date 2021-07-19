@@ -7,8 +7,8 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 
 import org.kidsfirstdrc.dwh.jobs.StandardETL
-import org.kidsfirstdrc.dwh.utils.SparkUtils._
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns._
 
 class ImportDBSNP()(implicit conf: Configuration) extends StandardETL(Public.dbsnp)(conf) {
 

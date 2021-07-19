@@ -6,8 +6,8 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.jobs.StandardETL
-import org.kidsfirstdrc.dwh.utils.SparkUtils._
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns._
 
 import scala.collection.mutable
 

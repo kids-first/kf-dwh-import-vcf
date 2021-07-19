@@ -137,4 +137,22 @@ object ClinicalUtils {
         Some(acl.filter(a => (a != studyId && !a.endsWith(".c999")) || a == "*"))
       }
     }
+
+  def getVisibleFiles(input: String,
+                      studyId: String,
+                      releaseId: String,
+                      contains: String)(implicit spark: SparkSession): List[String] = {
+    import spark.implicits._
+    getGenomicFiles(studyId, releaseId)
+      .select("file_name")
+      .distinct
+      .as[String]
+      .collect()
+      .filter(_.contains(contains))
+      .map(f => {
+        if (input.endsWith("/")) s"${input}${f}"
+        else s"$input/$f"
+      })
+      .toList
+  }
 }

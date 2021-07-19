@@ -9,7 +9,7 @@ import org.kidsfirstdrc.dwh.join.JoinConsequences._
 import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.publish.Publish.publishTable
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns.locusColumNames
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns.locusColumNames
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

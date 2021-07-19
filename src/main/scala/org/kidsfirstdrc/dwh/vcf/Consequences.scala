@@ -6,8 +6,9 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, HarmonizedData, Public}
-import org.kidsfirstdrc.dwh.utils.SparkUtils._
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns._
+import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getVisibleFiles
 
 class Consequences(studyId: String,
                    releaseId: String,

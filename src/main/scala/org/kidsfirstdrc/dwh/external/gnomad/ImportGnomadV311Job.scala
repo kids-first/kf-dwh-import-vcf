@@ -6,8 +6,8 @@ import org.apache.spark.sql.types.ArrayType
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
-import org.kidsfirstdrc.dwh.utils.SparkUtils.vcf
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.vcf
 
 class ImportGnomadV311Job(implicit conf: Configuration) extends StandardETL(Public.gnomad_genomes_3_1_1)(conf) {
 

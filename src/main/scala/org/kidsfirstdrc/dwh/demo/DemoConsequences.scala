@@ -6,8 +6,8 @@ import org.apache.spark.sql.functions.{input_file_name, regexp_extract}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.HarmonizedData
-import org.kidsfirstdrc.dwh.utils.SparkUtils._
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns._
 import org.kidsfirstdrc.dwh.vcf.Consequences
 
 class DemoConsequences(studyId: String, releaseId: String, input: String)(implicit

@@ -2,12 +2,13 @@ package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.spark3.config.Configuration
 import bio.ferlab.datalake.spark3.etl.ETL
+import bio.ferlab.datalake.spark3.implicits.SparkUtils._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}
-import org.kidsfirstdrc.dwh.utils.SparkUtils._
-import org.kidsfirstdrc.dwh.utils.SparkUtils.columns._
+import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getVisibleFiles
 
 class OccurrencesFamily(studyId: String,
                         releaseId: String,
