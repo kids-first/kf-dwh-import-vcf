@@ -1,0 +1,42 @@
+{
+  "index_patterns": ["genomic_suggestions*"],
+  "settings": {
+    "number_of_shards": 4
+  },
+  "mappings": {
+    "properties": {
+      "suggest": {
+        "type": "completion",
+        "analyzer": "standard"
+      },
+      "type": {
+        "type": "keyword",
+        "index": false
+      },
+      "locus": {
+        "type": "keyword",
+        "index": false
+      },
+      "suggestion_id": {
+        "type": "keyword",
+        "index": false
+      },
+      "hgvsg": {
+        "type": "keyword",
+        "index": false
+      },
+      "symbol": {
+        "type": "keyword",
+        "index": false
+      },
+      "rsnumber": {
+        "type": "keyword",
+        "index": false
+      },
+      "chromosome": {
+        "type": "keyword",
+        "index": false
+      }
+    }
+  }
+}
