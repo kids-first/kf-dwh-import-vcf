@@ -6,13 +6,15 @@ scalaVersion := "2.12.13"
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
 
 val spark_version = "3.1.1"
+val elasticsearch_spark_version = "7.12.0"
 
 resolvers += "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots"
 resolvers += "Sonatype OSS Releases" at "https://s01.oss.sonatype.org/content/repositories/releases"
 
 /* Runtime */
 libraryDependencies += "org.apache.spark" %% "spark-sql" % spark_version % Provided
-libraryDependencies += "bio.ferlab" %% "datalake-spark3" % "0.0.49"
+libraryDependencies += "bio.ferlab" %% "datalake-spark3" % "0.0.50"
+libraryDependencies += "org.elasticsearch" %% "elasticsearch-spark-30" % elasticsearch_spark_version % Provided
 
 /* Test */
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"
