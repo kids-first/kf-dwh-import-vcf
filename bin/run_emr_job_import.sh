@@ -2,14 +2,14 @@
 set -x
 study_id=$1
 release_id=${2:-"re_000012"}
-job=${3:-"occurrences"}
-schema=${4:-"variant"}
+job=${3:-"consequences"}
+schema=${4:-"portal"}
 cgp_pattern=${5:-".CGP.filtered.deNovo.vep.vcf.gz"}
 post_cgp_pattern=${6:-".CGP.filtered.vep.vcf.gz"}
 folder=${7:-"harmonized-data/simple-variants/"}
 biospecimen_id_column=${8:-"biospecimen_id"}
 reference_genome_path=${9:-"/home/hadoop/GRCh38_full_analysis_set_plus_decoy_hla.fa"}
-instance_count=${10:-"15"}
+instance_count=${10:-"20"}
 instance_type=${11:-"m5.4xlarge"}
 env=${12:-"qa"}
 

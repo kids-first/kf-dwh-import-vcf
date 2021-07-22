@@ -52,16 +52,16 @@ object VariantCentricOutput {
 
   case class ScorePredictions(
       sift_converted_rankscore: Option[Double] = Some(0.91255),
-      sift_score: Option[Double] = Some(0.91255),
+      //sift_score: Option[Double] = Some(0.91255),
       sift_pred: Option[String] = Some("D"),
       polyphen2_hvar_rankscore: Option[Double] = Some(0.97372),
-      polyphen2_hvar_score: Option[Double] = Some(0.91255),
+      //polyphen2_hvar_score: Option[Double] = Some(0.91255),
       polyphen2_hvar_pred: Option[String] = Some("D"),
       fathmm_converted_rankscore: Option[Double] = Some(0.98611),
       fathmm_pred: Option[String] = Some("D"),
       cadd_rankscore: Option[Double] = Some(0.76643),
       dann_rankscore: Option[Double] = Some(0.95813),
-      dann_score: Option[Double] = Some(0.9988206585102238),
+      //dann_score: Option[Double] = Some(0.9988206585102238),
       revel_rankscore: Option[Double] = Some(0.98972),
       lrt_converted_rankscore: Option[Double] = Some(0.62929),
       lrt_pred: Option[String] = Some("D")
@@ -115,6 +115,14 @@ object VariantCentricOutput {
       `cosmic`: List[COSMIC] = List(COSMIC())
   )
 
+  case class External_Reference(`is_dbsnp`: Boolean = true,
+                                `is_clinvar`: Boolean = true,
+                                `is_hpo`: Boolean = true,
+                                `is_orphanet`: Boolean = true,
+                                `is_omim`: Boolean = true,
+                                `is_ddd`: Boolean = true,
+                                `is_cosmic`: Boolean = true)
+
   case class Output(
       `hash`: String = "ba3d35feba14451058e6fc93eeba163c800a8e09",
       `genome_build`: String = "GRCh38",
@@ -138,7 +146,8 @@ object VariantCentricOutput {
       `hgvsg`: Option[String] = Some("chr2:g.166166916G>A"),
       `genes`: List[GENES] = List(GENES()),
       `participant_total_number`: Long = 15,
-      `participant_frequency`: Double = 0.8
+      `participant_frequency`: Double = 0.8,
+      `external_reference`: External_Reference = External_Reference()
   )
 
 }
