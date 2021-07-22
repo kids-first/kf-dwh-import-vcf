@@ -1,10 +1,12 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
+import bio.ferlab.datalake.spark3.config.Configuration
 import bio.ferlab.datalake.spark3.etl.ETL
+import bio.ferlab.datalake.spark3.implicits.SparkUtils._
+import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Clinical
-import bio.ferlab.datalake.spark3.implicits.SparkUtils._
 
 class Occurrences(studyId: String, releaseId: String)(implicit conf: Configuration) extends ETL() {
 
@@ -22,6 +24,7 @@ class Occurrences(studyId: String, releaseId: String)(implicit conf: Configurati
 
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
     data(Clinical.occurrences_family.id)
+      .withColumn("family_id", col("family_id").cast(StringType))
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {

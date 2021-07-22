@@ -141,14 +141,14 @@ object ClinicalUtils {
   def getVisibleFiles(input: String,
                       studyId: String,
                       releaseId: String,
-                      contains: String)(implicit spark: SparkSession): List[String] = {
+                      endsWith: String)(implicit spark: SparkSession): List[String] = {
     import spark.implicits._
     getGenomicFiles(studyId, releaseId)
       .select("file_name")
       .distinct
       .as[String]
       .collect()
-      .filter(_.contains(contains))
+      .filter(_.endsWith(endsWith))
       .map(f => {
         if (input.endsWith("/")) s"${input}${f}"
         else s"$input/$f"
