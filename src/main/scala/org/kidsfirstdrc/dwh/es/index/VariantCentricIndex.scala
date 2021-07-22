@@ -2,6 +2,8 @@ package org.kidsfirstdrc.dwh.es.index
 
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
+import bio.ferlab.datalake.spark3.implicits.SparkUtils._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns.locus
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{explode, _}
 import org.apache.spark.sql.types.{DoubleType, LongType}
@@ -9,8 +11,6 @@ import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
 import org.kidsfirstdrc.dwh.es.index.VariantCentricIndex._
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
-import bio.ferlab.datalake.spark3.implicits.SparkUtils._
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns.locus
 
 import scala.collection.mutable
 import scala.util.{Success, Try}
@@ -94,6 +94,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
       .withClinVar(clinvar)
       .withConsequences(consequences)
       .withGenes(genes)
+      .withExternalReference
       .select(
         "genome_build",
         "hash",
@@ -117,7 +118,8 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
         "genes",
         "hgvsg",
         "participant_total_number",
-        "participant_frequency"
+        "participant_frequency",
+        "external_reference"
       )
   }
 
@@ -348,16 +350,16 @@ object VariantCentricIndex {
           "predictions",
           struct(
             col("SIFT_converted_rankscore") as "sift_converted_rankscore",
-            col("SIFT_score") as "sift_score",
+            //col("SIFT_score") as "sift_score",
             col("SIFT_pred") as "sift_pred",
             col("Polyphen2_HVAR_rankscore") as "polyphen2_hvar_rankscore",
-            col("Polyphen2_HVAR_score") as "polyphen2_hvar_score",
+            //col("Polyphen2_HVAR_score") as "polyphen2_hvar_score",
             col("Polyphen2_HVAR_pred") as "polyphen2_hvar_pred",
             col("FATHMM_converted_rankscore") as "fathmm_converted_rankscore",
             col("FATHMM_pred") as "fathmm_pred",
             col("CADD_raw_rankscore") as "cadd_rankscore",
             col("DANN_rankscore") as "dann_rankscore",
-            col("DANN_score") as "dann_score",
+            //col("DANN_score") as "dann_score",
             col("REVEL_rankscore") as "revel_rankscore",
             col("LRT_converted_rankscore") as "lrt_converted_rankscore",
             col("LRT_pred") as "lrt_pred"
@@ -409,6 +411,21 @@ object VariantCentricIndex {
           )
 
       df.joinByLocus(occurrencesWithParticipants, "inner")
+    }
+
+    def withExternalReference(implicit spark: SparkSession): DataFrame = {
+      import spark.implicits._
+      df.withColumn(
+        "external_reference", struct(
+          $"rsnumber".isNotNull.as("is_dbsnp"),
+          $"clinvar".isNotNull.as("is_clinvar"),
+          exists($"genes", gene => gene("hpo").isNotNull).as("is_hpo"),
+          exists($"genes", gene => gene("orphanet").isNotNull).as("is_orphanet"),
+          exists($"genes", gene => gene("omim").isNotNull).as("is_omim"),
+          exists($"genes", gene => gene("cosmic").isNotNull).as("is_cosmic"),
+          exists($"genes", gene => gene("ddd").isNotNull).as("is_ddd")
+        )
+      )
     }
   }
 }
