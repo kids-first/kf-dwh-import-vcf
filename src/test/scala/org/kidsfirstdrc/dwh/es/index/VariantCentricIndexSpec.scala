@@ -2,8 +2,9 @@ package org.kidsfirstdrc.dwh.es.index
 
 import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
 import org.apache.spark.sql.DataFrame
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public, Raw}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
+import org.kidsfirstdrc.dwh.testutils.dataservice.StudyShortNameRaw
 import org.kidsfirstdrc.dwh.testutils.es.VariantCentricOutput
 import org.kidsfirstdrc.dwh.testutils.es.VariantCentricOutput._
 import org.kidsfirstdrc.dwh.testutils.external.{ClinvarOutput, GenesOutput}
@@ -27,6 +28,12 @@ class VariantCentricIndexSpec
     Configuration(
       List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
     )
+
+  val studyShortNamesDf: DataFrame = Seq(
+    StudyShortNameRaw("SD_123", "A KF study", "KF-ABC"),
+    StudyShortNameRaw("SD_456", "A KF study", "KF-DEF"),
+    StudyShortNameRaw("SD_789", "A KF study", "KF-GHI")
+  ).toDF
 
   val joinVariantDf: DataFrame = Seq(
     JoinVariantOutput(
@@ -186,16 +193,18 @@ class VariantCentricIndexSpec
   ).toDF()
 
   val data = Map(
-    Clinical.variants.id     -> joinVariantDf,
-    Clinical.consequences.id -> joinConsequencesDf,
-    Clinical.occurrences.id  -> occurrencesDf,
-    Public.clinvar.id        -> clinvarDf,
-    Public.genes.id          -> genesDf
+    Clinical.variants.id      -> joinVariantDf,
+    Clinical.consequences.id  -> joinConsequencesDf,
+    Clinical.occurrences.id   -> occurrencesDf,
+    Public.clinvar.id         -> clinvarDf,
+    Public.genes.id           -> genesDf,
+    Raw.studies_short_name.id -> studyShortNamesDf
   )
 
   val expectedStudies = List(
     Study(
       "SD_456",
+      "KF-DEF",
       List("SD_456.c1"),
       List("SD_456"),
       StudyFrequency(Freq(10, 5, 0.5, 2, 3), Freq(0, 0, 0, 0, 0)),
@@ -204,6 +213,7 @@ class VariantCentricIndexSpec
     ),
     Study(
       "SD_123",
+      "KF-ABC",
       List("SD_123.c1"),
       List("SD_123"),
       StudyFrequency(Freq(10, 5, 0.5, 2, 3), Freq(0, 0, 0, 0, 0)),
@@ -224,6 +234,7 @@ class VariantCentricIndexSpec
     ),
     Study(
       "SD_789",
+      "KF-GHI",
       List("SD_789.c99"),
       List("SD_789"),
       StudyFrequency(Freq(7, 2, 0.2857142857, 5, 1), Freq(7, 2, 0.2857142857, 5, 1)),

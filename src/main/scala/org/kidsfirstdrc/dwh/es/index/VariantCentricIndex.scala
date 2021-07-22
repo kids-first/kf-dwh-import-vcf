@@ -8,7 +8,7 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{explode, _}
 import org.apache.spark.sql.types.{DoubleType, LongType}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public, Raw}
 import org.kidsfirstdrc.dwh.es.index.VariantCentricIndex._
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 
@@ -45,9 +45,10 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
       Clinical.consequences.id -> spark.read.parquet(
         s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId"
       ),
-      Clinical.occurrences.id -> occurrences,
-      Public.clinvar.id       -> spark.table(s"${Public.clinvar.table.get.fullName}"),
-      Public.genes.id         -> spark.table(s"${Public.genes.table.get.fullName}")
+      Clinical.occurrences.id   -> occurrences,
+      Public.clinvar.id         -> spark.table(s"${Public.clinvar.table.get.fullName}"),
+      Public.genes.id           -> spark.table(s"${Public.genes.table.get.fullName}"),
+      Raw.studies_short_name.id -> spark.read.options(Raw.studies_short_name.readoptions).csv(Raw.studies_short_name.location)
     )
   }
 
@@ -76,12 +77,18 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
       .drop("biotype")
       .withColumnRenamed("chromosome", "genes_chromosome")
 
+    val studyCodes = data(Raw.studies_short_name.id)
+      .select(
+        col("kf_id") as "study_id",
+        col("code") as "study_code"
+      )
+
     variants
       .withParticipants(occurrences)
       .withColumn("locus", concat_ws("-", locus: _*))
       .withColumn("hash", sha1(col("locus")))
       .withColumn("genome_build", lit("GRCh38"))
-      .withStudies
+      .withStudies(studyCodes)
       .withColumn(
         "participant_total_number",
         (col("frequencies.upper_bound_kf.an") / 2).cast(LongType)
@@ -263,12 +270,13 @@ object VariantCentricIndex {
 
     Some("x").fold(Seq.empty[String])(x => x.split(",").toSeq)
 
-    def withStudies: DataFrame = {
+    def withStudies(studyCodes: DataFrame): DataFrame = {
       val minimumParticipantsPerStudy = 10
       val inputColumns: Seq[Column]   = df.columns.filterNot(_.equals("studies")).map(col)
 
       df
         .select(inputColumns :+ explode(col("studies")).as("study_id"): _*)
+        .join(studyCodes, Seq("study_id"), "left")
         .withColumn("acls", col("consent_codes_by_study")(col("study_id")))
         .withColumn("external_study_ids", external_study_ids(col("acls")))
         .withColumn("ids", col("participant_ids_by_study")(col("study_id")))
@@ -289,6 +297,7 @@ object VariantCentricIndex {
           "study",
           struct(
             col("study_id"),
+            col("study_code"),
             col("acls"),
             col("external_study_ids"),
             struct(

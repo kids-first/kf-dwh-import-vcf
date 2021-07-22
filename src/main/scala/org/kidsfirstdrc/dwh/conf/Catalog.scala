@@ -21,6 +21,15 @@ object Catalog {
   object Raw extends StoreFolder {
     override val alias: String = kfStridesVariantBucket
 
+    val studies_short_name = DatasetConf(
+      "studies_short_name",
+      alias,
+      "/raw/dataservice/mapping/studies_short_name.tsv",
+      CSV,
+      OverWrite,
+      readoptions = Map("delimiter"-> "\t", "header" -> "true")
+    )
+
     val `1000genomes_vcf` =
       DatasetConf("1000genomes_vcf", alias, "/raw/1000Genomes/ALL.*.sites.vcf.gz", VCF, OverWrite)
     val annovar_dbnsfp =
