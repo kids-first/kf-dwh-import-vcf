@@ -1,11 +1,11 @@
 #!/bin/bash
 study_ids=${1:-"SD_46SK55A3,SD_9PYZAHHE,SD_DYPMEHHF,SD_BHJXBDQK,SD_7NQ9151J,SD_NMVV8A1Y"}
-release_id=${2:-"RE_000011"}
+release_id=${2:-"RE_000012"}
 job=${3:-"variants"}
 mergeExisting=${4:-"false"}
 schema=${5:-"variant"}
-number_instance=${6:-"15"}
-instance_type=${7:-"r5.4xlarge"}
+number_instance=${6:-"25"}
+instance_type=${7:-"r5.2xlarge"}
 env=${8:-"qa"}
 
 #steps="[{\"Args\":[\"spark-submit\",\"--deploy-mode\",\"client\",\"--class\",\"org.kidsfirstdrc.dwh.join.Join\",\"s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar\",\"${study_ids}\",\"${release_id}\",\"s3a://kf-strides-variant-parquet-prd\",\"${job}\",\"${mergeExisting}\",\"variant\"],\"Type\":\"CUSTOM_JAR\",\"ActionOnFailure\":\"TERMINATE_CLUSTER\",\"Jar\":\"command-runner.jar\",\"Properties\":\"\",\"Name\":\"Spark application\"}]"

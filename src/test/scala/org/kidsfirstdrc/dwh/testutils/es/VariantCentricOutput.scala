@@ -17,6 +17,7 @@ object VariantCentricOutput {
 
   case class Study(
       study_id: String,
+      study_code: String,
       acls: List[String],
       external_study_ids: List[String],
       frequencies: StudyFrequency,
