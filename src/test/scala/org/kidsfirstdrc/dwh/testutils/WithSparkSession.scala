@@ -14,6 +14,8 @@ trait WithSparkSession {
     //.config("spark.ui.enabled", value = false)
     //.config("spark.sql.warehouse.dir", s"$tmp/wharehouse")
     //.config("spark.driver.extraJavaOptions", s"-Dderby.system.home=$tmp/derby")
+    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
     .enableHiveSupport()
     .master("local")
     .getOrCreate()
