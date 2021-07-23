@@ -2,7 +2,7 @@ package org.kidsfirstdrc.dwh.conf
 
 import bio.ferlab.datalake.spark3.config.{DatasetConf, TableConf}
 import bio.ferlab.datalake.spark3.loader.Format._
-import bio.ferlab.datalake.spark3.loader.LoadType.OverWrite
+import bio.ferlab.datalake.spark3.loader.LoadType.{OverWrite, Upsert}
 
 object Catalog {
 
@@ -154,6 +154,16 @@ object Catalog {
       OverWrite,
       TableConf(variantDb, "clinvar"),
       TableConf(variantLiveDb, "clinvar")
+    )
+    val clinvar_delta = DatasetConf(
+      "clinvar_delta",
+      alias,
+      "/public/delta/clinvar",
+      DELTA,
+      Upsert,
+      table = Some(TableConf(variantDb, "clinvar")),
+      view = Some(TableConf(variantLiveDb, "clinvar")),
+      keys = List("chromosome", "start", "reference", "alternate")
     )
     val cosmic_gene_set = DatasetConf(
       "cosmic_gene_set",

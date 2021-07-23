@@ -53,16 +53,13 @@ object VariantCentricOutput {
 
   case class ScorePredictions(
       sift_converted_rankscore: Option[Double] = Some(0.91255),
-      //sift_score: Option[Double] = Some(0.91255),
       sift_pred: Option[String] = Some("D"),
       polyphen2_hvar_rankscore: Option[Double] = Some(0.97372),
-      //polyphen2_hvar_score: Option[Double] = Some(0.91255),
       polyphen2_hvar_pred: Option[String] = Some("D"),
       fathmm_converted_rankscore: Option[Double] = Some(0.98611),
       fathmm_pred: Option[String] = Some("D"),
       cadd_rankscore: Option[Double] = Some(0.76643),
       dann_rankscore: Option[Double] = Some(0.95813),
-      //dann_score: Option[Double] = Some(0.9988206585102238),
       revel_rankscore: Option[Double] = Some(0.98972),
       lrt_converted_rankscore: Option[Double] = Some(0.62929),
       lrt_pred: Option[String] = Some("D")
