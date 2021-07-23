@@ -5,7 +5,7 @@ scalaVersion := "2.12.13"
 
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
 
-val spark_version = "3.1.1"
+val spark_version = "3.1.2"
 val elasticsearch_spark_version = "7.12.0"
 
 resolvers += "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots"
@@ -20,12 +20,16 @@ libraryDependencies += "org.elasticsearch" %% "elasticsearch-spark-30" % elastic
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"
 libraryDependencies += "org.apache.spark" %% "spark-hive" % spark_version % "test"
 
-parallelExecution in test := false
+test / parallelExecution := false
 fork := true
 
-test in assembly := {}
+assembly / test := {}
 
-assemblyMergeStrategy in assembly := {
+assembly / assemblyShadeRules := Seq(
+  ShadeRule.rename("shapeless.**" -> "shadeshapless.@1").inAll
+)
+
+assembly / assemblyMergeStrategy := {
   case "META-INF/io.netty.versions.properties" => MergeStrategy.last
   case "META-INF/native/libnetty_transport_native_epoll_x86_64.so" => MergeStrategy.last
   case "META-INF/DISCLAIMER" => MergeStrategy.last
@@ -35,7 +39,7 @@ assemblyMergeStrategy in assembly := {
   case "mime.types" => MergeStrategy.first
   case PathList("scala", "annotation", "nowarn.class" | "nowarn$.class") => MergeStrategy.first
   case x =>
-    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    val oldStrategy = (assembly / assemblyMergeStrategy).value
     oldStrategy(x)
 }
-assemblyJarName in assembly := s"kf-dwh-import-vcf.jar"
+assembly / assemblyJarName := s"kf-dwh-import-vcf.jar"

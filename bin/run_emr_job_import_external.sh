@@ -1,8 +1,8 @@
 #!/bin/bash
 config=${1:-"config/production.conf"}
-job_type=${2:-"gnomad_genomes_3_1_1"}
-instance_count=${3:-"20"}
-instance_type=${4:-"m5.4xlarge"}
+job_type=${2:-"clinvar"}
+instance_count=${3:-"5"}
+instance_type=${4:-"m5.2xlarge"}
 env=${5:-"qa"}
 
 aws s3 cp bootstrap-actions s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions --recursive
@@ -19,7 +19,7 @@ steps=$(cat <<EOF
   {
     "Args": [
       "spark-submit",
-      "--packages","io.projectglow:glow_2.12:0.5.0",
+      "--packages","io.projectglow:glow-spark3_2.12:1.0.1",
       "--exclude-packages",
       "org.apache.httpcomponents:httpcore,org.apache.httpcomponents:httpclient",
       "--deploy-mode",

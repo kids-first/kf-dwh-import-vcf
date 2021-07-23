@@ -3,8 +3,8 @@ study_ids=${1:-"SD_46SK55A3,SD_9PYZAHHE,SD_DYPMEHHF,SD_BHJXBDQK,SD_7NQ9151J,SD_N
 release_id=${2:-"RE_000012"}
 job=${3:-"variants"}
 mergeExisting=${4:-"false"}
-schema=${5:-"variant"}
-number_instance=${6:-"25"}
+schema=${5:-"portal"}
+number_instance=${6:-"20"}
 instance_type=${7:-"r5.2xlarge"}
 env=${8:-"qa"}
 
