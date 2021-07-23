@@ -428,11 +428,11 @@ object VariantCentricIndex {
         "external_reference", struct(
           $"rsnumber".isNotNull.as("is_dbsnp"),
           $"clinvar".isNotNull.as("is_clinvar"),
-          exists($"genes", gene => gene("hpo").isNotNull).as("is_hpo"),
-          exists($"genes", gene => gene("orphanet").isNotNull).as("is_orphanet"),
-          exists($"genes", gene => gene("omim").isNotNull).as("is_omim"),
-          exists($"genes", gene => gene("cosmic").isNotNull).as("is_cosmic"),
-          exists($"genes", gene => gene("ddd").isNotNull).as("is_ddd")
+          exists($"genes", gene => gene("hpo").isNotNull and size(gene("hpo")) > 0).as("is_hpo"),
+          exists($"genes", gene => gene("orphanet").isNotNull and size(gene("hpo")) > 0).as("is_orphanet"),
+          exists($"genes", gene => gene("omim").isNotNull and size(gene("hpo")) > 0).as("is_omim"),
+          exists($"genes", gene => gene("cosmic").isNotNull and size(gene("hpo")) > 0).as("is_cosmic"),
+          exists($"genes", gene => gene("ddd").isNotNull and size(gene("hpo")) > 0).as("is_ddd")
         )
       )
     }
