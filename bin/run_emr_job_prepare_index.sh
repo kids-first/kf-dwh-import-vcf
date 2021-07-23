@@ -1,8 +1,8 @@
 #!/bin/bash
-job_type=${1:-"gene_centric"}
+job_type=${1:-"variant_centric"}
 release_id=${2:-"re_000012"}
 number_instance=${3:-"15"}
-instance_type=${4:-"m5.2xlarge"}
+instance_type=${4:-"m5.4xlarge"}
 env=${5:-"qa"}
 
 steps=$(cat <<EOF
