@@ -2,12 +2,12 @@ package org.kidsfirstdrc.dwh.join
 
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
+import bio.ferlab.datalake.spark3.implicits.SparkUtils
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.firstAs
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.join.JoinConsequences._
-import bio.ferlab.datalake.spark3.implicits.SparkUtils
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.firstAs
 
 class JoinConsequences(
     studyIds: Seq[String],

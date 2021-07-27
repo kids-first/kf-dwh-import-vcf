@@ -1,13 +1,13 @@
 package org.kidsfirstdrc.dwh.external.gnomad
 
 import bio.ferlab.datalake.spark3.config.Configuration
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types.ArrayType
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns._
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.vcf
 
 class ImportGnomadV311Job(implicit conf: Configuration) extends StandardETL(Public.gnomad_genomes_3_1_1)(conf) {
 

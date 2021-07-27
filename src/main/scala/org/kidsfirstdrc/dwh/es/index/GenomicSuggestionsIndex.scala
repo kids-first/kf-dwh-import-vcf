@@ -1,14 +1,14 @@
 package org.kidsfirstdrc.dwh.es.index
 
-import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
+import bio.ferlab.datalake.spark3.config.Configuration
 import bio.ferlab.datalake.spark3.etl.ETL
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.locus
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.getColumnOrElse
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns.locus
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.getColumnOrElse
 
 class GenomicSuggestionsIndex(releaseId: String)(override implicit val conf: Configuration)
     extends ETL() {

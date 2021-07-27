@@ -1,10 +1,10 @@
 package org.kidsfirstdrc.dwh.covirt
 
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
-import bio.ferlab.datalake.spark3.implicits.SparkUtils._
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns._
 
 object CovirtOccurrences {
 

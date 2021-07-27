@@ -1,11 +1,9 @@
 package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.config.DatasetConf
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog._
-
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 class ImportDDDGeneCensus()(implicit conf: Configuration)

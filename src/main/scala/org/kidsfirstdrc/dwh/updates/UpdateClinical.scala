@@ -1,7 +1,7 @@
 package org.kidsfirstdrc.dwh.updates
 
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
-import org.apache.spark.sql.functions.col
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.locusColumNames
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
@@ -9,7 +9,6 @@ import org.kidsfirstdrc.dwh.join.JoinConsequences._
 import org.kidsfirstdrc.dwh.join.JoinWrite.write
 import org.kidsfirstdrc.dwh.publish.Publish.publishTable
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns.locusColumNames
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -37,7 +36,6 @@ class UpdateClinical(source: DatasetConf, destination: DatasetConf, schema: Stri
   private def genericUpdate(data: Map[String, DataFrame],
                             inputColumns: Seq[Column],
                             outputColumn: String)(implicit spark: SparkSession): DataFrame = {
-    import spark.implicits._
     val sourceDf = data(source.id)
       .selectLocus(inputColumns:_*)
       //.selectLocus($"ac", $"an", $"af")

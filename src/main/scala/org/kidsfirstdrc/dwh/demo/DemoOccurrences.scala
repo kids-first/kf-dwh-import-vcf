@@ -2,12 +2,12 @@ package org.kidsfirstdrc.dwh.demo
 
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}
-import bio.ferlab.datalake.spark3.implicits.SparkUtils._
+import org.kidsfirstdrc.dwh.conf.Catalog.{DataService, HarmonizedData}
 import org.kidsfirstdrc.dwh.vcf.OccurrencesFamily
 
 class DemoOccurrences(studyId: String, releaseId: String, input: String)(implicit

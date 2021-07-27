@@ -1,8 +1,9 @@
 package org.kidsfirstdrc.dwh.external.clinvar
 
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
 import bio.ferlab.datalake.spark3.implicits.SparkUtils._
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns._
 import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._

@@ -2,8 +2,8 @@ package org.kidsfirstdrc.dwh.es.index
 
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.locus
 import bio.ferlab.datalake.spark3.implicits.SparkUtils._
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns.locus
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{explode, _}
 import org.apache.spark.sql.types.{DoubleType, LongType}
@@ -155,6 +155,11 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
 
 object VariantCentricIndex {
 
+  /**
+   * Minimum number of participant having a trait in order to be publicly visible in the 'variant_centric' index
+   */
+  final val minimumParticipantsPerStudy = 10
+
   private def frequenciesForGnomad(colName: String): Column = {
     struct(
       col(s"$colName.ac") as "ac",
@@ -271,7 +276,6 @@ object VariantCentricIndex {
     Some("x").fold(Seq.empty[String])(x => x.split(",").toSeq)
 
     def withStudies(studyCodes: DataFrame): DataFrame = {
-      val minimumParticipantsPerStudy = 10
       val inputColumns: Seq[Column]   = df.columns.filterNot(_.equals("studies")).map(col)
 
       df

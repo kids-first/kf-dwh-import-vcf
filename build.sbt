@@ -14,7 +14,7 @@ resolvers += "Sonatype OSS Releases" at "https://s01.oss.sonatype.org/content/re
 /* Runtime */
 libraryDependencies += "org.apache.spark" %% "spark-sql" % spark_version % Provided
 libraryDependencies += "io.delta" %% "delta-core" % "1.0.0"
-libraryDependencies += "bio.ferlab" %% "datalake-spark3" % "0.0.50"
+libraryDependencies += "bio.ferlab" %% "datalake-spark3" % "0.0.52"
 libraryDependencies += "org.elasticsearch" %% "elasticsearch-spark-30" % elasticsearch_spark_version % Provided
 
 /* Test */

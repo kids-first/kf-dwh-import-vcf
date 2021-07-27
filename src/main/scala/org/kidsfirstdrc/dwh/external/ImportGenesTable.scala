@@ -1,13 +1,11 @@
 package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.config.DatasetConf
+import bio.ferlab.datalake.spark3.implicits.SparkUtils.removeEmptyObjectsIn
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
-
 import org.kidsfirstdrc.dwh.jobs.StandardETL
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.removeEmptyObjectsIn
 
 class ImportGenesTable()(implicit conf: Configuration) extends StandardETL(Public.genes)(conf) {
 
