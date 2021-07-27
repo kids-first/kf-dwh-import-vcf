@@ -1,8 +1,7 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
-import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
-import bio.ferlab.datalake.spark3.config.DatasetConf
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import bio.ferlab.datalake.spark3.config.Configuration
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 

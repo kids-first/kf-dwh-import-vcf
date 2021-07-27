@@ -1,12 +1,10 @@
 package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.config.DatasetConf
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{split, udf}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
-
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
 class ImportHumanGenes()(implicit conf: Configuration)

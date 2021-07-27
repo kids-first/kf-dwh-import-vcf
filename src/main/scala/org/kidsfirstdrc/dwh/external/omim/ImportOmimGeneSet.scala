@@ -1,8 +1,7 @@
 package org.kidsfirstdrc.dwh.external.omim
 
 import bio.ferlab.datalake.spark3.config.Configuration
-import bio.ferlab.datalake.spark3.config.DatasetConf
-import org.apache.spark.sql.functions.{array, col, explode, lit, split}
+import org.apache.spark.sql.functions.{col, explode, lit, split}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.external.omim.OmimPhenotype.parse_pheno

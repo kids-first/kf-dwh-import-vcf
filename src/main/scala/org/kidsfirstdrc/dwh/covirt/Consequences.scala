@@ -1,11 +1,11 @@
 package org.kidsfirstdrc.dwh.covirt
 
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.join.JoinConsequences
-import bio.ferlab.datalake.spark3.implicits.SparkUtils._
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns._
-import JoinConsequences._
+import org.kidsfirstdrc.dwh.join.JoinConsequences._
 
 object Consequences {
   def run(releaseId: String, input: String, output: String)(implicit spark: SparkSession): Unit = {

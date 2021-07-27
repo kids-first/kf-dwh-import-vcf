@@ -7,7 +7,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 import bio.ferlab.datalake.spark3.implicits.SparkUtils
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns.{calculated_duo_af, locusColumNames}
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.{calculated_duo_af, locusColumNames}
 import bio.ferlab.datalake.spark3.implicits.SparkUtils.firstAs
 
 class JoinVariants(

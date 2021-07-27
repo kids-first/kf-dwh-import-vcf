@@ -3,7 +3,7 @@ package org.kidsfirstdrc.dwh.glue
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf, StorageConf}
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog
-import org.kidsfirstdrc.dwh.conf.Catalog.Clinical.{consequences, occurrences, variants}
+import org.kidsfirstdrc.dwh.conf.Catalog.Clinical.{consequences, variants}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public._
 
 import scala.util.{Failure, Success, Try}

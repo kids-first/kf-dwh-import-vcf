@@ -7,7 +7,7 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{DataService, HarmonizedData}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.dataservice._
 import org.kidsfirstdrc.dwh.testutils.vcf.{OccurrenceOutput, PostCGPInput}
-import bio.ferlab.datalake.spark3.implicits.SparkUtils.columns.annotations
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.annotations
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

@@ -24,6 +24,8 @@ class ImportClinvarSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
 
   override def beforeAll(): Unit = {
     try {
+      spark.sql("CREATE DATABASE IF NOT EXISTS variant")
+      spark.sql("USE variant")
       new File(clinvar_delta.location).delete()
     }
   }
@@ -56,14 +58,6 @@ class ImportClinvarSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
 
     DeltaTable.forName("variant.clinvar").history().show(false)
     spark.sql("DESCRIBE DETAIL variant.clinvar").show(false)
-
-      DeltaTable.createIfNotExists(spark)
-        .tableName("demo.event")
-        .addColumn("date", DateType)
-        .addColumn("eventId", "STRING")
-        .addColumn("eventType", StringType)
-        .addColumn("data", "STRING")
-        .execute()
   }
 
 }

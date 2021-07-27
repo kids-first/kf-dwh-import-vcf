@@ -5,6 +5,7 @@ import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.vcf.Variants
 
+
 object ImportDemo extends App {
 
   val Array(releaseId, input, runType) = args
