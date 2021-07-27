@@ -63,7 +63,9 @@ class GenomicSuggestionsIndexSpec
       release_id = realeaseId,
       clin_sig = Some("pathogenic"),
       clinvar_id = Some("RCV000436956"),
-      name = "rs1313905795"
+      name = "rs1313905795",
+      transmissions = Map("AD" -> 3),
+      transmissions_by_study = Map(studyId1 -> Map("AD" -> 1), studyId2 -> Map("AD" -> 1), studyId3 -> Map("AD" -> 1))
     )
 
   val joinVariantDf: DataFrame = Seq(

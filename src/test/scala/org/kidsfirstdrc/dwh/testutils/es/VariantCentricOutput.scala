@@ -16,13 +16,14 @@ object VariantCentricOutput {
   case class StudyFrequency(upper_bound_kf: Freq, lower_bound_kf: Freq)
 
   case class Study(
-      study_id: String,
-      study_code: String,
-      acls: List[String],
-      external_study_ids: List[String],
-      frequencies: StudyFrequency,
-      participant_number: Long,
-      participant_ids: List[String] = List("PT_000003")
+      `study_id`: String,
+      `study_code`: String,
+      `acls`: List[String],
+      `external_study_ids`: List[String],
+      `frequencies`: StudyFrequency,
+      `participant_number`: Long,
+      `participant_ids`: List[String] = List("PT_000003"),
+      `transmissions`: Map[String, Int]
   )
 
   case class InternalFrequencies(
@@ -145,7 +146,8 @@ object VariantCentricOutput {
       `genes`: List[GENES] = List(GENES()),
       `participant_total_number`: Long = 15,
       `participant_frequency`: Double = 0.8,
-      `external_reference`: External_Reference = External_Reference()
+      `external_reference`: External_Reference = External_Reference(),
+      `transmissions`: Map[String, Int] = Map("AD" -> 13)
   )
 
 }

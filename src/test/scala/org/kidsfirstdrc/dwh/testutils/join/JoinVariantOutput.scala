@@ -12,9 +12,7 @@ case class JoinVariantOutput(
     hgvsg: String = "chr2:g.166166916G>A",
     variant_class: String = "SNV",
     frequencies: VariantFrequency = VariantFrequency(Freq(2, 1, 0.5, 1, 1), Freq(2, 1, 0.5, 1, 1)),
-    one_thousand_genomes: Option[OneThousandGenomesFreq] = Some(
-      OneThousandGenomesFreq(20, 10, 0.5)
-    ),
+    one_thousand_genomes: Option[OneThousandGenomesFreq] = Some(OneThousandGenomesFreq(20, 10, 0.5)),
     topmed: Option[Freq] = Some(Freq(20, 10, 0.5, 10, 10)),
     gnomad_genomes_2_1: Option[GnomadFreq] = Some(GnomadFreq(10, 20, 0.5, 10)),
     gnomad_exomes_2_1: Option[GnomadFreq] = Some(GnomadFreq(10, 20, 0.5, 10)),
@@ -36,6 +34,8 @@ case class JoinVariantOutput(
     studies: Set[String],
     consent_codes: Set[String],
     consent_codes_by_study: Map[String, Set[String]],
+    transmissions: Map[String, Int],
+    transmissions_by_study: Map[String, Map[String, Int]],
     release_id: String = "RE_ABCDEF"
 )
 

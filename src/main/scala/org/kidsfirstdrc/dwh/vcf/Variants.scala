@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.Configuration
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
 import bio.ferlab.datalake.spark3.implicits.SparkUtils._
@@ -11,7 +11,7 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Raw}
 class Variants(studyId: String, releaseId: String, schema: String)(implicit conf: Configuration)
     extends ETL() {
 
-  val destination = Clinical.variants
+  val destination: DatasetConf = Clinical.variants
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     val participantsPath = Raw.all_participants.location
@@ -60,15 +60,31 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
         $"is_hmb",
         $"variant_class",
         $"hgvsg",
-        $"dbgap_consent_code"
+        $"dbgap_consent_code",
+        $"transmission"
       )
-      .groupBy(locus: _*)
+      .withColumn("count", lit(1))
+      .groupBy("transmission", locusColumNames:_*)
       .agg(
+        sum("count") as "count_transmission",
         firstAs("name"),
         max("hgvsg") as "hgvsg",
         firstAs("end"),
         max("variant_class") as "variant_class",
         collect_set($"dbgap_consent_code").as("consent_codes"),
+        sum(col("ac")) as "ac",
+        sum(col("an_lower_bound_kf")) as "an_lower_bound_kf",
+        sum(col("homozygotes")) as "homozygotes",
+        sum(col("heterozygotes")) as "heterozygotes"
+      )
+      .groupBy(locus: _*)
+      .agg(
+        map_from_entries(filter(collect_list(struct(col("transmission"), col("count_transmission"))), c => c("transmission").isNotNull)) as "transmissions",
+        firstAs("name"),
+        max("hgvsg") as "hgvsg",
+        firstAs("end"),
+        max("variant_class") as "variant_class",
+        array_distinct(flatten(collect_list($"consent_codes"))).as("consent_codes"),
         sum(col("ac")) as "ac",
         sum(col("an_lower_bound_kf")) as "an_lower_bound_kf",
         sum(col("homozygotes")) as "homozygotes",
@@ -101,11 +117,13 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
         "heterozygotes",
         "homozygotes",
         "an_upper_bound_kf",
-        "an_lower_bound_kf"
+        "an_lower_bound_kf",
+        "count"
       )
       .withColumn("study_id", lit(studyId))
       .withColumn("release_id", lit(releaseId))
       .withColumn("consent_codes_by_study", map($"study_id", $"consent_codes"))
+      .withColumn("transmissions_by_study", map($"study_id", $"transmissions"))
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
