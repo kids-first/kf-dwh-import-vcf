@@ -10,13 +10,13 @@ import bio.ferlab.datalake.spark3.implicits.SparkUtils
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.{calculated_duo_af, locusColumNames}
 import bio.ferlab.datalake.spark3.implicits.SparkUtils.firstAs
 
-class JoinVariants(
-    studyIds: Seq[String],
-    releaseId: String,
-    mergeWithExisting: Boolean,
-    database: String
-)(implicit conf: Configuration)
-    extends ETL() {
+class JoinVariants(studyIds: Seq[String],
+                   releaseId: String,
+                   mergeWithExisting: Boolean,
+                   database: String)
+                  (implicit conf: Configuration) extends ETL() {
+
+  override val destination: DatasetConf = Clinical.variants
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
 
@@ -120,7 +120,9 @@ class JoinVariants(
       $"upper_bound_kf_heterozygotes",
       $"studies",
       $"consent_codes",
-      $"consent_codes_by_study"
+      $"consent_codes_by_study",
+      $"transmissions",
+      $"transmissions_by_study"
     )
 
     val allColumns = commonColumns :+
@@ -172,14 +174,24 @@ class JoinVariants(
     )
   }
 
-  private def mergeVariants(releaseId: String, variants: DataFrame)(implicit
-      spark: SparkSession
-  ): DataFrame = {
+  private def mergeVariants(releaseId: String, variants: DataFrame)
+                           (implicit spark: SparkSession): DataFrame = {
 
     import spark.implicits._
     val upper_bound_kf_an = getUpperBoundAlleleNumber(variants)
 
-    val t = variants
+    val transmissions = variants
+      .select(
+        explode(col("transmissions")).as(Seq("transmission", "transmission_count")),
+        variants("*")
+      )
+      .groupBy("transmission", "chromosome", "start", "reference", "alternate")
+      .count()
+      .groupBy("chromosome", "start", "reference", "alternate")
+      .agg(map_from_entries(collect_list(struct($"transmission", $"count"))) as "transmissions")
+
+    variants
+      .withColumn("transmission_by_study", $"transmissions_by_study"($"study_id"))
       .groupBy($"chromosome", $"start", $"reference", $"alternate")
       .agg(
         firstAs("name"),
@@ -187,48 +199,27 @@ class JoinVariants(
         firstAs("hgvsg"),
         firstAs("variant_class"),
         sum("lower_bound_kf_ac") as "lower_bound_kf_ac",
-        map_from_entries(
-          collect_list(struct($"study_id", $"lower_bound_kf_ac"))
-        ) as "lower_bound_kf_ac_by_study",
+        map_from_entries(collect_list(struct($"study_id", $"lower_bound_kf_ac"))) as "lower_bound_kf_ac_by_study",
         sum("lower_bound_kf_an") as "lower_bound_kf_an",
-        map_from_entries(
-          collect_list(struct($"study_id", $"lower_bound_kf_an"))
-        ) as "lower_bound_kf_an_by_study",
-        map_from_entries(
-          collect_list(struct($"study_id", calculated_duo_af("lower_bound_kf")))
-        ) as "lower_bound_kf_af_by_study",
+        map_from_entries(collect_list(struct($"study_id", $"lower_bound_kf_an"))) as "lower_bound_kf_an_by_study",
+        map_from_entries(collect_list(struct($"study_id", calculated_duo_af("lower_bound_kf")))) as "lower_bound_kf_af_by_study",
         sum("lower_bound_kf_homozygotes") as "lower_bound_kf_homozygotes",
-        map_from_entries(
-          collect_list(struct($"study_id", $"lower_bound_kf_homozygotes"))
-        ) as "lower_bound_kf_homozygotes_by_study",
+        map_from_entries(collect_list(struct($"study_id", $"lower_bound_kf_homozygotes"))) as "lower_bound_kf_homozygotes_by_study",
         sum("lower_bound_kf_heterozygotes") as "lower_bound_kf_heterozygotes",
-        map_from_entries(
-          collect_list(struct($"study_id", $"lower_bound_kf_heterozygotes"))
-        ) as "lower_bound_kf_heterozygotes_by_study",
+        map_from_entries(collect_list(struct($"study_id", $"lower_bound_kf_heterozygotes"))) as "lower_bound_kf_heterozygotes_by_study",
         sum("upper_bound_kf_ac") as "upper_bound_kf_ac",
-        map_from_entries(
-          collect_list(struct($"study_id", $"upper_bound_kf_ac"))
-        ) as "upper_bound_kf_ac_by_study",
+        map_from_entries(collect_list(struct($"study_id", $"upper_bound_kf_ac"))) as "upper_bound_kf_ac_by_study",
         sum("upper_bound_kf_an") as "upper_bound_kf_an",
-        map_from_entries(
-          collect_list(struct($"study_id", $"upper_bound_kf_an"))
-        ) as "upper_bound_kf_an_by_study",
-        map_from_entries(
-          collect_list(struct($"study_id", calculated_duo_af("upper_bound_kf")))
-        ) as "upper_bound_kf_af_by_study",
+        map_from_entries(collect_list(struct($"study_id", $"upper_bound_kf_an"))) as "upper_bound_kf_an_by_study",
+        map_from_entries(collect_list(struct($"study_id", calculated_duo_af("upper_bound_kf")))) as "upper_bound_kf_af_by_study",
         sum("upper_bound_kf_homozygotes") as "upper_bound_kf_homozygotes",
-        map_from_entries(
-          collect_list(struct($"study_id", $"upper_bound_kf_homozygotes"))
-        ) as "upper_bound_kf_homozygotes_by_study",
+        map_from_entries(collect_list(struct($"study_id", $"upper_bound_kf_homozygotes"))) as "upper_bound_kf_homozygotes_by_study",
         sum("upper_bound_kf_heterozygotes") as "upper_bound_kf_heterozygotes",
-        map_from_entries(
-          collect_list(struct($"study_id", $"upper_bound_kf_heterozygotes"))
-        ) as "upper_bound_kf_heterozygotes_by_study",
+        map_from_entries(collect_list(struct($"study_id", $"upper_bound_kf_heterozygotes"))) as "upper_bound_kf_heterozygotes_by_study",
         collect_list($"study_id") as "studies",
         array_distinct(flatten(collect_list($"consent_codes"))) as "consent_codes",
-        map_from_entries(
-          collect_list(struct($"study_id", $"consent_codes"))
-        ) as "consent_codes_by_study",
+        map_from_entries(collect_list(struct($"study_id", $"consent_codes"))) as "consent_codes_by_study",
+        map_from_entries(collect_list(struct($"study_id", $"transmission_by_study"))) as "transmissions_by_study",
         lit(releaseId) as "release_id"
       )
       .withColumn("upper_bound_kf_an", lit(upper_bound_kf_an))
@@ -258,18 +249,13 @@ class JoinVariants(
         "lower_bound_kf_ac",
         "lower_bound_kf_af",
         "lower_bound_kf_homozygotes",
-        "lower_bound_kf_heterozygotes"
-      )
-      .drop(
+        "lower_bound_kf_heterozygotes",
         "upper_bound_kf_an",
         "upper_bound_kf_ac",
         "upper_bound_kf_af",
         "upper_bound_kf_homozygotes",
         "upper_bound_kf_heterozygotes"
-      )
-
-    t
-
+      ).joinByLocus(transmissions, "left")
   }
 
   implicit class DataFrameOperations(df: DataFrame) {
@@ -339,6 +325,4 @@ class JoinVariants(
         .select(df("*"), dbsnp("name") as "dbsnp_id")
     }
   }
-
-  override val destination: DatasetConf = Clinical.variants
 }

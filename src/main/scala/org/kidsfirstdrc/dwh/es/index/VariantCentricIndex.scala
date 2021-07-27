@@ -102,6 +102,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
       .withConsequences(consequences)
       .withGenes(genes)
       .withExternalReference
+      .withColumn("transmissions", map_filter(col("transmissions"), (_, v) => v > minimumParticipantsPerStudy))
       .select(
         "genome_build",
         "hash",
@@ -126,7 +127,8 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
         "hgvsg",
         "participant_total_number",
         "participant_frequency",
-        "external_reference"
+        "external_reference",
+        "transmissions"
       )
   }
 
@@ -277,7 +279,6 @@ object VariantCentricIndex {
 
     def withStudies(studyCodes: DataFrame): DataFrame = {
       val inputColumns: Seq[Column]   = df.columns.filterNot(_.equals("studies")).map(col)
-
       df
         .select(inputColumns :+ explode(col("studies")).as("study_id"): _*)
         .join(studyCodes, Seq("study_id"), "left")
@@ -297,6 +298,9 @@ object VariantCentricIndex {
           "participant_ids",
           when(size(col("ids")) >= minimumParticipantsPerStudy, col("ids")).otherwise(lit(null))
         )
+        .withColumn("transmission_by_study",
+          map_filter(col("transmissions_by_study")(col("study_id")), (_, v) => v > minimumParticipantsPerStudy)
+        )
         .withColumn(
           "study",
           struct(
@@ -304,6 +308,7 @@ object VariantCentricIndex {
             col("study_code"),
             col("acls"),
             col("external_study_ids"),
+            col("transmission_by_study") as "transmissions",
             struct(
               frequenciesByStudiesFor("upper_bound_kf"),
               frequenciesByStudiesFor("lower_bound_kf")
@@ -314,7 +319,7 @@ object VariantCentricIndex {
         )
         .groupBy(locus: _*)
         .agg(
-          collect_set("study").as("studies"),
+          collect_list("study").as("studies"),
           (inputColumns.toSet -- locus.toSet).map(c => first(c).as(c.toString)).toList :+
             sum(col("participant_number_visible")).as("participant_number_visible") :+
             sum(col("participant_number")).as("participant_number") :+
@@ -363,16 +368,13 @@ object VariantCentricIndex {
           "predictions",
           struct(
             col("SIFT_converted_rankscore") as "sift_converted_rankscore",
-            //col("SIFT_score") as "sift_score",
             col("SIFT_pred") as "sift_pred",
             col("Polyphen2_HVAR_rankscore") as "polyphen2_hvar_rankscore",
-            //col("Polyphen2_HVAR_score") as "polyphen2_hvar_score",
             col("Polyphen2_HVAR_pred") as "polyphen2_hvar_pred",
             col("FATHMM_converted_rankscore") as "fathmm_converted_rankscore",
             col("FATHMM_pred") as "fathmm_pred",
             col("CADD_raw_rankscore") as "cadd_rankscore",
             col("DANN_rankscore") as "dann_rankscore",
-            //col("DANN_score") as "dann_score",
             col("REVEL_rankscore") as "revel_rankscore",
             col("LRT_converted_rankscore") as "lrt_converted_rankscore",
             col("LRT_pred") as "lrt_pred"

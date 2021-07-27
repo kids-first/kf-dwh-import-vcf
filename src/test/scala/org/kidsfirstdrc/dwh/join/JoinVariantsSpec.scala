@@ -37,7 +37,9 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         frequencies = VariantFrequency(),
         study_id = studyId1,
         consent_codes = Set(s"$studyId1.c1"),
-        consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c1"))
+        consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c1")),
+        transmissions = Map("AD" -> 1, "AR" -> 1),
+        transmissions_by_study = Map(studyId1 -> Map("AD" -> 1, "AR" -> 1))
       )
       val variant2 = VariantOutput(
         chromosome = "3",
@@ -51,7 +53,9 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         hgvsg = "chr3:g.2000T>G",
         study_id = studyId1,
         consent_codes = Set(s"$studyId1.c2"),
-        consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c2"))
+        consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c2")),
+        transmissions = Map("AD" -> 1),
+        transmissions_by_study = Map(studyId1 -> Map("AD" -> 1))
       )
 
       Seq(variant1, variant2)
@@ -75,12 +79,16 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           VariantFrequency(), //ac = 10, an = 30, af = 0.33333333, homozygotes = 2, heterozygotes = 8,
         study_id = studyId2,
         consent_codes = Set(s"$studyId2.c0"),
-        consent_codes_by_study = Map(studyId2 -> Set(s"$studyId2.c0"))
+        consent_codes_by_study = Map(studyId2 -> Set(s"$studyId2.c0")),
+        transmissions = Map("AD" -> 1),
+        transmissions_by_study = Map(studyId2 -> Map("AD" -> 1))
       )
       val variant4 = variant1.copy(
         study_id = studyId2,
         consent_codes = Set(s"$studyId2.c1"),
-        consent_codes_by_study = Map(studyId2 -> Set(s"$studyId2.c1"))
+        consent_codes_by_study = Map(studyId2 -> Set(s"$studyId2.c1")),
+        transmissions = Map("AD" -> 1),
+        transmissions_by_study = Map(studyId2 -> Map("AD" -> 1))
       )
 
       Seq(variant3, variant4)
@@ -111,8 +119,9 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         studies = Set(studyId1, studyId3),
         release_id = "RE_PREVIOUS",
         consent_codes = Set(s"$studyId1.c99", s"$studyId3.c99"),
-        consent_codes_by_study =
-          Map(studyId1 -> Set(s"$studyId1.c99"), studyId3 -> Set(s"$studyId3.c99"))
+        consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c99"), studyId3 -> Set(s"$studyId3.c99")),
+        transmissions = Map("AD" -> 1),
+        transmissions_by_study = Map(studyId3 -> Map("AD" -> 1))
       )
 
       val removedOldVariant = JoinVariantOutput(
@@ -130,7 +139,9 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         studies = Set(studyId1),
         release_id = "RE_PREVIOUS",
         consent_codes = Set(s"$studyId1.c99"),
-        consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c99"))
+        consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c99")),
+        transmissions = Map("AD" -> 1),
+        transmissions_by_study = Map(studyId1 -> Map("AD" -> 1))
       )
 
       val existingVariant2 = JoinVariantOutput(
@@ -161,7 +172,9 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         dbsnp_id = None,
         release_id = "RE_PREVIOUS",
         consent_codes = Set(s"$studyId3.c99"),
-        consent_codes_by_study = Map(studyId3 -> Set(s"$studyId3.c99"))
+        consent_codes_by_study = Map(studyId3 -> Set(s"$studyId3.c99")),
+        transmissions = Map("AD" -> 1),
+        transmissions_by_study = Map(studyId3 -> Map("AD" -> 1))
       )
 
       Seq(existingVariant1, removedOldVariant, existingVariant2)
@@ -283,6 +296,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
             studyId2 -> Set("SD_456.c1"),
             studyId3 -> Set(s"$studyId3.c99")
           ),
+          transmissions = Map("AD" -> 3, "AR" -> 1),
+          transmissions_by_study = Map(studyId1 -> Map("AD" -> 1, "AR" -> 1), studyId2 -> Map("AD" -> 1), studyId3 -> Map("AD" -> 1)),
         ),
         JoinVariantOutput(
           chromosome = "3",
@@ -312,6 +327,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           studies = Set(studyId1),
           consent_codes = variant2.consent_codes,
           consent_codes_by_study = Map(studyId1 -> variant2.consent_codes),
+          transmissions = Map("AD" -> 1),
+          transmissions_by_study = Map(studyId1 -> Map("AD" -> 1)),
           one_thousand_genomes = None,
           gnomad_exomes_2_1 = None,
           gnomad_genomes_3_0 = None,
@@ -345,6 +362,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           studies = Set(studyId2),
           consent_codes = variant3.consent_codes,
           consent_codes_by_study = Map(studyId2 -> variant3.consent_codes),
+          transmissions = Map("AD" -> 1),
+          transmissions_by_study = Map(studyId2 -> Map("AD" -> 1)),
           one_thousand_genomes = None,
           gnomad_exomes_2_1 = None,
           gnomad_genomes_3_0 = None,
@@ -363,18 +382,6 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         )
       )
       output.collect() should contain theSameElementsAs expectedOutput
-      /*
-      JoinVariantOutput(2,165310406,165310406,G,A,rs1057520413,chr2:g.166166916G>A,SNV,VariantFrequency(Freq(11,6,0.5454545454545454,7,1),Freq(11,6,0.5454545454545454,7,1)),Some(OneThousandGenomesFreq(20,10,0.5)),Some(Freq(20,10,0.5,10,10)),Some(GnomadFreq(10,20,0.5,10)),Some(GnomadFreq(10,20,0.5,10)),None,Some(GnomadFreq(10,20,0.5,10)),Some(RCV000436956),Some(Pathogenic),Some(rs1234567),Map(SD_789 -> 2, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 7, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 0.2857142857142857, SD_123 -> 1.0, SD_456 -> 1.0),Map(SD_789 -> 5, SD_123 -> 1, SD_456 -> 1),Map(SD_789 -> 1, SD_123 -> 0, SD_456 -> 0),Map(SD_789 -> 2, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 7, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 0.2857142857142857, SD_123 -> 1.0, SD_456 -> 1.0),Map(SD_789 -> 5, SD_123 -> 1, SD_456 -> 1),Map(SD_789 -> 1, SD_123 -> 0, SD_456 -> 0),Set(SD_789, SD_123, SD_456),Set(SD_789.c99, SD_123.c1, SD_456.c1),Map(SD_789 -> Set(SD_789.c99), SD_123 -> Set(SD_123.c1), SD_456 -> Set(SD_456.c1)),RE_ABCDEF),
-      JoinVariantOutput(2,165310406,165310406,G,A,rs1057520413,chr2:g.166166916G>A,SNV,VariantFrequency(Freq(11,6,0.5454545454545454,7,1),Freq(11,6,0.5454545454545454,7,1)),Some(OneThousandGenomesFreq(20,10,0.5)),Some(Freq(20,10,0.5,10,10)),Some(GnomadFreq(10,20,0.5,10)),Some(GnomadFreq(10,20,0.5,10)),None,Some(GnomadFreq(10,20,0.5,10)),Some(RCV000436956),Some(Pathogenic),Some(rs1234567),Map(SD_789 -> 2, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 7, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 0.2857142857142857, SD_123 -> 1.0, SD_456 -> 1.0),Map(SD_789 -> 5, SD_123 -> 1, SD_456 -> 1),Map(SD_789 -> 1, SD_123 -> 0, SD_456 -> 0),Map(SD_789 -> 2, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 7, SD_123 -> 2, SD_456 -> 2),Map(SD_789 -> 0.2857142857142857, SD_123 -> 1.0, SD_456 -> 1.0),Map(SD_789 -> 5, SD_123 -> 1, SD_456 -> 1),Map(SD_789 -> 1, SD_123 -> 0, SD_456 -> 0),Set(SD_123, SD_456, SD_789),Set(SD_789.c99, SD_123.c1, SD_456.c1),Map(SD_123 -> Set(SD_123.c1), SD_456 -> Set(SD_456.c1), SD_789 -> Set(SD_789.c99)),RE_ABCDEF),
-
-      JoinVariantOutput(3,3000,3000,T,G,mutation_2,chr3:g.2000T>G,SNV,VariantFrequency(Freq(11,2,0.18181818181818182,1,0),Freq(2,2,1.0,1,0)),None,None,None,None,None,None,None,None,None,Map(SD_123 -> 2),Map(SD_123 -> 2),Map(SD_123 -> 1.0),Map(SD_123 -> 1),Map(SD_123 -> 0),Map(SD_123 -> 2),Map(SD_123 -> 2),Map(SD_123 -> 1.0),Map(SD_123 -> 1),Map(SD_123 -> 0),Set(SD_123),Set(SD_123.c2),Map(SD_123 -> Set(SD_123.c2)),RE_ABCDEF),
-      JoinVariantOutput(3,3000,3000,C,A,mutation_2,chr3:g.2000T>G,SNV,VariantFrequency(Freq(11,2,0.18181818181818182,1,0),Freq(2,2,1.0,1,0)),None,None,None,None,None,None,None,None,None,Map(SD_456 -> 2),Map(SD_456 -> 2),Map(SD_456 -> 1.0),Map(SD_456 -> 1),Map(SD_456 -> 0),Map(SD_456 -> 2),Map(SD_456 -> 2),Map(SD_456 -> 1.0),Map(SD_456 -> 1),Map(SD_456 -> 0),Set(SD_456),Set(SD_456.c0),Map(SD_456 -> Set(SD_456.c0)),RE_ABCDEF),
-      JoinVariantOutput(4,4000,4000,T,G,rs1057520413,chr2:g.166166916G>A,SNV,VariantFrequency(Freq(11,2,0.18181818181818182,1,1),Freq(3,2,0.6666666666666666,1,1)),None,None,None,None,None,None,None,None,None,Map(SD_789 -> 2),Map(SD_789 -> 3),Map(SD_789 -> 0.6666666666666666),Map(SD_789 -> 1),Map(SD_789 -> 1),Map(SD_789 -> 2),Map(SD_789 -> 3),Map(SD_789 -> 0.6666666666666666),Map(SD_789 -> 1),Map(SD_789 -> 1),Set(SD_789),Set(SD_789.c99),Map(SD_789 -> Set(SD_789.c99)),RE_ABCDEF)) did not contain the same elements as List(
-
-      JoinVariantOutput(3,3000,3000,T,G,mutation_2,chr3:g.2000T>G,SNV,VariantFrequency(Freq(11,2,0.18181818181818182,1,0),Freq(2,2,1.0,1,0)),None,None,None,None,None,None,None,None,None,Map(SD_123 -> 2),Map(SD_123 -> 2),Map(SD_123 -> 1.0),Map(SD_123 -> 1),Map(SD_123 -> 0),Map(SD_123 -> 2),Map(SD_123 -> 2),Map(SD_123 -> 1.0),Map(SD_123 -> 1),Map(SD_123 -> 0),Set(SD_123),Set(SD_123.c2),Map(SD_123 -> Set(SD_123.c2)),RE_ABCDEF),
-      JoinVariantOutput(3,3000,3000,C,A,mutation_2,chr3:g.2000T>G,SNV,VariantFrequency(Freq(11,2,0.18181818181818182,1,0),Freq(2,2,1.0,1,0)),None,None,None,None,None,None,None,None,None,Map(SD_456 -> 2),Map(SD_456 -> 2),Map(SD_456 -> 1.0),Map(SD_456 -> 1),Map(SD_456 -> 0),Map(SD_456 -> 2),Map(SD_456 -> 2),Map(SD_456 -> 1.0),Map(SD_456 -> 1),Map(SD_456 -> 0),Set(SD_456),Set(SD_456.c0),Map(SD_456 -> Set(SD_456.c0)),RE_ABCDEF)
-      JoinVariantOutput(4,4000,4000,T,G,rs1057520413,chr2:g.166166916G>A,SNV,VariantFrequency(Freq(11,2,0.18181818181818182,1,1),Freq(3,2,0.6666666666666666,1,1)),None,None,None,None,None,None,None,None,None,Map(SD_789 -> 2),Map(SD_789 -> 3),Map(SD_789 -> 0.6666666666666666),Map(SD_789 -> 1),Map(SD_789 -> 1),Map(SD_789 -> 2),Map(SD_789 -> 3),Map(SD_789 -> 0.6666666666666666),Map(SD_789 -> 1),Map(SD_789 -> 1),Set(SD_789),Set(SD_789.c99),Map(SD_789 -> Set(SD_789.c99)),RE_ABCDEF))
-      */
     }
   }
 
@@ -417,7 +424,9 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
             studies = Set(studyId3),
             release_id = "RE_PREVIOUS",
             consent_codes = Set(s"$studyId3.c99"),
-            consent_codes_by_study = Map(studyId3 -> Set(s"$studyId3.c99"))
+            consent_codes_by_study = Map(studyId3 -> Set(s"$studyId3.c99")),
+            transmissions = Map("AD" -> 1),
+            transmissions_by_study = Map(studyId3 -> Map("AD" -> 1)),
           )
         ).toDF.write
           .mode(SaveMode.Overwrite)
@@ -437,7 +446,9 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           frequencies = VariantFrequency(Freq(6, 3, 0.5, 1, 1), Freq(4, 3, 0.75, 1, 1)),
           consent_codes = Set("SD_111.c1"),
           study_id = "SD_111",
-          consent_codes_by_study = Map("SD_111" -> Set("SD_111.c1"))
+          consent_codes_by_study = Map("SD_111" -> Set("SD_111.c1")),
+          transmissions = Map("AD" -> 1),
+          transmissions_by_study = Map("SD_111" -> Map("AD" -> 1))
         ),
         VariantOutput(
           "2",
@@ -450,7 +461,9 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           frequencies = VariantFrequency(Freq(6, 3, 0.5, 1, 1), Freq(4, 3, 0.75, 1, 1)),
           consent_codes = Set("SD_222.c1"),
           study_id = "SD_222",
-          consent_codes_by_study = Map("SD_222" -> Set("SD_222.c1"))
+          consent_codes_by_study = Map("SD_222" -> Set("SD_222.c1")),
+          transmissions = Map("AD" -> 1),
+          transmissions_by_study = Map("SD_222" -> Map("AD" -> 1))
         )
       ).toDF()
 

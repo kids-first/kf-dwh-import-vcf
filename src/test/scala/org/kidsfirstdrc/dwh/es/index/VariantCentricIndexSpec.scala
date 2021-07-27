@@ -60,7 +60,9 @@ class VariantCentricIndexSpec
       ),
       release_id = realeaseId,
       clin_sig = Some("pathogenic"),
-      clinvar_id = Some("RCV000436956")
+      clinvar_id = Some("RCV000436956"),
+      transmissions = Map("AD" -> 13, "AR" -> 1),
+      transmissions_by_study = Map(studyId1 -> Map("AD" -> 11, "AR" -> 1), studyId2 -> Map("AD" -> 1), studyId3 -> Map("AD" -> 1))
     )
   ).toDF().withColumnRenamed("one_thousand_genomes", "1k_genomes")
 
@@ -209,7 +211,8 @@ class VariantCentricIndexSpec
       List("SD_456"),
       StudyFrequency(Freq(10, 5, 0.5, 2, 3), Freq(0, 0, 0, 0, 0)),
       1,
-      null
+      null,
+      Map() // transmissions below 10 are filtered out
     ),
     Study(
       "SD_123",
@@ -230,7 +233,8 @@ class VariantCentricIndexSpec
         "PT_000010",
         "PT_000011",
         "PT_000012"
-      )
+      ),
+      Map("AD" -> 11) // transmissions below 10 are filtered out
     ),
     Study(
       "SD_789",
@@ -239,7 +243,8 @@ class VariantCentricIndexSpec
       List("SD_789"),
       StudyFrequency(Freq(7, 2, 0.2857142857, 5, 1), Freq(7, 2, 0.2857142857, 5, 1)),
       0,
-      null
+      null,
+      Map()
     )
   )
 

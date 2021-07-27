@@ -15,7 +15,9 @@ case class VariantOutput(
     study_id: String = "SD_123456",
     release_id: String = "RE_ABCDEF",
     consent_codes: Set[String] = Set("SD_123456.c1"),
-    consent_codes_by_study: Map[String, Set[String]] = Map("SD_123456" -> Set("SD_123456.c1"))
+    consent_codes_by_study: Map[String, Set[String]] = Map("SD_123456" -> Set("SD_123456.c1")),
+    transmissions: Map[String, Int] = Map(),
+    transmissions_by_study: Map[String, Map[String, Int]] = Map()
 )
 
 case class VariantFrequency(
