@@ -10,19 +10,7 @@ object Index extends App {
 
   println(s"ARGS: " + args.mkString("[", ", ", "]"))
 
-  val Array(
-    input,
-    esNodes,
-    alias,
-    oldRelease,
-    newRelease,
-    templateFileName,
-    jobType,
-    batchSize,
-    chromosome,
-    format,
-    repartition
-  ) = args
+  val Array(input, esNodes, alias, oldRelease, newRelease, templateFileName, jobType, batchSize, chromosome, format, repartition) = args
 
   implicit val spark: SparkSession = SparkSession.builder
     .config("es.index.auto.create", "true")
@@ -69,11 +57,11 @@ object Index extends App {
             .repartition(n)
         }
 
-    case s =>
+    case chr =>
       spark.read
         .format(format)
         .load(input)
-        .where(col("chromosome") === s)
+        .where(col("chromosome") === chr)
   }
 
   job.run(df)(esClient)
