@@ -186,9 +186,9 @@ class JoinVariants(studyIds: Seq[String],
         variants("*")
       )
       .groupBy("transmission", "chromosome", "start", "reference", "alternate")
-      .count()
+      .agg(sum($"transmission_count") as "transmission_count")
       .groupBy("chromosome", "start", "reference", "alternate")
-      .agg(map_from_entries(collect_list(struct($"transmission", $"count"))) as "transmissions")
+      .agg(map_from_entries(collect_list(struct($"transmission", $"transmission_count"))) as "transmissions")
 
     variants
       .withColumn("transmission_by_study", $"transmissions_by_study"($"study_id"))

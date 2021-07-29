@@ -38,8 +38,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         study_id = studyId1,
         consent_codes = Set(s"$studyId1.c1"),
         consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c1")),
-        transmissions = Map("AD" -> 1, "AR" -> 1),
-        transmissions_by_study = Map(studyId1 -> Map("AD" -> 1, "AR" -> 1))
+        transmissions = Map("AD" -> 3, "AR" -> 1),
+        transmissions_by_study = Map(studyId1 -> Map("AD" -> 3, "AR" -> 1))
       )
       val variant2 = VariantOutput(
         chromosome = "3",
@@ -296,8 +296,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
             studyId2 -> Set("SD_456.c1"),
             studyId3 -> Set(s"$studyId3.c99")
           ),
-          transmissions = Map("AD" -> 3, "AR" -> 1),
-          transmissions_by_study = Map(studyId1 -> Map("AD" -> 1, "AR" -> 1), studyId2 -> Map("AD" -> 1), studyId3 -> Map("AD" -> 1)),
+          transmissions = Map("AD" -> 5, "AR" -> 1),
+          transmissions_by_study = Map(studyId1 -> Map("AD" -> 3, "AR" -> 1), studyId2 -> Map("AD" -> 1), studyId3 -> Map("AD" -> 1)),
         ),
         JoinVariantOutput(
           chromosome = "3",
