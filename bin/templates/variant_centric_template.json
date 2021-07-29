@@ -194,6 +194,31 @@
           }
         }
       },
+      "external_reference": {
+        "properties": {
+          "is_clinvar": {
+            "type": "boolean"
+          },
+          "is_cosmic": {
+            "type": "boolean"
+          },
+          "is_dbsnp": {
+            "type": "boolean"
+          },
+          "is_ddd": {
+            "type": "boolean"
+          },
+          "is_hpo": {
+            "type": "boolean"
+          },
+          "is_omim": {
+            "type": "boolean"
+          },
+          "is_orphanet": {
+            "type": "boolean"
+          }
+        }
+      },
       "external_study_ids": {
         "type": "keyword"
       },
@@ -526,41 +551,54 @@
           "participant_number": {
             "type": "long"
           },
+          "study_code": {
+            "type": "keyword"
+          },
           "study_id": {
             "type": "keyword"
           },
-          "study_code": {
-            "type": "keyword"
+          "transmissions": {
+            "properties": {
+              "autosomal_dominant": {
+                "type": "long"
+              },
+              "autosomal_dominant (de_novo)": {
+                "type": "long"
+              },
+              "autosomal_recessive": {
+                "type": "long"
+              },
+              "non carrier proband": {
+                "type": "long"
+              },
+              "unknown proband genotype": {
+                "type": "long"
+              }
+            }
+          }
+        }
+      },
+      "transmissions": {
+        "properties": {
+          "autosomal_dominant": {
+            "type": "long"
+          },
+          "autosomal_dominant (de_novo)": {
+            "type": "long"
+          },
+          "autosomal_recessive": {
+            "type": "long"
+          },
+          "non carrier proband": {
+            "type": "long"
+          },
+          "unknown proband genotype": {
+            "type": "long"
           }
         }
       },
       "variant_class": {
         "type": "keyword"
-      },
-      "external_reference": {
-        "properties": {
-          "is_dbsnp": {
-            "type": "boolean"
-          },
-          "is_clinvar": {
-            "type": "boolean"
-          },
-          "is_hpo": {
-            "type": "boolean"
-          },
-          "is_orphanet": {
-            "type": "boolean"
-          },
-          "is_omim": {
-            "type": "boolean"
-          },
-          "is_ddd": {
-            "type": "boolean"
-          },
-          "is_cosmic": {
-            "type": "boolean"
-          }
-        }
       }
     }
   }

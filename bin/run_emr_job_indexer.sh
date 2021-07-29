@@ -1,13 +1,13 @@
 #!/bin/bash
 release_id=${1:-"re_000012"}
-input=${2:-"s3a://kf-strides-variant-parquet-prd/portal/es_index/gene_centric/"}
+input=${2:-"s3a://kf-strides-variant-parquet-prd/portal/es_index/variant_centric_re_000012/"}
 es_nodes=${3:-"https://vpc-kf-arranger-blue-es-service-exwupkrf4dyupg24dnfmvzcwri.us-east-1.es.amazonaws.com:443"}
 #es_nodes=${3:-"https://vpc-kf-arranger-blue-es-prd-4gbc2zkvm5uttysiqkcbzwxqeu.us-east-1.es.amazonaws.com:443"}
-es_index_name=${4:-"gene_centric"}
-es_index_template=${5:-"gene_centric_template.json"}
+es_index_name=${4:-"variant_centric"}
+es_index_template=${5:-"variant_centric_template.json"}
 es_job_type=${6:-"index"} # one of: index, update, upsert or create
 es_batch_size=${7:-"500"} #default is 1000
-chromosome=${8:-"all"} #all, 1, 2, 3, ..., X, Y
+chromosome=${8:-"1"} #all, 1, 2, 3, ..., X, Y
 jarV=${9:-"7.12.0"}
 number_instance=${10:-"1"}
 instance_type=${11:-"m5.2xlarge"}
