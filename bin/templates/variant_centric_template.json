@@ -573,6 +573,15 @@
               },
               "unknown proband genotype": {
                 "type": "long"
+              },
+              "x_linked_dominant (de_novo)": {
+                "type": "long"
+              },
+              "x_linked_recessive": {
+                "type": "long"
+              },
+              "x_linked_recessive (de_novo)": {
+                "type": "long"
               }
             }
           }
@@ -593,6 +602,15 @@
             "type": "long"
           },
           "unknown proband genotype": {
+            "type": "long"
+          },
+          "x_linked_dominant (de_novo)": {
+            "type": "long"
+          },
+          "x_linked_recessive": {
+            "type": "long"
+          },
+          "x_linked_recessive (de_novo)": {
             "type": "long"
           }
         }
