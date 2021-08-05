@@ -2,8 +2,8 @@ package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.spark3.config.Configuration
 import bio.ferlab.datalake.spark3.etl.ETL
-import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.vcf
 import bio.ferlab.datalake.spark3.implicits.SparkUtils._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType

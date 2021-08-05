@@ -6,7 +6,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.util.Try
 
-object Indexer extends App {
+object Index extends App {
 
   println(s"ARGS: " + args.mkString("[", ", ", "]"))
 
