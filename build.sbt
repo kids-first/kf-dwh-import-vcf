@@ -9,7 +9,7 @@ val spark_version = "3.1.2"
 val deltaCoreVersion = "1.0.0"
 val elasticsearch_spark_version = "7.12.0"
 val scalatestVersion = "3.2.9"
-val datalakeSpark3Version = "0.0.52"
+val datalakeSpark3Version = "0.0.54"
 
 resolvers += "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots"
 resolvers += "Sonatype OSS Releases" at "https://s01.oss.sonatype.org/content/repositories/releases"
