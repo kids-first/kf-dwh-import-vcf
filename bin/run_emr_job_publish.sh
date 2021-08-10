@@ -1,6 +1,6 @@
 #!/bin/bash
-study_ids=$1
-release_id=$2
+study_ids=${1:-"SD_46SK55A3,SD_9PYZAHHE,SD_DYPMEHHF,SD_BHJXBDQK,SD_7NQ9151J,SD_NMVV8A1Y"}
+release_id=${2:-"RE_000012"}
 instance_type=${3:-"m5.xlarge"}
 env=${4:-"qa"}
 
