@@ -1,22 +1,21 @@
 package org.kidsfirstdrc.dwh.es.index
 
-import bio.ferlab.datalake.spark3.config.Configuration
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.locus
 import bio.ferlab.datalake.spark3.implicits.SparkUtils.getColumnOrElse
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.StringType
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 
-class GenomicSuggestionsIndex(releaseId: String)(override implicit val conf: Configuration)
+class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Configuration)
     extends ETL() {
 
-  val destination = Es.genomic_suggestions
+  val destination: DatasetConf = Es.variants_suggestions
 
-  final val geneSymbolWeight            = 5
-  final val geneAliasesWeight           = 3
+  //final val geneSymbolWeight            = 5
+  //final val geneAliasesWeight           = 3
   final val variantSymbolAaChangeWeight = 4
   final val variantSymbolWeight         = 2
 
@@ -25,7 +24,6 @@ class GenomicSuggestionsIndex(releaseId: String)(override implicit val conf: Con
 
   override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
-      Public.genes.id -> spark.table(s"${Public.genes.table.get.fullName}"),
       Clinical.variants.id -> spark.read.parquet(
         s"${Clinical.variants.rootPath}/variants/variants_$releaseId"
       ),
@@ -36,7 +34,6 @@ class GenomicSuggestionsIndex(releaseId: String)(override implicit val conf: Con
   }
 
   override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
-    val genes = data(Public.genes.id).select("symbol", "alias", "ensembl_gene_id")
     val variants =
       data(Clinical.variants.id).selectLocus(col("hgvsg"), col("name"), col("clinvar_id"))
     val consequences = data(Clinical.consequences.id)
@@ -50,13 +47,13 @@ class GenomicSuggestionsIndex(releaseId: String)(override implicit val conf: Con
       )
       .dropDuplicates()
 
-    getGenesSuggest(genes).unionByName(getVariantSuggest(variants, consequences))
+    getVariantSuggest(variants, consequences)
   }
 
   override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
     data.write
       .mode(SaveMode.Overwrite)
-      .option("format", "parquet")
+      .option("format", destination.format.sparkFormat)
       .option("path", s"${destination.location}_$releaseId")
       .saveAsTable(s"${destination.table.get.fullName}_${releaseId}")
     data
@@ -131,43 +128,6 @@ class GenomicSuggestionsIndex(releaseId: String)(override implicit val conf: Con
         )
       )
       .withColumn("symbol", col("symbol")(0))
-      .select(indexColumns.head, indexColumns.tail: _*)
-  }
-
-  def getGenesSuggest(genes: DataFrame): DataFrame = {
-    genes
-      .withColumn("ensembl_gene_id", getColumnOrElse("ensembl_gene_id"))
-      .withColumn("symbol", getColumnOrElse("symbol"))
-      .withColumn("type", lit("gene"))
-      .withColumn(
-        "suggestion_id",
-        sha1(col("symbol"))
-      ) //this maps to `hash` column in gene_centric index
-      .withColumn("hgvsg", lit(null).cast(StringType))
-      .withColumn("rsnumber", lit(null).cast(StringType))
-      .withColumn("locus", lit(null).cast(StringType))
-      .withColumn("chromosome", lit(null).cast(StringType))
-      .withColumn(
-        "suggest",
-        array(
-          struct(
-            array(col("symbol")) as "input",
-            lit(geneSymbolWeight) as "weight"
-          ),
-          struct(
-            array_remove(
-              flatten(
-                array(
-                  functions.transform(col("alias"), c => when(c.isNull, lit("")).otherwise(c)),
-                  array(col("ensembl_gene_id"))
-                )
-              ),
-              ""
-            ) as "input",
-            lit(geneAliasesWeight) as "weight"
-          )
-        )
-      )
       .select(indexColumns.head, indexColumns.tail: _*)
   }
 }
