@@ -448,13 +448,22 @@ object Catalog {
       OverWrite,
       TableConf("portal", "gene_centric")
     )
-    val genomic_suggestions = DatasetConf(
-      "genomic_suggestions",
+    val genes_suggestions = DatasetConf(
+      "genes_suggestions",
       alias,
-      s"$relativePath/genomic_suggestions",
+      s"$relativePath/genes_suggestions",
       PARQUET,
       OverWrite,
-      TableConf("portal", "genomic_suggestions")
+      TableConf("portal", "genes_suggestions")
+    )
+
+    val variants_suggestions = DatasetConf(
+      "variants_suggestions",
+      alias,
+      s"$relativePath/variants_suggestions",
+      PARQUET,
+      OverWrite,
+      TableConf("portal", "variants_suggestions")
     )
   }
 

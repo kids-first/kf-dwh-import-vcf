@@ -2,17 +2,16 @@ package org.kidsfirstdrc.dwh.es.index
 
 import bio.ferlab.datalake.spark3.config.Configuration
 import org.apache.spark.sql.DataFrame
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
+import org.kidsfirstdrc.dwh.conf.Catalog.Clinical
 import org.kidsfirstdrc.dwh.testutils._
-import org.kidsfirstdrc.dwh.testutils.es.{SUGGEST, SuggesterIndexOutput}
-import org.kidsfirstdrc.dwh.testutils.external.GenesOutput
+import org.kidsfirstdrc.dwh.testutils.es.{SUGGEST, VariantsSuggestOutput}
 import org.kidsfirstdrc.dwh.testutils.join.{Freq, JoinConsequenceOutput, JoinVariantOutput}
 import org.kidsfirstdrc.dwh.testutils.vcf.{OccurrenceOutput, VariantFrequency}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class GenomicSuggestionsIndexSpec
+class VariantsSuggestionsIndexSpec
     extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
   import spark.implicits._
   val studyId1   = "SD_123"
@@ -94,21 +93,7 @@ class GenomicSuggestionsIndexSpec
     JoinConsequenceOutput().copy(symbol = null, aa_change = null)
   ).toDF()
 
-  val genesDf: DataFrame = Seq(
-    GenesOutput(
-      `alias` = List("BII", "CACH6", "CACNL1A6", "Cav2.3", "", null)
-    )
-  ).toDF()
-
-  val genesWithNullsDf: DataFrame = Seq(
-    GenesOutput(
-      `alias` = List("BII", "CACH6", "CACNL1A6", "Cav2.3", "", null),
-      `ensembl_gene_id` = null
-    )
-  ).toDF()
-
   val data = Map(
-    Public.genes.id          -> genesDf,
     Clinical.occurrences.id  -> occurrencesDf,
     Clinical.variants.id     -> joinVariantDf,
     Clinical.consequences.id -> joinConsequencesDf
@@ -118,34 +103,21 @@ class GenomicSuggestionsIndexSpec
 
   "suggester index job" should "transform data to the right format" in {
 
-    val result = new GenomicSuggestionsIndex("re_000010").transform(data)
+    val result = new VariantsSuggestionsIndex("re_000010").transform(data)
     result.show(false)
 
-    result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
-      SuggesterIndexOutput(),
-      SuggesterIndexOutput(
-        `type` = "gene",
-        `chromosome` = null,
-        `locus` = null,
-        `suggestion_id` = "9b8016c31b93a7504a8314ce3d060792f67ca2ad",
-        `hgvsg` = null,
-        `symbol` = "OR4F5",
-        `rsnumber` = null,
-        `suggest` = List(
-          SUGGEST(List("OR4F5"), 5),
-          SUGGEST(List("BII", "CACH6", "CACNL1A6", "Cav2.3", "ENSG00000198216"), 3)
-        )
-      )
+    result.as[VariantsSuggestOutput].collect() should contain allElementsOf Seq(
+      VariantsSuggestOutput()
     )
   }
 
   "suggester from variants" should "remove null and empty values" in {
 
-    val result = new GenomicSuggestionsIndex("")
+    val result = new VariantsSuggestionsIndex("")
       .getVariantSuggest(joinVariantWithNullDf, joinConsequencesWithEmptyAndNullDf)
     result.show(false)
 
-    val expectedResult = SuggesterIndexOutput(
+    val expectedResult = VariantsSuggestOutput(
       `hgvsg` = "",
       `suggest` = List(
         SUGGEST(List("SCN2A", "SCN2A.2", "2-165310406-G-A", "rs1313905795", "RCV000436956"), 4),
@@ -156,29 +128,7 @@ class GenomicSuggestionsIndexSpec
       )
     )
 
-    result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
-      expectedResult
-    )
-  }
-
-  "suggester from genes" should "remove null and empty values" in {
-
-    val result = new GenomicSuggestionsIndex("").getGenesSuggest(genesWithNullsDf)
-    result.show(false)
-
-    val expectedResult = SuggesterIndexOutput(
-      `type` = "gene",
-      `chromosome` = null,
-      `locus` = null,
-      `suggestion_id` = "9b8016c31b93a7504a8314ce3d060792f67ca2ad",
-      `hgvsg` = null,
-      `symbol` = "OR4F5",
-      `rsnumber` = null,
-      `suggest` =
-        List(SUGGEST(List("OR4F5"), 5), SUGGEST(List("BII", "CACH6", "CACNL1A6", "Cav2.3"), 3))
-    )
-
-    result.as[SuggesterIndexOutput].collect() should contain allElementsOf Seq(
+    result.as[VariantsSuggestOutput].collect() should contain allElementsOf Seq(
       expectedResult
     )
   }
