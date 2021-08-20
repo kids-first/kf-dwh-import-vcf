@@ -9,7 +9,8 @@ val spark_version = "3.1.2"
 val deltaCoreVersion = "1.0.0"
 val elasticsearch_spark_version = "7.12.0"
 val scalatestVersion = "3.2.9"
-val datalakeSpark3Version = "0.0.54"
+val datalakeSpark3Version = "0.0.56"
+val glowVersion = "1.0.1"
 
 resolvers += "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots"
 resolvers += "Sonatype OSS Releases" at "https://s01.oss.sonatype.org/content/repositories/releases"
@@ -19,6 +20,7 @@ libraryDependencies += "org.apache.spark" %% "spark-sql" % spark_version % Provi
 libraryDependencies += "io.delta" %% "delta-core" % deltaCoreVersion
 libraryDependencies += "bio.ferlab" %% "datalake-spark3" % datalakeSpark3Version
 libraryDependencies += "org.elasticsearch" %% "elasticsearch-spark-30" % elasticsearch_spark_version % Provided
+libraryDependencies += "io.projectglow" %% "glow-spark3" % glowVersion % Provided exclude ("org.apache.hadoop", "hadoop-client")
 
 /* Test */
 libraryDependencies += "org.scalatest" %% "scalatest" % scalatestVersion % Test
