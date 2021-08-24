@@ -46,8 +46,8 @@ object Index extends App {
   val templatePath = s"s3://kf-strides-variant-parquet-prd/jobs/templates/$templateFileName"
 
   val indexName = chromosome match {
-    case "all" => alias
-    case c     => s"${alias}_${c}"
+    case "all" => alias.toLowerCase
+    case c     => s"${alias}_${c}".toLowerCase
   }
 
   println(s"$jobType - ${indexName}_$newRelease")
