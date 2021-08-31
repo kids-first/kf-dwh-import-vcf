@@ -5,7 +5,7 @@ import bio.ferlab.datalake.spark3.etl.ETL
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.locus
 import bio.ferlab.datalake.spark3.implicits.SparkUtils._
 import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.functions.{explode, _}
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DoubleType, LongType}
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public, Raw}
@@ -102,7 +102,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
       .withConsequences(consequences)
       .withGenes(genes)
       .withExternalReference
-      .withColumn("transmissions", map_filter(col("transmissions"), (_, v) => v > minimumParticipantsPerStudy))
+      .withColumn("transmissions", map_keys(col("transmissions")))
       .select(
         "genome_build",
         "hash",
@@ -128,7 +128,8 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
         "participant_total_number",
         "participant_frequency",
         "external_reference",
-        "transmissions"
+        "transmissions",
+        "zygosity"
       )
   }
 
@@ -275,8 +276,6 @@ object VariantCentricIndex {
       array.map(fullConsentCode => fullConsentCode.split('.')(0)).distinct
     }
 
-    Some("x").fold(Seq.empty[String])(x => x.split(",").toSeq)
-
     def withStudies(studyCodes: DataFrame): DataFrame = {
       val inputColumns: Seq[Column]   = df.columns.filterNot(_.equals("studies")).map(col)
       df
@@ -299,7 +298,7 @@ object VariantCentricIndex {
           when(size(col("ids")) >= minimumParticipantsPerStudy, col("ids")).otherwise(lit(null))
         )
         .withColumn("transmission_by_study",
-          map_filter(col("transmissions_by_study")(col("study_id")), (_, v) => v > minimumParticipantsPerStudy)
+          map_keys(col("transmissions_by_study")(col("study_id")))
         )
         .withColumn(
           "study",
@@ -428,19 +427,44 @@ object VariantCentricIndex {
       df.joinByLocus(occurrencesWithParticipants, "inner")
     }
 
+    def withZigozity(implicit spark: SparkSession): DataFrame = {
+      import spark.implicits._
+
+      val conditionValueMap: List[(Column, String)] = List(
+        $"clinvar".isNotNull -> "Clinvar",
+        exists($"genes", gene => gene("hpo").isNotNull and size(gene("hpo")) > 0) -> "HPO",
+        exists($"genes", gene => gene("orphanet").isNotNull and size(gene("orphanet")) > 0) -> "Orphanet",
+        exists($"genes", gene => gene("omim").isNotNull and size(gene("omim")) > 0) -> "OMIM",
+        exists($"genes", gene => gene("cosmic").isNotNull and size(gene("cosmic")) > 0) -> "Cosmic",
+        exists($"genes", gene => gene("ddd").isNotNull and size(gene("ddd")) > 0) -> "DDD"
+      )
+      conditionValueMap.foldLeft {
+        df.withColumn("external_reference", when($"rsnumber".isNotNull, array(lit("DBSNP"))).otherwise(array()))
+      } { case (d, (condition, value)) => d
+        .withColumn("external_reference",
+          when(condition, array_union($"external_reference", array(lit(value))))
+            .otherwise($"external_reference"))
+      }
+    }
+
     def withExternalReference(implicit spark: SparkSession): DataFrame = {
       import spark.implicits._
-      df.withColumn(
-        "external_reference", struct(
-          $"rsnumber".isNotNull.as("is_dbsnp"),
-          $"clinvar".isNotNull.as("is_clinvar"),
-          exists($"genes", gene => gene("hpo").isNotNull and size(gene("hpo")) > 0).as("is_hpo"),
-          exists($"genes", gene => gene("orphanet").isNotNull and size(gene("hpo")) > 0).as("is_orphanet"),
-          exists($"genes", gene => gene("omim").isNotNull and size(gene("hpo")) > 0).as("is_omim"),
-          exists($"genes", gene => gene("cosmic").isNotNull and size(gene("hpo")) > 0).as("is_cosmic"),
-          exists($"genes", gene => gene("ddd").isNotNull and size(gene("hpo")) > 0).as("is_ddd")
-        )
+
+      val conditionValueMap: List[(Column, String)] = List(
+        $"clinvar".isNotNull -> "Clinvar",
+        exists($"genes", gene => gene("hpo").isNotNull and size(gene("hpo")) > 0) -> "HPO",
+        exists($"genes", gene => gene("orphanet").isNotNull and size(gene("orphanet")) > 0) -> "Orphanet",
+        exists($"genes", gene => gene("omim").isNotNull and size(gene("omim")) > 0) -> "OMIM",
+        exists($"genes", gene => gene("cosmic").isNotNull and size(gene("cosmic")) > 0) -> "Cosmic",
+        exists($"genes", gene => gene("ddd").isNotNull and size(gene("ddd")) > 0) -> "DDD"
       )
+      conditionValueMap.foldLeft {
+        df.withColumn("external_reference", when($"rsnumber".isNotNull, array(lit("DBSNP"))).otherwise(array()))
+      } { case (d, (condition, value)) => d
+        .withColumn("external_reference",
+          when(condition, array_union($"external_reference", array(lit(value))))
+            .otherwise($"external_reference"))
+      }
     }
   }
 }

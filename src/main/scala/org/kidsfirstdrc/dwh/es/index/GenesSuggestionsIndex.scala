@@ -14,8 +14,6 @@ class GenesSuggestionsIndex(releaseId: String)
 
   final val geneSymbolWeight            = 5
   final val geneAliasesWeight           = 3
-  //final val variantSymbolAaChangeWeight = 4
-  //final val variantSymbolWeight         = 2
 
   final val indexColumns =
     List("type", "symbol", "suggestion_id", "suggest", "ensembl_gene_id")

@@ -212,7 +212,7 @@ class VariantCentricIndexSpec
       StudyFrequency(Freq(10, 5, 0.5, 2, 3), Freq(0, 0, 0, 0, 0)),
       1,
       null,
-      Map() // transmissions below 10 are filtered out
+      List("AD")
     ),
     Study(
       "SD_123",
@@ -234,7 +234,7 @@ class VariantCentricIndexSpec
         "PT_000011",
         "PT_000012"
       ),
-      Map("AD" -> 11) // transmissions below 10 are filtered out
+      List("AD", "AR")
     ),
     Study(
       "SD_789",
@@ -244,7 +244,7 @@ class VariantCentricIndexSpec
       StudyFrequency(Freq(7, 2, 0.2857142857, 5, 1), Freq(7, 2, 0.2857142857, 5, 1)),
       0,
       null,
-      Map()
+      List("AD")
     )
   )
 

@@ -63,6 +63,7 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
         $"dbgap_consent_code",
         $"transmission"
       )
+      .withColumn("zygosity", when($"zygosity".isNull, lit("")).otherwise($"zygosity"))
       .withColumn("count", lit(1))
       .groupBy("transmission", locusColumNames:_*)
       .agg(
@@ -75,7 +76,8 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
         sum(col("ac")) as "ac",
         sum(col("an_lower_bound_kf")) as "an_lower_bound_kf",
         sum(col("homozygotes")) as "homozygotes",
-        sum(col("heterozygotes")) as "heterozygotes"
+        sum(col("heterozygotes")) as "heterozygotes",
+        collect_set("zygosity") as "zygosity"
       )
       .groupBy(locus: _*)
       .agg(
@@ -88,7 +90,8 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
         sum(col("ac")) as "ac",
         sum(col("an_lower_bound_kf")) as "an_lower_bound_kf",
         sum(col("homozygotes")) as "homozygotes",
-        sum(col("heterozygotes")) as "heterozygotes"
+        sum(col("heterozygotes")) as "heterozygotes",
+        array_remove(array_distinct(flatten(collect_list("zygosity"))), "") as "zygosity"
       )
       .withColumn("an_upper_bound_kf", calculate_an_upper_bound_kf(participantTotalCount))
       .withColumn(

@@ -14,8 +14,6 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
 
   val destination: DatasetConf = Es.variants_suggestions
 
-  //final val geneSymbolWeight            = 5
-  //final val geneAliasesWeight           = 3
   final val variantSymbolAaChangeWeight = 4
   final val variantSymbolWeight         = 2
 
