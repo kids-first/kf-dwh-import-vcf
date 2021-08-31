@@ -36,7 +36,8 @@ case class JoinVariantOutput(
     consent_codes_by_study: Map[String, Set[String]],
     transmissions: Map[String, Int],
     transmissions_by_study: Map[String, Map[String, Int]],
-    release_id: String = "RE_ABCDEF"
+    release_id: String = "RE_ABCDEF",
+    zygosity: List[String] = List("HET", "HOM")
 )
 
 case class OneThousandGenomesFreq(an: Long = 20, ac: Long = 10, af: Double = 0.5)

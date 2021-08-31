@@ -39,7 +39,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         consent_codes = Set(s"$studyId1.c1"),
         consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c1")),
         transmissions = Map("AD" -> 3, "AR" -> 1),
-        transmissions_by_study = Map(studyId1 -> Map("AD" -> 3, "AR" -> 1))
+        transmissions_by_study = Map(studyId1 -> Map("AD" -> 3, "AR" -> 1)),
+        zygosity = List("HOM")
       )
       val variant2 = VariantOutput(
         chromosome = "3",
@@ -55,7 +56,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         consent_codes = Set(s"$studyId1.c2"),
         consent_codes_by_study = Map(studyId1 -> Set(s"$studyId1.c2")),
         transmissions = Map("AD" -> 1),
-        transmissions_by_study = Map(studyId1 -> Map("AD" -> 1))
+        transmissions_by_study = Map(studyId1 -> Map("AD" -> 1)),
+        zygosity = List("HET")
       )
 
       Seq(variant1, variant2)
@@ -81,7 +83,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         consent_codes = Set(s"$studyId2.c0"),
         consent_codes_by_study = Map(studyId2 -> Set(s"$studyId2.c0")),
         transmissions = Map("AD" -> 1),
-        transmissions_by_study = Map(studyId2 -> Map("AD" -> 1))
+        transmissions_by_study = Map(studyId2 -> Map("AD" -> 1)),
+        zygosity = List("WT")
       )
       val variant4 = variant1.copy(
         study_id = studyId2,
@@ -332,7 +335,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           one_thousand_genomes = None,
           gnomad_exomes_2_1 = None,
           gnomad_genomes_3_0 = None,
-          gnomad_genomes_3_1_1 = None
+          gnomad_genomes_3_1_1 = None,
+          zygosity = List("HET")
         ),
         JoinVariantOutput(
           chromosome = "3",
@@ -367,7 +371,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           one_thousand_genomes = None,
           gnomad_exomes_2_1 = None,
           gnomad_genomes_3_0 = None,
-          gnomad_genomes_3_1_1 = None
+          gnomad_genomes_3_1_1 = None,
+          zygosity = List("WT")
         ),
         existingVariant2.copy(
           release_id = releaseId,
@@ -448,7 +453,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           study_id = "SD_111",
           consent_codes_by_study = Map("SD_111" -> Set("SD_111.c1")),
           transmissions = Map("AD" -> 1),
-          transmissions_by_study = Map("SD_111" -> Map("AD" -> 1))
+          transmissions_by_study = Map("SD_111" -> Map("AD" -> 1)),
+          zygosity = List("HOM")
         ),
         VariantOutput(
           "2",
@@ -463,7 +469,8 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
           study_id = "SD_222",
           consent_codes_by_study = Map("SD_222" -> Set("SD_222.c1")),
           transmissions = Map("AD" -> 1),
-          transmissions_by_study = Map("SD_222" -> Map("AD" -> 1))
+          transmissions_by_study = Map("SD_222" -> Map("AD" -> 1)),
+          zygosity = List("HET")
         )
       ).toDF()
 

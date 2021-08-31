@@ -195,29 +195,7 @@
         }
       },
       "external_reference" : {
-        "properties" : {
-          "is_clinvar" : {
-            "type" : "boolean"
-          },
-          "is_cosmic" : {
-            "type" : "boolean"
-          },
-          "is_dbsnp" : {
-            "type" : "boolean"
-          },
-          "is_ddd" : {
-            "type" : "boolean"
-          },
-          "is_hpo" : {
-            "type" : "boolean"
-          },
-          "is_omim" : {
-            "type" : "boolean"
-          },
-          "is_orphanet" : {
-            "type" : "boolean"
-          }
-        }
+        "type": "keyword"
       },
       "external_study_ids" : {
         "type" : "keyword"
@@ -558,62 +536,15 @@
             "type" : "keyword"
           },
           "transmissions" : {
-            "properties" : {
-              "autosomal_dominant" : {
-                "type" : "long"
-              },
-              "autosomal_dominant_de_novo" : {
-                "type" : "long"
-              },
-              "autosomal_recessive" : {
-                "type" : "long"
-              },
-              "non_carrier_proband" : {
-                "type" : "long"
-              },
-              "unknown_proband_genotype" : {
-                "type" : "long"
-              },
-              "x_linked_dominant_de_novo" : {
-                "type" : "long"
-              },
-              "x_linked_recessive" : {
-                "type" : "long"
-              },
-              "x_linked_recessive_de_novo" : {
-                "type" : "long"
-              }
-            }
+            "type" : "keyword"
           }
         }
       },
       "transmissions" : {
-        "properties" : {
-          "autosomal_dominant" : {
-            "type" : "long"
-          },
-          "autosomal_dominant_de_novo" : {
-            "type" : "long"
-          },
-          "autosomal_recessive" : {
-            "type" : "long"
-          },
-          "non_carrier_proband" : {
-            "type" : "long"
-          },
-          "unknown_proband_genotype" : {
-            "type" : "long"
-          },
-          "x_linked_dominant_de_novo" : {
-            "type" : "long"
-          },
-          "x_linked_recessive" : {
-            "type" : "long"
-          },
-          "x_linked_recessive_de_novo" : {
-            "type" : "long"
-          }
-        }
+        "type" : "keyword"
+      },
+      "zygosity" : {
+        "type" : "keyword"
       },
       "variant_class" : {
         "type" : "keyword"

@@ -21,7 +21,7 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
 
   "transform 'portal'" should "should keep only PT_001 and PT_002" in {
 
-    implicit val conf: Configuration =
+    implicit val conf: Configuration = {
       Configuration(
         List(
           StorageConf(
@@ -30,9 +30,13 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
           )
         )
       )
+    }
 
     val occurrencesDf = Seq(
-      OccurrenceOutput(`participant_id` = "PT_001", `zygosity` = "HET", `hgvsg` = null,
+      OccurrenceOutput(
+        `participant_id` = "PT_001",
+        `zygosity` = "HET",
+        `hgvsg` = null,
         `transmission` = Some("autosomal_recessive")),
       OccurrenceOutput(
         `participant_id` = "PT_002",
@@ -77,7 +81,8 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
         Set("phs001738.c1"),
         Map("SD_123456" -> Set("phs001738.c1")),
         transmissions = Map("autosomal_dominant" -> 1, "autosomal_recessive" -> 1),
-        transmissions_by_study = Map("SD_123456" -> Map("autosomal_dominant" -> 1, "autosomal_recessive" -> 1))
+        transmissions_by_study = Map("SD_123456" -> Map("autosomal_dominant" -> 1, "autosomal_recessive" -> 1)),
+        List("HET")
       )
     )
 
@@ -139,7 +144,8 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
         consent_codes_by_study =
           Map("SD_123456" -> Set("SD_123456.c1", "SD_123456.c2", "SD_123456.c3")),
         transmissions = Map("autosomal_dominant" -> 2),
-        transmissions_by_study = Map("SD_123456" -> Map("autosomal_dominant" -> 2))
+        transmissions_by_study = Map("SD_123456" -> Map("autosomal_dominant" -> 2)),
+        zygosity = List("UNK", "HET", "HOM")
       )
     )
 

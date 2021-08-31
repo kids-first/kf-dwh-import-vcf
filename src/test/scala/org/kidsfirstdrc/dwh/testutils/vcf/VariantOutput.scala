@@ -17,7 +17,8 @@ case class VariantOutput(
     consent_codes: Set[String] = Set("SD_123456.c1"),
     consent_codes_by_study: Map[String, Set[String]] = Map("SD_123456" -> Set("SD_123456.c1")),
     transmissions: Map[String, Int] = Map(),
-    transmissions_by_study: Map[String, Map[String, Int]] = Map()
+    transmissions_by_study: Map[String, Map[String, Int]] = Map(),
+    zygosity: List[String]
 )
 
 case class VariantFrequency(

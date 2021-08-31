@@ -2,7 +2,7 @@ package org.kidsfirstdrc.dwh.join
 
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.{array_distinct, _}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
@@ -122,7 +122,8 @@ class JoinVariants(studyIds: Seq[String],
       $"consent_codes",
       $"consent_codes_by_study",
       $"transmissions",
-      $"transmissions_by_study"
+      $"transmissions_by_study",
+      $"zygosity"
     )
 
     val allColumns = commonColumns :+
@@ -220,7 +221,8 @@ class JoinVariants(studyIds: Seq[String],
         array_distinct(flatten(collect_list($"consent_codes"))) as "consent_codes",
         map_from_entries(collect_list(struct($"study_id", $"consent_codes"))) as "consent_codes_by_study",
         map_from_entries(collect_list(struct($"study_id", $"transmission_by_study"))) as "transmissions_by_study",
-        lit(releaseId) as "release_id"
+        lit(releaseId) as "release_id",
+        array_distinct(flatten(collect_list("zygosity"))) as "zygosity"
       )
       .withColumn("upper_bound_kf_an", lit(upper_bound_kf_an))
       .withColumn("upper_bound_kf_af", calculated_duo_af("upper_bound_kf"))

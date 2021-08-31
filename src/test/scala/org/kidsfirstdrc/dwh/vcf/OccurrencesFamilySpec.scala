@@ -192,7 +192,7 @@ class OccurrencesFamilySpec
         `has_alt` = 0,
         `gender` = "Female",
         `is_multi_allelic` = true,
-        `transmission` = Some("non carrier proband"),
+        `transmission` = Some("non_carrier_proband"),
         `hgvsg` = null,
         `variant_class` = null),
       OccurrenceOutput(participant_id = "PT_000003",
