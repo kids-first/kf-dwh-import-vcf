@@ -9,6 +9,8 @@ import org.apache.spark.sql.functions._
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 
+import java.time.LocalDateTime
+
 class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Configuration)
     extends ETL() {
 
@@ -20,7 +22,8 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
   final val indexColumns =
     List("type", "symbol", "locus", "suggestion_id", "hgvsg", "suggest", "chromosome", "rsnumber")
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
       Clinical.variants.id -> spark.read.parquet(
         s"${Clinical.variants.rootPath}/variants/variants_$releaseId"
@@ -31,7 +34,9 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
     )
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     val variants =
       data(Clinical.variants.id).selectLocus(col("hgvsg"), col("name"), col("clinvar_id"))
     val consequences = data(Clinical.consequences.id)
@@ -48,7 +53,9 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
     getVariantSuggest(variants, consequences)
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     data.write
       .mode(SaveMode.Overwrite)
       .option("format", destination.format.sparkFormat)

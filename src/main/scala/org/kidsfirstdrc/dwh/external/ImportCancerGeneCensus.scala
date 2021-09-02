@@ -8,12 +8,14 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog._
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
+import java.time.LocalDateTime
 import scala.collection.mutable
 
 class ImportCancerGeneCensus()(implicit conf: Configuration)
     extends StandardETL(Public.cosmic_gene_set)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
       Raw.cosmic_cancer_gene_census.id -> spark.read
         .option("header", "true")
@@ -32,7 +34,9 @@ class ImportCancerGeneCensus()(implicit conf: Configuration)
     }
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     spark.udf.register("trim_array", trim_array_udf)
 
@@ -77,7 +81,9 @@ class ImportCancerGeneCensus()(implicit conf: Configuration)
 
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     super.load(data.coalesce(1))
   }
 }

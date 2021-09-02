@@ -10,6 +10,8 @@ import bio.ferlab.datalake.spark3.implicits.SparkUtils
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.{calculated_duo_af, locusColumNames}
 import bio.ferlab.datalake.spark3.implicits.SparkUtils.firstAs
 
+import java.time.LocalDateTime
+
 class JoinVariants(studyIds: Seq[String],
                    releaseId: String,
                    mergeWithExisting: Boolean,
@@ -18,7 +20,8 @@ class JoinVariants(studyIds: Seq[String],
 
   override val destination: DatasetConf = Clinical.variants
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
 
     val variants: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) { (currentDF, studyId) =>
       val nextDf =
@@ -56,7 +59,9 @@ class JoinVariants(studyIds: Seq[String],
       .sum
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val variants = data(Clinical.variants.id)
@@ -164,7 +169,9 @@ class JoinVariants(studyIds: Seq[String],
       .joinWithDBSNP(dbsnp)
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     JoinWrite.write(
       releaseId,
       Clinical.variants.rootPath,

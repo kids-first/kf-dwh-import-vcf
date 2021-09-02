@@ -9,6 +9,8 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.join.JoinConsequences._
 
+import java.time.LocalDateTime
+
 class JoinConsequences(
     studyIds: Seq[String],
     releaseId: String,
@@ -17,7 +19,8 @@ class JoinConsequences(
 )(implicit conf: Configuration)
     extends ETL() {
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val consequences: DataFrame = studyIds.foldLeft(spark.emptyDataFrame) { (currentDF, studyId) =>
       val nextDf =
         spark.table(SparkUtils.tableName(Clinical.consequences.id, studyId, releaseId, database))
@@ -35,7 +38,9 @@ class JoinConsequences(
     )
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val consequences    = data(Clinical.consequences.id)
@@ -107,7 +112,9 @@ class JoinConsequences(
 
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     JoinWrite.write(
       releaseId,
       Clinical.consequences.rootPath,

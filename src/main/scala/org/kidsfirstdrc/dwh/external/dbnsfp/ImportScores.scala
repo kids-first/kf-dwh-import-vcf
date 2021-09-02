@@ -7,6 +7,8 @@ import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
+import java.time.LocalDateTime
+
 class ImportScores()(implicit conf: Configuration)
     extends StandardETL(Public.dbnsfp_original)(conf) {
 
@@ -26,13 +28,16 @@ class ImportScores()(implicit conf: Configuration)
   def pred(colName: String): Column = when(element_at_postion(colName) === ".", null)
     .otherwise(element_at_postion(colName)) as colName
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
       Public.dbnsfp_variant.id -> spark.table(s"${Public.dbnsfp_variant.table.get.fullName}")
     )
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     data(Public.dbnsfp_variant.id)
       .select(
         col("chromosome"),
@@ -292,7 +297,9 @@ class ImportScores()(implicit conf: Configuration)
 
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     super.load(data
       .repartition(col("chromosome"))
       .sortWithinPartitions("start"))

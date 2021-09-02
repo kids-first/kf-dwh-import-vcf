@@ -6,10 +6,13 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
+import java.time.LocalDateTime
+
 class ImportHPOGeneSet()(implicit conf: Configuration)
     extends StandardETL(Public.hpo_gene_set)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val inputDF: DataFrame = spark.read
       .format("csv")
       .option("inferSchema", "true")
@@ -31,7 +34,9 @@ class ImportHPOGeneSet()(implicit conf: Configuration)
     )
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     val human_genes = data(Public.human_genes.id)
     val inputDF =
       data(Raw.hpo_genes_to_phenotype.id)
@@ -53,7 +58,9 @@ class ImportHPOGeneSet()(implicit conf: Configuration)
       .select(inputDF("*"), human_genes("ensembl_gene_id"))
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     super.load(data.coalesce(1))
   }
 }

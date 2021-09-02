@@ -7,6 +7,8 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public}
 
+import java.time.LocalDateTime
+
 class GenesSuggestionsIndex(releaseId: String)
                            (override implicit val conf: Configuration) extends ETL() {
 
@@ -18,7 +20,8 @@ class GenesSuggestionsIndex(releaseId: String)
   final val indexColumns =
     List("type", "symbol", "suggestion_id", "suggest", "ensembl_gene_id")
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
       Public.genes.id -> spark.table(s"${Public.genes.table.get.fullName}"),
       Clinical.variants.id -> spark.read.parquet(
@@ -30,13 +33,17 @@ class GenesSuggestionsIndex(releaseId: String)
     )
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     val genes = data(Public.genes.id).select("symbol", "alias", "ensembl_gene_id")
 
     getGenesSuggest(genes)
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     data.write
       .mode(SaveMode.Overwrite)
       .option("format", destination.format.sparkFormat)

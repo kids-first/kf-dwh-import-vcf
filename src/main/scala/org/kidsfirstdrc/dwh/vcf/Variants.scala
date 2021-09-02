@@ -8,12 +8,15 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Raw}
 
+import java.time.LocalDateTime
+
 class Variants(studyId: String, releaseId: String, schema: String)(implicit conf: Configuration)
     extends ETL() {
 
   val destination: DatasetConf = Clinical.variants
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val participantsPath = Raw.all_participants.location
     val occurrencesPath =
       s"${Clinical.occurrences.rootPath}/occurrences/${tableName(Clinical.occurrences.id, studyId, releaseId)}"
@@ -30,7 +33,9 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
     load(variants)
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val participants = data(Raw.all_participants.id).select($"id" as "participant_id")
@@ -129,7 +134,9 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
       .withColumn("transmissions_by_study", map($"study_id", $"transmissions"))
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     val tableVariants = tableName(destination.id, studyId, releaseId)
     data
       .repartition(col("chromosome"))
