@@ -11,6 +11,8 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, DataService, HarmonizedData}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getVisibleFiles
 
+import java.time.LocalDateTime
+
 class OccurrencesFamily(studyId: String,
                         releaseId: String,
                         input: String,
@@ -23,7 +25,8 @@ class OccurrencesFamily(studyId: String,
 
   val destination: DatasetConf = Clinical.occurrences_family
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val inputDF: DataFrame = unionCGPFiles(input, studyId, releaseId, cgpPattern, postCgpPattern, referenceGenomePath)
 
     val biospecimens =
@@ -42,7 +45,9 @@ class OccurrencesFamily(studyId: String,
     )
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     val participants = data(DataService.participants.id)
       .withColumn(
@@ -115,7 +120,9 @@ class OccurrencesFamily(studyId: String,
       .withGenotypeTransmission("transmission", $"father_calls", $"mother_calls")
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     val tableOccurence = tableName(destination.id, studyId, releaseId)
     data

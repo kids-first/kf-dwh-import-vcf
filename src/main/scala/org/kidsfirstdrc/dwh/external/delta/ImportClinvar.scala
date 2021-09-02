@@ -9,6 +9,7 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 
+import java.time.LocalDateTime
 import scala.collection.mutable
 
 class ImportClinvar()(implicit conf: Configuration) extends ETLP {
@@ -17,11 +18,14 @@ class ImportClinvar()(implicit conf: Configuration) extends ETLP {
 
   val clinvar_vcf: DatasetConf = conf.getDataset("clinvar_vcf")
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(clinvar_vcf.id -> vcf(clinvar_vcf.location, None))
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
 
     val df = data(clinvar_vcf.id)
     spark.udf.register("inheritance", inheritance_udf)
@@ -70,7 +74,9 @@ class ImportClinvar()(implicit conf: Configuration) extends ETLP {
 
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     super.load(data.coalesce(1))
   }
 

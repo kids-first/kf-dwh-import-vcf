@@ -11,6 +11,8 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, HarmonizedData, Public}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getVisibleFiles
 
+import java.time.LocalDateTime
+
 class Consequences(studyId: String,
                    releaseId: String,
                    input: String,
@@ -21,7 +23,8 @@ class Consequences(studyId: String,
 
   val destination = Clinical.consequences
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val inputDF = vcf(
       (getVisibleFiles(input, studyId, releaseId, cgpPattern) ++
         getVisibleFiles(input, studyId, releaseId, postCgpPattern)).distinct,
@@ -36,7 +39,9 @@ class Consequences(studyId: String,
     )
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     val ensembl_mappingDf = data(Public.ensembl_mapping.id)
       .select(
         col("ensembl_transcript_id"),
@@ -93,7 +98,9 @@ class Consequences(studyId: String,
       .drop("is_canonical")
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     val tableConsequences = tableName(destination.id, studyId, releaseId)
     val salt = (rand * 3).cast(
       IntegerType

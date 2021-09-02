@@ -6,12 +6,14 @@ import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
+import java.time.LocalDateTime
 import scala.xml.{Elem, Node, XML}
 
 class ImportOrphanetGeneSet()(implicit conf: Configuration)
     extends StandardETL(Public.orphanet_gene_set)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     import spark.implicits._
 
     def loadXML: String => Elem = str =>
@@ -28,7 +30,9 @@ class ImportOrphanetGeneSet()(implicit conf: Configuration)
 
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     data(orphanet_gene_association.id)
       .join(
         data(orphanet_disease_history.id).select(
@@ -141,7 +145,10 @@ class ImportOrphanetGeneSet()(implicit conf: Configuration)
     }
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame =
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     super.load(data.coalesce(1))
+  }
 
 }

@@ -8,13 +8,18 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog._
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
+import java.time.LocalDateTime
+
 class Import1k()(implicit conf: Configuration) extends StandardETL(Public.`1000_genomes`)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(Raw.`1000genomes_vcf`.id -> vcf(Raw.`1000genomes_vcf`.location, None))
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     data(Raw.`1000genomes_vcf`.id)
       .select(
         chromosome,
@@ -35,7 +40,9 @@ class Import1k()(implicit conf: Configuration) extends StandardETL(Public.`1000_
       )
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     super.load(data
       .repartition(col("chromosome"))
       .sortWithinPartitions("start"))

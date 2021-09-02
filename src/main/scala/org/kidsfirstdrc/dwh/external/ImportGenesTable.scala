@@ -7,9 +7,12 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
+import java.time.LocalDateTime
+
 class ImportGenesTable()(implicit conf: Configuration) extends StandardETL(Public.genes)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
       Public.omim_gene_set.id     -> spark.table(s"${Public.omim_gene_set.table.get.fullName}"),
       Public.orphanet_gene_set.id -> spark.table(s"${Public.orphanet_gene_set.table.get.fullName}"),
@@ -20,7 +23,9 @@ class ImportGenesTable()(implicit conf: Configuration) extends StandardETL(Publi
     )
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val humanGenes = data(Public.human_genes.id)
@@ -93,7 +98,9 @@ class ImportGenesTable()(implicit conf: Configuration) extends StandardETL(Publi
     }
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     super.load(data.repartition(1))
   }
 }

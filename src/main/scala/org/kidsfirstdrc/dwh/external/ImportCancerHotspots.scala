@@ -7,11 +7,14 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
+import java.time.LocalDateTime
+
 class ImportCancerHotspots()(implicit conf: Configuration)
     extends StandardETL(Public.cancer_hotspots)(conf) with App {
   val chain = "/home/hadoop/b37ToHg38.over.chain"
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val df = spark.read
       .option("comment", "#")
       .option("header", "true")
@@ -20,7 +23,9 @@ class ImportCancerHotspots()(implicit conf: Configuration)
     Map(Raw.cancerhotspots_csv.id -> df)
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     val lifted: Dataset[Row] =
       data(Raw.cancerhotspots_csv.id)

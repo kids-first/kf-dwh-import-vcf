@@ -195,7 +195,7 @@
         }
       },
       "external_reference" : {
-        "type": "keyword"
+        "type" : "keyword"
       },
       "external_study_ids" : {
         "type" : "keyword"
@@ -543,10 +543,10 @@
       "transmissions" : {
         "type" : "keyword"
       },
-      "zygosity" : {
+      "variant_class" : {
         "type" : "keyword"
       },
-      "variant_class" : {
+      "zygosity" : {
         "type" : "keyword"
       }
     }

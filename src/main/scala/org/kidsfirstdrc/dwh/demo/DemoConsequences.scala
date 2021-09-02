@@ -10,6 +10,8 @@ import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.HarmonizedData
 import org.kidsfirstdrc.dwh.vcf.Consequences
 
+import java.time.LocalDateTime
+
 class DemoConsequences(studyId: String, releaseId: String, input: String)(implicit
     conf: Configuration
 ) extends ETL() {
@@ -20,18 +22,23 @@ class DemoConsequences(studyId: String, releaseId: String, input: String)(implic
     load(consequences)
   }
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val df = vcf(input, None)
       .withColumn("file_name", regexp_extract(input_file_name(), ".*/(.*)", 1))
       .select(chromosome, start, end, reference, alternate, name, annotations)
     Map(HarmonizedData.family_variants_vcf.id -> df)
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     new Consequences(studyId, releaseId, input, "", "").transform(data)
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     new Consequences(studyId, releaseId, input, "", "").load(data)
   }
 

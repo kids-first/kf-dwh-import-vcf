@@ -10,11 +10,14 @@ import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.{DataService, HarmonizedData}
 import org.kidsfirstdrc.dwh.vcf.OccurrencesFamily
 
+import java.time.LocalDateTime
+
 class DemoOccurrences(studyId: String, releaseId: String, input: String)(implicit
     conf: Configuration
 ) extends ETL() {
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val inputDF = vcf(input, None)
       .withColumn("genotype", explode(col("genotypes")))
       .withColumn("file_name", regexp_extract(input_file_name(), ".*/(.*)", 1))
@@ -30,7 +33,9 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)(implici
     )
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     val occurenceJob = new OccurrencesFamily(
@@ -74,7 +79,9 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)(implici
     load(demoOccurrences)
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     new OccurrencesFamily(
       studyId,
       releaseId,

@@ -12,6 +12,7 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es, Public, Raw}
 import org.kidsfirstdrc.dwh.es.index.VariantCentricIndex._
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 
+import java.time.LocalDateTime
 import scala.collection.mutable
 import scala.util.{Success, Try}
 
@@ -19,7 +20,8 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
 
   override val destination: DatasetConf = Es.variant_centric
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     import spark.implicits._
     val occurrences: DataFrame = spark.read
       .parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId")
@@ -52,7 +54,9 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
     )
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     val variants = data(Clinical.variants.id)
       .drop("end")
       .withColumnRenamed("dbsnp_id", "rsnumber")
@@ -133,7 +137,9 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
       )
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     data
       //avoids many small files created by the following partitionBy() operation
       .repartition(1000, col("chromosome"))

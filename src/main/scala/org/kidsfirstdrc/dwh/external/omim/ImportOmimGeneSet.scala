@@ -7,10 +7,13 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}
 import org.kidsfirstdrc.dwh.external.omim.OmimPhenotype.parse_pheno
 import org.kidsfirstdrc.dwh.jobs.StandardETL
 
+import java.time.LocalDateTime
+
 class ImportOmimGeneSet()(implicit conf: Configuration)
     extends StandardETL(Public.omim_gene_set)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val df = spark.read
       .format("csv")
       .option("inferSchema", "true")
@@ -22,7 +25,9 @@ class ImportOmimGeneSet()(implicit conf: Configuration)
     Map(Raw.omim_genemap2.id -> df)
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     val intermediateDf =
       data(Raw.omim_genemap2.id)
         .select(
@@ -60,6 +65,9 @@ class ImportOmimGeneSet()(implicit conf: Configuration)
       .unionByName(nullPhenotypes)
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame =
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     super.load(data.coalesce(1))
+  }
 }

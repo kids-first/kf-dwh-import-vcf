@@ -17,7 +17,8 @@ import scala.util.Try
 class UpdateClinical(source: DatasetConf, destination: DatasetConf, schema: String)(implicit conf: Configuration)
     extends StandardETL(destination)(conf) {
 
-  override def extract()(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
       destination.id -> spark.table(s"$schema.${destination.id}"),
       //TODO remove .dropDuplicates(locusColumNames) when issue#2893 is fixed
@@ -65,7 +66,9 @@ class UpdateClinical(source: DatasetConf, destination: DatasetConf, schema: Stri
       .joinWithDbnsfp(dbnsfp)
   }
 
-  override def transform(data: Map[String, DataFrame])(implicit spark: SparkSession): DataFrame = {
+  override def transform(data: Map[String, DataFrame],
+                         lastRunDateTime: LocalDateTime = minDateTime,
+                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     (source, destination) match {
       case (Public.clinvar             , Clinical.variants)     => updateClinvar(data)
@@ -80,7 +83,9 @@ class UpdateClinical(source: DatasetConf, destination: DatasetConf, schema: Stri
     }
   }
 
-  override def load(data: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  override def load(data: DataFrame,
+                    lastRunDateTime: LocalDateTime = minDateTime,
+                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
 
     val localTimeNow       = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
     val releaseId_datetime = s"${lastReleaseId}_$localTimeNow"

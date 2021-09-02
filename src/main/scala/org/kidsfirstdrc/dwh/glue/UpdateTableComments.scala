@@ -22,7 +22,7 @@ object UpdateTableComments extends App {
 
   implicit val conf: Configuration = Configuration(
     List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")),
-    sources = Catalog.sources.toList.map(s => s.copy(documentationpath = s"s3a://kf-strides-variant-parquet-prd/jobs/documentation/${s.id}.json"))
+    sources = Catalog.sources.toList.map(s => s.copy(documentationpath = Some(s"s3a://kf-strides-variant-parquet-prd/jobs/documentation/${s.id}.json")))
   )
 
   val ids = Set(
@@ -36,15 +36,18 @@ object UpdateTableComments extends App {
   }
 
   def run(ds: DatasetConf)(implicit spark: SparkSession): Unit = {
-    (ds.table, ds.view) match {
-      case (None, Some(v)) =>
-        run(v.database, v.name, ds.documentationpath)
-      case (Some(t), None) =>
-        run(t.database, t.name, ds.documentationpath)
-      case (Some(t), Some(v)) =>
-        run(t.database, t.name, ds.documentationpath)
-        run(v.database, v.name, ds.documentationpath)
-      case (None, None) =>
+    (ds.table, ds.view, ds.documentationpath) match {
+      case (None, Some(v), None) =>
+        run(v.database, v.name, "")
+      case (Some(t), None, Some(documentationpath)) =>
+        run(t.database, t.name, documentationpath)
+      case (Some(t), Some(v), Some(documentationpath)) =>
+        run(t.database, t.name, documentationpath)
+        run(v.database, v.name, documentationpath)
+      case (Some(t), Some(v), None) =>
+        run(t.database, t.name, "")
+        run(v.database, v.name, "")
+      case (None, None, None) =>
     }
   }
 
