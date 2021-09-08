@@ -1,15 +1,15 @@
 #!/bin/bash
 set -x
 study_id=$1
-release_id=${2:-"re_000012"}
-job=${3:-"variants"}
-schema=${4:-"portal"}
-cgp_pattern=${5:-".CGP.filtered.deNovo.vep.vcf.gz"}
-post_cgp_pattern=${6:-".CGP.filtered.vep.vcf.gz"}
-folder=${7:-"harmonized-data/simple-variants/"}
+release_id=${2:-"re_000013"}
+job=${3:-"occurrences_family"}
+schema=${4:-"variant"}
+cgp_pattern=${5:-".postCGP.filtered.deNovo.vep.vcf.gz"}
+post_cgp_pattern=${6:-".CGP.filtered.deNovo.vep.vcf.gz"}
+folder=${7:-"harmonized-data/family-variants/"}
 biospecimen_id_column=${8:-"biospecimen_id"}
 reference_genome_path=${9:-"/home/hadoop/GRCh38_full_analysis_set_plus_decoy_hla.fa"}
-instance_count=${10:-"20"}
+instance_count=${10:-"15"}
 instance_type=${11:-"r5.4xlarge"}
 env=${12:-"qa"}
 
