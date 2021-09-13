@@ -1,10 +1,17 @@
 #!/bin/bash
-study_ids=${1:-"SD_46SK55A3,SD_9PYZAHHE,SD_DYPMEHHF,SD_BHJXBDQK,SD_7NQ9151J,SD_NMVV8A1Y,SD_0TYVY1TW,SD_Z6MWD3H0"}
-release_id=${2:-"RE_000013"}
-merge_existing=${3:-"true"}
+study_ids=${1:-"SD_46SK55A3,SD_9PYZAHHE,SD_DYPMEHHF,SD_BHJXBDQK,SD_7NQ9151J,SD_NMVV8A1Y"} # "SD_DZTB5HRR"}
+release_id=${2:-"RE_000012"}
+merge_existing=${3:-"false"}
 tables=${4:-"all"}
-instance_type=${5:-"m5.xlarge"}
-env=${6:-"qa"}
+instance_type=${5:-"m5.4xlarge"}
+instance_count=${6:-"5"}
+env=${7:-"qa"}
+
+# SD_46SK55A3,SD_9PYZAHHE,SD_DYPMEHHF,SD_BHJXBDQK,SD_7NQ9151J,SD_NMVV8A1Y
+# SD_DZTB5HRR,SD_ZXJFFMEF,SD_6FPYJQBR,SD_YGVA0E1C,
+# SD_RM8AFW0R,SD_W0V965XZ,SD_R0EPRSGS,SD_P445ACHV,SD_VTTSHWV4,SD_JWS3V24D,SD_0TYVY1TW,SD_DZ4GPQX6,SD_PREASA7S,SD_46RR9ZR6,
+# SD_DK0KRWK8,SD_B8X3C1MX # NOT allowed
+
 
 steps=$(cat <<EOF
 [
@@ -35,7 +42,7 @@ steps=$(cat <<EOF
 ]
 EOF
 )
-instance_groups="[{\"InstanceCount\":1,\"InstanceGroupType\":\"CORE\",\"InstanceType\":\"${instance_type}\",\"Name\":\"Core - 2\"},{\"InstanceCount\":1,\"EbsConfiguration\":{\"EbsBlockDeviceConfigs\":[{\"VolumeSpecification\":{\"SizeInGB\":32,\"VolumeType\":\"gp2\"},\"VolumesPerInstance\":2}]},\"InstanceGroupType\":\"MASTER\",\"InstanceType\":\"m5.xlarge\",\"Name\":\"Master - 1\"}]"
+instance_groups="[{\"InstanceCount\":${instance_count},\"InstanceGroupType\":\"CORE\",\"InstanceType\":\"${instance_type}\",\"Name\":\"Core - 2\"},{\"InstanceCount\":1,\"EbsConfiguration\":{\"EbsBlockDeviceConfigs\":[{\"VolumeSpecification\":{\"SizeInGB\":32,\"VolumeType\":\"gp2\"},\"VolumesPerInstance\":2}]},\"InstanceGroupType\":\"MASTER\",\"InstanceType\":\"m5.4xlarge\",\"Name\":\"Master - 1\"}]"
 
 aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --ec2-attributes '{"KeyName":"flintrock","InstanceProfile":"kf-variant-emr-ec2-prd-profile","ServiceAccessSecurityGroup":"sg-0587a1d20e24f4104","SubnetId":"subnet-00aab84919d5a44e2","EmrManagedSlaveSecurityGroup":"sg-0dc6b48e674070821","EmrManagedMasterSecurityGroup":"sg-0a31895d33d1643da"}' \
