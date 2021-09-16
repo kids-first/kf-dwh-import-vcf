@@ -62,15 +62,13 @@ class OccurrencesFamily(studyId: String,
 
     val biospecimens = data(DataService.biospecimens.id)
       .select(
-        col(biospecimenIdColumn).as("joined_sample_id"),
-        $"biospecimen_id",
+        col(biospecimenIdColumn).as("biospecimen_id"),
         $"participant_id",
         $"family_id",
         coalesce($"dbgap_consent_code", lit("_NONE_")) as "dbgap_consent_code",
         ($"consent_type" === "GRU") as "is_gru",
         ($"consent_type" === "HMB") as "is_hmb"
       )
-      .drop("joined_sample_id")
 
     val family_relationships = data(DataService.family_relationships.id)
       .where($"participant1_to_participant2_relation".isin("Mother", "Father"))

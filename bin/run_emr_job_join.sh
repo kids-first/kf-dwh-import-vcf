@@ -1,9 +1,9 @@
 #!/bin/bash
-study_ids=${1:-"SD_46SK55A3,SD_9PYZAHHE,SD_DYPMEHHF,SD_BHJXBDQK,SD_7NQ9151J,SD_NMVV8A1Y,SD_0TYVY1TW,SD_Z6MWD3H0"}
-release_id=${2:-"RE_000012"}
+study_ids=${1:-"SD_46SK55A3,SD_9PYZAHHE,SD_DYPMEHHF,SD_BHJXBDQK,SD_7NQ9151J,SD_NMVV8A1Y"}
+release_id=${2:-"re_000012"}
 job=${3:-"variants"}
 mergeExisting=${4:-"false"}
-schema=${5:-"portal"}
+schema=${5:-"variant"}
 number_instance=${6:-"15"}
 instance_type=${7:-"r5.4xlarge"}
 env=${8:-"qa"}
