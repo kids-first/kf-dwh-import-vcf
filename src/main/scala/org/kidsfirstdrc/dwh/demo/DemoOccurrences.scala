@@ -41,7 +41,6 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)(implici
     val occurenceJob = new OccurrencesFamily(
       studyId,
       releaseId,
-      input,
       "biospecimen_id",
       ".CGP.filtered.deNovo.vep.vcf.gz",
       ".postCGP.filtered.deNovo.vep.vcf.gz"
@@ -85,7 +84,6 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)(implici
     new OccurrencesFamily(
       studyId,
       releaseId,
-      input,
       "biospecimen_id",
       ".CGP.filtered.deNovo.vep.vcf.gz",
       ".postCGP.filtered.deNovo.vep.vcf.gz"

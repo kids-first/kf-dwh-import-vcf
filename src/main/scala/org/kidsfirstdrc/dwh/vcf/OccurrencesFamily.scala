@@ -15,7 +15,6 @@ import java.time.LocalDateTime
 
 class OccurrencesFamily(studyId: String,
                         releaseId: String,
-                        input: String,
                         biospecimenIdColumn: String,
                         cgpPattern: String,
                         postCgpPattern: String,
@@ -27,7 +26,7 @@ class OccurrencesFamily(studyId: String,
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
-    val inputDF: DataFrame = unionCGPFiles(input, studyId, releaseId, cgpPattern, postCgpPattern, referenceGenomePath)
+    val inputDF: DataFrame = unionCGPFiles(studyId, releaseId, cgpPattern, postCgpPattern, referenceGenomePath)
 
     val biospecimens =
       spark.table(s"${DataService.biospecimens.table.get.fullName}_${releaseId.toLowerCase}")
@@ -219,15 +218,14 @@ class OccurrencesFamily(studyId: String,
     * @param spark
     * @return a dataframe that unions cgp and postcgp vcf
     */
-  private def unionCGPFiles(input: String,
-                            studyId: String,
+  private def unionCGPFiles(studyId: String,
                             releaseId: String,
                             cgpPattern: String,
                             postCgpPattern: String,
                             referenceGenomePath: Option[String] = None
   )(implicit spark: SparkSession): DataFrame = {
-    val postCGPFiles = getVisibleFiles(input, studyId, releaseId, postCgpPattern)
-    val CGPFiles     = getVisibleFiles(input, studyId, releaseId, cgpPattern)
+    val postCGPFiles = getVisibleFiles(studyId, releaseId, postCgpPattern)
+    val CGPFiles     = getVisibleFiles(studyId, releaseId, cgpPattern)
     val vcfDf = (postCGPFiles, CGPFiles) match {
       case (Nil, Nil)                                   => throw new IllegalStateException("No VCF files found!")
       case (Nil, genomicFiles) if genomicFiles.nonEmpty => asCGP(vcf(genomicFiles, referenceGenomePath))

@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.Configuration
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import bio.ferlab.datalake.spark3.implicits.SparkUtils._
 import org.apache.spark.sql.functions.col
@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 
 class Occurrences(studyId: String, releaseId: String)(implicit conf: Configuration) extends ETL() {
 
-  val destination = Clinical.occurrences
+  val destination: DatasetConf = Clinical.occurrences
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {

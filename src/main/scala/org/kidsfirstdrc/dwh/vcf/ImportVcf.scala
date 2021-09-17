@@ -11,7 +11,7 @@ object ImportVcf extends App {
   val Array(
     studyId,
     releaseId,
-    folder,
+    _,
     runType,
     biospecimenIdColumn,
     cgp_pattern,
@@ -45,7 +45,6 @@ object ImportVcf extends App {
   run(
     studyId,
     releaseId,
-    s"s3a://kf-study-us-east-1-prd-${studyId.replace("_", "-").toLowerCase}/$folder",
     runType,
     biospecimenIdColumn,
     cgp_pattern,
@@ -56,7 +55,6 @@ object ImportVcf extends App {
 
   def run(studyId: String,
           releaseId: String,
-          input: String,
           runType: String = "all",
           biospecimenIdColumn: String = "biospecimen_id",
           cgp_pattern: String = ".CGP.filtered.deNovo.vep.vcf.gz",
@@ -69,16 +67,16 @@ object ImportVcf extends App {
 
     runType match {
       case "occurrences_family" =>
-        new OccurrencesFamily(studyId, releaseId, input, biospecimenIdColumn, cgp_pattern, post_cgp_pattern, refGenome).run()
+        new OccurrencesFamily(studyId, releaseId, biospecimenIdColumn, cgp_pattern, post_cgp_pattern, refGenome).run()
       case "occurrences" => new Occurrences(studyId, releaseId).run()
       case "variants"    => new Variants(studyId, releaseId, schema).run()
       case "consequences" =>
-        new Consequences(studyId, releaseId, input, cgp_pattern, post_cgp_pattern, refGenome).run()
+        new Consequences(studyId, releaseId, cgp_pattern, post_cgp_pattern, refGenome).run()
       case "all" =>
-        new OccurrencesFamily(studyId, releaseId, input, biospecimenIdColumn, cgp_pattern, post_cgp_pattern, refGenome).run()
+        new OccurrencesFamily(studyId, releaseId, biospecimenIdColumn, cgp_pattern, post_cgp_pattern, refGenome).run()
         new Occurrences(studyId, releaseId).run()
         new Variants(studyId, releaseId, schema).run()
-        new Consequences(studyId, releaseId, input, cgp_pattern, post_cgp_pattern, refGenome).run()
+        new Consequences(studyId, releaseId, cgp_pattern, post_cgp_pattern, refGenome).run()
 
     }
   }

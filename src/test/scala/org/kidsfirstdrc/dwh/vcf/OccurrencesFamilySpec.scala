@@ -1,19 +1,19 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf, StorageConf}
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.annotations
 import org.apache.spark.sql.functions.{array_sort, col, explode, lit}
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.kidsfirstdrc.dwh.conf.Catalog.{DataService, HarmonizedData}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.dataservice._
 import org.kidsfirstdrc.dwh.testutils.vcf.{OccurrenceOutput, PostCGPInput}
-import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.annotations
-import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.{BeforeAndAfterAll, GivenWhenThen}
 
 class OccurrencesFamilySpec
-    extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+    extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers with BeforeAndAfterAll {
 
   import spark.implicits._
   spark.sparkContext.setCheckpointDir(getClass.getClassLoader.getResource(".").getFile)
@@ -21,6 +21,11 @@ class OccurrencesFamilySpec
   val studyId      = "SD_123456"
   val releaseId    = "RE_ABCDEF"
   val releaseId_lc = releaseId.toLowerCase
+
+  override def beforeAll(): Unit = {
+    spark.sql("CREATE DATABASE IF NOT EXISTS variant")
+    spark.sql("use variant")
+  }
 
   implicit val conf: Configuration =
     Configuration(
@@ -83,12 +88,14 @@ class OccurrencesFamilySpec
       study_id = "SD_789"
     )
   ).toDF()
+  val input = getClass.getResource("/input_vcf/SD_123456").getFile
 
   val genomic_filesDf = Seq(
     GenomicFileOutput(
-      acl = List("*"),
-      file_name = "sample.CGP.filtered.deNovo.vep.vcf.gz",
-      study_id = "SD_123456"
+      `acl` = List("*"),
+      `file_name` = s"$input/sample.CGP.filtered.deNovo.vep.vcf.gz",
+      `study_id` = "SD_123456",
+      `urls` = List(s"$input/sample.CGP.filtered.deNovo.vep.vcf.gz")
     )
   ).toDF()
 
@@ -155,8 +162,6 @@ class OccurrencesFamilySpec
   ).toDF
 
   "transform" should "return a dataframe with all expected columns" in {
-    spark.sql("CREATE DATABASE IF NOT EXISTS variant")
-    spark.sql("use variant")
 
     val postCGP = Seq(
       PostCGPInput()
@@ -178,7 +183,6 @@ class OccurrencesFamilySpec
     val outputDf = new OccurrencesFamily(
       studyId,
       releaseId,
-      "",
       "biospecimen_id",
       ".CGP.filtered.deNovo.vep.vcf.gz",
       ".postCGP.filtered.deNovo.vep.vcf.gz"
@@ -228,7 +232,6 @@ class OccurrencesFamilySpec
   }
 
   "run" should "return a dataframe with all expected columns" in {
-    spark.sql("CREATE DATABASE IF NOT EXISTS variant")
     loadTestData(DataService.biospecimens, biospecimensDf, "biospecimens", releaseId_lc)
     loadTestData(DataService.genomic_files, genomic_filesDf, "genomic_files", releaseId_lc)
     loadTestData(
@@ -244,14 +247,9 @@ class OccurrencesFamilySpec
       releaseId_lc
     )
 
-    val input = getClass.getResource("/input_vcf/SD_123456").getFile
-
-    spark.sql("use variant")
-
     val outputDf = new OccurrencesFamily(
       studyId,
       releaseId,
-      input,
       "biospecimen_id",
       ".CGP.filtered.deNovo.vep.vcf.gz",
       ".postCGP.filtered.deNovo.vep.vcf.gz",
