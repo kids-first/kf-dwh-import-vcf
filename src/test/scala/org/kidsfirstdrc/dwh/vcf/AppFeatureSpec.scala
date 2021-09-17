@@ -50,7 +50,8 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
         And(
           "A table genomic_files_re_abcdef that contains only sample.CGP.filtered.deNovo.vep.vcf.gz"
         )
-        loadTestClinicalTable("genomic_files", s"${DataService.genomic_files.rootPath}/Dataservice")
+
+        loadGenomicFiles()
 
         And("A table genomic_files_override that contains a file to include")
         loadTestTable("genomic_files_override", s"${DataService.genomic_files_override.rootPath}")
@@ -65,7 +66,7 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
         )
 
         When("Run the main application")
-        ImportVcf.run(studyId, releaseId, input)
+        ImportVcf.run(studyId, releaseId)
 
         Then(
           "Table occurrences_sd_123456_re_abcdef should contain rows for the given study and release"
@@ -251,6 +252,22 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
         consequences.collect() should contain theSameElementsAs expectedConsequences
       }
     }
+  }
+
+  private def loadGenomicFiles(): Unit = {
+    val tableName = "genomic_files"
+    spark.sql(s"drop table if exists variant.${tableName}_re_abcdef ")
+
+    Seq(
+      ("sample.CGP.filtered.deNovo.vep.vcf.gz",
+        "SD_123456",
+        Array(s"${this.getClass.getResource(s"/input_vcf/SD_123456").getFile}/sample.CGP.filtered.deNovo.vep.vcf.gz")))
+      .toDF("file_name", "study_id", "urls")
+      .write
+      .mode(SaveMode.Overwrite)
+      .option("path", s"${DataService.genomic_files.rootPath}/Dataservice/$tableName/${tableName}_re_abcdef")
+      .format("parquet")
+      .saveAsTable(s"variant.${tableName}_re_abcdef")
   }
 
   private def loadTestClinicalTable(tableName: String, output: String): Unit = {

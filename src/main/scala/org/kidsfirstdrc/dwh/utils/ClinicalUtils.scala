@@ -122,12 +122,32 @@ object ClinicalUtils {
 
   def getGenomicFiles(studyId: String, releaseId: String)(implicit
       spark: SparkSession
-  ): DataFrame = {
+  ): List[String] = {
     import spark.implicits._
-    loadClinicalTable(studyId, releaseId, "genomic_files")
-      .select($"file_name")
-      .unionByName(loadManifestFile(studyId))
-      .dropDuplicates("file_name")
+
+    val urls = loadClinicalTable(studyId, releaseId, "genomic_files")
+      .select($"urls")
+      .as[Array[String]]
+      .collect()
+      .flatten
+      .distinct
+      .map(_.replace("s3://", "s3a://"))
+
+    //for example - "s3://kf-study-us-east-1-prd-sd-xxxxxxxx/harmonized/family-variants/xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.CGP.filtered.deNovo.vep.vcf.gz"
+    val studyPrefixPattern = "(.*)/.*".r
+    val studyPrefixPattern(folder) = urls.head
+
+    val genomicFilesOverride = loadManifestFile(studyId)
+      .as[String]
+      .collect()
+      .distinct
+      .map {
+        case f: String if f.startsWith("s3://") => f.replace("s3://", "s3a://")
+        case f: String if f.startsWith("/") => s"$folder$f"
+        case f: String => s"$folder/$f"
+      }
+
+    (genomicFilesOverride ++ urls).toList
   }
 
   val filterAcl: String => UserDefinedFunction = studyId =>
@@ -138,21 +158,11 @@ object ClinicalUtils {
       }
     }
 
-  def getVisibleFiles(input: String,
-                      studyId: String,
+  def getVisibleFiles(studyId: String,
                       releaseId: String,
                       endsWith: String)(implicit spark: SparkSession): List[String] = {
-    import spark.implicits._
     getGenomicFiles(studyId, releaseId)
-      .select("file_name")
       .distinct
-      .as[String]
-      .collect()
       .filter(_.endsWith(endsWith))
-      .map(f => {
-        if (input.endsWith("/")) s"${input}${f}"
-        else s"$input/$f"
-      })
-      .toList
   }
 }

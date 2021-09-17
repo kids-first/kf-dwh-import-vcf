@@ -33,13 +33,13 @@ class DemoConsequences(studyId: String, releaseId: String, input: String)(implic
   override def transform(data: Map[String, DataFrame],
                          lastRunDateTime: LocalDateTime = minDateTime,
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
-    new Consequences(studyId, releaseId, input, "", "").transform(data)
+    new Consequences(studyId, releaseId, "", "").transform(data)
   }
 
   override def load(data: DataFrame,
                     lastRunDateTime: LocalDateTime = minDateTime,
                     currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
-    new Consequences(studyId, releaseId, input, "", "").load(data)
+    new Consequences(studyId, releaseId, "", "").load(data)
   }
 
   override val destination: DatasetConf = Catalog.Clinical.consequences

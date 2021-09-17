@@ -1,7 +1,7 @@
 #!/bin/bash
 es_nodes=${1:-"https://vpc-kf-arranger-blue-es-service-exwupkrf4dyupg24dnfmvzcwri.us-east-1.es.amazonaws.com"}
 instance_type=${2:-"r5.4xlarge"}
-number_instance=${3:-"10"}
+number_instance=${3:-"15"}
 env=${4:-"qa"}
 
 # default is dev vpc-05be68d35774905e8

@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.Configuration
+import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.vcf
@@ -15,19 +15,18 @@ import java.time.LocalDateTime
 
 class Consequences(studyId: String,
                    releaseId: String,
-                   input: String,
                    cgpPattern: String,
                    postCgpPattern: String,
                    referenceGenomePath: Option[String] = None)(implicit conf: Configuration)
   extends ETL() {
 
-  val destination = Clinical.consequences
+  val destination: DatasetConf = Clinical.consequences
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val inputDF = vcf(
-      (getVisibleFiles(input, studyId, releaseId, cgpPattern) ++
-        getVisibleFiles(input, studyId, releaseId, postCgpPattern)).distinct,
+      (getVisibleFiles(studyId, releaseId, cgpPattern) ++
+        getVisibleFiles(studyId, releaseId, postCgpPattern)).distinct,
       referenceGenomePath
     )
       .withColumn("file_name", filename)
