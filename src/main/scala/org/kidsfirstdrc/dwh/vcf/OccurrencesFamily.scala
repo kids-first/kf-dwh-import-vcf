@@ -233,7 +233,7 @@ class OccurrencesFamily(studyId: String,
       case (postCGPFiles, cgpFiles) =>
         val postCGP = asPostCGP(vcf(postCGPFiles, referenceGenomePath))
         val cgp     = asCGP(vcf(cgpFiles, referenceGenomePath))
-        union(postCGP, cgp)
+        postCGP.unionByName(cgp)
 
     }
 

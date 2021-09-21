@@ -120,7 +120,7 @@ class JoinConsequences(
       Clinical.consequences.rootPath,
       Clinical.consequences.id,
       data,
-      Some(60),
+      None,
       database
     )
   }

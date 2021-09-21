@@ -105,7 +105,7 @@ class Consequences(studyId: String,
       IntegerType
     ) //3 files per chr, tried with 1 file per chr but got an OOM when writing parquet files
     data
-      .repartition(69, col("chromosome"), salt)
+      .repartition(70, col("chromosome"), salt)
       .write
       .mode(SaveMode.Overwrite)
       .partitionBy("study_id", "release_id", "chromosome")
