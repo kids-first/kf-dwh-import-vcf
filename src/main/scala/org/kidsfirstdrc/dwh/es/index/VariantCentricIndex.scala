@@ -59,6 +59,8 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     val variants = data(Clinical.variants.id)
       .drop("end")
+      .where(col("hgvsg").isNotNull) //SKFP-190
+      .withColumn("zygosity", sort_array(filter(col("zygosity"), c => c.isin("HOM", "HET")))) //SKFP-192
       .withColumnRenamed("dbsnp_id", "rsnumber")
 
     val consequences = data(Clinical.consequences.id)
@@ -106,7 +108,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
       .withConsequences(consequences)
       .withGenes(genes)
       .withExternalReference
-      .withColumn("transmissions", map_keys(col("transmissions")))
+      .withTransmissions
       .select(
         "genome_build",
         "hash",
@@ -168,6 +170,10 @@ object VariantCentricIndex {
    * Minimum number of participant having a trait in order to be publicly visible in the 'variant_centric' index
    */
   final val minimumParticipantsPerStudy = 10
+
+  val transmissionsToKeep = List(
+    "autosomal_dominant", "autosomal_recessive", "autosomal_dominant_de_novo",
+    "x_linked_dominant_de_novo", "x_linked_recessive_de_novo", "x_linked_dominant", "x_linked_recessive")
 
   private def frequenciesForGnomad(colName: String): Column = {
     struct(
@@ -304,7 +310,9 @@ object VariantCentricIndex {
           when(size(col("ids")) >= minimumParticipantsPerStudy, col("ids")).otherwise(lit(null))
         )
         .withColumn("transmission_by_study",
-          map_keys(col("transmissions_by_study")(col("study_id")))
+          filter(
+            map_keys(col("transmissions_by_study")(col("study_id"))), _.isin(transmissionsToKeep:_*)
+          )
         )
         .withColumn(
           "study",
@@ -471,6 +479,11 @@ object VariantCentricIndex {
           when(condition, array_union($"external_reference", array(lit(value))))
             .otherwise($"external_reference"))
       }
+    }
+
+    def withTransmissions: DataFrame = {
+      df
+        .withColumn("transmissions", filter(map_keys(col("transmissions")),  _.isin(transmissionsToKeep:_*)))
     }
   }
 }

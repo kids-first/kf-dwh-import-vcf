@@ -137,7 +137,7 @@ object VariantCentricOutput {
                      `participant_total_number`: Long = 15,
                      `participant_frequency`: Double = 0.8,
                      `external_reference`: List[String] = List("DBSNP", "Clinvar", "HPO", "Orphanet", "OMIM", "Cosmic", "DDD"),
-                     `transmissions`: List[String] = List("AD", "AR"),
+                     `transmissions`: List[String] = List("autosomal_dominant", "autosomal_recessive"),
                      `zygosity`: List[String] = List("HET", "HOM")
                    )
 
