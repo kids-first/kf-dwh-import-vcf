@@ -8,7 +8,8 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Es, Public}
 
 import java.time.LocalDateTime
 
-class GeneCentricIndex()(override implicit val conf: Configuration) extends ETL() {
+class GeneCentricIndex(releaseId: String)
+                      (override implicit val conf: Configuration) extends ETL() {
 
   val destination = Es.gene_centric
 
@@ -29,9 +30,12 @@ class GeneCentricIndex()(override implicit val conf: Configuration) extends ETL(
   override def load(data: DataFrame,
                     lastRunDateTime: LocalDateTime = minDateTime,
                     currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
-    data.write
+    data
+      .write
       .mode(SaveMode.Overwrite)
-      .parquet(s"${destination.location}")
+      .option("format", destination.format.sparkFormat)
+      .option("path", s"${destination.location}_$releaseId")
+      .saveAsTable(s"${destination.table.get.fullName}_$releaseId")
     data
   }
 

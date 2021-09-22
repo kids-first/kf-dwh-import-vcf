@@ -36,7 +36,7 @@ class VariantCentricIndexSpec
   ).toDF
 
   val joinVariantDf: DataFrame = Seq(
-    JoinVariantOutput(
+    JoinVariantOutput( // should be kept in result
       frequencies = VariantFrequency(
         Freq(ac = 12, an = 30, af = 0.4, homozygotes = 9, heterozygotes = 7),
         Freq(ac = 12, an = 27, af = 0.4444444444, homozygotes = 9, heterozygotes = 7)
@@ -58,9 +58,32 @@ class VariantCentricIndexSpec
         studyId2 -> Set("SD_456.c1"),
         studyId3 -> Set(s"$studyId3.c99")
       ),
+      zygosity = List("HOM", "HET", "WT", "UNK"),
       release_id = realeaseId,
       clin_sig = Some("pathogenic"),
       clinvar_id = Some("RCV000436956"),
+      transmissions = Map("autosomal_dominant" -> 13, "autosomal_recessive" -> 1, "non_carrier_proband" -> 900),
+      transmissions_by_study = Map(studyId1 -> Map("autosomal_dominant" -> 11, "autosomal_recessive" -> 1), studyId2 -> Map("autosomal_dominant" -> 1), studyId3 -> Map("autosomal_dominant" -> 1))
+    ),
+    JoinVariantOutput( // should be filtered out
+      hgvsg = null,
+      upper_bound_kf_ac_by_study = Map(studyId1 -> 5, studyId2 -> 5, studyId3 -> 2),
+      upper_bound_kf_an_by_study = Map(studyId1 -> 10, studyId2 -> 10, studyId3 -> 7),
+      upper_bound_kf_af_by_study = Map(studyId1 -> 0.5, studyId2 -> 0.5, studyId3 -> 0.2857142857),
+      upper_bound_kf_homozygotes_by_study = Map(studyId1 -> 2, studyId2 -> 2, studyId3 -> 5),
+      upper_bound_kf_heterozygotes_by_study = Map(studyId1 -> 3, studyId2 -> 3, studyId3 -> 1),
+      lower_bound_kf_ac_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 2),
+      lower_bound_kf_an_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 7),
+      lower_bound_kf_af_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 0.2857142857),
+      lower_bound_kf_homozygotes_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 5),
+      lower_bound_kf_heterozygotes_by_study = Map(studyId1 -> 0, studyId2 -> 0, studyId3 -> 1),
+      studies = Set(studyId1, studyId2, studyId3),
+      consent_codes = Set("SD_789.c99", "SD_123.c1", "SD_456.c1"),
+      consent_codes_by_study = Map(
+        studyId1 -> Set("SD_123.c1"),
+        studyId2 -> Set("SD_456.c1"),
+        studyId3 -> Set(s"$studyId3.c99")
+      ),
       transmissions = Map("AD" -> 13, "AR" -> 1),
       transmissions_by_study = Map(studyId1 -> Map("AD" -> 11, "AR" -> 1), studyId2 -> Map("AD" -> 1), studyId3 -> Map("AD" -> 1))
     )
@@ -212,7 +235,7 @@ class VariantCentricIndexSpec
       StudyFrequency(Freq(10, 5, 0.5, 2, 3), Freq(0, 0, 0, 0, 0)),
       1,
       null,
-      List("AD")
+      List("autosomal_dominant")
     ),
     Study(
       "SD_123",
@@ -234,7 +257,7 @@ class VariantCentricIndexSpec
         "PT_000011",
         "PT_000012"
       ),
-      List("AD", "AR")
+      List("autosomal_dominant", "autosomal_recessive")
     ),
     Study(
       "SD_789",
@@ -244,7 +267,7 @@ class VariantCentricIndexSpec
       StudyFrequency(Freq(7, 2, 0.2857142857, 5, 1), Freq(7, 2, 0.2857142857, 5, 1)),
       0,
       null,
-      List("AD")
+      List("autosomal_dominant")
     )
   )
 
