@@ -26,7 +26,7 @@ class GeneCentricIndexSpec
 
   "Gene_centric index job" should "transform data to the right format" in {
 
-    val result = new GeneCentricIndex().transform(data)
+    val result = new GeneCentricIndex("").transform(data)
     result.columns should contain allElementsOf Seq("hash")
     result.as[GeneCentricOutput].collect() should contain allElementsOf Seq(GeneCentricOutput())
   }
