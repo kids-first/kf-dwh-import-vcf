@@ -1,6 +1,7 @@
 #!/bin/bash
 study_ids=${1:-"SD_46SK55A3,SD_9PYZAHHE,SD_DYPMEHHF,SD_BHJXBDQK,SD_7NQ9151J,SD_NMVV8A1Y"}
-release_id=${2:-"RE_000012"}
+release_id=${2:-"re_000017"}
+schema=${2:-"variant"}
 instance_type=${3:-"m5.xlarge"}
 env=${4:-"qa"}
 
@@ -18,7 +19,8 @@ steps=$(cat <<EOF
       "org.kidsfirstdrc.dwh.publish.Publish",
       "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${study_ids}",
-      "${release_id}"
+      "${release_id}",
+      "${schema}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",
