@@ -507,20 +507,17 @@
         "index" : false
       },
       "participant_frequency" : {
-        "type" : "float",
-        "index" : false
+        "type" : "float"
       },
       "participant_number" : {
-        "type" : "long",
-        "index" : false
+        "type" : "long"
       },
       "participant_number_visible" : {
         "type" : "long",
         "index" : false
       },
       "participant_total_number" : {
-        "type" : "long",
-        "index" : false
+        "type" : "long"
       },
       "reference" : {
         "type" : "keyword",

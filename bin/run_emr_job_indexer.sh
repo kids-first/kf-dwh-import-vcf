@@ -1,6 +1,6 @@
 #!/bin/bash
-index="variant_centric"
-release_id=${1:-"re_000012"}
+index="variants_suggestions"
+release_id=${1:-"re_000017"}
 input=${2:-"s3a://kf-strides-variant-parquet-prd/portal/es_index/${index}_${release_id}/"}
 es_nodes=${3:-"https://vpc-kf-arranger-blue-es-service-exwupkrf4dyupg24dnfmvzcwri.us-east-1.es.amazonaws.com:443"}
 #es_nodes=${3:-"https://vpc-kf-arranger-blue-es-prd-4gbc2zkvm5uttysiqkcbzwxqeu.us-east-1.es.amazonaws.com:443"}
@@ -8,15 +8,15 @@ es_index_name=${4:-"${index}"}
 es_index_template=${5:-"${index}_template.json"}
 es_job_type=${6:-"index"} # one of: index, update, upsert or create
 es_batch_size=${7:-"500"} #default is 1000
-chromosome=${8:-"14"} #all, 1, 2, 3, ..., X, Y
+chromosome=${8:-"all"} #all, 1, 2, 3, ..., X, Y
 jarV=${9:-"7.12.0"}
 number_instance=${10:-"2"}
 instance_type=${11:-"r5.2xlarge"}
 env=${12:-"qa"}
 format=${13:-"parquet"}
 repartition=${14:-"10000"}
-previous_release_id=${15:-"re_000011"}
-aws s3 cp templates s3://kf-strides-variant-parquet-prd/jobs/templates --recursive
+previous_release_id=${15:-"re_000016"}
+# aws s3 cp templates s3://kf-strides-variant-parquet-prd/jobs/templates --recursive
 
 # default is dev vpc-05be68d35774905e8
 subnetId="subnet-0f822f9f9ff99871a"
