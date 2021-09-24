@@ -18,5 +18,5 @@ aws s3 cp target/scala-2.12/kf-dwh-import-vcf.jar ${bucket}/jobs/${folder}/kf-dw
 aws s3 cp target/scala-2.12/kf-dwh-import-vcf.jar ${bucket}/jobs/${folder}/kf-dwh-import-vcf-${tag}.jar
 
 aws s3 cp bin/documentation ${bucket}/jobs/documentation --recursive
-
+aws s3 cp bin/templates ${bucket}/jobs/templates --recursive
 aws s3 cp src/main/resources/config ${bucket}/jobs/${folder}/config --recursive
