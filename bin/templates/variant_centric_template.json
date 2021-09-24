@@ -19,8 +19,7 @@
       "clinvar" : {
         "properties" : {
           "clin_sig" : {
-            "type" : "keyword",
-            "index" : false
+            "type" : "keyword"
           },
           "clinvar_id" : {
             "type" : "keyword",
@@ -464,8 +463,7 @@
             }
           },
           "omim_gene_id" : {
-            "type" : "keyword",
-            "index" : false
+            "type" : "keyword"
           },
           "orphanet" : {
             "properties" : {
