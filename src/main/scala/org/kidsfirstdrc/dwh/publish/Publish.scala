@@ -4,7 +4,7 @@ import org.apache.spark.sql.SparkSession
 
 object Publish extends App {
 
-  val Array(studyIds, releaseId) = args
+  val Array(studyIds, releaseId, schema) = args
 
   implicit val spark: SparkSession = SparkSession.builder
     .config(
@@ -15,13 +15,21 @@ object Publish extends App {
     .appName(s"Publishing for $studyIds - $releaseId")
     .getOrCreate()
 
-  run(studyIds, releaseId)
+  run(studyIds, releaseId, schema)
 
-  def run(studyIds: String, releaseId: String)(implicit spark: SparkSession): Unit = {
-    publishOccurrences(studyIds, releaseId)
-    publishDataservice(releaseId)
-    publishTable(releaseId, "variants")
-    publishTable(releaseId, "consequences")
+  def run(studyIds: String, releaseId: String, schema: String)(implicit spark: SparkSession): Unit = {
+    schema match {
+      case "variant" =>
+        publishOccurrences(studyIds, releaseId)
+        publishDataservice(releaseId)
+        publishTable(releaseId, "variants", schema)
+        publishTable(releaseId, "variants", s"${schema}_live")
+        publishTable(releaseId, "consequences", schema)
+        publishTable(releaseId, "consequences", s"${schema}_live")
+      case _ =>
+        publishTable(releaseId, "variants", schema)
+        publishTable(releaseId, "consequences", schema)
+    }
   }
 
   private def publishDataservice(releaseId: String): Unit = {
@@ -47,13 +55,9 @@ object Publish extends App {
   }
 
   def publishTable(releaseId: String, tableName: String, schema: String = "variant")(implicit spark: SparkSession): Unit = {
-
-    List(schema, s"${schema}_live").foreach {s =>
-      spark.sql(
-        s"create or replace view $s.$tableName as select * from $schema.${tableName}_${releaseId.toLowerCase()}"
-      )
-    }
-
+    spark.sql(
+      s"create or replace view $schema.$tableName as select * from $schema.${tableName}_${releaseId.toLowerCase()}"
+    )
   }
 
   private def publishOccurrences(studyIds: String, releaseId: String)(implicit
