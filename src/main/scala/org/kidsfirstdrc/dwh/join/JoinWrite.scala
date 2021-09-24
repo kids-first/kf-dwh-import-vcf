@@ -13,10 +13,10 @@ object JoinWrite {
       database: String
   )(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    //nbPartitions
-    //  .map(df.repartitionByRange(_, $"chromosome", $"start"))
-    //  .getOrElse(df.repartition(100, $"chromosome"))
-      df.write
+    nbPartitions
+      .map(df.repartitionByRange(_, $"chromosome", $"start"))
+      .getOrElse(df.repartition(120, $"chromosome"))
+      .write
       .mode(SaveMode.Overwrite)
       .partitionBy("chromosome")
       .format("parquet")
