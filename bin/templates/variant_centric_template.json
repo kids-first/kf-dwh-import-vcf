@@ -397,6 +397,7 @@
             "index" : false
           },
           "cosmic" : {
+            "type" : "nested",
             "properties" : {
               "tumour_types_germline" : {
                 "type" : "keyword"
@@ -404,6 +405,7 @@
             }
           },
           "ddd" : {
+            "type" : "nested",
             "properties" : {
               "disease_name" : {
                 "type" : "keyword"
@@ -423,10 +425,10 @@
             "index" : false
           },
           "hpo" : {
+            "type" : "nested",
             "properties" : {
               "hpo_term_id" : {
-                "type" : "keyword",
-                "index" : false
+                "type" : "keyword"
               },
               "hpo_term_label" : {
                 "type" : "keyword"
@@ -444,21 +446,19 @@
             "type" : "keyword"
           },
           "omim" : {
+            "type" : "nested",
             "properties" : {
               "inheritance" : {
-                "type" : "keyword",
-                "index" : false
+                "type" : "keyword"
               },
               "inheritance_code" : {
-                "type" : "keyword",
-                "index" : false
+                "type" : "keyword"
               },
               "name" : {
                 "type" : "keyword"
               },
               "omim_id" : {
-                "type" : "keyword",
-                "index" : false
+                "type" : "keyword"
               }
             }
           },
@@ -466,14 +466,13 @@
             "type" : "keyword"
           },
           "orphanet" : {
+            "type" : "nested",
             "properties" : {
               "disorder_id" : {
-                "type" : "long",
-                "index" : false
+                "type" : "long"
               },
               "inheritance" : {
-                "type" : "keyword",
-                "index" : false
+                "type" : "keyword"
               },
               "panel" : {
                 "type" : "keyword"
