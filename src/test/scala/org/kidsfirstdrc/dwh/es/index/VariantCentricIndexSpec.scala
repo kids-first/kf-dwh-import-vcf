@@ -336,7 +336,7 @@ class VariantCentricIndexSpec
 
   "VariantDbJson" should "transform data to the right format" in {
 
-    val result = new VariantCentricIndex(realeaseId).transform(data)
+    val result = new VariantCentricIndex("portal", realeaseId).transform(data)
 
     val parsedResult = result.as[VariantCentricOutput.Output].collect()
     val variant      = parsedResult.head
