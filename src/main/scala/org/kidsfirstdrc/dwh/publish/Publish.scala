@@ -27,6 +27,7 @@ object Publish extends App {
         publishTable(releaseId, "consequences", schema)
         publishTable(releaseId, "consequences", s"${schema}_live")
       case _ =>
+        publishOccurrences(studyIds, releaseId, schema)
         publishTable(releaseId, "variants", schema)
         publishTable(releaseId, "consequences", schema)
     }
@@ -60,7 +61,7 @@ object Publish extends App {
     )
   }
 
-  private def publishOccurrences(studyIds: String, releaseId: String)(implicit
+  private def publishOccurrences(studyIds: String, releaseId: String, schema: String = "variant")(implicit
       spark: SparkSession
   ): Unit = {
     val allStudies = studyIds.split(",")
@@ -68,10 +69,10 @@ object Publish extends App {
       .foreach { study =>
         val studyLc = study.toLowerCase
         spark.sql(
-          s"create or replace VIEW variant.occurrences_family_${studyLc} AS SELECT * FROM variant.occurrences_${studyLc}_${releaseId.toLowerCase}"
+          s"create or replace VIEW $schema.occurrences_family_${studyLc} AS SELECT * FROM $schema.occurrences_${studyLc}_${releaseId.toLowerCase}"
         )
         spark.sql(
-          s"create or replace VIEW variant.occurrences_${studyLc} AS SELECT * FROM variant.occurrences_${studyLc}_${releaseId.toLowerCase}"
+          s"create or replace VIEW $schema.occurrences_${studyLc} AS SELECT * FROM $schema.occurrences_${studyLc}_${releaseId.toLowerCase}"
         )
       }
   }

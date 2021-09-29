@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 import scala.collection.mutable
 import scala.util.{Success, Try}
 
-class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) extends ETL()(conf) {
+class VariantCentricIndex(schema: String, releaseId: String)(implicit conf: Configuration) extends ETL()(conf) {
 
   override val destination: DatasetConf = Es.variant_centric
 
@@ -32,9 +32,7 @@ class VariantCentricIndex(releaseId: String)(implicit conf: Configuration) exten
       .collect()
       .map(studyId =>
         Try(
-          spark.read.parquet(
-            s"${Clinical.occurrences.rootPath}/occurrences/${tableName("occurrences", studyId, releaseId)}"
-          )
+          spark.table(s"$schema.occurrences_${studyId.toLowerCase}")
         )
       )
       .collect { case Success(df) => df }
