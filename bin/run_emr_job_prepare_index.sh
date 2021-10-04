@@ -1,6 +1,6 @@
 #!/bin/bash
 job_type=${1:-"variant_centric"}
-release_id=${2:-"re_000012"}
+release_id=${2:-"re_000017"}
 number_instance=${3:-"15"}
 instance_type=${4:-"m5.4xlarge"}
 env=${5:-"qa"}

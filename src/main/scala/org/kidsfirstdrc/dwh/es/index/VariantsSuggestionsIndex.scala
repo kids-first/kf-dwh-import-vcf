@@ -20,7 +20,7 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
   final val variantSymbolWeight         = 2
 
   final val indexColumns =
-    List("type", "symbol", "locus", "suggestion_id", "hgvsg", "suggest", "chromosome", "rsnumber")
+    List("type", "locus", "suggestion_id", "hgvsg", "suggest", "chromosome", "rsnumber", "symbol_aa_change")
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
@@ -38,7 +38,12 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
                          lastRunDateTime: LocalDateTime = minDateTime,
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     val variants =
-      data(Clinical.variants.id).selectLocus(col("hgvsg"), col("name"), col("clinvar_id"))
+      data(Clinical.variants.id)
+        .selectLocus(
+          col("hgvsg"),
+          col("name"),
+          col("clinvar_id"))
+
     val consequences = data(Clinical.consequences.id)
       .selectLocus(
         col("symbol"),
@@ -65,20 +70,15 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
   }
 
   def getVariantSuggest(variants: DataFrame, consequence: DataFrame): DataFrame = {
-
     val groupedByLocusConsequences = consequence
+      .withColumn("symbol_aa_change", concat_ws(" ", col("symbol"), col("aa_change")))
       .withColumn("ensembl_gene_id", getColumnOrElse("ensembl_gene_id"))
       .withColumn("ensembl_transcript_id", getColumnOrElse("ensembl_transcript_id"))
-      .withColumn("aa_change", getColumnOrElse("aa_change"))
-      .withColumn("symbol", getColumnOrElse("symbol"))
-      .withColumn("symbol_aa_change", trim(concat_ws(" ", col("symbol"), col("aa_change"))))
       .withColumn("refseq_mrna_id", getColumnOrElse("refseq_mrna_id"))
       .withColumn("refseq_protein_id", getColumnOrElse("refseq_protein_id"))
       .groupBy(locus: _*)
       .agg(
-        collect_set(col("symbol")) as "symbol",
-        collect_set(col("aa_change")) as "aa_change",
-        collect_set(col("symbol_aa_change")) as "symbol_aa_change",
+        array_remove(collect_set(col("symbol_aa_change")), "") as "symbol_aa_change",
         collect_set(col("ensembl_gene_id")) as "ensembl_gene_id",
         collect_set(col("ensembl_transcript_id")) as "ensembl_transcript_id",
         collect_set(col("refseq_mrna_id")) as "refseq_mrna_id",
@@ -104,7 +104,6 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
             array_remove(
               flatten(
                 array(
-                  col("symbol_aa_change"),
                   array(col("hgvsg")),
                   array(col("locus")),
                   array(col("rsnumber")),
@@ -119,7 +118,7 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
             array_remove(
               flatten(
                 array(
-                  col("symbol"),
+                  col("symbol_aa_change"),
                   col("ensembl_gene_id"),
                   col("ensembl_transcript_id"),
                   col("refseq_mrna_id"),
@@ -132,7 +131,6 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
           )
         )
       )
-      .withColumn("symbol", col("symbol")(0))
       .select(indexColumns.head, indexColumns.tail: _*)
   }
 }
