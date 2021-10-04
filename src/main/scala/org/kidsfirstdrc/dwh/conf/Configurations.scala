@@ -18,7 +18,7 @@ object Configurations extends App {
   val localConfiguration = Configuration(List(), Catalog.sources.toList, List(), Map())
 
   // example of output for each file
-  ConfigurationWriter.writeTo("src/main/resources/config/production.conf", productionConfiguration)
+  ConfigurationWriter.writeTo("src/main/resources/config/prd.conf", productionConfiguration)
   ConfigurationWriter.writeTo("src/main/resources/config/qa.conf", qaConfiguration)
   ConfigurationWriter.writeTo("src/test/resources/config/test.conf", localConfiguration)
 
