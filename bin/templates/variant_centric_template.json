@@ -215,7 +215,10 @@
           }
         }
       },
-      "external_reference" : {
+      "gene_external_reference" : {
+        "type" : "keyword"
+      },
+      "variant_external_reference" : {
         "type" : "keyword"
       },
       "external_study_ids" : {

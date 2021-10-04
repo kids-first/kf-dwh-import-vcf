@@ -105,7 +105,8 @@ class VariantCentricIndex(schema: String, releaseId: String)(implicit conf: Conf
       .withClinVar(clinvar)
       .withConsequences(consequences)
       .withGenes(genes)
-      .withExternalReference
+      .withGeneExternalReference
+      .withVariantExternalReference
       .withTransmissions
       .select(
         "genome_build",
@@ -131,7 +132,8 @@ class VariantCentricIndex(schema: String, releaseId: String)(implicit conf: Conf
         "hgvsg",
         "participant_total_number",
         "participant_frequency",
-        "external_reference",
+        "gene_external_reference",
+        "variant_external_reference",
         "transmissions",
         "zygosity"
       )
@@ -459,23 +461,36 @@ object VariantCentricIndex {
       }
     }
 
-    def withExternalReference(implicit spark: SparkSession): DataFrame = {
+    def withGeneExternalReference(implicit spark: SparkSession): DataFrame = {
       import spark.implicits._
 
+      val outputColumnName = "gene_external_reference"
       val conditionValueMap: List[(Column, String)] = List(
-        $"clinvar".isNotNull -> "Clinvar",
-        exists($"genes", gene => gene("hpo").isNotNull and size(gene("hpo")) > 0) -> "HPO",
         exists($"genes", gene => gene("orphanet").isNotNull and size(gene("orphanet")) > 0) -> "Orphanet",
         exists($"genes", gene => gene("omim").isNotNull and size(gene("omim")) > 0) -> "OMIM",
         exists($"genes", gene => gene("cosmic").isNotNull and size(gene("cosmic")) > 0) -> "Cosmic",
         exists($"genes", gene => gene("ddd").isNotNull and size(gene("ddd")) > 0) -> "DDD"
       )
       conditionValueMap.foldLeft {
-        df.withColumn("external_reference", when($"rsnumber".isNotNull, array(lit("DBSNP"))).otherwise(array()))
+        df.withColumn(outputColumnName, when(
+          exists($"genes", gene => gene("hpo").isNotNull and size(gene("hpo")) > 0), array(lit("HPO"))).otherwise(array()))
       } { case (d, (condition, value)) => d
-        .withColumn("external_reference",
-          when(condition, array_union($"external_reference", array(lit(value))))
-            .otherwise($"external_reference"))
+        .withColumn(outputColumnName,
+          when(condition, array_union(col(outputColumnName), array(lit(value)))).otherwise(col(outputColumnName)))
+      }
+    }
+
+    def withVariantExternalReference(implicit spark: SparkSession): DataFrame = {
+      import spark.implicits._
+      val outputColumnName = "variant_external_reference"
+      val conditionValueMap: List[(Column, String)] = List(
+        $"clinvar".isNotNull -> "Clinvar"
+      )
+      conditionValueMap.foldLeft {
+        df.withColumn(outputColumnName, when($"rsnumber".isNotNull, array(lit("DBSNP"))).otherwise(array()))
+      } { case (d, (condition, value)) => d
+        .withColumn(outputColumnName,
+          when(condition, array_union(col(outputColumnName), array(lit(value)))).otherwise(col(outputColumnName)))
       }
     }
 
