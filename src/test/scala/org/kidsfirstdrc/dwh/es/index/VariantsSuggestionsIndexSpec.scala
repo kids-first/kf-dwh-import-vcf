@@ -119,8 +119,9 @@ class VariantsSuggestionsIndexSpec
 
     val expectedResult = VariantsSuggestOutput(
       `hgvsg` = "",
+      `symbol_aa_change` = List("SCN2A", "SCN2A.2"),
       `suggest` = List(
-        SUGGEST(List("SCN2A", "SCN2A.2", "2-165310406-G-A", "rs1313905795", "RCV000436956"), 4),
+        SUGGEST(List("2-165310406-G-A", "rs1313905795", "RCV000436956"), 4),
         SUGGEST(
           List("SCN2A", "SCN2A.2", "ENSG00000136531", "ENST00000486878", "NM_XXX", "NP_YYY"),
           2
@@ -131,5 +132,12 @@ class VariantsSuggestionsIndexSpec
     result.as[VariantsSuggestOutput].collect() should contain allElementsOf Seq(
       expectedResult
     )
+
+    /*
+
+    VariantsSuggestOutput(variant,2,2-165310406-G-A,ba3d35feba14451058e6fc93eeba163c800a8e09,,rs1313905795,List(SCN2A, SCN2A.2, ),List(SUGGEST(List(2-165310406-G-A, rs1313905795, RCV000436956),4), SUGGEST(List(SCN2A, SCN2A.2, ENSG00000136531, ENST00000486878, NM_XXX, NP_YYY),2)))) did not contain all elements of List(
+    VariantsSuggestOutput(variant,2,2-165310406-G-A,ba3d35feba14451058e6fc93eeba163c800a8e09,,rs1313905795,List(SCN2A, SCN2A.2),List(SUGGEST(List(2-165310406-G-A, rs1313905795, RCV000436956),4), SUGGEST(List(SCN2A, SCN2A.2, ENSG00000136531, ENST00000486878, NM_XXX, NP_YYY),2))))
+
+     */
   }
 }
