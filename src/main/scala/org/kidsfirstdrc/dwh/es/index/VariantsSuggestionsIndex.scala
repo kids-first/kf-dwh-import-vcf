@@ -78,6 +78,7 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
       .withColumn("refseq_protein_id", getColumnOrElse("refseq_protein_id"))
       .groupBy(locus: _*)
       .agg(
+        array_remove(collect_set(col("aa_change")), "") as "aa_change",
         array_remove(collect_set(col("symbol_aa_change")), "") as "symbol_aa_change",
         collect_set(col("ensembl_gene_id")) as "ensembl_gene_id",
         collect_set(col("ensembl_transcript_id")) as "ensembl_transcript_id",
@@ -115,17 +116,20 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
             lit(variantSymbolAaChangeWeight) as "weight"
           ),
           struct(
-            array_remove(
-              flatten(
-                array(
-                  col("symbol_aa_change"),
-                  col("ensembl_gene_id"),
-                  col("ensembl_transcript_id"),
-                  col("refseq_mrna_id"),
-                  col("refseq_protein_id")
-                )
-              ),
-              ""
+            array_distinct(
+              array_remove(
+                flatten(
+                  array(
+                    col("aa_change"),
+                    col("symbol_aa_change"),
+                    col("ensembl_gene_id"),
+                    col("ensembl_transcript_id"),
+                    col("refseq_mrna_id"),
+                    col("refseq_protein_id")
+                  )
+                ),
+                ""
+              )
             ) as "input",
             lit(variantSymbolWeight) as "weight"
           )

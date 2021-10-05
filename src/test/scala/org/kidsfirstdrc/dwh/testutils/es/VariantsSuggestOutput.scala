@@ -11,7 +11,7 @@ case class VariantsSuggestOutput(`type`: String = "variant",
                                  `rsnumber`: String = "rs1313905795",
                                  `symbol_aa_change`: List[String] = List("SCN2A V261E", "SCN2A.2 V261M"),
                                  `suggest`: List[SUGGEST] =
-                                 List(SUGGEST(), SUGGEST(List("SCN2A V261E", "SCN2A.2 V261M", "ENSG00000136531", "ENST00000486878"), 2)))
+                                 List(SUGGEST(), SUGGEST(List("V261E", "V261M", "SCN2A V261E", "SCN2A.2 V261M", "ENSG00000136531", "ENST00000486878"), 2)))
 
 case class SUGGEST(`input`: List[String] = List("chr2:g.166166916G>A", "2-165310406-G-A", "rs1313905795", "RCV000436956"),
                    `weight`: Long = 4)

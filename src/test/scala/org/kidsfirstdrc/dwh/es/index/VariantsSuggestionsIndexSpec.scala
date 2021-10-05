@@ -24,15 +24,15 @@ class VariantsSuggestionsIndexSpec
       chromosome = "3",
       `start` = 165310406,
       `end` = 165310406,
-      is_gru = false,
-      is_hmb = false
+      `is_gru` = false,
+      `is_hmb` = false
     ),
     OccurrenceOutput(
       chromosome = "2",
       `start` = 165310406,
       `end` = 165310406,
-      is_gru = true,
-      is_hmb = false
+      `is_gru` = true,
+      `is_hmb` = false
     )
   ).toDF()
 
