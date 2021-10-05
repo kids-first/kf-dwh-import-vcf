@@ -91,8 +91,9 @@ class VariantCentricIndexSpec
 
   val joinConsequencesDf: DataFrame = Seq(
     JoinConsequenceOutput().copy(
-      ensembl_gene_id = "ENSG00000189337",
-      ensembl_transcript_id = "ENST00000636564",
+      `impact` = "MODERATE",
+      `ensembl_gene_id` = "ENSG00000189337",
+      `ensembl_transcript_id` = "ENST00000636564",
       `ensembl_regulatory_id` = Some("ENSR0000636135"),
       `intron` = Some(Intron(2, 10)),
       `SIFT_score` = Some(0.91255),
@@ -104,8 +105,9 @@ class VariantCentricIndexSpec
       `refseq_mrna_id` = Some("MN_XXX")
     ),
     JoinConsequenceOutput().copy(
-      ensembl_gene_id = "ENSG00000189337",
-      ensembl_transcript_id = "ENST00000636203",
+      `impact` = "LOW",
+      `ensembl_gene_id` = "ENSG00000189337",
+      `ensembl_transcript_id` = "ENST00000636203",
       `ensembl_regulatory_id` = Some("ENSR0000636134"),
       `intron` = Some(Intron(2, 10)),
       `SIFT_score` = Some(0.91255),
@@ -273,7 +275,7 @@ class VariantCentricIndexSpec
 
   val expectedConsequences: List[Consequence] = List(
     Consequence(
-      "MODERATE",
+      "LOW",
       "SCN2A",
       Some("ENST00000636203"),
       Some("ENSR0000636134"),
@@ -292,7 +294,7 @@ class VariantCentricIndexSpec
       Some(108),
       Some("V108M"),
       Some("322G>A"),
-      3,
+      2,
       false,
       None,
       None,
@@ -347,6 +349,7 @@ class VariantCentricIndexSpec
     variant.consequences should contain allElementsOf expectedConsequences
     variant.studies should contain allElementsOf expectedStudies
     variant.genes should contain allElementsOf expectedGenes
+    variant.`vep_impacts` shouldBe List("LOW", "MODERATE")
     variant.copy(consequences = List(), studies = List(), genes = List()) shouldBe
       VariantCentricOutput.Output(studies = List(), consequences = List(), genes = List())
 

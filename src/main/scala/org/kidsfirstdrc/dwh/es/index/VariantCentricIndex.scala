@@ -127,7 +127,8 @@ class VariantCentricIndex(schema: String, releaseId: String)(implicit conf: Conf
         "rsnumber",
         "release_id",
         "consequences",
-        "impact_score",
+        "vep_impacts",
+        "max_impact_score",
         "genes",
         "hgvsg",
         "participant_total_number",
@@ -278,7 +279,8 @@ object VariantCentricIndex {
           .agg(
             collect_set(col("consequence")) as "consequences",
             collect_set(col("symbol")) as "symbols",
-            max(col("impact_score")) as "impact_score"
+            collect_set(col("vep_impact")) as "vep_impacts",
+            max(col("impact_score")) as "max_impact_score"
           )
 
       df.joinByLocus(consequencesDf, "left")

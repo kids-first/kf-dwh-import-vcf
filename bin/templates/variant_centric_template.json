@@ -499,7 +499,10 @@
         "type" : "keyword",
         "index" : false
       },
-      "impact_score" : {
+      "vep_impacts" : {
+        "type" : "keyword"
+      },
+      "max_impact_score" : {
         "type" : "long"
       },
       "locus" : {
