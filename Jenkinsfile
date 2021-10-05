@@ -11,6 +11,7 @@ pipeline {
       steps {
         deleteDir()
         checkout scm
+        slackResponse = slackSend (color: '#FFFF00', message: "${projectName}:sweat_smile: Starting to deploy to ${syslevel}: Branch '${env.BRANCH_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
       }
     }
     stage("Create ssh_config file") {
@@ -29,15 +30,15 @@ pipeline {
         }
       }
       steps{
-        pending("${env.JOB_NAME}","prd")
+        pending("${env.JOB_NAME}","prd","${slackResponse.threadId}")
         sh '''
            ./deploy.sh $(git log -n 1 --pretty=format:'%h') qa
           '''
-        success("${env.JOB_NAME}","prd")
+        success("${env.JOB_NAME}","prd","${slackResponse.threadId}")
       }
       post {
         failure {
-          fail("${env.JOB_NAME}","prd")
+          fail("${env.JOB_NAME}","prd","${slackResponse.threadId}")
         }
       }
     }
@@ -46,15 +47,15 @@ pipeline {
         buildingTag()
       }
       steps{
-        pending("${env.JOB_NAME}","prd")
+        pending("${env.JOB_NAME}","prd","${slackResponse.threadId}")
         sh '''
            ./deploy.sh $(git tag --sort version:refname | tail -1) prd
           '''
-        success("${env.JOB_NAME}","prd")
+        success("${env.JOB_NAME}","prd","${slackResponse.threadId}")
       }
       post {
         failure {
-          fail("${env.JOB_NAME}","prd")
+          fail("${env.JOB_NAME}","prd","${slackResponse.threadId}")
         }
       }
     }
@@ -65,39 +66,39 @@ pipeline {
         }
       }
       steps{
-        pending("${env.JOB_NAME}","prd")
+        pending("${env.JOB_NAME}","prd","${slackResponse.threadId}")
         sh '''
            ./test.sh
           '''
-        success("${env.JOB_NAME}","prd")
+        success("${env.JOB_NAME}","prd","${slackResponse.threadId}")
       }
       post {
         failure {
-          fail("${env.JOB_NAME}","prd")
+          fail("${env.JOB_NAME}","prd","${slackResponse.threadId}")
         }
       }
     }
     stage('Finished Building') {
       steps{
-        success("${env.JOB_NAME}","prd")
+        success("${env.JOB_NAME}","prd","${slackResponse.threadId}")
       }
     }
   }
 }
 
-void success(projectName,syslevel) {
+void success(projectName,syslevel,channel="jenkins-kf") {
 //   sendStatusToGitHub(projectName,"success")
-  slackSend (color: '#00FF00', message: "${projectName}:smile: Deployed to ${syslevel}: Branch '${env.BRANCH_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+  slackSend (color: '#00FF00', channel: "${channel}", message: "${projectName}:smile: Deployed to ${syslevel}: Branch '${env.BRANCH_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
 }
 
-void fail(projectName,syslevel) {
+void fail(projectName,syslevel,channel="jenkins-kf") {
 //   sendStatusToGitHub(projectName,"failure")
-  slackSend (color: '#ff0000', message: "${projectName}:frowning: Deployed to ${syslevel} Failed: Branch '${env.BRANCH_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+  slackSend (color: '#ff0000', channel: "${channel}", message: "${projectName}:frowning: Deployed to ${syslevel} Failed: Branch '${env.BRANCH_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", replyBroadcast: true)
 }
 
-void pending(projectName, syslevel) {
+void pending(projectName, syslevel,channel="jenkins-kf") {
   //sendStatusToGitHub(projectName, "pending")
-  slackSend (color: '#FFFF00', message: "${projectName}:sweat_smile:Starting to deploy to ${syslevel}: Branch '${env.BRANCH_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+  slackSend (color: '#FFFF00', channel: "${channel}", message: "${projectName}:sweat_smile:Starting to deploy to ${syslevel}: Branch '${env.BRANCH_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
 }
 
 void sendStatusToGitHub(projectName,status) {
