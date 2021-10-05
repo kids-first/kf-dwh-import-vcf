@@ -11,7 +11,7 @@ pipeline {
       steps {
         deleteDir()
         checkout scm
-        slackResponse = slackSend (color: '#FFFF00', message: "${projectName}:sweat_smile: Starting to deploy to ${syslevel}: Branch '${env.BRANCH_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        slackResponse = slackSend (color: '#FFFF00', message: "kf-dwh-import-vcf :sweat_smile: Starting Jenkins pipeline: Branch '${env.BRANCH_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
       }
     }
     stage("Create ssh_config file") {
