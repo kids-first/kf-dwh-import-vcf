@@ -207,8 +207,7 @@
             "type" : "long"
           },
           "symbol" : {
-            "type" : "keyword",
-            "index" : false
+            "type" : "keyword"
           },
           "vep_impact" : {
             "type" : "keyword"
@@ -483,8 +482,7 @@
             }
           },
           "symbol" : {
-            "type" : "keyword",
-            "index" : false
+            "type" : "keyword"
           }
         }
       },
@@ -506,8 +504,7 @@
         "type" : "long"
       },
       "locus" : {
-        "type" : "keyword",
-        "index" : false
+        "type" : "keyword"
       },
       "participant_frequency" : {
         "type" : "float"
