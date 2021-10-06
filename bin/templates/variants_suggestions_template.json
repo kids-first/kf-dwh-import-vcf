@@ -28,7 +28,7 @@
         "type": "keyword",
         "index": false
       },
-      "symbol": {
+      "symbol_aa_change": {
         "type": "keyword",
         "index": false
       },
