@@ -1,8 +1,4 @@
 {
-  "index_patterns": ["variant_centric*"],
-  "settings": {
-    "number_of_shards": 6
-  },
   "mappings" : {
     "properties" : {
       "acls" : {
@@ -14,12 +10,14 @@
         "index" : false
       },
       "chromosome" : {
-        "type" : "keyword"
+        "type" : "keyword",
+        "eager_global_ordinals": true
       },
       "clinvar" : {
         "properties" : {
           "clin_sig" : {
-            "type" : "keyword"
+            "type" : "keyword",
+            "eager_global_ordinals": true
           },
           "clinvar_id" : {
             "type" : "keyword",
@@ -34,7 +32,8 @@
             "index" : false
           },
           "interpretations" : {
-            "type" : "keyword"
+            "type" : "keyword",
+            "eager_global_ordinals": true
           }
         }
       },
@@ -58,7 +57,8 @@
             }
           },
           "biotype" : {
-            "type" : "keyword"
+            "type" : "keyword",
+            "eager_global_ordinals": true
           },
           "canonical" : {
             "type" : "boolean"
@@ -88,7 +88,8 @@
             }
           },
           "consequences" : {
-            "type" : "keyword"
+            "type" : "keyword",
+            "eager_global_ordinals": true
           },
           "conservations" : {
             "properties" : {
@@ -166,16 +167,19 @@
                 "type" : "float"
               },
               "fathmm_pred" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "eager_global_ordinals": true
               },
               "lrt_converted_rankscore" : {
                 "type" : "float"
               },
               "lrt_pred" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "eager_global_ordinals": true
               },
               "polyphen2_hvar_pred" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "eager_global_ordinals": true
               },
               "polyphen2_hvar_rankscore" : {
                 "type" : "float"
@@ -187,7 +191,8 @@
                 "type" : "float"
               },
               "sift_pred" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "eager_global_ordinals": true
               }
             }
           },
@@ -207,21 +212,26 @@
             "type" : "long"
           },
           "symbol" : {
-            "type" : "keyword"
+            "type" : "keyword",
+            "eager_global_ordinals": true
           },
           "vep_impact" : {
-            "type" : "keyword"
+            "type" : "keyword",
+            "eager_global_ordinals": true
           }
         }
       },
       "gene_external_reference" : {
-        "type" : "keyword"
+        "type" : "keyword",
+        "eager_global_ordinals": true
       },
       "variant_external_reference" : {
-        "type" : "keyword"
+        "type" : "keyword",
+        "eager_global_ordinals": true
       },
       "external_study_ids" : {
-        "type" : "keyword"
+        "type" : "keyword",
+        "eager_global_ordinals": true
       },
       "frequencies" : {
         "properties" : {
@@ -402,7 +412,8 @@
             "type" : "nested",
             "properties" : {
               "tumour_types_germline" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "eager_global_ordinals": true
               }
             }
           },
@@ -410,7 +421,8 @@
             "type" : "nested",
             "properties" : {
               "disease_name" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "eager_global_ordinals": true
               }
             }
           },
@@ -430,7 +442,8 @@
             "type" : "nested",
             "properties" : {
               "hpo_term_id" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "eager_global_ordinals": true
               },
               "hpo_term_label" : {
                 "type" : "keyword"
@@ -442,30 +455,37 @@
             }
           },
           "location" : {
-            "type" : "keyword"
+            "type" : "keyword",
+            "eager_global_ordinals": true
           },
           "name" : {
-            "type" : "keyword"
+            "type" : "keyword",
+            "eager_global_ordinals": true
           },
           "omim" : {
             "type" : "nested",
             "properties" : {
               "inheritance" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "eager_global_ordinals": true
               },
               "inheritance_code" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "eager_global_ordinals": true
               },
               "name" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "eager_global_ordinals": true
               },
               "omim_id" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "eager_global_ordinals": true
               }
             }
           },
           "omim_gene_id" : {
-            "type" : "keyword"
+            "type" : "keyword",
+            "eager_global_ordinals": true
           },
           "orphanet" : {
             "type" : "nested",
@@ -474,15 +494,18 @@
                 "type" : "long"
               },
               "inheritance" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "eager_global_ordinals": true
               },
               "panel" : {
-                "type" : "keyword"
+                "type" : "keyword",
+                "eager_global_ordinals": true
               }
             }
           },
           "symbol" : {
-            "type" : "keyword"
+            "type" : "keyword",
+            "eager_global_ordinals": true
           }
         }
       },
@@ -498,13 +521,15 @@
         "index" : false
       },
       "vep_impacts" : {
-        "type" : "keyword"
+        "type" : "keyword",
+        "eager_global_ordinals": true
       },
       "max_impact_score" : {
         "type" : "long"
       },
       "locus" : {
-        "type" : "keyword"
+        "type" : "keyword",
+        "eager_global_ordinals": true
       },
       "participant_frequency" : {
         "type" : "float"
@@ -604,7 +629,8 @@
             "index" : false
           },
           "study_code" : {
-            "type" : "keyword"
+            "type" : "keyword",
+            "eager_global_ordinals": true
           },
           "study_id" : {
             "type" : "keyword",
@@ -617,13 +643,16 @@
         }
       },
       "transmissions" : {
-        "type" : "keyword"
+        "type" : "keyword",
+        "eager_global_ordinals": true
       },
       "variant_class" : {
-        "type" : "keyword"
+        "type" : "keyword",
+        "eager_global_ordinals": true
       },
       "zygosity" : {
-        "type" : "keyword"
+        "type" : "keyword",
+        "eager_global_ordinals": true
       }
     }
   }
