@@ -36,7 +36,7 @@ class VariantCentricIndex(schema: String, releaseId: String)(implicit conf: Conf
         )
       )
       .collect { case Success(df) => df }
-      .reduce((df1, df2) => df1.drop("joined_sample_id").unionByName(df2.drop("joined_sample_id")))
+      .reduce(_ unionByName _)
 
     Map(
       Clinical.variants.id -> spark.read.parquet(
@@ -440,7 +440,7 @@ object VariantCentricIndex {
             ) as "participant_ids_by_study"
           )
 
-      df.joinByLocus(occurrencesWithParticipants, "inner")
+      df.joinByLocus(occurrencesWithParticipants, "left")
     }
 
     def withZigozity(implicit spark: SparkSession): DataFrame = {
