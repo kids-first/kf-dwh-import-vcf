@@ -40,7 +40,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --release-label emr-6.3.0 \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --steps "${steps}" \
---name "Prepare ${job_type} - ${release_id}" \
+--name "manual - Prepare Index ${job_type} - ${release_id}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \

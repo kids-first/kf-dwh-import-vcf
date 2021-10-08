@@ -60,7 +60,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --bootstrap-actions Path="s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions/${bootstrapAction}.sh" \
 --steps "${steps}" \
---name "Import - ${job} - ${study_id} - ${release_id} - ${schema}" \
+--name "manual - Import - ${job} - ${study_id} - ${release_id} - ${schema}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \

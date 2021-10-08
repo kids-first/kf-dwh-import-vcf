@@ -4,11 +4,11 @@ release_id=${1:-"re_000017"}
 input=${2:-"s3a://kf-strides-variant-parquet-prd/portal/es_index/${index}_${release_id}/"}
 es_nodes=${3:-"https://vpc-kf-arranger-blue-es-service-exwupkrf4dyupg24dnfmvzcwri.us-east-1.es.amazonaws.com:443"}
 #es_nodes=${3:-"https://vpc-kf-arranger-blue-es-prd-4gbc2zkvm5uttysiqkcbzwxqeu.us-east-1.es.amazonaws.com:443"}
-es_index_name=${4:-"${index}_small_shards"}
+es_index_name=${4:-"${index}"}
 es_index_template=${5:-"${index}_template.json"}
 es_job_type=${6:-"index"} # one of: index, update, upsert or create
 es_batch_size=${7:-"500"} #default is 1000
-chromosome=${8:-"10"} #all, 1, 2, 3, ..., X, Y
+chromosome=${8:-"6"} #all, 1, 2, 3, ..., X, Y
 jarV=${9:-"7.12.0"}
 number_instance=${10:-"2"}
 instance_type=${11:-"r5.2xlarge"}
@@ -73,7 +73,7 @@ aws emr create-cluster --applications Name=Hadoop Name=Spark \
 --release-label emr-6.3.0 \
 --log-uri 's3n://kf-strides-variant-parquet-prd/jobs/elasticmapreduce/' \
 --steps "${steps}" \
---name "${es_index_name}_${chromosome} index to ES7 ${release_id} - ${env}" \
+--name "manual - Index ${es_index_name}_${chromosome} to ES7 ${release_id} - ${env}" \
 --instance-groups "${instance_groups}" \
 --scale-down-behavior TERMINATE_AT_TASK_COMPLETION \
 --auto-terminate \
