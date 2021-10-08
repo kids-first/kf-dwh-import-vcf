@@ -2,7 +2,7 @@ package org.kidsfirstdrc.dwh.es.index
 
 import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
-import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.locus
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.{locus, locusColumNames}
 import bio.ferlab.datalake.spark3.implicits.SparkUtils.getColumnOrElse
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
@@ -10,8 +10,9 @@ import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Es}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 
 import java.time.LocalDateTime
+import scala.util.{Success, Try}
 
-class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Configuration)
+class VariantsSuggestionsIndex(schema: String, releaseId: String)(override implicit val conf: Configuration)
     extends ETL() {
 
   val destination: DatasetConf = Es.variants_suggestions
@@ -24,7 +25,24 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
+    import spark.implicits._
+    val occurrences: DataFrame = spark.read
+      .parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId")
+      .withColumn("study", explode(col("studies")))
+      .select("study")
+      .distinct
+      .as[String]
+      .collect()
+      .map(studyId =>
+        Try(
+          spark.table(s"$schema.occurrences_${studyId.toLowerCase}")
+        )
+      )
+      .collect { case Success(df) => df }
+      .reduce(_ unionByName _)
+
     Map(
+      Clinical.occurrences.id -> occurrences,
       Clinical.variants.id -> spark.read.parquet(
         s"${Clinical.variants.rootPath}/variants/variants_$releaseId"
       ),
@@ -37,12 +55,19 @@ class VariantsSuggestionsIndex(releaseId: String)(override implicit val conf: Co
   override def transform(data: Map[String, DataFrame],
                          lastRunDateTime: LocalDateTime = minDateTime,
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
+    val distinctOccurrences = data(Clinical.occurrences.id)
+      .selectLocus(col("has_alt"))
+      .where(col("has_alt") === 1)
+      .drop("has_alt")
+      .dropDuplicates(locusColumNames.head, locusColumNames.tail:_*)
+
     val variants =
       data(Clinical.variants.id)
         .selectLocus(
           col("hgvsg"),
           col("name"),
           col("clinvar_id"))
+        .join(distinctOccurrences, locusColumNames, "inner")
 
     val consequences = data(Clinical.consequences.id)
       .selectLocus(

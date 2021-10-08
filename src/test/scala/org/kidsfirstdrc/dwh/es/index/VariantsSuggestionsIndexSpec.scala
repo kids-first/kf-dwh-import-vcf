@@ -25,14 +25,24 @@ class VariantsSuggestionsIndexSpec
       `start` = 165310406,
       `end` = 165310406,
       `is_gru` = false,
-      `is_hmb` = false
+      `is_hmb` = false,
+      `has_alt` = 0
     ),
     OccurrenceOutput(
       chromosome = "2",
       `start` = 165310406,
       `end` = 165310406,
       `is_gru` = true,
-      `is_hmb` = false
+      `is_hmb` = false,
+      `has_alt` = 1
+    ),
+    OccurrenceOutput(
+      chromosome = "2",
+      `start` = 165310406,
+      `end` = 165310406,
+      `is_gru` = true,
+      `is_hmb` = false,
+      `has_alt` = 0
     )
   ).toDF()
 
@@ -103,7 +113,7 @@ class VariantsSuggestionsIndexSpec
 
   "suggester index job" should "transform data to the right format" in {
 
-    val result = new VariantsSuggestionsIndex("re_000010").transform(data)
+    val result = new VariantsSuggestionsIndex("portal", "re_000010").transform(data)
     result.show(false)
 
     result.as[VariantsSuggestOutput].collect() should contain allElementsOf Seq(
@@ -113,7 +123,7 @@ class VariantsSuggestionsIndexSpec
 
   "suggester from variants" should "remove null and empty values" in {
 
-    val result = new VariantsSuggestionsIndex("")
+    val result = new VariantsSuggestionsIndex("portal", "")
       .getVariantSuggest(joinVariantWithNullDf, joinConsequencesWithEmptyAndNullDf)
     result.show(false)
 
