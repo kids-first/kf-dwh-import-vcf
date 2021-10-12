@@ -25,24 +25,9 @@ class VariantsSuggestionsIndex(schema: String, releaseId: String)(override impli
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
-    import spark.implicits._
-    val occurrences: DataFrame = spark.read
-      .parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId")
-      .withColumn("study", explode(col("studies")))
-      .select("study")
-      .distinct
-      .as[String]
-      .collect()
-      .map(studyId =>
-        Try(
-          spark.table(s"$schema.occurrences_${studyId.toLowerCase}")
-        )
-      )
-      .collect { case Success(df) => df }
-      .reduce(_ unionByName _)
 
     Map(
-      Clinical.occurrences.id -> occurrences,
+      Clinical.occurrences.id -> getOccurrencesWithAlt(schema, releaseId),
       Clinical.variants.id -> spark.read.parquet(
         s"${Clinical.variants.rootPath}/variants/variants_$releaseId"
       ),
@@ -55,11 +40,10 @@ class VariantsSuggestionsIndex(schema: String, releaseId: String)(override impli
   override def transform(data: Map[String, DataFrame],
                          lastRunDateTime: LocalDateTime = minDateTime,
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
-    val distinctOccurrences = data(Clinical.occurrences.id)
-      .selectLocus(col("has_alt"))
-      .where(col("has_alt") === 1)
-      .drop("has_alt")
-      .dropDuplicates(locusColumNames.head, locusColumNames.tail:_*)
+    val distinctOccurrences =
+      data(Clinical.occurrences.id)
+        .selectLocus()
+        .dropDuplicates(locusColumNames.head, locusColumNames.tail:_*)
 
     val variants =
       data(Clinical.variants.id)

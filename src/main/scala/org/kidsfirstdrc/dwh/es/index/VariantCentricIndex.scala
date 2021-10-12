@@ -14,7 +14,6 @@ import org.kidsfirstdrc.dwh.utils.ClinicalUtils._
 
 import java.time.LocalDateTime
 import scala.collection.mutable
-import scala.util.{Success, Try}
 
 class VariantCentricIndex(schema: String, releaseId: String)(implicit conf: Configuration) extends ETL()(conf) {
 
@@ -22,30 +21,10 @@ class VariantCentricIndex(schema: String, releaseId: String)(implicit conf: Conf
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
-    import spark.implicits._
-    val occurrences: DataFrame = spark.read
-      .parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId")
-      .withColumn("study", explode(col("studies")))
-      .select("study")
-      .distinct
-      .as[String]
-      .collect()
-      .map(studyId =>
-        Try(
-          spark.table(s"$schema.occurrences_${studyId.toLowerCase}")
-        )
-      )
-      .collect { case Success(df) => df }
-      .reduce(_ unionByName _)
-
     Map(
-      Clinical.variants.id -> spark.read.parquet(
-        s"${Clinical.variants.rootPath}/variants/variants_$releaseId"
-      ),
-      Clinical.consequences.id -> spark.read.parquet(
-        s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId"
-      ),
-      Clinical.occurrences.id   -> occurrences,
+      Clinical.variants.id      -> spark.read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId"),
+      Clinical.consequences.id  -> spark.read.parquet(s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId"),
+      Clinical.occurrences.id   -> getOccurrencesWithAlt(schema, releaseId),
       Public.clinvar.id         -> spark.table(s"${Public.clinvar.table.get.fullName}"),
       Public.genes.id           -> spark.table(s"${Public.genes.table.get.fullName}"),
       Raw.studies_short_name.id -> spark.read.options(Raw.studies_short_name.readoptions).csv(Raw.studies_short_name.location)
@@ -65,7 +44,6 @@ class VariantCentricIndex(schema: String, releaseId: String)(implicit conf: Conf
       .withColumnRenamed("impact", "vep_impact")
 
     val occurrences = data(Clinical.occurrences.id)
-      .where(col("has_alt") === 1)
       .selectLocus(col("participant_id"), col("study_id"))
 
     val clinvar = data(Public.clinvar.id)
