@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.external.delta
 
-import bio.ferlab.datalake.spark3.config.{Configuration, ConfigurationLoader, DatasetConf, StorageConf}
+import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, DatasetConf, StorageConf}
 import io.delta.tables.DeltaTable
 import org.apache.spark.sql.types.{DateType, StringType}
 import org.kidsfirstdrc.dwh.conf.Catalog

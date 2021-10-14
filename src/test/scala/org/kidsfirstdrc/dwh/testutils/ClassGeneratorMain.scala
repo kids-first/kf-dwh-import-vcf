@@ -9,7 +9,7 @@ import bio.ferlab.datalake.spark3.ClassGenerator._
 import org.kidsfirstdrc.dwh.testutils.external._
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
-import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
 import org.kidsfirstdrc.dwh.external.{ImportCancerGeneCensus, ImportDDDGeneCensus}
 
 object ClassGeneratorMain extends App with WithSparkSession {

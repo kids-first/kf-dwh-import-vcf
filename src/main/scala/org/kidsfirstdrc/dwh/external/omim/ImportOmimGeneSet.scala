@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.external.omim
 
-import bio.ferlab.datalake.spark3.config.Configuration
+import bio.ferlab.datalake.commons.config.Configuration
 import org.apache.spark.sql.functions.{col, explode, lit, split}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.{Public, Raw}

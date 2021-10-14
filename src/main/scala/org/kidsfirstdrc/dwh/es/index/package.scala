@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.es
 
-import bio.ferlab.datalake.spark3.config.Configuration
+import bio.ferlab.datalake.commons.config.Configuration
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.{col, explode}
 import org.kidsfirstdrc.dwh.conf.Catalog.Clinical

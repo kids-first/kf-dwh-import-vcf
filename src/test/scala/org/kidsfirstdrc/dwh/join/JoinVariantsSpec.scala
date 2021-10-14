@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.join
 
-import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SaveMode
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.testutils.Model._

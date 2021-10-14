@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.glue
 
-import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf, StorageConf}
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, StorageConf}
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.Clinical.{consequences, variants}

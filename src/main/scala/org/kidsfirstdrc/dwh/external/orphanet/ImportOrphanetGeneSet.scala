@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.external.orphanet
 
-import bio.ferlab.datalake.spark3.config.Configuration
+import bio.ferlab.datalake.commons.config.Configuration
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._

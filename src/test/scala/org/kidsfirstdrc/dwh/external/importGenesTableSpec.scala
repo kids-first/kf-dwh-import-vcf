@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.external
 
-import bio.ferlab.datalake.spark3.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
 import org.apache.spark.sql.functions
 import org.apache.spark.sql.functions.col
 import org.kidsfirstdrc.dwh.conf.Catalog.Public

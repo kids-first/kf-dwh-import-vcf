@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf, StorageConf}
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, StorageConf}
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.annotations
 import org.apache.spark.sql.functions.{array_sort, col, explode, lit}
 import org.apache.spark.sql.{DataFrame, SaveMode}

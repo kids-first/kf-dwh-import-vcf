@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.conf
 
-import bio.ferlab.datalake.spark3.config.{Configuration, ConfigurationWriter, StorageConf}
+import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationWriter, StorageConf}
 
 object Configurations extends App {
 

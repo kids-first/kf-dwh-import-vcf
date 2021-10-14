@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.jobs
 
-import bio.ferlab.datalake.spark3.config.{Configuration, DatasetConf}
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.{col, lit, regexp_extract, trim}

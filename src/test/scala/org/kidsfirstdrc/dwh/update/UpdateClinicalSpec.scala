@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.update
 
-import bio.ferlab.datalake.spark3.config.{Configuration, ConfigurationLoader, StorageConf}
+import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, StorageConf}
 import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob

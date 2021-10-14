@@ -40,7 +40,7 @@ object Index extends App {
 
   println(s"$jobType - ${indexName}_$newRelease")
 
-  val job = new Indexer(jobType, templatePath, alias, s"${indexName}_$newRelease", Some(s"${indexName}_$oldRelease"))
+  val job = new Indexer(jobType, templatePath, s"${indexName}_$newRelease")
   implicit val esClient: ElasticSearchClient = new ElasticSearchClient(esNodes.split(',').head)
 
   val df: DataFrame = chromosome match {
