@@ -33,7 +33,7 @@ object Catalog {
     val `1000genomes_vcf` =
       DatasetConf("1000genomes_vcf", alias, "/raw/1000Genomes/ALL.*.sites.vcf.gz", VCF, OverWrite)
     val annovar_dbnsfp =
-      DatasetConf("annovar_dbnsfp", alias, "/raw/annovar/dbNSFP/hg38_dbnsfp41a.txt", CSV, OverWrite)
+      DatasetConf("annovar_dbnsfp", alias, "/raw/annovar/dbNSFP/hg38_dbnsfp42a_patched.txt.gz", CSV, OverWrite)
     val cancerhotspots_csv = DatasetConf(
       "cancerhotspots_csv",
       alias,
