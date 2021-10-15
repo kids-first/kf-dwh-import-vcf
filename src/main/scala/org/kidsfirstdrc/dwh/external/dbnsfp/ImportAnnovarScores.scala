@@ -158,7 +158,6 @@ class ImportAnnovarScores()(implicit conf: Configuration)
                     lastRunDateTime: LocalDateTime = minDateTime,
                     currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     super.load(data
-      .repartition(col("chromosome"))
-      .sortWithinPartitions("start"))
+      .repartition(col("chromosome")))
   }
 }
