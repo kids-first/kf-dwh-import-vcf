@@ -106,6 +106,10 @@ class ImportScores()(implicit conf: Configuration)
         col("MetaLR_pred"),
         col("MetaLR_rankscore"),
         col("MetaLR_score"),
+        col("Reliability_index"),
+        col("MetaRNN_pred"),
+        col("MetaRNN_rankscore"),
+        col("MetaRNN_score"),
         col("M-CAP_pred"),
         col("M-CAP_rankscore"),
         col("M-CAP_score"),
@@ -233,6 +237,10 @@ class ImportScores()(implicit conf: Configuration)
         col("MetaLR_pred"),
         cast("MetaLR_rankscore"),
         cast("MetaLR_score"),
+        cast("Reliability_index"),
+        col("MetaRNN_pred"),
+        cast("MetaRNN_rankscore"),
+        cast("MetaRNN_score"),
         col("M-CAP_pred"),
         cast("M-CAP_score"),
         cast("M-CAP_rankscore"),
@@ -296,7 +304,6 @@ class ImportScores()(implicit conf: Configuration)
       .drop("position")
 
   }
-
   override def load(data: DataFrame,
                     lastRunDateTime: LocalDateTime = minDateTime,
                     currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
