@@ -38,7 +38,7 @@ class ImportAnnovarScores()(implicit conf: Configuration)
         $"End".cast("long") as "end",
         $"Ref" as "reference",
         $"Alt" as "alternate",
-        $"DamagePredCount".cast("float") as "DamagePredCount",
+        $"DamagePredCount",
         cast("SIFT_score"),
         cast("SIFT_converted_rankscore"),
         $"SIFT_pred",
