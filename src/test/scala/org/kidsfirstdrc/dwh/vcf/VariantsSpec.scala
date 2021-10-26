@@ -19,7 +19,7 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
   val studyId   = "SD_123456"
   val releaseId = "RE_ABCDEF"
 
-  "transform 'portal'" should "should keep only PT_001 and PT_002" in {
+  "transform 'portal'" should "should keep only PT_001" in {
 
     implicit val conf: Configuration = {
       Configuration(
@@ -36,18 +36,21 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
       OccurrenceOutput(
         `participant_id` = "PT_001",
         `zygosity` = "HET",
-        `hgvsg` = null,
+        `hgvsg` = "chr4:g.73979437G>T",
+        `has_alt` = 1,
         `transmission` = Some("autosomal_recessive")),
       OccurrenceOutput(
         `participant_id` = "PT_002",
         `zygosity` = null,
+        `has_alt` = 0,
         `hgvsg` = "chr4:g.73979437G>T",
-        `transmission` = Some("autosomal_dominant")
+        `transmission` = Some("non_carrier")
       ),
       //should be dropped because PT_003 missing from participants table
       OccurrenceOutput(
         `participant_id` = "PT_003",
         `zygosity` = "HOM",
+        `has_alt` = 1,
         `hgvsg` = "chr4:g.73979437G>T",
         `transmission` = Some("autosomal_dominant")
       )
@@ -80,8 +83,8 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
         "RE_ABCDEF",
         Set("phs001738.c1"),
         Map("SD_123456" -> Set("phs001738.c1")),
-        transmissions = Map("autosomal_dominant" -> 1, "autosomal_recessive" -> 1),
-        transmissions_by_study = Map("SD_123456" -> Map("autosomal_dominant" -> 1, "autosomal_recessive" -> 1)),
+        transmissions = Map("autosomal_recessive" -> 1),
+        transmissions_by_study = Map("SD_123456" -> Map("autosomal_recessive" -> 1)),
         List("HET")
       )
     )
@@ -140,12 +143,12 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
         "chr4:g.73979437G>T",
         None,
         frequencies = VariantFrequency(Freq(6, 3, 0.5, 1, 1), Freq(4, 3, 0.75, 1, 1)),
-        consent_codes = Set("SD_123456.c1", "SD_123456.c2", "SD_123456.c3"),
+        consent_codes = Set("SD_123456.c1", "SD_123456.c2"),
         consent_codes_by_study =
-          Map("SD_123456" -> Set("SD_123456.c1", "SD_123456.c2", "SD_123456.c3")),
+          Map("SD_123456" -> Set("SD_123456.c1", "SD_123456.c2")),
         transmissions = Map("autosomal_dominant" -> 2),
         transmissions_by_study = Map("SD_123456" -> Map("autosomal_dominant" -> 2)),
-        zygosity = List("UNK", "HET", "HOM")
+        zygosity = List("HET", "HOM")
       )
     )
 
