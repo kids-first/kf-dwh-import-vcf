@@ -42,13 +42,15 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
 
     val occurrences: DataFrame = schema match {
       case "portal" =>
-        data(Clinical.occurrences.id).join(broadcast(participants), Seq("participant_id"), "inner")
+        data(Clinical.occurrences.id)
+          .join(broadcast(participants), Seq("participant_id"), "inner")
       case _ => data(Clinical.occurrences.id)
     }
 
     val participantTotalCount = occurrences.select("participant_id").distinct().count()
 
     occurrences
+      .filter($"has_alt" === 1)
       .select(
         $"chromosome",
         $"start",
@@ -68,6 +70,10 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
         $"dbgap_consent_code",
         $"transmission"
       )
+      .withColumn("variant_class",
+        //VEP annotation code has a bug which sets some variant_class to 'indel' instead of 'SNV' when they contain only 1 nucleotide.
+        //see here for more info about variant_class https://m.ensembl.org/info/genome/variation/prediction/classification.html#classes
+        when(length($"reference") === 1 and length($"alternate") === 1, lit("SNV")).otherwise($"variant_class"))
       .withColumn("zygosity", when($"zygosity".isNull, lit("")).otherwise($"zygosity"))
       .withColumn("count", lit(1))
       .groupBy("transmission", locusColumNames:_*)
