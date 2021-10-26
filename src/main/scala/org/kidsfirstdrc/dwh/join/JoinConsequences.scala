@@ -12,12 +12,12 @@ import org.kidsfirstdrc.dwh.join.JoinConsequences._
 import java.time.LocalDateTime
 
 class JoinConsequences(
-    studyIds: Seq[String],
-    releaseId: String,
-    mergeWithExisting: Boolean,
-    database: String
-)(implicit conf: Configuration)
-    extends ETL() {
+                        studyIds: Seq[String],
+                        releaseId: String,
+                        mergeWithExisting: Boolean,
+                        database: String
+                      )(implicit conf: Configuration)
+  extends ETL() {
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
@@ -33,8 +33,10 @@ class JoinConsequences(
     }
 
     Map(
-      Clinical.consequences.id  -> consequences,
-      Public.dbnsfp_original.id -> spark.table("variant.dbnsfp_original")
+      Clinical.consequences.id -> consequences,
+      Public.dbnsfp_original.id -> spark.table("variant.dbnsfp_original"),
+      Public.ensembl_mapping.id -> spark.table(Public.ensembl_mapping.table.get.fullName)
+
     )
   }
 
@@ -43,7 +45,18 @@ class JoinConsequences(
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
-    val consequences    = data(Clinical.consequences.id)
+    val consequences = data(Clinical.consequences.id)
+
+    val ensembl_mapping = data(Public.ensembl_mapping.id)
+      .select(
+        col("ensembl_transcript_id"),
+        col("is_canonical"),
+        col("is_mane_plus") as "mane_plus",
+        col("is_mane_select") as "mane_select",
+        col("refseq_mrna_id"),
+        col("refseq_protein_id")
+      )
+
     val dbnsfp_original = data(Public.dbnsfp_original.id)
       .drop(
         "aaref",
@@ -80,12 +93,7 @@ class JoinConsequences(
       $"protein_position",
       $"amino_acids",
       $"codons",
-      $"original_canonical",
-      $"canonical",
-      $"mane_plus",
-      $"mane_select",
-      $"refseq_mrna_id",
-      $"refseq_protein_id"
+      $"original_canonical"
     )
 
     val allColumns = commonColumns :+ col("study_id")
@@ -108,7 +116,9 @@ class JoinConsequences(
         mergeConsequences(releaseId, consequences.select(allColumns: _*))
       }
 
-    merged.joinWithDbnsfp(dbnsfp_original)
+    merged
+      .joinWithEnsemblMapping(ensembl_mapping)
+      .joinWithDbnsfp(dbnsfp_original)
 
   }
 
@@ -126,7 +136,7 @@ class JoinConsequences(
   }
 
   private def mergeConsequences(releaseId: String, consequences: DataFrame)(implicit
-      spark: SparkSession
+                                                                            spark: SparkSession
   ): DataFrame = {
 
     import spark.implicits._
@@ -162,11 +172,6 @@ class JoinConsequences(
         firstAs("amino_acids"),
         firstAs("codons"),
         firstAs("original_canonical"),
-        firstAs("canonical"),
-        firstAs("mane_plus"),
-        firstAs("mane_select"),
-        firstAs("refseq_mrna_id"),
-        firstAs("refseq_protein_id"),
         collect_set($"study_id") as "study_ids"
       )
       .withColumn(
@@ -195,6 +200,13 @@ object JoinConsequences {
     def joinWithDbnsfp(dbnsfp_original: DataFrame): DataFrame = {
       df
         .join(dbnsfp_original, Seq("chromosome", "start", "reference", "alternate", "ensembl_transcript_id"), "left")
+    }
+
+    def joinWithEnsemblMapping(ensembl_mapping: DataFrame): DataFrame = {
+      df
+        .join(ensembl_mapping, Seq("ensembl_transcript_id"), "left")
+        .withColumn("canonical", coalesce(col("is_canonical"), lit(false)))
+        .drop("is_canonical")
     }
   }
 }

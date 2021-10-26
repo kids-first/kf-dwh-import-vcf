@@ -23,9 +23,7 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
   "build" should "return a dataframe with one consequecne by transcript" in {
 
-    val ensemblDf = Seq(
-      EnsemblMappingOutput()
-    ).toDF()
+
 
     val df = Seq(
       ConsequenceRowInput(
@@ -46,7 +44,7 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
     val output = new Consequences(studyId, releaseId, "", "")
       .transform(
-        Map(HarmonizedData.family_variants_vcf.id -> df, Public.ensembl_mapping.id -> ensemblDf)
+        Map(HarmonizedData.family_variants_vcf.id -> df)
       )
 
     output.as[ConsequenceOutput].collect() should contain theSameElementsAs Seq(
@@ -59,10 +57,6 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
   }
 
   it should "return a dataframe with one ConsequenceInput with regulatory feature" in {
-
-    val ensemblDf = Seq(
-      EnsemblMappingOutput()
-    ).toDF()
 
     val df = Seq(
       ConsequenceRowInput(
@@ -80,7 +74,7 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
     val output =
       new Consequences(studyId, releaseId, "", "")
         .transform(
-          Map(HarmonizedData.family_variants_vcf.id -> df, Public.ensembl_mapping.id -> ensemblDf)
+          Map(HarmonizedData.family_variants_vcf.id -> df)
         )
 
     output.as[ConsequenceOutput].collect() should contain theSameElementsAs Seq(
@@ -88,11 +82,7 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
         ensembl_transcript_id = Some("ENST00000332831"),
         ensembl_regulatory_id = None,
         feature_type = "Transcript",
-        original_canonical = false,
-        mane_plus = Some(true),
-        mane_select = Some(true),
-        refseq_mrna_id = Some("NM_001005277"),
-        refseq_protein_id = Some("NP_001005277")
+        original_canonical = false
       ),
       ConsequenceOutput(
         ensembl_transcript_id = None,

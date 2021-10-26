@@ -2,8 +2,9 @@ package org.kidsfirstdrc.dwh.join
 
 import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
 import org.apache.spark.sql.SaveMode
+import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
-import org.kidsfirstdrc.dwh.testutils.external.ImportScores
+import org.kidsfirstdrc.dwh.testutils.external.{EnsemblMappingOutput, ImportScores}
 import org.kidsfirstdrc.dwh.testutils.join.JoinConsequenceOutput
 import org.kidsfirstdrc.dwh.testutils.vcf.{ConsequenceOutput, Exon, RefAlt}
 import org.scalatest.GivenWhenThen
@@ -11,7 +12,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 class JoinConsequencesSpec
-    extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
+  extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers {
 
   import spark.implicits._
 
@@ -27,6 +28,19 @@ class JoinConsequencesSpec
 
       spark.sql("create database if not exists variant")
       spark.sql("use variant")
+      Given("an ensembl_mapping table")
+      Seq(
+        EnsemblMappingOutput(
+          ensembl_gene_id="ENSG00000136531",
+          ensembl_transcript_id = "ENST00000283256.10"
+        )
+      ).toDF()
+        .write
+        .mode(SaveMode.Overwrite)
+        .option("path", s"$outputDir/ensembl_mapping")
+        .format("parquet")
+        .saveAsTable(Public.ensembl_mapping.table.get.name)
+
       Given("2 studies")
       val studyId1 = "SD_123"
       val studyId2 = "SD_456"
@@ -117,12 +131,12 @@ class JoinConsequencesSpec
           261,
           RefAlt("V", "M"),
           RefAlt("GTG", "ATG"),
-          true,
-          true,
-          None,
-          None,
-          None,
-          None,
+          `original_canonical` = true,
+          `canonical` = true,
+          mane_plus = Some(true),
+          mane_select = Some(true),
+          refseq_mrna_id = Some("NM_001005277"),
+          refseq_protein_id = Some("NP_001005277"),
           List("SD_456", "SD_123"),
           Some("V261M"),
           "781G>A",
