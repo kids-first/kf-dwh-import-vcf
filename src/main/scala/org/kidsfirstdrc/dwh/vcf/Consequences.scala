@@ -33,23 +33,13 @@ class Consequences(studyId: String,
       .select(chromosome, start, end, reference, alternate, name, annotations, is_normalized)
 
     Map(
-      HarmonizedData.family_variants_vcf.id -> inputDF,
-      Public.ensembl_mapping.id             -> spark.table(s"${Public.ensembl_mapping.table.get.fullName}")
+      HarmonizedData.family_variants_vcf.id -> inputDF
     )
   }
 
   override def transform(data: Map[String, DataFrame],
                          lastRunDateTime: LocalDateTime = minDateTime,
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
-    val ensembl_mappingDf = data(Public.ensembl_mapping.id)
-      .select(
-        col("ensembl_transcript_id"),
-        col("is_canonical"),
-        col("is_mane_plus") as "mane_plus",
-        col("is_mane_select") as "mane_select",
-        col("refseq_mrna_id"),
-        col("refseq_protein_id")
-      )
     val consequencesDf = data(HarmonizedData.family_variants_vcf.id)
       .groupBy(locus: _*)
       .agg(
@@ -87,14 +77,7 @@ class Consequences(studyId: String,
         lit(releaseId) as "release_id"
       )
       .drop("annotation")
-
     consequencesDf
-      .join(ensembl_mappingDf, Seq("ensembl_transcript_id"), "left")
-      .withColumn(
-        "canonical",
-        when(col("is_canonical").isNull, col("original_canonical")).otherwise(col("is_canonical"))
-      )
-      .drop("is_canonical")
   }
 
   override def load(data: DataFrame,
