@@ -31,7 +31,7 @@ class JoinConsequencesSpec
       Given("an ensembl_mapping table")
       Seq(
         EnsemblMappingOutput(
-          ensembl_gene_id="ENSG00000136531",
+          ensembl_gene_id = "ENSG00000136531",
           ensembl_transcript_id = "ENST00000283256.10"
         )
       ).toDF()
