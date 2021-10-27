@@ -49,6 +49,7 @@ class JoinConsequences(
 
     val ensembl_mapping = data(Public.ensembl_mapping.id)
       .select(
+        col("ensembl_gene_id"),
         col("ensembl_transcript_id"),
         col("is_canonical"),
         col("is_mane_plus") as "mane_plus",
@@ -204,7 +205,7 @@ object JoinConsequences {
 
     def joinWithEnsemblMapping(ensembl_mapping: DataFrame): DataFrame = {
       df
-        .join(ensembl_mapping, Seq("ensembl_transcript_id"), "left")
+        .join(ensembl_mapping, Seq("ensembl_transcript_id", "ensembl_gene_id"), "left")
         .withColumn("canonical", coalesce(col("is_canonical"), lit(false)))
         .drop("is_canonical")
     }
