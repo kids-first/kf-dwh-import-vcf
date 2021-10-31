@@ -37,7 +37,7 @@ class VariantCentricIndex(schema: String, releaseId: String)(implicit conf: Conf
     val variants = data(Clinical.variants.id)
       .drop("end")
       .where(col("hgvsg").isNotNull) //SKFP-190
-      .withColumn("zygosity", sort_array(filter(col("zygosity"), c => c.isin("HOM", "HET")))) //SKFP-192
+      .withColumn("zygosity", sort_array(filter(col("zygosity"), c => c.isin("HOM", "HET", "UNK")))) //SKFP-192
       .withColumnRenamed("dbsnp_id", "rsnumber")
 
     val consequences = data(Clinical.consequences.id)
@@ -269,7 +269,7 @@ object VariantCentricIndex {
     }
 
     def withStudies(studyCodes: DataFrame): DataFrame = {
-      val inputColumns: Seq[Column]   = df.columns.filterNot(_.equals("studies")).map(col)
+      val inputColumns: Seq[Column] = df.columns.filterNot(_.equals("studies")).map(col)
       df
         .select(inputColumns :+ explode(col("studies")).as("study_id"): _*)
         .join(studyCodes, Seq("study_id"), "left")

@@ -123,6 +123,6 @@ object VariantCentricOutput {
                     `variant_external_reference`: List[String] = List("DBSNP", "Clinvar"),
                     `gene_external_reference` : List[String] = List("HPO", "Orphanet", "OMIM", "Cosmic", "DDD"),
                     `transmissions`: List[String] = List("autosomal_dominant", "autosomal_recessive"),
-                    `zygosity`: List[String] = List("HET", "HOM"))
+                    `zygosity`: List[String] = List("HET", "HOM", "UNK"))
 
 }

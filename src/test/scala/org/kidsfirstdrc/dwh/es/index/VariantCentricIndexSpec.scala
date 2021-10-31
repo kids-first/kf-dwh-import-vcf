@@ -123,91 +123,104 @@ class VariantCentricIndexSpec
       `start` = 165310406,
       `end` = 165310406,
       `has_alt` = 0,
-      participant_id = "PT_000001"
+      participant_id = "PT_000001",
+      `zygosity` = "WT"
     ), //removed because `has_alt` = 0
     OccurrenceOutput(
       `start` = 165310406,
       `end` = 165310406,
       `has_alt` = 1,
       participant_id = "PT_000002",
-      `study_id` = "SD_123"
+      `study_id` = "SD_123",
+      `zygosity` = "HOM"
     ),
     OccurrenceOutput(
       `start` = 165310406,
       `end` = 165310406,
       `has_alt` = 1,
       participant_id = "PT_000003",
-      `study_id` = "SD_123"
+      `study_id` = "SD_123",
+      `zygosity` = "HOM"
     ),
     OccurrenceOutput(
       `start` = 165310406,
       `end` = 165310406,
       `has_alt` = 1,
       participant_id = "PT_000004",
-      `study_id` = "SD_123"
+      `study_id` = "SD_123",
+      `zygosity` = "HOM"
     ),
     OccurrenceOutput(
       `start` = 165310406,
       `end` = 165310406,
       `has_alt` = 1,
       participant_id = "PT_000005",
-      `study_id` = "SD_123"
+      `study_id` = "SD_123",
+      `zygosity` = "HOM"
     ),
     OccurrenceOutput(
       `start` = 165310406,
       `end` = 165310406,
       `has_alt` = 1,
       participant_id = "PT_000006",
-      `study_id` = "SD_123"
+      `study_id` = "SD_123",
+      `zygosity` = "HOM"
     ),
     OccurrenceOutput(
       `start` = 165310406,
       `end` = 165310406,
       `has_alt` = 1,
       participant_id = "PT_000007",
-      `study_id` = "SD_123"
+      `study_id` = "SD_123",
+      `zygosity` = "HOM"
     ),
     OccurrenceOutput(
       `start` = 165310406,
       `end` = 165310406,
       `has_alt` = 1,
       participant_id = "PT_000008",
-      `study_id` = "SD_123"
+      `study_id` = "SD_123",
+      `zygosity` = "HOM"
     ),
     OccurrenceOutput(
       `start` = 165310406,
       `end` = 165310406,
       `has_alt` = 1,
       participant_id = "PT_000009",
-      `study_id` = "SD_123"
+      `study_id` = "SD_123",
+      `zygosity` = "HOM"
     ),
     OccurrenceOutput(
       `start` = 165310406,
       `end` = 165310406,
       `has_alt` = 1,
       participant_id = "PT_000010",
-      `study_id` = "SD_123"
+      `study_id` = "SD_123",
+      `zygosity` = "HOM"
     ),
     OccurrenceOutput(
       `start` = 165310406,
       `end` = 165310406,
       `has_alt` = 1,
       participant_id = "PT_000011",
-      `study_id` = "SD_123"
+      `study_id` = "SD_123",
+      `zygosity` = "HOM"
     ),
     OccurrenceOutput(
       `start` = 165310406,
       `end` = 165310406,
       `has_alt` = 1,
       participant_id = "PT_000012",
-      `study_id` = "SD_123"
+      `study_id` = "SD_123",
+      `zygosity` = "HOM"
     ),
     OccurrenceOutput(
       `start` = 165310406,
       `end` = 165310406,
       `has_alt` = 1,
       participant_id = "PT_000033",
-      `study_id` = "SD_456"
+      `study_id` = "SD_456",
+      `zygosity` = "HOM"
     ) //removed because <10 participants
   ).toDF()
 
