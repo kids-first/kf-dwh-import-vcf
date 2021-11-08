@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.demo
 
-import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunType}
 import bio.ferlab.datalake.spark3.etl.ETL
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import org.apache.spark.sql.functions._
@@ -73,7 +73,7 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)(implici
 
   }
 
-  override def run()(implicit spark: SparkSession): DataFrame = {
+  override def run(runType: RunType)(implicit spark: SparkSession): DataFrame = {
     val demoOccurrences = transform(extract())
     load(demoOccurrences)
   }

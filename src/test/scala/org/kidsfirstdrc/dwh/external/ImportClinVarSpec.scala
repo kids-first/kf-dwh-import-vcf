@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, DatasetConf, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.LOCAL
 import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
@@ -13,7 +14,7 @@ class ImportClinVarSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSes
   import spark.implicits._
 
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources("config/test.conf")
-    .copy(storages = List(StorageConf(Catalog.kfStridesVariantBucket, getClass.getClassLoader.getResource(".").getFile)))
+    .copy(storages = List(StorageConf(Catalog.kfStridesVariantBucket, getClass.getClassLoader.getResource(".").getFile, LOCAL)))
 
   val clinvar_vcf: DatasetConf = conf.getDataset("clinvar_vcf")
 

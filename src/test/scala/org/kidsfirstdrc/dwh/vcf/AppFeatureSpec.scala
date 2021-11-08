@@ -2,6 +2,7 @@ package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
 import bio.ferlab.datalake.commons.config.DatasetConf
+import bio.ferlab.datalake.commons.file.FileSystemType.LOCAL
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.kidsfirstdrc.dwh.conf.Catalog.DataService
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
@@ -17,7 +18,7 @@ class AppFeatureSpec extends AnyFeatureSpec with GivenWhenThen with WithSparkSes
 
   implicit val conf: Configuration =
     Configuration(
-      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
+      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile, LOCAL))
     )
 
   Feature("Run") {

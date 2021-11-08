@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunType}
 import bio.ferlab.datalake.spark3.etl.ETL
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
 import bio.ferlab.datalake.spark3.implicits.SparkUtils._
@@ -27,7 +27,7 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
     )
   }
 
-  override def run()(implicit spark: SparkSession): DataFrame = {
+  override def run(runType: RunType)(implicit spark: SparkSession): DataFrame = {
     val inputDF             = extract()(spark)
     val variants: DataFrame = transform(inputDF)
     load(variants)

@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.external.dbnsfp
 
 import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.LOCAL
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
@@ -10,7 +11,7 @@ class ImportScoresSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
   implicit val conf: Configuration =
     Configuration(
-      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
+      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile, LOCAL))
     )
 
   //"ImportScores" should "transform data into expected format" in {

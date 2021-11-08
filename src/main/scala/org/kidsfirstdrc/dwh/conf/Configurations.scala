@@ -1,13 +1,14 @@
 package org.kidsfirstdrc.dwh.conf
 
 import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationWriter, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.S3
 
 object Configurations extends App {
 
   //example of storages per environment
-  val productionStorage = List(StorageConf(Catalog.kfStridesVariantBucket, "s3a://kf-strides-variant-parquet-prd"))
-  val qaStorage = List(StorageConf(Catalog.kfStridesVariantBucket, "s3a://kf-strides-variant-parquet-prd"))
-  val localStorage = List(StorageConf(Catalog.kfStridesVariantBucket, getClass.getClassLoader.getResource(".").getFile))
+  val productionStorage = List(StorageConf(Catalog.kfStridesVariantBucket, "s3a://kf-strides-variant-parquet-prd", S3))
+  val qaStorage = List(StorageConf(Catalog.kfStridesVariantBucket, "s3a://kf-strides-variant-parquet-prd", S3))
+  val localStorage = List(StorageConf(Catalog.kfStridesVariantBucket, getClass.getClassLoader.getResource(".").getFile, S3))
 
   // common options for EMR execution
   val emrOptions = Map("hive.metastore.client.factory.class" -> "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")

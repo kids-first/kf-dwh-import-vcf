@@ -10,6 +10,7 @@ import org.kidsfirstdrc.dwh.testutils.external._
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
 import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.LOCAL
 import org.kidsfirstdrc.dwh.external.{ImportCancerGeneCensus, ImportDDDGeneCensus}
 
 object ClassGeneratorMain extends App with WithSparkSession {
@@ -19,7 +20,7 @@ object ClassGeneratorMain extends App with WithSparkSession {
   import spark.implicits._
 
   implicit val conf: Configuration = Configuration(
-    List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd"))
+    List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd", LOCAL))
   )
 
   //val path = getClass.getResource("/ensembl/canonical.csv").getFile

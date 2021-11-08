@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.S3
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog
 
@@ -32,9 +33,9 @@ object ImportVcf extends App {
     .getOrCreate()
 
   val storage = schema match {
-    case "variant" => StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")
+    case "variant" => StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd", S3)
     case "portal" =>
-      StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/portal")
+      StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/portal", S3)
   }
 
   implicit val conf: Configuration = Configuration(

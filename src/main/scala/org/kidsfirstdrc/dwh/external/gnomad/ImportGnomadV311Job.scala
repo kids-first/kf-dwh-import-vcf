@@ -64,7 +64,7 @@ class ImportGnomadV311Job(implicit conf: Configuration) extends StandardETL(Publ
 
   /* in case we decide to load the files one at a time
    *
-  override def run()(implicit spark: SparkSession): DataFrame = {
+  override def run(runType: RunType)(implicit spark: SparkSession): DataFrame = {
     //clears the existing data
     HadoopFileSystem.remove(destination.location)
     //for each file found in /raw/gnomad/r3.1.1/

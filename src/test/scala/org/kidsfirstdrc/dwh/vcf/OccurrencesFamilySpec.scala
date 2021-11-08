@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.LOCAL
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.annotations
 import org.apache.spark.sql.functions.{array_sort, col, explode, lit}
 import org.apache.spark.sql.{DataFrame, SaveMode}
@@ -29,7 +30,7 @@ class OccurrencesFamilySpec
 
   implicit val conf: Configuration =
     Configuration(
-      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
+      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile, LOCAL))
     )
 
   val biospecimensDf = Seq(

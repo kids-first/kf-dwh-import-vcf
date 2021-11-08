@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunType}
 import bio.ferlab.datalake.spark3.etl.ETL
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
@@ -134,7 +134,7 @@ class OccurrencesFamily(studyId: String,
     data
   }
 
-  override def run()(implicit spark: SparkSession): DataFrame = {
+  override def run(runType: RunType)(implicit spark: SparkSession): DataFrame = {
     val outputDf = transform(extract())
     load(outputDf)
   }

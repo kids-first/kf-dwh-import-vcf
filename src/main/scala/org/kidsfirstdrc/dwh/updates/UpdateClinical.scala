@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.updates
 
-import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunType}
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.locusColumNames
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
@@ -96,7 +96,7 @@ class UpdateClinical(source: DatasetConf, destination: DatasetConf, schema: Stri
     data
   }
 
-  override def run()(implicit spark: SparkSession): DataFrame = {
+  override def run(runType: RunType)(implicit spark: SparkSession): DataFrame = {
     Try(extract())
       .map {inputs =>
         val output = transform(inputs)

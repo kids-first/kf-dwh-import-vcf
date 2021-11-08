@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.LOCAL
 import org.kidsfirstdrc.dwh.conf.Catalog.{HarmonizedData, Public}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.EnsemblMappingOutput
@@ -15,7 +16,7 @@ class ConsequencesSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
 
   implicit val conf: Configuration =
     Configuration(
-      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
+      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile, LOCAL))
     )
 
   val studyId   = "SD_123456"

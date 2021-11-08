@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.es.index
 
 import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.LOCAL
 import org.apache.spark.sql.DataFrame
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public, Raw}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
@@ -26,7 +27,7 @@ class VariantCentricIndexSpec
 
   implicit val conf: Configuration =
     Configuration(
-      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
+      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile, LOCAL))
     )
 
   val studyShortNamesDf: DataFrame = Seq(

@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.es.index
 
-import bio.ferlab.datalake.commons.config.Configuration
+import bio.ferlab.datalake.commons.config.{Configuration, RunType}
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions.{col, sha1}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
@@ -39,7 +39,7 @@ class GeneCentricIndex(releaseId: String)
     data
   }
 
-  override def run()(implicit spark: SparkSession): DataFrame = {
+  override def run(runType: RunType)(implicit spark: SparkSession): DataFrame = {
     val inputDF  = extract()
     val outputDF = transform(inputDF).persist()
     println(s"count: ${outputDF.count}")

@@ -1,12 +1,10 @@
 package org.kidsfirstdrc.dwh.external
 
 import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.LOCAL
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
-import org.kidsfirstdrc.dwh.testutils.external.{
-  CosmicCancerGeneCensusInput,
-  CosmicCancerGeneCensusOutput
-}
+import org.kidsfirstdrc.dwh.testutils.external.{CosmicCancerGeneCensusInput, CosmicCancerGeneCensusOutput}
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -17,7 +15,7 @@ class ImportCancerGeneCensusSpec
 
   implicit val conf: Configuration =
     Configuration(
-      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
+      List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile, LOCAL))
     )
 
   "run" should "creates cosmic gene set table" in {

@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.join
 
 import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.LOCAL
 import org.apache.spark.sql.SaveMode
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.testutils.Model._
@@ -22,7 +23,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
     withOutputFolder("output") { outputDir =>
       implicit val conf: Configuration = Configuration(
         List(
-          StorageConf("kf-strides-variant", outputDir)
+          StorageConf("kf-strides-variant", outputDir, LOCAL)
         )
       )
 
@@ -394,7 +395,7 @@ class JoinVariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSess
     withOutputFolder("output") { outputDir =>
       implicit val conf: Configuration = Configuration(
         List(
-          StorageConf("kf-strides-variant", getClass.getResource(".").getFile)
+          StorageConf("kf-strides-variant", getClass.getResource(".").getFile, LOCAL)
         )
       )
 

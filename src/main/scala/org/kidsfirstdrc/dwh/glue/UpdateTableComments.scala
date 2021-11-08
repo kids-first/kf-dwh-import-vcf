@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.glue
 
 import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.S3
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.Clinical.{consequences, variants}
@@ -21,7 +22,7 @@ object UpdateTableComments extends App {
     .getOrCreate()
 
   implicit val conf: Configuration = Configuration(
-    List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd")),
+    List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd", S3)),
     sources = Catalog.sources.toList.map(s => s.copy(documentationpath = Some(s"s3a://kf-strides-variant-parquet-prd/jobs/documentation/${s.id}.json")))
   )
 

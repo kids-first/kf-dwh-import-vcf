@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.join
 
 import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.LOCAL
 import org.apache.spark.sql.SaveMode
 import org.kidsfirstdrc.dwh.conf.Catalog.Public
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
@@ -22,7 +23,7 @@ class JoinConsequencesSpec
     withOutputFolder("output") { outputDir =>
       implicit val conf: Configuration = Configuration(
         List(
-          StorageConf("kf-strides-variant", outputDir)
+          StorageConf("kf-strides-variant", outputDir, LOCAL)
         )
       )
 
