@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.update
 
 import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.LOCAL
 import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
 import org.kidsfirstdrc.dwh.external.clinvar.ImportClinVarJob
@@ -20,7 +21,7 @@ class UpdateClinicalSpec
   import spark.implicits._
 
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources("config/test.conf")
-    .copy(storages = List(StorageConf(Catalog.kfStridesVariantBucket, getClass.getClassLoader.getResource(".").getFile)))
+    .copy(storages = List(StorageConf(Catalog.kfStridesVariantBucket, getClass.getClassLoader.getResource(".").getFile, LOCAL)))
 
   before {
     Try(spark.sql("DROP TABLE IF EXISTS variant.variants"))

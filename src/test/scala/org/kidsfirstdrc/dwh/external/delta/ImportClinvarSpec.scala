@@ -1,8 +1,8 @@
 package org.kidsfirstdrc.dwh.external.delta
 
 import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, DatasetConf, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.LOCAL
 import io.delta.tables.DeltaTable
-import org.apache.spark.sql.types.{DateType, StringType}
 import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.external.{ClinvarInput, ClinvarOutput}
@@ -11,19 +11,20 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, GivenWhenThen}
 
 import java.io.File
+import scala.util.Try
 
 class ImportClinvarSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession with Matchers with BeforeAndAfterAll {
 
   import spark.implicits._
 
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources("config/test.conf")
-    .copy(storages = List(StorageConf(Catalog.kfStridesVariantBucket, getClass.getClassLoader.getResource(".").getFile)))
+    .copy(storages = List(StorageConf(Catalog.kfStridesVariantBucket, getClass.getClassLoader.getResource(".").getFile, LOCAL)))
 
   val clinvar_vcf: DatasetConf = conf.getDataset("clinvar_vcf")
   val clinvar_delta: DatasetConf = conf.getDataset("clinvar_delta")
 
   override def beforeAll(): Unit = {
-    try {
+    Try {
       spark.sql("CREATE DATABASE IF NOT EXISTS variant")
       spark.sql("USE variant")
       new File(clinvar_delta.location).delete()

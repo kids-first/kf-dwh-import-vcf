@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.demo
 
 import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.{LOCAL, S3}
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog
 import org.kidsfirstdrc.dwh.vcf.Variants
@@ -20,7 +21,7 @@ object ImportDemo extends App {
     .getOrCreate()
 
   implicit val conf: Configuration = Configuration(
-    List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/public/demo")),
+    List(StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/public/demo", S3)),
     Catalog.sources.toList
   )
 

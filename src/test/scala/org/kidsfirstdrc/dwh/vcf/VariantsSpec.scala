@@ -1,6 +1,7 @@
 package org.kidsfirstdrc.dwh.vcf
 
 import bio.ferlab.datalake.commons.config.{Configuration, StorageConf}
+import bio.ferlab.datalake.commons.file.FileSystemType.LOCAL
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Raw}
 import org.kidsfirstdrc.dwh.testutils.WithSparkSession
 import org.kidsfirstdrc.dwh.testutils.join.Freq
@@ -26,7 +27,8 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
         List(
           StorageConf(
             "kf-strides-variant",
-            getClass.getClassLoader.getResource(".").getFile + "portal"
+            getClass.getClassLoader.getResource(".").getFile + "portal",
+            LOCAL
           )
         )
       )
@@ -98,7 +100,7 @@ class VariantsSpec extends AnyFlatSpec with GivenWhenThen with WithSparkSession 
 
     implicit val conf: Configuration =
       Configuration(
-        List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile))
+        List(StorageConf("kf-strides-variant", getClass.getClassLoader.getResource(".").getFile, LOCAL))
       )
 
     val occurrencesDf = Seq(
