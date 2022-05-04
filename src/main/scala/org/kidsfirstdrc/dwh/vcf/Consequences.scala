@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunType}
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunStep}
 import bio.ferlab.datalake.spark3.etl.ETL
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.vcf
@@ -8,7 +8,7 @@ import bio.ferlab.datalake.spark3.implicits.SparkUtils._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
-import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, HarmonizedData, Public}
+import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, HarmonizedData}
 import org.kidsfirstdrc.dwh.utils.ClinicalUtils.getVisibleFiles
 
 import java.time.LocalDateTime
@@ -98,7 +98,9 @@ class Consequences(studyId: String,
     data
   }
 
-  override def run(runType: RunType)(implicit spark: SparkSession): DataFrame = {
+  override def run(runSteps: Seq[RunStep] = RunStep.default_load,
+                   lastRunDateTime: Option[LocalDateTime] = None,
+                   currentRunDateTime: Option[LocalDateTime] = None)(implicit spark: SparkSession): DataFrame = {
     val input = extract()
 
     val consequences = transform(input)

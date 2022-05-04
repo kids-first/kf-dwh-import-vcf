@@ -10,15 +10,17 @@ import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetGeneSet
 
 object ImportExternal extends SparkApp {
 
-  val Array(configFile, jobType) = args
+  //args(0) -> configuration file path
+  //args(1) -> run steps
+  val Array(_, _, destination) = args
 
   // calls SparkApp.init() to load configuration file passed as first argument as well as an instance of SparkSession
-  implicit val (conf, spark) = init()
+  implicit val (conf, runSteps, spark) = init()
 
-  println(s"Loading $configFile")
-  println(conf.sources)
+  log.info(s"Loading $conf")
+  log.info(s"${conf.sources.mkString}")
 
-  jobType.toLowerCase match {
+  destination.toLowerCase match {
     case "1000_genomes"         => new Import1k().run()
     case "annovar_scores"       => new ImportAnnovarScores().run()
     case "cancer_hotspots"      => new ImportCancerHotspots().run()

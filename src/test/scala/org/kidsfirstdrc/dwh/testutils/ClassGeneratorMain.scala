@@ -5,7 +5,7 @@ import org.apache.spark.sql.functions._
 import org.kidsfirstdrc.dwh.external.ImportHPOGeneSet
 import org.kidsfirstdrc.dwh.external.omim.ImportOmimGeneSet
 import org.kidsfirstdrc.dwh.external.orphanet.ImportOrphanetGeneSet
-import bio.ferlab.datalake.spark3.ClassGenerator._
+import bio.ferlab.datalake.spark3.utils.ClassGenerator._
 import org.kidsfirstdrc.dwh.testutils.external._
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw
 import org.kidsfirstdrc.dwh.conf.Catalog.Raw._
