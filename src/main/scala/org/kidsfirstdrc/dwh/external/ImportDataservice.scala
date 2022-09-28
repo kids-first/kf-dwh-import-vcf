@@ -19,8 +19,8 @@ object ImportDataservice extends App {
   build(studyIds, releaseId, input, output, mergeExisting, tables)
 
   def parseArgs(
-      args: Array[String]
-  ): (Set[String], String, String, String, Boolean, Set[String]) = {
+                 args: Array[String]
+               ): (Set[String], String, String, String, Boolean, Set[String]) = {
     def multi(s: String): Set[String] = s.split(",").toSet
 
     val Array(studyIds, releaseId, input, output, mergeExisting) = args.take(5)
@@ -33,20 +33,20 @@ object ImportDataservice extends App {
   }
 
   def build(
-      studyIds: Set[String],
-      releaseId: String,
-      input: String,
-      output: String,
-      mergeExisting: Boolean,
-      tables: Set[String]
-  )(implicit spark: SparkSession): Unit = {
+             studyIds: Set[String],
+             releaseId: String,
+             input: String,
+             output: String,
+             mergeExisting: Boolean,
+             tables: Set[String]
+           )(implicit spark: SparkSession): Unit = {
     (tables - "biospecimens").foreach { name =>
       write(studyIds, releaseId, input, output, mergeExisting, name)
     }
     if (tables.contains("biospecimens")) {
       writeLoad(studyIds, releaseId, output, mergeExisting, "biospecimens") { (studyId, spark) =>
         import spark.implicits._
-        val bio  = spark.read.parquet(s"$input/biospecimens/$studyId")
+        val bio = spark.read.parquet(s"$input/biospecimens/$studyId")
         val part = spark.read.parquet(s"$input/participants/$studyId")
         val df = bio
           .join(part, bio("participant_id") === part("kf_id"))
@@ -58,25 +58,25 @@ object ImportDataservice extends App {
   }
 
   def write(
-      studyIds: Set[String],
-      releaseId: String,
-      input: String,
-      output: String,
-      mergeExisting: Boolean,
-      name: String
-  )(implicit spark: SparkSession): Unit = {
+             studyIds: Set[String],
+             releaseId: String,
+             input: String,
+             output: String,
+             mergeExisting: Boolean,
+             name: String
+           )(implicit spark: SparkSession): Unit = {
     writeLoad(studyIds, releaseId, output, mergeExisting, name) { (studyId, spark) =>
       spark.read.parquet(s"$input/$name/$studyId")
     }
   }
 
   def writeLoad(
-      studyIds: Set[String],
-      releaseId: String,
-      output: String,
-      mergeExisting: Boolean,
-      name: String
-  )(load: (String, SparkSession) => DataFrame)(implicit spark: SparkSession): Unit = {
+                 studyIds: Set[String],
+                 releaseId: String,
+                 output: String,
+                 mergeExisting: Boolean,
+                 name: String
+               )(load: (String, SparkSession) => DataFrame)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
     val releaseIdLc = releaseId.toLowerCase
     val unionsDF = studyIds.foldLeft(spark.emptyDataFrame) { (currentDF, studyId) =>
@@ -86,14 +86,14 @@ object ImportDataservice extends App {
       if (currentDF.isEmpty) {
         nextDf
       } else {
-        currentDF.unionByName(nextDf).dropDuplicates()
+        currentDF.unionByName(nextDf, allowMissingColumns = true).dropDuplicates()
       }
     }
     val existingTableName = s"variant.$name"
     val merged = if (mergeExisting && spark.catalog.tableExists(existingTableName)) {
       val existing = spark.table(existingTableName).where(not($"study_id".isin(studyIds.toSeq: _*)))
 
-      existing.unionByName(unionsDF).dropDuplicates()
+      existing.unionByName(unionsDF, allowMissingColumns = true).dropDuplicates()
     } else {
       unionsDF
     }
