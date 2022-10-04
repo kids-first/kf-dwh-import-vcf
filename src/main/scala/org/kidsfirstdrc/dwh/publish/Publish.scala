@@ -22,10 +22,11 @@ object Publish extends App {
       case "variant" =>
         publishOccurrences(studyIds, releaseId)
         publishDataservice(releaseId)
-        publishTable(releaseId, "variants", schema)
-        publishTable(releaseId, "variants", s"${schema}_live")
-        publishTable(releaseId, "consequences", schema)
-        publishTable(releaseId, "consequences", s"${schema}_live")
+        publishDataservice(releaseId, "variant", "variant_live")
+        publishTable(releaseId, "variants")
+        publishTable(releaseId, "variants", "variant", s"variant_live")
+        publishTable(releaseId, "consequences")
+        publishTable(releaseId, "consequences", "variant", s"variant_live")
       case _ =>
         publishOccurrences(studyIds, releaseId, schema)
         publishTable(releaseId, "variants", schema)
@@ -33,7 +34,7 @@ object Publish extends App {
     }
   }
 
-  private def publishDataservice(releaseId: String): Unit = {
+  private def publishDataservice(releaseId: String, schemaFrom: String = "variant", schemaTo: String = "variant"): Unit = {
     val all = Set(
       "participants",
       "biospecimens",
@@ -51,28 +52,28 @@ object Publish extends App {
       "phenotypes"
     )
     all.foreach { t =>
-      publishTable(releaseId, t)
+      publishTable(releaseId, t, schemaFrom, schemaTo)
     }
   }
 
-  def publishTable(releaseId: String, tableName: String, schema: String = "variant")(implicit spark: SparkSession): Unit = {
+  def publishTable(releaseId: String, tableName: String, schemaFrom: String = "variant", schemaTo: String = "variant")(implicit spark: SparkSession): Unit = {
     spark.sql(
-      s"create or replace view $schema.$tableName as select * from $schema.${tableName}_${releaseId.toLowerCase()}"
+      s"create or replace view $schemaTo.$tableName as select * from $schemaFrom.${tableName}_${releaseId.toLowerCase()}"
     )
   }
 
-  private def publishOccurrences(studyIds: String, releaseId: String, schema: String = "variant")(implicit
-      spark: SparkSession
+  private def publishOccurrences(studyIds: String, releaseId: String, schemaFrom: String = "variant")(implicit
+                                                                                                      spark: SparkSession
   ): Unit = {
     val allStudies = studyIds.split(",")
     allStudies
       .foreach { study =>
         val studyLc = study.toLowerCase
         spark.sql(
-          s"create or replace VIEW $schema.occurrences_family_${studyLc} AS SELECT * FROM $schema.occurrences_${studyLc}_${releaseId.toLowerCase}"
+          s"create or replace VIEW $schemaFrom.occurrences_family_${studyLc} AS SELECT * FROM $schemaFrom.occurrences_${studyLc}_${releaseId.toLowerCase}"
         )
         spark.sql(
-          s"create or replace VIEW $schema.occurrences_${studyLc} AS SELECT * FROM $schema.occurrences_${studyLc}_${releaseId.toLowerCase}"
+          s"create or replace VIEW $schemaFrom.occurrences_${studyLc} AS SELECT * FROM $schemaFrom.occurrences_${studyLc}_${releaseId.toLowerCase}"
         )
       }
   }
