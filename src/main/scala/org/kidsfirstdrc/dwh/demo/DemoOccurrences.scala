@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.demo
 
-import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunType}
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunStep}
 import bio.ferlab.datalake.spark3.etl.ETL
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import org.apache.spark.sql.functions._
@@ -12,9 +12,8 @@ import org.kidsfirstdrc.dwh.vcf.OccurrencesFamily
 
 import java.time.LocalDateTime
 
-class DemoOccurrences(studyId: String, releaseId: String, input: String)(implicit
-    conf: Configuration
-) extends ETL() {
+class DemoOccurrences(studyId: String, releaseId: String, input: String)
+                     (implicit conf: Configuration) extends ETL() {
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
@@ -73,7 +72,9 @@ class DemoOccurrences(studyId: String, releaseId: String, input: String)(implici
 
   }
 
-  override def run(runType: RunType)(implicit spark: SparkSession): DataFrame = {
+  override def run(runSteps: Seq[RunStep] = RunStep.default_load,
+                   lastRunDateTime: Option[LocalDateTime] = None,
+                   currentRunDateTime: Option[LocalDateTime] = None)(implicit spark: SparkSession): DataFrame = {
     val demoOccurrences = transform(extract())
     load(demoOccurrences)
   }

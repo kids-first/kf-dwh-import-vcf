@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.es.index
 
-import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunType}
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunStep}
 import bio.ferlab.datalake.spark3.etl.ETL
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.locus
 import bio.ferlab.datalake.spark3.implicits.SparkUtils._
@@ -134,7 +134,9 @@ class VariantCentricIndex(schema: String, releaseId: String)(implicit conf: Conf
     data
   }
 
-  override def run(runType: RunType)(implicit spark: SparkSession): DataFrame = {
+  override def run(runSteps: Seq[RunStep] = RunStep.default_load,
+                   lastRunDateTime: Option[LocalDateTime] = None,
+                   currentRunDateTime: Option[LocalDateTime] = None)(implicit spark: SparkSession): DataFrame = {
     val inputDF  = extract()
     val outputDF = transform(inputDF).persist()
     println(s"count: ${outputDF.count}")

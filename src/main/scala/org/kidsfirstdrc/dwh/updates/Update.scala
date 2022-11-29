@@ -3,13 +3,16 @@ package org.kidsfirstdrc.dwh.updates
 import bio.ferlab.datalake.spark3.public.SparkApp
 import org.apache.spark.sql.SparkSession
 import org.kidsfirstdrc.dwh.conf.Catalog.{Clinical, Public}
+import org.kidsfirstdrc.dwh.external.ImportExternal.{args, init}
 
 object Update extends SparkApp {
 
-  val Array(_, source, destination) = args
+  //args(0) -> configuration file path
+  //args(1) -> run steps
+  val Array(_, _, source, destination) = args
 
   // calls SparkApp.init() to load configuration file passed as first argument as well as an instance of SparkSession
-  implicit val (conf, spark) = init()
+  implicit val (conf, runSteps, spark) = init()
 
   run(source, destination)
 

@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.updates
 
-import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunType}
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunStep}
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns.locusColumNames
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter
 import scala.util.Try
 
 class UpdateClinical(source: DatasetConf, destination: DatasetConf, schema: String)(implicit conf: Configuration)
-    extends StandardETL(destination)(conf) {
+  extends StandardETL(destination)(conf) {
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
@@ -40,7 +40,7 @@ class UpdateClinical(source: DatasetConf, destination: DatasetConf, schema: Stri
                             outputColumn: String)(implicit spark: SparkSession): DataFrame = {
     val sourceDf = data(source.id)
       .selectLocus(inputColumns:_*)
-      //.selectLocus($"ac", $"an", $"af")
+    //.selectLocus($"ac", $"an", $"af")
 
     data(destination.id)
       .drop(outputColumn)
@@ -96,7 +96,9 @@ class UpdateClinical(source: DatasetConf, destination: DatasetConf, schema: Stri
     data
   }
 
-  override def run(runType: RunType)(implicit spark: SparkSession): DataFrame = {
+  override def run(runSteps: Seq[RunStep] = RunStep.default_load,
+                   lastRunDateTime: Option[LocalDateTime] = None,
+                   currentRunDateTime: Option[LocalDateTime] = None)(implicit spark: SparkSession): DataFrame = {
     Try(extract())
       .map {inputs =>
         val output = transform(inputs)

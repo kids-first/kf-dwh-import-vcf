@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.es.index
 
-import bio.ferlab.datalake.commons.config.{Configuration, RunType}
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunStep}
 import bio.ferlab.datalake.spark3.etl.ETL
 import org.apache.spark.sql.functions.{col, sha1}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 class GeneCentricIndex(releaseId: String)
                       (override implicit val conf: Configuration) extends ETL() {
 
-  val destination = Es.gene_centric
+  override val destination: DatasetConf = Es.gene_centric
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
@@ -39,7 +39,9 @@ class GeneCentricIndex(releaseId: String)
     data
   }
 
-  override def run(runType: RunType)(implicit spark: SparkSession): DataFrame = {
+  override def run(runSteps: Seq[RunStep] = RunStep.default_load,
+                   lastRunDateTime: Option[LocalDateTime] = None,
+                   currentRunDateTime: Option[LocalDateTime] = None)(implicit spark: SparkSession): DataFrame = {
     val inputDF  = extract()
     val outputDF = transform(inputDF).persist()
     println(s"count: ${outputDF.count}")

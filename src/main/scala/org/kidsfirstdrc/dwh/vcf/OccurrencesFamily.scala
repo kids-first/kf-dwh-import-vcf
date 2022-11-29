@@ -1,6 +1,6 @@
 package org.kidsfirstdrc.dwh.vcf
 
-import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunType}
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RunStep}
 import bio.ferlab.datalake.spark3.etl.ETL
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
@@ -114,7 +114,15 @@ class OccurrencesFamily(studyId: String,
       .withColumn("mother_zygosity", zygosity($"mother_calls"))
       .withColumn("father_zygosity", zygosity($"father_calls"))
       .withParentalOrigin("parental_origin", $"father_calls", $"mother_calls")
-      .withGenotypeTransmission("transmission", $"father_calls", $"mother_calls")
+      .withGenotypeTransmission(
+        "transmission",
+        "calls",
+        "gender",
+        "affected_status",
+        "father_calls",
+        "father_affected_status",
+        "mother_calls",
+      "mother_affected_status")
   }
 
   override def load(data: DataFrame,
@@ -134,7 +142,9 @@ class OccurrencesFamily(studyId: String,
     data
   }
 
-  override def run(runType: RunType)(implicit spark: SparkSession): DataFrame = {
+  override def run(runSteps: Seq[RunStep] = RunStep.default_load,
+          lastRunDateTime: Option[LocalDateTime] = None,
+          currentRunDateTime: Option[LocalDateTime] = None)(implicit spark: SparkSession): DataFrame = {
     val outputDf = transform(extract())
     load(outputDf)
   }
@@ -304,6 +314,14 @@ class OccurrencesFamily(studyId: String,
       .withColumn("mother_zygosity", zygosity($"mother_calls"))
       .withColumn("father_zygosity", zygosity($"father_calls"))
       .withParentalOrigin("parental_origin", $"father_calls", $"mother_calls")
-      .withGenotypeTransmission("transmission", $"father_calls", $"mother_calls")
+      .withGenotypeTransmission(
+        "transmission",
+        "calls",
+        "gender",
+        "affected_status",
+        "father_calls",
+        "father_affected_status",
+        "mother_calls",
+        "mother_affected_status")
   }
 }
