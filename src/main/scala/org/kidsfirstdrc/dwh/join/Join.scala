@@ -13,12 +13,12 @@ object Join extends App {
       "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
     )
     .enableHiveSupport()
-    .appName(s"Join $runType for $studyId - $releaseId")
+    .appName(s"Join $runType for $studyId - $releaseId - $schema")
     .getOrCreate()
 
   val output = schema match {
     case "variant" => "s3a://kf-strides-variant-parquet-prd"
-    case "portal"  => "s3a://kf-strides-variant-parquet-prd/portal"
+    case _  => s"s3a://kf-strides-variant-parquet-prd/$schema"
   }
 
   implicit val conf: Configuration = Configuration(
