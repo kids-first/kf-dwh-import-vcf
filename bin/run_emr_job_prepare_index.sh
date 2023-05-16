@@ -1,9 +1,11 @@
 #!/bin/bash
-job_type=${1:-"variant_centric"}
+job_type=${1:-"
+"}
 release_id=${2:-"re_000017"}
-number_instance=${3:-"15"}
-instance_type=${4:-"m5.4xlarge"}
-env=${5:-"qa"}
+schema=${3:-"variant"}
+number_instance=${4:-"15"}
+instance_type=${5:-"m5.4xlarge"}
+env=${6:-"prd"}
 
 steps=$(cat <<EOF
 [
@@ -19,7 +21,8 @@ steps=$(cat <<EOF
       "org.kidsfirstdrc.dwh.es.index.PrepareIndex",
       "s3a://kf-strides-variant-parquet-prd/jobs/${env}/kf-dwh-import-vcf.jar",
       "${job_type}",
-      "${release_id}"
+      "${release_id}",
+      "${schema}"
     ],
     "Type": "CUSTOM_JAR",
     "ActionOnFailure": "TERMINATE_CLUSTER",

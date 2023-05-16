@@ -13,12 +13,12 @@ import java.time.LocalDateTime
 import scala.util.{Success, Try}
 
 class VariantsSuggestionsIndex(schema: String, releaseId: String)(override implicit val conf: Configuration)
-    extends ETL() {
+  extends ETL() {
 
   val destination: DatasetConf = Es.variants_suggestions
 
   final val variantSymbolAaChangeWeight = 4
-  final val variantSymbolWeight         = 2
+  final val variantSymbolWeight = 2
 
   final val indexColumns =
     List("type", "locus", "suggestion_id", "hgvsg", "suggest", "chromosome", "rsnumber", "symbol_aa_change")
@@ -28,13 +28,10 @@ class VariantsSuggestionsIndex(schema: String, releaseId: String)(override impli
 
     Map(
       Clinical.occurrences.id -> getOccurrencesWithAlt(schema, releaseId),
-      Clinical.variants.id -> spark.read.parquet(
-        s"${Clinical.variants.rootPath}/variants/variants_$releaseId"
-      ),
-      Clinical.consequences.id -> spark.read.parquet(
-        s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId"
-      )
+      Clinical.variants.id -> spark.table(s"variants_$releaseId"),
+      Clinical.consequences.id -> spark.table(s"consequences_$releaseId")
     )
+
   }
 
   override def transform(data: Map[String, DataFrame],
@@ -43,7 +40,7 @@ class VariantsSuggestionsIndex(schema: String, releaseId: String)(override impli
     val distinctOccurrences =
       data(Clinical.occurrences.id)
         .selectLocus()
-        .dropDuplicates(locusColumNames.head, locusColumNames.tail:_*)
+        .dropDuplicates(locusColumNames.head, locusColumNames.tail: _*)
 
     val variants =
       data(Clinical.variants.id)

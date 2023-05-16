@@ -34,8 +34,8 @@ object ImportVcf extends App {
 
   val storage = schema match {
     case "variant" => StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd", S3)
-    case "portal" =>
-      StorageConf("kf-strides-variant", "s3a://kf-strides-variant-parquet-prd/portal", S3)
+    case s =>
+      StorageConf("kf-strides-variant", s"s3a://kf-strides-variant-parquet-prd/$s", S3)
   }
 
   implicit val conf: Configuration = Configuration(

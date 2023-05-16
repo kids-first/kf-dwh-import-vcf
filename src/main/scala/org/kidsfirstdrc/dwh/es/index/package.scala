@@ -11,8 +11,8 @@ package object index {
 
   def getOccurrencesWithAlt(schema: String, releaseId: String)(implicit spark: SparkSession, conf: Configuration): DataFrame = {
     import spark.implicits._
-    spark.read
-      .parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId")
+    spark
+      .table(s"variants_$releaseId")
       .withColumn("study", explode(col("studies")))
       .select("study")
       .distinct

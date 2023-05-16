@@ -6,7 +6,7 @@ mergeExisting=${4:-"false"}
 schema=${5:-"variant"}
 number_instance=${6:-"15"}
 instance_type=${7:-"r5.4xlarge"}
-env=${8:-"qa"}
+env=${8:-"prd"}
 
 #steps="[{\"Args\":[\"spark-submit\",\"--deploy-mode\",\"client\",\"--class\",\"org.kidsfirstdrc.dwh.join.Join\",\"s3a://kf-strides-variant-parquet-prd/jobs/kf-dwh-import-vcf.jar\",\"${study_ids}\",\"${release_id}\",\"s3a://kf-strides-variant-parquet-prd\",\"${job}\",\"${mergeExisting}\",\"variant\"],\"Type\":\"CUSTOM_JAR\",\"ActionOnFailure\":\"TERMINATE_CLUSTER\",\"Jar\":\"command-runner.jar\",\"Properties\":\"\",\"Name\":\"Spark application\"}]"
 steps=$(cat <<EOF

@@ -18,12 +18,10 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val participantsPath = Raw.all_participants.location
-    val occurrencesPath =
-      s"${Clinical.occurrences.rootPath}/occurrences/${tableName(Clinical.occurrences.id, studyId, releaseId)}"
-
+    val participantsDF = if(schema == "portal") spark.read.json(participantsPath) else spark.emptyDataFrame
     Map(
-      Raw.all_participants.id -> spark.read.json(participantsPath),
-      Clinical.occurrences.id -> spark.read.parquet(occurrencesPath)
+      Raw.all_participants.id -> participantsDF,
+      Clinical.occurrences.id -> spark.table(tableName(Clinical.occurrences.id, studyId, releaseId))
     )
   }
 
@@ -38,10 +36,10 @@ class Variants(studyId: String, releaseId: String, schema: String)(implicit conf
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
-    val participants = data(Raw.all_participants.id).select($"id" as "participant_id")
 
     val occurrences: DataFrame = schema match {
       case "portal" =>
+        val participants = data(Raw.all_participants.id).select($"id" as "participant_id")
         data(Clinical.occurrences.id)
           .join(broadcast(participants), Seq("participant_id"), "inner")
       case _ => data(Clinical.occurrences.id)

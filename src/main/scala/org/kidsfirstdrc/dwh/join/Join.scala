@@ -16,10 +16,7 @@ object Join extends App {
     .appName(s"Join $runType for $studyId - $releaseId - $schema")
     .getOrCreate()
 
-  val output = schema match {
-    case "variant" => "s3a://kf-strides-variant-parquet-prd"
-    case _  => s"s3a://kf-strides-variant-parquet-prd/$schema"
-  }
+  val output = if (schema == "variant") "s3a://kf-strides-variant-parquet-prd" else s"s3a://kf-strides-variant-parquet-prd/$schema"
 
   implicit val conf: Configuration = Configuration(
     List(StorageConf("kf-strides-variant", output, S3)),
@@ -29,13 +26,13 @@ object Join extends App {
   run(studyId, releaseId, runType, mergeExisting.toBoolean, schema)
 
   def run(
-      studyId: String,
-      releaseId: String,
-      runType: String,
-      mergeExisting: Boolean,
-      schema: String
-  )(implicit spark: SparkSession): Unit = {
-    val studyIds    = studyId.split(",")
+           studyId: String,
+           releaseId: String,
+           runType: String,
+           mergeExisting: Boolean,
+           schema: String
+         )(implicit spark: SparkSession): Unit = {
+    val studyIds = studyId.split(",")
     val releaseIdLc = releaseId.toLowerCase()
 
     spark.sql(s"USE $schema")

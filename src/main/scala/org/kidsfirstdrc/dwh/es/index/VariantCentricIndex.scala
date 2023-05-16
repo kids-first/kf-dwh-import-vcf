@@ -22,8 +22,8 @@ class VariantCentricIndex(schema: String, releaseId: String)(implicit conf: Conf
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
-      Clinical.variants.id      -> spark.read.parquet(s"${Clinical.variants.rootPath}/variants/variants_$releaseId"),
-      Clinical.consequences.id  -> spark.read.parquet(s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId"),
+      Clinical.variants.id      -> spark.table(s"variants_$releaseId"),
+      Clinical.consequences.id  -> spark.table(s"consequences_$releaseId"),
       Clinical.occurrences.id   -> getOccurrencesWithAlt(schema, releaseId),
       Public.clinvar.id         -> spark.table(s"${Public.clinvar.table.get.fullName}"),
       Public.genes.id           -> spark.table(s"${Public.genes.table.get.fullName}"),

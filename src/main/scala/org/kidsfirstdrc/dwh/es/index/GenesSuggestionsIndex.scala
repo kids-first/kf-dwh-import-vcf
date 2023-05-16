@@ -24,12 +24,8 @@ class GenesSuggestionsIndex(releaseId: String)
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
       Public.genes.id -> spark.table(s"${Public.genes.table.get.fullName}"),
-      Clinical.variants.id -> spark.read.parquet(
-        s"${Clinical.variants.rootPath}/variants/variants_$releaseId"
-      ),
-      Clinical.consequences.id -> spark.read.parquet(
-        s"${Clinical.consequences.rootPath}/consequences/consequences_$releaseId"
-      )
+      Clinical.variants.id -> spark.table(s"variants_$releaseId"),
+      Clinical.consequences.id -> spark.table(s"consequences_$releaseId")
     )
   }
 

@@ -11,7 +11,7 @@ biospecimen_id_column=${8:-"biospecimen_id"}
 reference_genome_path=${9:-"/home/hadoop/GRCh38_full_analysis_set_plus_decoy_hla.fa"}
 instance_count=${10:-"15"}
 instance_type=${11:-"r5.4xlarge"}
-env=${12:-"qa"}
+env=${12:-"prd"}
 
 aws s3 cp bootstrap-actions s3://kf-strides-variant-parquet-prd/jobs/bootstrap-actions --recursive
 
