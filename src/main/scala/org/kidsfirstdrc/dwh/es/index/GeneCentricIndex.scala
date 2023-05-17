@@ -31,8 +31,10 @@ class GeneCentricIndex(releaseId: String)(override implicit val conf: Configurat
       .withColumn(
         "search_text",
         filter(
+          // Note: array_union([a, b], null) => null whereas array_union([a, b], []) => [a, b]
           array_union(
             array(col("symbol"), col("ensembl_gene_id")),
+            // falling back on [] if no "alias" so that we have: array_union([a, b], []) => [a, b]
             when(col("alias").isNotNull, col("alias")).otherwise(array().cast("array<string>"))
           ),
           x => x.isNotNull && x =!= ""
